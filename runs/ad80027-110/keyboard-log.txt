@@ -1,0 +1,131 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-11-02 12:16:42.814 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:16:42.814 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:16:42.820 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:16:43.443 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-02 12:16:43.453 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:21:41.198 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:21:41.198 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:21:41.202 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:21:41.552 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-02 12:21:41.570 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:23:43.184 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host will resign active: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:23:48.242 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host did enter background: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:24:37.000 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:24:37.000 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:24:37.008 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:24:37.820 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-02 12:24:37.840 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:24:58.893 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:24:58.893 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:24:58.896 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:24:59.309 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-02 12:24:59.318 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:28:11.903 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:28:11.903 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:28:11.907 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:28:12.354 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:28:12.368 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:29:44.676 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:29:44.676 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:29:44.679 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:29:45.100 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:29:45.108 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:30:56.134 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:30:56.134 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:30:56.136 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:30:56.441 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:30:56.452 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:31:52.255 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:31:52.255 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:31:52.259 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:31:52.560 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:31:52.575 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:32:45.648 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:32:45.648 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:32:45.652 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:32:46.102 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:32:46.117 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:34:27.501 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:34:27.501 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:34:27.506 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:34:28.046 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:34:28.055 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:36:23.799 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:36:23.799 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:36:23.802 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:36:24.325 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:36:24.344 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:38:17.285 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:38:17.285 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:38:17.287 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:38:17.595 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:38:17.605 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:39:50.105 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:39:50.106 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:39:50.109 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:39:50.513 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:39:50.521 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:40:17.601 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:40:17.602 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:40:17.606 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:40:18.079 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-02 12:40:18.087 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:40:22.721 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host will resign active: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:40:26.596 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host did enter background: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:40:32.048 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:40:32.049 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:40:32.053 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:40:32.404 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-02 12:40:32.416 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:40:59.696 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host will resign active: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:40:59.966 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host became active after 27.917946458333518 s, kept: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:41:30.163 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:41:30.163 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:41:30.168 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:41:30.648 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-02 12:41:30.656 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:42:56.434 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:42:56.434 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:42:56.449 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:42:56.850 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:42:56.909 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:43:08.545 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:08.545 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:08.553 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:08.939 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:43:08.947 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:43:14.770 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host will resign active: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:43:15.006 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host became active after 6.462728291666281 s, kept: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:43:23.414 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:23.414 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:23.418 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:23.803 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:43:23.824 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:43:33.194 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:33.194 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:33.197 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:33.377 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:43:33.386 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:43:38.479 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host will resign active: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:43:38.789 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host became active after 5.595312000000376 s, kept: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:43:47.339 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:47.339 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:47.341 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:43:47.692 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:43:47.709 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:45:02.046 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:45:02.047 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:45:02.052 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:45:02.434 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-02 12:45:02.444 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:45:05.065 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host will resign active: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:45:09.793 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host did enter background: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:45:16.447 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:45:16.447 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:45:16.449 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-02 12:45:17.082 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-02 12:45:17.101 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:45:52.295 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host will resign active: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-02 12:45:52.472 Db ProtlyCIKeyboard[9473:9933] [com.northprot.protly:height] host became active after 36.02703720833324 s, kept: height 257.000000 window 257.000000 pin 257.000000 active true
