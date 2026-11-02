@@ -1,0 +1,13 @@
+1793616705019 ok appearance now light
+1793616729430 ok appearance now dark
+1793616741439 ok content_size now extra-extra-large
+1793616768332 ok content_size now large
+1793616771864 ok appearance now dark
+1793616789285 ok appearance now light
+1793616805248 ok appearance now dark
+1793616813816 ok appearance now dark
+1793616816341 ok content_size now large
+1793616819272 ok appearance now dark
+1793616821292 ok content_size now large
+1793616832215 ok appearance now dark
+1793616835238 ok content_size now large
