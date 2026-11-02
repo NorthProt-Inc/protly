@@ -15,6 +15,8 @@ that types Korean and English on one QWERTY grid and offers Translate / Polish /
 - Keyboard and app UI (Sprint 9, local campaign): `docs/plans/2026-10-30-keyboard-ui.md` (design:
   `docs/plans/2026-10-30-keyboard-ui-design.md`).
 - Phone and simulator findings: `docs/ios-keyboard-notes.md`.
+- English style for Translate and Polish: `docs/style-guide.md` (derived from `cyanprot/humanizer`). Code copies its
+  prompt blocks verbatim and this file wins over the Sprint 7a draft.
 
 ## Layout
 
