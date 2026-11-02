@@ -1,0 +1,44 @@
+Attributes: Application, 0x1135a26c0, pid: 12928, label: 'Settings'
+Element subtree:
+ →Application, 0x1135a26c0, pid: 12928, label: 'Settings'
+    Window (Main), 0x1135a30c0, {{0.0, 0.0}, {390.0, 844.0}}
+      Other, 0x1135a1e00, {{0.0, 0.0}, {390.0, 844.0}}
+        Other, 0x1135a3480, {{0.0, 0.0}, {390.0, 844.0}}
+          Other, 0x1135a3ac0, {{0.0, 0.0}, {390.0, 844.0}}
+            Other, 0x1135a2940, {{0.0, 0.0}, {390.0, 844.0}}
+              Other, 0x1135a3200, {{0.0, 0.0}, {390.0, 844.0}}
+                Other, 0x1135a2580, {{0.0, 0.0}, {390.0, 844.0}}
+                  Other, 0x1135a35c0, {{0.0, 0.0}, {390.0, 844.0}}
+                    Other, 0x1135a1f40, {{0.0, 0.0}, {390.0, 844.0}}
+                      NavigationBar, 0x1135a0a00, {{0.0, 47.0}, {390.0, 54.0}}, identifier: '_TtGC7SwiftUI32NavigationStackHosting'
+                        Button, 0x1135a2800, {{16.0, 47.0}, {44.0, 44.0}}, identifier: 'BackButton', label: 'Keyboards'
+                      Other, 0x1135a3980, {{0.0, 0.0}, {390.0, 844.0}}
+                        Other, 0x1135a3700, {{0.0, 0.0}, {390.0, 844.0}}
+                          Other, 0x1135a21c0, {{0.0, 0.0}, {390.0, 844.0}}
+                            Other, 0x1135a0500, {{0.0, 0.0}, {390.0, 844.0}}
+                              Other, 0x1135a2300, {{0.0, 101.0}, {390.0, 709.0}}
+                                Table, 0x1135a3840, {{0.0, 0.0}, {390.0, 844.0}}
+                                  Other, 0x1135a0780, {{0.0, 101.0}, {390.0, 17.7}}
+                                  Cell, 0x1135a2080, {{20.0, 118.7}, {350.0, 53.0}}, identifier: 'Allow Full Access'
+                                    Other, 0x1135a17c0, {{20.0, 118.7}, {350.0, 53.0}}
+                                      Other, 0x1135a2f80, {{20.0, 118.7}, {350.0, 53.0}}
+                                        Switch, 0x1135a1900, {{34.0, 131.3}, {320.0, 28.0}}, identifier: 'Allow Full Access', label: 'Allow Full Access', value: 1
+                                          Button, 0x1135a3340, {{76.0, 135.0}, {131.0, 20.3}}, identifier: 'Allow Full Access', label: 'Allow Full Access'
+                                          Switch, 0x1135a0dc0, {{293.0, 131.3}, {63.0, 28.0}}, value: 1
+                                          Button, 0x1135a1400, {{34.0, 131.3}, {28.0, 28.0}}, identifier: 'Allow Full Access'
+                                  Other, 0x1135a0f00, {{0.0, 171.7}, {390.0, 17.3}}
+                                  Other, 0x1135a12c0, {{357.0, 101.0}, {30.0, 695.7}}, label: 'Vertical scroll bar, 1 page', value: 0%
+                                    Other, 0x1135a0c80, {{384.0, 705.0}, {3.0, 88.7}}
+                                  Other, 0x1136fa940, {{47.3, 811.0}, {295.3, 30.0}}, label: 'Horizontal scroll bar, 1 page', value: 0%
+                                    Other, 0x1136fae40, {{50.3, 838.0}, {289.3, 3.0}}
+                      Other, 0x1136fb200, {{0.0, 0.0}, {390.0, 844.0}}
+                        Other, 0x1136faf80, {{0.0, 0.0}, {390.0, 844.0}}
+                Other, 0x1136fb980, {{0.0, 0.0}, {390.0, 844.0}}
+                  Other, 0x1136f8280, {{0.0, 0.0}, {390.0, 844.0}}
+Path to element:
+ →Application, 0x1135a26c0, pid: 12928, label: 'Settings'
+Query chain:
+ →Find: Application 'com.apple.Preferences'
+  Output: {
+    Application, 0x1136fad00, pid: 12928, label: 'Settings'
+  }
