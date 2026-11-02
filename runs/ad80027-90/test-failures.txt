@@ -1,0 +1,1 @@
+/Users/runner/work/protly/protly/ios-app/CI/UITests/Driver.swift:155: error: -[ProtlyCIUITests.KeyboardShotsUITests testScenarios] : failed - 03-after-emoji: expected protly, found english
