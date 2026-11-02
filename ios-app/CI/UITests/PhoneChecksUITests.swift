@@ -2,19 +2,42 @@ import ProtlyCore
 import UIKit
 import XCTest
 
-/// The phone checks of docs/plans/2026-10-30-sim-phone-checks.md, Sprint 001 (no network): checklist items of the
-/// feature plan's Tasks 6.8 and 8.5, the flip-over-whitespace rule (997f108), memory and the app icon.
+/// The phone checks of docs/plans/2026-10-30-sim-phone-checks.md. Sprint 001 (no network): checklist items of the
+/// feature plan's Tasks 6.8 and 8.5, the flip-over-whitespace rule (997f108), memory and the app icon. Sprint 002
+/// (NetworkChecks.swift): Full Access, Translate / Polish / Read clipboard with the CI key, and the container app's
+/// about-me note (Tasks 6.8 item 11, 7.7 and 8.5).
 ///
 /// Each item appends `CHECK <id> PASS|FAIL|RECORD|SKIP|PENDING <evidence>` to $SHOTS_DIR/checks.txt and saves
 /// c-<id>.png; checks.py resolves PENDING and assembles the report. An item never fails the test itself (a FAIL on
 /// keyboard behaviour is a finding, and the job still measures the layout). Learned words carry over between
 /// methods, so the methods are numbered: XCTest runs them alphabetically, after KeyboardShotsUITests.
 final class PhoneChecksUITests: XCTestCase {
+    /// Seconds each method may run before XCTest stops it (run-shots.sh passes -test-timeouts-enabled YES; XCTest
+    /// rounds up to whole minutes). Run 36 ran 71 minutes without a line: a method that hangs now ends, and the
+    /// network groups stop starting items 2 minutes before theirs (PhoneRun.startGroup).
+    static let allowance: [String: TimeInterval] = [
+        "test0_access": 300, "test0_probe": 480, "test1_68": 900, "test2_ws": 300, "test3_85offline": 900,
+        "test4_memory": 600, "test5_icon": 300, "test5a_web": 900, "test5b_menu": 420, "test5c_pad": 420,
+        "test5d_card": 720, "test5e_bar": 600,
+        "test6_85net": 1080, "test7_77": 1080,
+    ]
+
     override func setUpWithError() throws {
         continueAfterFailure = true
+        // name is "-[ProtlyCIUITests.PhoneChecksUITests test6_85net]".
+        let method = name.split(separator: " ").last.map { String($0.dropLast()) } ?? ""
+        executionTimeAllowance = Self.allowance[method] ?? 600
     }
 
-    /// Plan Task 1.0. Only with PROBE=1 (run-shots.sh passes it on a `[probe]` commit).
+    /// Full Access for Protly (plan Task 2.2): read in Settings, turned on there when off. Every later method that
+    /// needs it (network, clipboard) reads the outcome. Runs first: "access" sorts before "probe".
+    @MainActor
+    func test0_access() throws {
+        try PhoneRun(test: self, name: "test0_access", launch: false).fullAccess()
+    }
+
+    /// Plan Task 2.2 (Sprint 002's probe; Sprint 001's, Task 1.0, is in the notes and git history). Only with
+    /// PROBE=1 (run-shots.sh passes it on a `[probe]` commit).
     @MainActor
     func test0_probe() throws {
         guard ProcessInfo.processInfo.environment["PROBE"] == "1" else {
@@ -47,18 +70,62 @@ final class PhoneChecksUITests: XCTestCase {
     func test5_icon() throws {
         try PhoneRun(test: self, name: "test5_icon", launch: false).icon()
     }
+
+    /// typing-fixes 004 (TypingChecks.swift): the dark web composer (dark-1, ret-*), the edit menu (menu-*) and the
+    /// space trackpad (pad-*), on the host's extra screens. Offline, so before the network groups.
+    @MainActor
+    func test5a_web() throws {
+        try PhoneRun(test: self, name: "test5a_web").checksWeb()
+    }
+
+    @MainActor
+    func test5b_menu() throws {
+        try PhoneRun(test: self, name: "test5b_menu", arguments: ["-screen", "uikit"]).checksMenu()
+    }
+
+    @MainActor
+    func test5c_pad() throws {
+        try PhoneRun(test: self, name: "test5c_pad", arguments: ["-screen", "uikit"]).checksPad()
+    }
+
+    /// keyboard-ui 003 (CardChecks.swift): the strip and the result card from the CI stub's recorded streams, dark and
+    /// light, the cancel and the memory during a stream. Offline (a marker draft never reaches the API), after Full Access.
+    @MainActor
+    func test5d_card() throws {
+        try PhoneRun(test: self, name: "test5d_card", arguments: ["-fills", Stub.fills]).checksCard()
+    }
+
+    /// keyboard-ui 003: the bar's hit frames, the bar in light mode, a long target name at a large text size, and the
+    /// container app's guide screen in both looks.
+    @MainActor
+    func test5e_bar() throws {
+        try PhoneRun(test: self, name: "test5e_bar", arguments: ["-fills", PhoneRun.barFills.joined(separator: "|")])
+            .checksBar()
+    }
+
+    /// After every offline group, so the requests and the about-me note change nothing they check.
+    @MainActor
+    func test6_85net() throws {
+        try PhoneRun(test: self, name: "test6_85net").checks85network()
+    }
+
+    @MainActor
+    func test7_77() throws {
+        try PhoneRun(test: self, name: "test7_77").checks77()
+    }
 }
 
-/// A string as checks.py reads it back: in double quotes, with \\, \" and \n escaped. nil is `<unreadable>`.
+/// A string as checks.py reads it back: in double quotes, with \\, \" and \n escaped, and every other line break
+/// (\r, U+0085, U+2028, U+2029) as \n too, so one CHECK stays one line. nil is `<unreadable>`.
 func q(_ s: String?) -> String {
     guard let s else { return "<unreadable>" }
     var r = "\""
-    for ch in s {
-        switch ch {
+    for u in s.unicodeScalars {
+        switch u {
         case "\\": r += "\\\\"
         case "\"": r += "\\\""
-        case "\n": r += "\\n"
-        default: r.append(ch)
+        case "\n", "\r", "\u{85}", "\u{2028}", "\u{2029}": r += "\\n"
+        default: r.unicodeScalars.append(u)
         }
     }
     return r + "\""
@@ -77,6 +144,10 @@ final class Item {
     private var ocrMissing = false
     private var notes: [String] = []
     private var shots = 0
+    /// SKIP and why (`no network key`, `request cap`), unless something already failed.
+    private var skipReason: String?
+    /// The item holds model output for checks.py's script rules: PENDING unless the test saw a FAIL itself.
+    private var pending = false
 
     init(_ id: String) {
         self.id = id
@@ -119,6 +190,25 @@ final class Item {
         notes.append(why)
     }
 
+    /// One try's model output as `<group>#<n>="..."`, which checks.py judges (plan Task 2.3).
+    func output(_ group: String, _ n: Int, _ text: String) {
+        pending = true
+        notes.append("\(group)#\(n)=\(q(text))")
+    }
+
+    /// The readings are for checks.py to judge (CardChecks.swift): PENDING unless the test saw a FAIL itself.
+    func markPending() {
+        pending = true
+    }
+
+    func skip(_ why: String) {
+        skipReason = why
+    }
+
+    var skipped: Bool { skipReason != nil }
+
+    var hasFailed: Bool { failed || unreadable }
+
     func markOCRMissing(_ why: String) {
         ocrMissing = true
         notes.append(why)
@@ -131,11 +221,14 @@ final class Item {
 
     func status(record: Bool) -> String {
         if unreadable || failed { return "FAIL" }
+        if skipReason != nil { return "SKIP" }
+        if pending { return "PENDING" }
         return record || ocrMissing ? "RECORD" : "PASS"
     }
 
     var evidence: String {
-        (unreadable ? "unreadable: " : "") + notes.joined(separator: " ")
+        if let skipReason, !(unreadable || failed) { return ([skipReason] + notes).joined(separator: " ") }
+        return (unreadable ? "unreadable: " : "") + notes.joined(separator: " ")
     }
 }
 
@@ -150,25 +243,28 @@ struct SlotRead {
 
 @MainActor
 final class PhoneRun {
-    let d: Driver
+    /// The driver of the app under test: the host, or the container app while a 7.7 step runs there (inApp).
+    var d: Driver
     let reader: Reader
-    private let ready: Bool
+    let ready: Bool
     /// OCR_FALLBACK=1 (plan Task 1.2 step 3): when Vision fails its self-test, label checks RECORD the crop instead
     /// of FAIL. Off by default: run 8's probe showed Vision works in the UI test.
     private let ocrFallback = ProcessInfo.processInfo.environment["OCR_FALLBACK"] == "1"
     /// Fewer ink pixels than this in a slot = nothing drawn there. A word is thousands at 3x.
     static let inkEmpty = 40
 
-    init(test: XCTestCase, name: String, launch: Bool = true) throws {
+    /// `arguments`: the host's launch arguments (`-screen uikit`, HostApp.swift).
+    init(test: XCTestCase, name: String, launch: Bool = true, arguments: [String] = []) throws {
         let driver = try Driver(test: test)
         driver.strict = false
         driver.keyPause = 0.35
         let reader = Reader(driver: driver)
         driver.log("== PhoneChecksUITests.\(name)")
+        driver.restoreLooks()  // an earlier method that stopped in light mode or at a large text size
         reader.selfTest()
         var ok = false
         if launch {
-            driver.launch()
+            driver.launch(arguments: arguments)
             ok = driver.ensureProtly()
         }
         d = driver
@@ -189,11 +285,12 @@ final class PhoneRun {
         d.log(line)
     }
 
-    func finish(_ item: Item, record: Bool = false) {
+    /// `screen`: the screenshot that shows the item (CardChecks: the card at the moment it was read), else the screen now.
+    func finish(_ item: Item, record: Bool = false, screen: XCUIScreenshot? = nil) {
         // A step that did not happen (no keyboard to type on, Clear left text, a slot tap without a keyboard) means
         // the evidence does not show what the item claims.
         for p in d.takeProblems() { item.markUnreadable("problem=\(q(p))") }
-        if !d.savePNG("c-\(item.id)") { item.markUnreadable("c-\(item.id).png not written") }
+        if !d.savePNG("c-\(item.id)", screen) { item.markUnreadable("c-\(item.id).png not written") }
         let line = "CHECK \(item.id) \(item.status(record: record)) \(item.evidence)"
         d.append(line, to: "checks.txt")
         d.log(line)
@@ -214,7 +311,7 @@ final class PhoneRun {
     }
 
     /// Screenshot (saved), then OCR and ink of one slot.
-    func readSlot(_ slot: Slot, _ item: Item) -> SlotRead {
+    func readSlot(_ slot: Slot, _ item: Item, languages: [String] = Reader.languages) -> SlotRead {
         d.pause(0.6)  // the bar follows the last key
         let board = d.current()
         let screen = XCUIScreen.main.screenshot()
@@ -229,10 +326,33 @@ final class PhoneRun {
         let rect = d.slotRect(slot, row1: row1)
         let ink = shot.ink(in: rect, background: CGPoint(x: rect.midX, y: rect.minY + 1))
         var text: String?
-        if reader.works, let lines = reader.text(in: rect, of: screen, points: d.width, label: "\(item.id) \(slot.name)") {
+        if reader.works, let lines = reader.text(in: rect, of: screen, points: d.width, label: "\(item.id) \(slot.name)",
+                                                 languages: languages) {
             text = Self.clean(lines.joined(separator: " "))
         }
         return SlotRead(text: text, ink: ink, file: file + ".png")
+    }
+
+    /// OCR first; when it misses, the slot button's accessibility label, if the slot has ink (the keyboard's elements
+    /// are in the host's tree: tree-06). Once keyboard-ui 001 dropped the quotes around the flip, Vision read the
+    /// jamo-only "ㅗ디ㅣㅐ" as "-]T" (runs 49f47b2-62 and 394cf1a-66, also from contrast-stretched crops); the label is
+    /// the string the slot draws. Both readings are noted.
+    func labelFallback(_ slot: Slot, _ item: Item, _ first: SlotRead, _ ok: (String) -> Bool) -> SlotRead {
+        guard first.unreadable == nil, !(first.text.map(ok) ?? false) else { return first }
+        let label = slotLabel(slot)
+        item.note("\(slot.name)-ocr=\(q(first.text)) \(slot.name)-label=\(q(label)) ink \(first.ink)")
+        guard let label, ok(label), first.ink >= Self.inkEmpty else { return first }
+        return SlotRead(text: label, ink: first.ink, file: first.file)
+    }
+
+    /// The label of the button whose center is in `slot`'s rect, among buttons with a Hangul label.
+    func slotLabel(_ slot: Slot) -> String? {
+        guard let row1 = d.rowOne() else { return nil }
+        let rect = d.slotRect(slot, row1: row1)
+        let hangul = NSPredicate(format: "label MATCHES %@", ".*[\\u1100-\\u11FF\\u3130-\\u318F\\uAC00-\\uD7A3].*")
+        return d.app.buttons.matching(hangul).allElementsBoundByIndex
+            .first { rect.contains(CGPoint(x: $0.frame.midX, y: $0.frame.midY)) }?
+            .label
     }
 
     /// OCR text without the flip's curly quotes around it.
@@ -415,6 +535,7 @@ final class PhoneRun {
         d.tapSlot(.left)
         let other = KeyEncoder.keys(forHangul: "봐").map { Dubeolsik.latin($0) } ?? "?"
         it.expect("after-flip", field(), "내일 " + other)
+        translate68(it)  // the Translate part (Sprint 002, NetworkChecks.swift)
         finish(it)
 
         // 6.8-9: the learned word survives a new host process; checks.py compares the keyboard pids at the marks.
@@ -448,7 +569,8 @@ final class PhoneRun {
         var it = Item("ws-1")
         d.clearField()
         d.type("hello ")
-        let left = readSlot(.left, it)
+        // Vision misreads the unquoted jamo `ㅗ디ㅣㅐ` (keyboard-ui 001): the slot's label stands in, with its ink.
+        let left = labelFallback(.left, it, readSlot(.left, it)) { hasHangul($0) }
         expectSlot(it, "left", left, "Hangul") { hasHangul($0) }
         d.tapSlot(.left)
         if let f = field() {
@@ -481,14 +603,16 @@ final class PhoneRun {
     func checks85() {
         if notReady(["8.5-1o", "8.5-2o", "8.5-6o", "8.5-7o", "8.5-8o", "8.5-9o"]) { return }
 
-        // A draft's last word is still being typed until a space ends it, and the bar offers no action while a word
-        // is typed (ProtlyBar / refreshField): the drafts end with a space, except 8.5-8o (cursor at the end).
+        // The drafts end with a space, as sending would: it ends the last word, so its reading has settled. Since
+        // keyboard-ui 001 the bar's action stays visible while a word is typed; 8.5-8o records it with the cursor
+        // right after the last letter.
         var it = Item("8.5-1o")
         d.clearField()
         typeCode("ru", it)
         d.type(": 누나 노트 고마워 누나 덕분에 살았다 ")
         it.expect("field", field(), "ru: 누나 노트 고마워 누나 덕분에 살았다 ")
-        expectSlot(it, "center", readSlot(.center, it), equals: "Translate")
+        let russian = readSlot(.center, it, languages: Reader.labelLanguages("Русский"))
+        expectSlot(it, "center", russian, q("Русский")) { $0.contains("Русский") }
         finish(it)
 
         it = Item("8.5-2o")
@@ -509,7 +633,7 @@ final class PhoneRun {
         typeCode("ok", it)
         d.type(": 내일 봐 ")
         it.expect("field", field(), "ok: 내일 봐 ")
-        expectSlot(it, "center", readSlot(.center, it), equals: "Translate")
+        expectSlot(it, "center", readSlot(.center, it), q("English")) { $0.contains("English") }
         finish(it)
 
         it = Item("8.5-7o")
@@ -517,7 +641,7 @@ final class PhoneRun {
         typeCode("ko", it)
         d.type(": 낼 시간되? 같이 밥먹자 ㅋㅋ 안되면 말해죠 ")
         it.expect("field", field(), "ko: 낼 시간되? 같이 밥먹자 ㅋㅋ 안되면 말해죠 ")
-        expectSlot(it, "center", readSlot(.center, it), equals: "Polish")
+        expectSlot(it, "center", readSlot(.center, it), q("Polish")) { $0.contains("Polish") }
         finish(it)
 
         it = Item("8.5-8o")
@@ -533,7 +657,7 @@ final class PhoneRun {
         let spanish = "me encanta el color de tu chaqueta, donde la conprastes? jaja "
         d.type(spanish)
         it.expect("field", field(), spanish)
-        expectSlot(it, "center", readSlot(.center, it), equals: "Polish")
+        expectSlot(it, "center", readSlot(.center, it), q("Polish")) { $0.contains("Polish") }
         finish(it)
         d.clearField()
     }
@@ -556,7 +680,8 @@ final class PhoneRun {
             let after = d.current()
             if after == .none { hidden += 1 } else { d.log("round \(i): \(after.rawValue) after Dismiss") }
             if d.field.waitForExistence(timeout: 2) { d.field.tap() }
-            if d.wait(for: .protly, timeout: 4) { shown += 1 } else { d.log("round \(i): no Protly after the tap") }
+            // 8 s: run 41 had one round of 30 where Protly took just over 4 s to come back.
+            if d.wait(for: .protly, timeout: 8) { shown += 1 } else { d.log("round \(i): no Protly after the tap") }
             d.pause(1)
         }
         d.mark("mem-end")
@@ -607,60 +732,87 @@ final class PhoneRun {
         d.log("icon: page \(page + 1), exists \(icon.exists)")
     }
 
-    // MARK: Probe (plan Task 1.0)
+    // MARK: Probe (plan Task 2.2)
 
+    /// Sprint 002's probe: the panel's text and button positions around one Translate, and how the Allow Paste prompt
+    /// shows for a Read clipboard. Full Access is test0_access's (run-shots.sh dumps the preferences around it).
     func probe() {
         let p = { (line: String) in self.d.append(line, to: "probe.txt") }
-        p("vision languages (.accurate): \(reader.supportedLanguages())")
-        p("vision self-test: works \(reader.works), hangul \(reader.readsHangul)")
+        p("== sprint 002 probe (keyboard-ui 003: the strip and the streamed card)")
+        p("full access: \(fullAccessHow)")
+        p("network key: \(Self.network)")
         guard ready else {
             p("protly not reached: \(d.takeProblems())")
             return
         }
-
+        let it = Item("probe")
+        registerPasteMonitor()  // the probe tries both Allow Paste paths
         d.clearField()
-        d.type("hello ")
-        d.pause(0.8)
-        let screen = XCUIScreen.main.screenshot()
-        d.savePNG("probe-hello", screen)
-        if let shot = d.screenshot(screen), let row1 = d.rowOne(shot) {
-            p(String(format: "row 1 top %.2f pt", row1))
-            let bar = CGRect(x: 16, y: row1 - Geo.barBottom - Geo.barHeight - 2, width: d.width - 32, height: Geo.barHeight + 3)
-            p("hello space, whole bar: \(reader.text(in: bar, of: screen, points: d.width, label: "probe bar") ?? ["<vision error>"])")
-            for s in Slot.allCases {
-                let r = d.slotRect(s, row1: row1)
-                let ocr = reader.text(in: r, of: screen, points: d.width, label: "probe \(s.name)") ?? ["<vision error>"]
-                p("hello space, \(s.name) \(r): \(ocr) ink \(shot.ink(in: r, background: CGPoint(x: r.midX, y: r.minY + 1)))")
+        if Self.network && send(it) {
+            d.type("내일 봐 ")
+            if let row1 = d.rowOne() {
+                p(String(format: "row 1 top %.2f pt, panel %@, button band %@", row1,
+                         NSCoder.string(for: d.panelRect(row1: row1)), NSCoder.string(for: d.panelButtonBand(row1: row1))))
+                d.savePNG("probe-bar")
+                let t0 = Date()
+                d.tapSlot(.center, settle: 0)
+                // keyboard-ui 003: the strip in the bar while the call runs, then the card streaming in. The trees
+                // show what KeyboardTree.swift reads (parts, labels, frames, enabled).
+                d.pause(0.5)
+                d.savePNG("probe-strip")
+                try? d.app.debugDescription.write(to: d.out.appendingPathComponent("tree-probe-strip.txt"),
+                                                  atomically: true, encoding: .utf8)
+                p("strip: \(q(d.callView()?.stripText))")
+                var streamed = false
+                for _ in 0..<40 where !streamed {
+                    if let v = d.callView(), !v.cardRows.body.isEmpty {
+                        streamed = true
+                        p(String(format: "first text after %.1f s: %@ buttons %@", Date().timeIntervalSince(t0),
+                                 q(v.cardRows.body.first), q(v.buttons(v.card))))
+                        d.savePNG("probe-card-streaming")
+                        try? d.app.debugDescription.write(to: d.out.appendingPathComponent("tree-probe-streaming.txt"),
+                                                          atomically: true, encoding: .utf8)
+                    } else {
+                        d.pause(0.25)
+                    }
+                }
+                let r = waitCall(it, primary: "Replace", busy: "Translating", name: "probe-result")
+                p(String(format: "result after %.1f s: %@ card %@ strip %@", Date().timeIntervalSince(t0),
+                         "\(r.end)", q(r.text), q(r.strip)))
+                try? d.app.debugDescription.write(to: d.out.appendingPathComponent("tree-probe-card.txt"),
+                                                  atomically: true, encoding: .utf8)
+                probePanel("probe-panel-result", row1, p)
+                d.pause(0.6)
+                tapPanelButton("Cancel", row1, it)
+                p("after Cancel: field \(q(field())), card \(d.callView()?.card.count ?? -1) elements")
             }
         } else {
-            p("hello space: no keyboard in probe-hello.png")
+            p("panel probe skipped: no network key")
         }
+        resetKeyboard()
 
-        d.clearField()
-        d.type("안녕")
-        d.pause(0.5)
-        let fieldShot = XCUIScreen.main.screenshot()
-        d.savePNG("probe-hangul", fieldShot)
-        let frame = d.field.frame.insetBy(dx: -8, dy: -8)
-        let ocr = reader.text(in: frame, of: fieldShot, points: d.width, label: "probe field") ?? ["<vision error>"]
-        p("field 안녕: value \(q(field())), ocr of \(frame): \(ocr)")
+        // Allow Paste: a note-shaped clipboard sends no request.
+        let paste = readClipboard(it, "protly about me v1\nprobe", waitFor: ["Save"], sends: false, probe: p)
+        p("clipboard panel: \(q(paste?.text))")
+        if let row1 = paste?.row1 {  // measured before the tap: the panel now covers the keys
+            probePanel("probe-panel-confirm", row1, p)
+            tapPanelButton("Cancel", row1, it)
+        }
+        resetKeyboard()
+        p("problems: \(d.takeProblems()) notes: \(it.evidence)")
+    }
 
-        d.clearField()
-        if let row1 = d.rowOne() {
-            let (x, y) = d.position(of: .layer123, row1: row1)
-            d.point(x, y).tap()
-            d.pause(1)
-            d.savePNG("probe-123")
-            p(String(format: "123 layer: probe-123.png (123 key tapped at %.1f, %.1f)", x, y))
-            d.point(x, y).tap()  // ABC
-            d.pause(0.8)
+    private func probePanel(_ name: String, _ row1: CGFloat, _ p: (String) -> Void) {
+        let screen = XCUIScreen.main.screenshot()
+        d.savePNG(name, screen)
+        guard let seen = reader.read(in: d.panelRect(row1: row1), of: screen, points: d.width, label: name) else {
+            p("\(name): vision error")
+            return
         }
-        for symbol in [":", "?", ",", ".", "!"] {
-            d.clearField()
-            d.type(symbol)
-            p("symbol \(symbol) at its computed position: field \(q(field()))")
+        p("\(name): \(q(seen.text))")
+        for w in seen.words {
+            p(String(format: "  word %@ at x %.1f y %.1f w %.1f h %.1f", q(w.text), w.rect.minX, w.rect.minY,
+                     w.rect.width, w.rect.height))
         }
-        d.clearField()
-        p("problems: \(d.takeProblems())")
     }
 }
