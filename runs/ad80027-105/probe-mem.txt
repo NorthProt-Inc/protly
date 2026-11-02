@@ -1,0 +1,24 @@
+memsample: process name ProtlyCIKeyboard, interval 2.0 s
+memsample: started at 1793615606.252 after '== PhoneChecksUITests.test1' in /Users/runner/work/_temp/shots/ui-log.txt
+pgrep -x ProtlyCIKeyboard: 15597
+footprint: `footprint -p 15597` exit 0 value_kb 29696
+    ======================================================================
+    ProtlyCIKeyboard [15597]: 64-bit    Footprint: 29 MB (16384 bytes per page)
+    ======================================================================
+    
+      Dirty      Clean  Reclaimable    Regions    Category
+        ---        ---          ---        ---    ---
+      10 MB        0 B        12 MB          7    MALLOC_SMALL
+    6935 KB      32 KB          0 B        884    __DATA
+sudo-footprint: `sudo -n footprint -p 15597` exit 0 value_kb 27648
+    ======================================================================
+    ProtlyCIKeyboard [15597]: 64-bit    Footprint: 27 MB (16384 bytes per page)
+    ======================================================================
+    
+      Dirty      Clean  Reclaimable    Regions    Category
+        ---        ---          ---        ---    ---
+    8800 KB        0 B        14 MB          7    MALLOC_SMALL
+    6967 KB      32 KB          0 B        884    __DATA
+rss: `ps -o rss= -p 15597` exit 0 value_kb 257920
+    257920
+chosen footprint method: footprint
