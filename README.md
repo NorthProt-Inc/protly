@@ -1,13 +1,12 @@
 # protly
 
-Write in Korean or English, send in English. protly is a Chrome extension (Instagram DMs and Gmail drafts) and
-a custom iPhone keyboard that types Korean and English on one QWERTY grid. Both translate or polish what you
-write with Claude.
+Write in Korean or English, send in English. protly is a Chrome extension and a custom iPhone keyboard that
+types Korean and English on one QWERTY grid. Both translate or polish what you write with Claude.
 
 ## Chrome extension
 
-- Works on `instagram.com` and `mail.google.com`.
-- Press `Alt+T` in the focused text box to translate or polish it, or use the popup.
+- Built in on `instagram.com` (DMs) and `mail.google.com` (drafts).
+- On any other site, press `Alt+T` in a focused text box, or right-click a box or a selection and pick protly.
 - Calls to the Anthropic API go through a native messaging host (`host/protly_host.py`), so the API key stays
   in that process and never reaches the page or the extension.
 
