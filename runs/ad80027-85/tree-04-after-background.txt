@@ -1,0 +1,31 @@
+Attributes: Application, 0x116396bc0, pid: 11632, label: 'ProtlyCIHost'
+Element subtree:
+ →Application, 0x116396bc0, pid: 11632, label: 'ProtlyCIHost'
+    Window (Main), 0x116396d00, {{0.0, 0.0}, {390.0, 844.0}}
+      Other, 0x116397700, {{0.0, 0.0}, {390.0, 844.0}}
+        Other, 0x116396e40, {{0.0, 0.0}, {390.0, 844.0}}
+          Other, 0x116396f80, {{0.0, 0.0}, {390.0, 844.0}}
+            Other, 0x116397200, {{0.0, 0.0}, {390.0, 844.0}}
+              TextField, 0x1163975c0, {{16.0, 71.0}, {200.0, 22.0}}, identifier: 'field', Keyboard Focused
+                Other, 0x116397340, {{16.0, 71.0}, {0.0, 0.0}}, identifier: '_UITextSelectionRangeAdjustmentContainerView'
+                  Other, 0x116397ac0, {{16.0, 71.0}, {0.0, 0.0}}, identifier: 'com.apple.text.grabber.leading'
+                    Other, 0x116397840, {{8.8, 57.5}, {16.5, 16.5}}
+                    Other, 0x116397c00, {{16.0, 71.0}, {2.0, 0.0}}
+                  Other, 0x116397980, {{16.0, 71.0}, {0.0, 0.0}}, identifier: 'com.apple.text.grabber.leading'
+                    Other, 0x116397d40, {{8.8, 57.5}, {16.5, 16.5}}
+                    Other, 0x116bb5f40, {{16.0, 71.0}, {2.0, 0.0}}
+                Other, 0x116bb6080, {{16.0, 79.0}, {200.0, 11.0}}, label: 'Horizontal scroll bar, 1 page', value: 0%
+              Button, 0x116bb61c0, {{334.0, 71.0}, {40.0, 20.3}}, identifier: 'clear', label: 'Clear'
+              Button, 0x116bb66c0, {{314.7, 107.3}, {59.3, 20.3}}, identifier: 'dismiss', label: 'Dismiss'
+    Window, 0x116bb6800, {{0.0, 0.0}, {390.0, 844.0}}
+      Other, 0x116bb6300, {{0.0, 0.0}, {390.0, 844.0}}
+        Other, 0x116bb6440, {{0.0, 0.0}, {390.0, 844.0}}
+        Other, 0x116bb6580, {{0.0, 495.0}, {390.0, 349.0}}
+          Other, 0x116bb5cc0, {{0.0, 512.0}, {390.0, 332.0}}, identifier: 'inputView'
+Path to element:
+ →Application, 0x116396bc0, pid: 11632, label: 'ProtlyCIHost'
+Query chain:
+ →Find: Target Application 'com.northprot.protly.cihost'
+  Output: {
+    Application, 0x116bb6bc0, pid: 11632, label: 'ProtlyCIHost'
+  }
