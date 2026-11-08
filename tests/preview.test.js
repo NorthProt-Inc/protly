@@ -387,3 +387,90 @@ test('kept: laughter or crying in bare jamo never counts as new Hangul', () => {
   }
   assert.equal(reduce(s, { type: 'enter', text: "Let's go 지민 ㅋㅋ 빨리" }).effect.type, 'translate');
 });
+
+// Bracket notes (plan docs/plans/2026-11-08-notes-and-iphone-port.md, rules 3 to 8 and 12).
+const NOTES_ONLY = 'Add the message too. [Brackets] are notes for protly.';
+const NOTE_ON_TRANSLATION = 'Notes work on a new draft. Undo first, then add the note.';
+const previewOf = (text, { polish = false, translation = 'T' } = {}) => {
+  const a = reduce(initial(), { type: 'enter', text, polish });
+  return reduce(a.state, { type: 'result', reqId: a.effect.reqId, translation, back_translation: 'b', lang: 'en', model: 'm' }).state;
+};
+
+test('notes: a Korean draft with a note translates the text and sends the notes; the state keeps the raw draft', () => {
+  const r = reduce(initial(), { type: 'enter', text: '내일 보자 [좀 더 정중하게]' });
+  assert.equal(r.effect.type, 'translate');
+  assert.equal(r.effect.korean, '내일 보자');
+  assert.deepEqual(r.effect.notes, ['좀 더 정중하게']);
+  assert.equal(r.state.korean, '내일 보자 [좀 더 정중하게]');
+  const plain = reduce(initial(), { type: 'enter', text: '내일 보자' });
+  assert.deepEqual(plain.effect.notes, []);
+});
+
+test('notes: the prefix is read after leading notes', () => {
+  const r = reduce(initial(), { type: 'enter', text: '[formal] ru: 안녕' });
+  assert.equal(r.effect.lang, 'ru');
+  assert.equal(r.effect.korean, '안녕');
+  assert.deepEqual(r.effect.notes, ['formal']);
+});
+
+test('notes: an English draft with a note is polished on Enter even with the Polish switch off', () => {
+  for (const text of ['see you [formal]', '123 [make it words]']) {
+    const r = reduce(initial(), { type: 'enter', text, polish: false });
+    assert.equal(r.effect.type, 'translate', text);
+    assert.equal(r.effect.kind, 'polish', text);
+    assert.equal(r.effect.korean, text.replace(/ \[.*\]$/, ''));
+    assert.equal(r.state.korean, text);
+  }
+  assert.deepEqual(reduce(initial(), { type: 'enter', text: 'see you [1]', polish: false }).effect, { type: 'pass' });
+  const run = reduce(initial(), { type: 'run', text: '123 [make it words]' }).effect;
+  assert.deepEqual([run.kind, run.korean, run.notes], ['polish', '123', ['make it words']]);
+});
+
+test('notes: a draft of notes only runs nothing (Enter and Alt+T)', () => {
+  for (const type of ['enter', 'run']) {
+    const r = reduce(initial(), { type, text: '[formal] [short]', polish: true });
+    assert.deepEqual(r.effect, { type: 'hold', message: NOTES_ONLY }, type);
+    assert.equal(r.state.mode, 'idle');
+    assert.equal(r.state.reqId, 0);
+  }
+});
+
+test('notes: a note typed into a preview or a kept translation is held, Alt+Enter and Alt+T too', () => {
+  const p = previewOf('내일 보자');
+  const k = reduce(p, { type: 'esc' }).state;
+  assert.equal(k.mode, 'kept');
+  for (const [s, e] of [[p, { type: 'enter', text: 'T [shorter]' }], [p, { type: 'enter', text: 'T [shorter]', hard: true }],
+    [p, { type: 'run', text: 'T [shorter]' }], [k, { type: 'enter', text: 'T [shorter]' }], [k, { type: 'run', text: 'T [shorter]' }],
+    [k, { type: 'enter', text: '[짧게] 새 초안' }]]) {
+    const r = reduce(s, e);
+    assert.deepEqual(r.effect, { type: 'hold', message: NOTE_ON_TRANSLATION }, `${s.mode} ${JSON.stringify(e)}`);
+    assert.equal(r.state, s);
+  }
+});
+
+test('notes: a bracket the translation itself has is not a new note', () => {
+  const p = previewOf('내일 보자', { translation: 'see you [tomorrow]' });
+  assert.deepEqual(reduce(p, { type: 'enter', text: 'see you [tomorrow]' }).effect, { type: 'sent', korean: '내일 보자' });
+  // Hangul inside such a bracket is no new draft: the decision reads the text without notes.
+  const q = previewOf('내일 보자', { translation: 'see you [내일]' });
+  assert.deepEqual(reduce(q, { type: 'enter', text: 'see you [내일] ok' }).effect, { type: 'sent', korean: '내일 보자' });
+});
+
+test('notes: re-runs keep the notes (Deep, the language chip, a polish Deep)', () => {
+  const p = previewOf('내일 보자 [정중하게]');
+  const deep = reduce(p, { type: 'enter', text: 'T', hard: true }).effect;
+  assert.equal(deep.korean, '내일 보자');
+  assert.deepEqual(deep.notes, ['정중하게']);
+  const chip = reduce(p, { type: 'lang', lang: 'ja' }).effect;
+  assert.deepEqual([chip.korean, chip.lang, chip.notes], ['내일 보자', 'ja', ['정중하게']]);
+  const pp = previewOf('see you [formal]');
+  const pd = reduce(pp, { type: 'enter', text: 'T', hard: true }).effect;
+  assert.deepEqual([pd.kind, pd.korean, pd.notes], ['polish', 'see you', ['formal']]);
+});
+
+test('notes: Alt+Z restores the raw draft and the sent record keeps it', () => {
+  const p = previewOf('내일 보자 [정중하게]');
+  assert.deepEqual(reduce(p, { type: 'undo' }).effect, { type: 'restore', korean: '내일 보자 [정중하게]' });
+  assert.deepEqual(reduce(reduce(p, { type: 'esc' }).state, { type: 'undo' }).effect, { type: 'restore', korean: '내일 보자 [정중하게]' });
+  assert.deepEqual(reduce(p, { type: 'enter', text: 'T' }).effect, { type: 'sent', korean: '내일 보자 [정중하게]' });
+});
