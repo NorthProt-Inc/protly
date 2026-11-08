@@ -117,3 +117,49 @@ test('splitNotes matches the shared note cases', { skip: !lang.splitNotes && 'sp
     assert.deepEqual(lang.splitNotes(c.draft), { text: c.text, notes: c.notes }, `${c.why}: ${JSON.stringify(c.draft)}`);
   }
 });
+
+// Notes beyond the shared cases (plan Part A rules 1 to 3).
+test('splitNotes: closing punctuation takes no space, opening text and emoji do', () => {
+  const { splitNotes } = lang;
+  assert.deepEqual(splitNotes('Hi [x]!'), { text: 'Hi!', notes: ['x'] });
+  assert.deepEqual(splitNotes('Really [x]?'), { text: 'Really?', notes: ['x'] });
+  assert.deepEqual(splitNotes('(see [x]) ok'), { text: '(see) ok', notes: ['x'] });
+  assert.deepEqual(splitNotes('one [x], two'), { text: 'one, two', notes: ['x'] });
+  assert.deepEqual(splitNotes('a [x] (b)'), { text: 'a (b)', notes: ['x'] });
+});
+
+test('splitNotes: tabs count as spaces, line breaks stay (CRLF too)', () => {
+  const { splitNotes } = lang;
+  assert.deepEqual(splitNotes('a\t[x]\tb'), { text: 'a b', notes: ['x'] });
+  assert.deepEqual(splitNotes('a\r\n[x]\r\nb'), { text: 'a\r\n\r\nb', notes: ['x'] });
+  assert.deepEqual(splitNotes('a [x]\nb'), { text: 'a\nb', notes: ['x'] });
+  assert.deepEqual(splitNotes('a\n[x] b'), { text: 'a\nb', notes: ['x'] });
+});
+
+test('splitNotes: any script counts as a letter; emoji, digits and symbols alone do not', () => {
+  const { splitNotes } = lang;
+  assert.deepEqual(splitNotes('a [ㅋ] b'), { text: 'a b', notes: ['ㅋ'] });
+  assert.deepEqual(splitNotes('a [é] b'), { text: 'a b', notes: ['é'] });
+  assert.deepEqual(splitNotes('a [кратко] b'), { text: 'a b', notes: ['кратко'] });
+  for (const s of ['a [👍] b', 'a [3:30] b', 'a [!!] b']) assert.deepEqual(splitNotes(s), { text: s, notes: [] }, s);
+});
+
+test('splitNotes: a non-note bracket between two notes splits them into two runs', () => {
+  assert.deepEqual(lang.splitNotes('a [x] [1] [y] b'), { text: 'a [1] b', notes: ['x', 'y'] });
+});
+
+test('splitNotes: a long unmatched [ stays text and returns at once', () => {
+  const s = `[${'a'.repeat(50000)}`;
+  const t = Date.now();
+  assert.deepEqual(lang.splitNotes(s), { text: s, notes: [] });
+  assert.ok(Date.now() - t < 200);
+});
+
+test('hasNotes and addsNote', () => {
+  assert.equal(lang.hasNotes('a [x]'), true);
+  assert.equal(lang.hasNotes('a [1]'), false);
+  assert.equal(lang.addsNote('see you [formal]', 'see you'), true);
+  assert.equal(lang.addsNote('see you [formal]', 'see you [formal]'), false); // the translation kept it
+  assert.equal(lang.addsNote('see you', 'see you'), false);
+  assert.equal(lang.addsNote('[x] see you', null), true);
+});

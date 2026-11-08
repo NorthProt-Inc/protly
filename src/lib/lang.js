@@ -90,3 +90,53 @@ export function parseLangPrefix(s) {
   if (!code || !isCode(code)) return { lang: null, text: tagSpans(s) };
   return { lang: code, text: tagSpans(s.slice(m[0].length)) };
 }
+
+// Notes (plan docs/plans/2026-11-08-notes-and-iphone-port.md, Part A): `[` + content + `]` in the user's own draft,
+// where the content holds no bracket and at least one letter, is an instruction to the model for this message.
+// Notes leave the text; a run of notes and the spaces around it becomes one space when the line has text on both
+// sides of it, else nothing (also before closing punctuation: "Hello [x]." -> "Hello."). Line breaks stay. One pass:
+// only the innermost pair of a nested one is a note. Never applied to text someone else wrote (incoming, selection).
+// The iPhone keyboard's Notes.swift follows the same rules; tests/fixtures/notes-cases.json holds both to them.
+const BRACKET = /\[([^[\]]*)\]/g;
+const LETTER = /\p{L}/u;
+const H_SPACE = /[^\S\r\n]/;
+const ONLY_H_SPACE = /^[^\S\r\n]*$/;
+const CLOSING = /[\p{Pe}\p{Pf}.,;:!?…。、，！？；：]/u;
+const lineEdge = (c) => c === undefined || c === '\n' || c === '\r';
+
+export function splitNotes(s) {
+  const found = [];
+  for (const m of s.matchAll(BRACKET)) {
+    if (LETTER.test(m[1])) found.push({ from: m.index, to: m.index + m[0].length, note: m[1].trim() });
+  }
+  const notes = [];
+  let out = '';
+  let i = 0;
+  for (let k = 0; k < found.length;) {
+    let { from, to } = found[k];
+    notes.push(found[k++].note);
+    while (k < found.length && ONLY_H_SPACE.test(s.slice(to, found[k].from))) {
+      notes.push(found[k].note);
+      to = found[k++].to;
+    }
+    while (from > i && H_SPACE.test(s[from - 1])) from--;
+    while (to < s.length && H_SPACE.test(s[to])) to++;
+    const before = from > 0 ? s[from - 1] : undefined;
+    const after = s[to];
+    out += s.slice(i, from) + (lineEdge(before) || lineEdge(after) || CLOSING.test(after) ? '' : ' ');
+    i = to;
+  }
+  return { text: (out + s.slice(i)).trim(), notes };
+}
+
+export const hasNotes = (s) => splitNotes(s).notes.length > 0;
+
+// The text has a note the shown translation did not have: the user typed it into the translation.
+export function addsNote(text, shown) {
+  const had = splitNotes(shown ?? '').notes;
+  return splitNotes(text).notes.some((n) => !had.includes(n));
+}
+
+// User-facing text for the two held cases (plan rules 5 and 8).
+export const NOTES_ONLY = 'Add the message too. [Brackets] are notes for protly.';
+export const NOTE_ON_TRANSLATION = 'Notes work on a new draft. Undo first, then add the note.';
