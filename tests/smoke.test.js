@@ -79,7 +79,7 @@ test('both content-script origins can load the shared UI modules and fonts', () 
 // No test drives these modules end to end; importing them catches broken imports and duplicate declarations.
 test('content modules import cleanly', async () => {
   for (const p of ['../src/content/main.js', '../src/content/instagram.js', '../src/content/outgoing.js', '../src/content/panel.js',
-    '../src/content/gmail/main.js', '../src/content/gmail/compose.js']) {
+    '../src/content/gmail/main.js', '../src/content/gmail/compose.js', '../src/content/whatsapp/site.js']) {
     await import(new URL(p, import.meta.url));
   }
 });
