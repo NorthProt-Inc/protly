@@ -25,8 +25,9 @@ test('keyboard prompt carries the shared English style verbatim (src/lib/style.j
 });
 
 test('keyboard prompt stays inside its size budget (it is sent on every call from the phone)', () => {
-  // 5000 since 2026-11-08: the span tag rule (fr:...;) and the notes rules added about 490 characters.
-  assert.ok(prompt.length <= 5000, `keyboard prompt is ${prompt.length} characters, budget 5000`);
+  // 5100 since 2026-11-08 (measured 5037): the span tag rule, the notes rules and the email, slang and numbers wording
+  // of the extension polish added about 590 characters.
+  assert.ok(prompt.length <= 5100, `keyboard prompt is ${prompt.length} characters, budget 5100`);
 });
 
 test('the keyboard translates into the extension languages (ProtlyCore Languages.swift equals LANG_NAMES)', () => {
@@ -75,6 +76,14 @@ test('keyboard prompt carries the shared notes rules (plan 2026-11-08 Part A rul
     ),
     last,
   );
+});
+
+test('keyboard prompt keeps an email, slang and numbers as the extension polish does (prompts.js POLISH_SYSTEM)', () => {
+  const fix = prompt.slice(prompt.indexOf('\nMODE fix '), prompt.indexOf('\nEnglish you write in '));
+  assert.ok(fix.includes('\n- An email keeps its greeting, sign-off, paragraphs and line breaks.\n'));
+  const all = prompt.slice(prompt.indexOf('\nAll modes:\n'));
+  assert.ok(all.includes('\n- Keep the register: casual stays casual, slang stays slang. '));
+  assert.ok(all.includes('\n- Keep emoji, names, @handles, URLs, numbers and line breaks exactly.\n'));
 });
 
 test('keyboard prompt has no screen or memo material from the Shortcut prompt', () => {
