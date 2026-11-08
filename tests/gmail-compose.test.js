@@ -253,6 +253,15 @@ test('a ru: prefix sends lang ru without the prefix, Undo brings back the prefix
   assert.equal(userText(dialog), 'ru: 안녕하세요');
 });
 
+test('a mid-draft span sends the tagged text with lang auto', async () => {
+  const { dialog, calls } = setup();
+  draft(dialog, '안녕 fr:고마워; 잘가');
+  translate(dialog);
+  assert.equal(calls[0].type, 'email');
+  assert.equal(calls[0].lang, 'auto');
+  assert.equal(calls[0].korean, '안녕 <fr>고마워</fr> 잘가');
+});
+
 test('a polish preview has Opus and Undo but no language picker', async () => {
   const { dialog, reply, note, buttonIn } = setup();
   draft(dialog, ENGLISH);

@@ -51,11 +51,39 @@ export const LANG_NAMES = {
 
 export const langName = (code) => LANG_NAMES[code] || code;
 
-// "ru: 안녕" -> { lang: 'ru', text: '안녕' }. Only known non-Korean codes count, so "ok:" stays text.
+const isCode = (c) => c !== 'ko' && c in LANG_NAMES;
+
+// A span inside the draft: a lowercase code, not right after an ASCII letter or digit, then `:`, optional spaces and
+// Hangul at once, so "ID: abc", "No: 3", "http:" and "10:30" never open one. A single `;` closes it and is dropped;
+// a run of two or more (;; is a sweat emoticon) is text. With no closing `;` the span runs to the end.
+const SPAN_OPEN = /(?<![A-Za-z0-9])([a-z]{2,3}):\s*(?=[ᄀ-ᇿ㄰-㆏가-힯])/g;
+const SPAN_CLOSE = /(?<!;);(?!;)/g;
+
+function tagSpans(s) {
+  let out = '';
+  let i = 0;
+  for (;;) {
+    SPAN_OPEN.lastIndex = i;
+    let m;
+    while ((m = SPAN_OPEN.exec(s)) && !isCode(m[1]));
+    if (!m) break;
+    const from = m.index + m[0].length;
+    SPAN_CLOSE.lastIndex = from;
+    const c = SPAN_CLOSE.exec(s);
+    const to = c ? c.index : s.length;
+    out += `${s.slice(i, m.index)}<${m[1]}>${s.slice(from, to)}</${m[1]}>`;
+    i = c ? to + 1 : s.length;
+  }
+  return out + s.slice(i);
+}
+
+// "ru: 안녕" -> { lang: 'ru', text: '안녕' }: a leading prefix picks the whole draft's language (any case, with or
+// without a later `;`). Only known non-Korean codes count, so "ok:" stays text. Spans after it are tagged for the
+// model: "안녕 fr:고마워; 잘가" -> { lang: null, text: '안녕 <fr>고마워</fr> 잘가' } (the prompts explain the tags).
 // Callers apply it to Korean drafts only, which keeps English such as "no: ..." (Norwegian) out of it.
 export function parseLangPrefix(s) {
   const m = s.match(/^\s*([a-z]{2,3}):\s*/i);
   const code = m?.[1].toLowerCase();
-  if (!code || code === 'ko' || !(code in LANG_NAMES)) return { lang: null, text: s };
-  return { lang: code, text: s.slice(m[0].length) };
+  if (!code || !isCode(code)) return { lang: null, text: tagSpans(s) };
+  return { lang: code, text: tagSpans(s.slice(m[0].length)) };
 }

@@ -7,7 +7,7 @@ const LETTER = /\p{L}/u;
 export function decideBox(text) {
   const p = parseLangPrefix(text);
   if (p.lang) return p.text.trim() ? { kind: 'translate', lang: p.lang, text: p.text } : { kind: 'none' };
-  if (hasHangul(text)) return { kind: 'translate', lang: 'en', text };
+  if (hasHangul(text)) return { kind: 'translate', lang: 'en', text: p.text };
   if (LETTER.test(text)) return { kind: 'polish', text };
   return { kind: 'none' };
 }

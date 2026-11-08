@@ -11,6 +11,11 @@ test('decideBox: a prefix with nothing after it does nothing', () => {
   assert.deepEqual(decideBox('ru:   '), { kind: 'none' });
 });
 
+test('decideBox: spans reach the request, with or without a leading prefix', () => {
+  assert.deepEqual(decideBox('안녕 fr:고마워; 잘가'), { kind: 'translate', lang: 'en', text: '안녕 <fr>고마워</fr> 잘가' });
+  assert.deepEqual(decideBox('ru: 안녕 fr:고마워;'), { kind: 'translate', lang: 'ru', text: '안녕 <fr>고마워</fr>' });
+});
+
 test('decideBox: Hangul goes to English', () => {
   assert.deepEqual(decideBox('내일 봐 ㅋㅋ'), { kind: 'translate', lang: 'en', text: '내일 봐 ㅋㅋ' });
 });

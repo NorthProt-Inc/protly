@@ -240,3 +240,10 @@ test('run is ignored while translating and in preview', () => {
   assert.equal(c.state, p);
   assert.deepEqual(c.effect, { type: 'none' });
 });
+
+test('a draft with a span sends the tagged text and no language; Esc restores the raw draft', () => {
+  const { effects } = run([{ type: 'enter', text: '안녕 fr:고마워; 잘가' }, { type: 'esc' }]);
+  assert.equal(effects[0].korean, '안녕 <fr>고마워</fr> 잘가');
+  assert.equal(effects[0].lang, null);
+  assert.deepEqual(effects[1], { type: 'restore', korean: '안녕 fr:고마워; 잘가' });
+});

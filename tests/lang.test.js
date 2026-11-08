@@ -59,8 +59,43 @@ test('parseLangPrefix: a known code picks the language and is dropped', () => {
   assert.deepEqual(parseLangPrefix('ja: 첫줄\n둘째 줄'), { lang: 'ja', text: '첫줄\n둘째 줄' });
 });
 
-test('parseLangPrefix: ko, unknown codes, a late prefix and URLs stay text', () => {
+test('parseLangPrefix: ko, unknown codes, a late prefix with no Korean after it and URLs stay text', () => {
   for (const s of ['ko: 안녕', 'ok: 안녕', '안녕 ru:', 'https://x.com 안녕']) {
     assert.deepEqual(parseLangPrefix(s), { lang: null, text: s });
   }
+});
+
+// Spans: from a mid-draft `fr:` up to a single `;` (plan docs/plans/2026-11-08-prefix-spans.md).
+test('parseLangPrefix: a mid-draft code opens a tagged span that closes at a single ;', () => {
+  const span = (s) => parseLangPrefix(s);
+  assert.deepEqual(span('오늘 고마웠어 fr:정말 고마워; 다음에 또 보자'), { lang: null, text: '오늘 고마웠어 <fr>정말 고마워</fr> 다음에 또 보자' });
+  assert.deepEqual(span('안녕 fr:고마워; 그리고 ja:잘가; 끝'), { lang: null, text: '안녕 <fr>고마워</fr> 그리고 <ja>잘가</ja> 끝' });
+  assert.deepEqual(span('안녕 fr:고마워 잘가'), { lang: null, text: '안녕 <fr>고마워 잘가</fr>' }); // no ; runs to the end
+  assert.deepEqual(span('안녕 fr:  고마워;'), { lang: null, text: '안녕 <fr>고마워</fr>' }); // spaces after the colon
+  assert.deepEqual(span('고마워fr:안녕;'), { lang: null, text: '고마워<fr>안녕</fr>' }); // right after Hangul
+  assert.deepEqual(span('안녕 fr:고마워 ja:잘가; 끝'), { lang: null, text: '안녕 <fr>고마워 ja:잘가</fr> 끝' }); // no nesting
+});
+
+test('parseLangPrefix: ;; and longer runs are text and do not close a span; a ; outside a span is text', () => {
+  assert.deepEqual(parseLangPrefix('안녕 fr:미안;; 늦었어'), { lang: null, text: '안녕 <fr>미안;; 늦었어</fr>' });
+  assert.deepEqual(parseLangPrefix('안녕 fr:고마워;;; 응'), { lang: null, text: '안녕 <fr>고마워;;; 응</fr>' });
+  assert.deepEqual(parseLangPrefix('안녕 fr:고마워; ;'), { lang: null, text: '안녕 <fr>고마워</fr> ;' });
+  assert.deepEqual(parseLangPrefix('안녕; 잘가'), { lang: null, text: '안녕; 잘가' });
+});
+
+test('parseLangPrefix: a leading prefix still means the whole draft, and spans can follow it', () => {
+  assert.deepEqual(parseLangPrefix('ru: 미안;; 늦었어'), { lang: 'ru', text: '미안;; 늦었어' });
+  assert.deepEqual(parseLangPrefix('ru: 안녕; 잘가'), { lang: 'ru', text: '안녕; 잘가' });
+  assert.deepEqual(parseLangPrefix('ru: 안녕 fr:고마워;'), { lang: 'ru', text: '안녕 <fr>고마워</fr>' });
+});
+
+test('parseLangPrefix: mid-draft look-alikes stay text', () => {
+  for (const s of ['x ID: abc 추가해줘', 'x UK: 런던', 'x No: 3', '링크 http://안녕', '10:30 만나', '안녕 ok:안녕',
+    '안녕 ko:안녕', '안녕 fr: Bonjour', '안녕 abc:안녕']) {
+    assert.deepEqual(parseLangPrefix(s), { lang: null, text: s }, s);
+  }
+});
+
+test('parseLangPrefix: known false positive, a lowercase id: before Hangul opens Indonesian (previewed before sending)', () => {
+  assert.deepEqual(parseLangPrefix('내 아이디 id:홍길동'), { lang: null, text: '내 아이디 <id>홍길동</id>' });
 });

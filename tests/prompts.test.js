@@ -158,6 +158,17 @@ test('outgoing prompt checks gendered words and never answers in Korean; email s
   assert.doesNotMatch(e.system, /ty spasla/);
 });
 
+test('outgoing and email prompts explain language tags; email lang names the main target', () => {
+  const o = buildOutgoingRequest({ model: 'claude-sonnet-5-5', profile: 'outgoing', memo: '', context: [], korean: '안녕 <fr>고마워</fr>', lang: 'en' });
+  const e = buildEmailRequest({ model: 'claude-sonnet-5-5', context: [], korean: '안녕 <fr>고마워</fr>' });
+  for (const r of [o, e]) {
+    assert.match(r.system, /wrapped in a language tag such as <fr>\.\.\.<\/fr> goes into that language/);
+    assert.match(r.system, /Never write the tags/);
+    assert.match(r.messages[0].content, /KOREAN DRAFT:\n안녕 <fr>고마워<\/fr>$/);
+  }
+  assert.match(e.system, /lang: the ISO 639-1 code of the main language you wrote in \(TARGET, not a tagged part\)/);
+});
+
 test('box request: outgoing system, hostname line, no memo or conversation', () => {
   const b = buildBoxRequest({ model: 'claude-sonnet-5-5', profile: 'outgoing', korean: '안녕하세요', lang: 'en', hostname: 'forum.example.org' });
   const dm = buildOutgoingRequest({ model: 'claude-sonnet-5-5', profile: 'outgoing', memo: '', context: [], korean: 'x', lang: 'en' });
