@@ -1,6 +1,9 @@
 const HANGUL = /[ᄀ-ᇿ㄰-㆏가-힯]/;
 const HANGUL_G = /[ᄀ-ᇿ㄰-㆏가-힯]/g;
 
+// Each run of consecutive Hangul in s.
+export const hangulRuns = (s) => s.match(/[ᄀ-ᇿ㄰-㆏가-힯]+/g) ?? [];
+
 export function hasHangul(s) {
   return HANGUL.test(s);
 }

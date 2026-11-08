@@ -7,9 +7,9 @@ import { createCard } from '../ui/card.js';
 import { showToast } from '../ui/toast.js';
 import { errorText } from '../ui/errors.js';
 import { trusted } from '../ui/trust.js';
-import { commandListener } from '../lib/command.js';
+import { commandListener, isUndoKey } from '../lib/command.js';
 
-const HINTS = 'Enter send · Esc undo · Alt+Enter Opus';
+const HINTS = 'Enter send · Esc keep · Alt+Z undo · Alt+Enter Opus';
 
 const COMPOSE_ENTER_MS = 300; // a deferred IME Enter must be followed by compositionend within this window
 const WRITE_SETTLE_MS = 50;   // editors such as Lexical commit DOM updates asynchronously
@@ -37,8 +37,9 @@ export function holdUntrustedEnter(e, { composer: c, writing, mode, polish = fal
 export function mountOutgoing(cur) {
   let state = initial();
   let enterAfterComposition = null; // { hard, at }
-  let lastText = ''; // composer text while previewing; recorded if Instagram's Send button sends it
-  let writing = false; // a composer write is queued or running: its input events are ours, and Enter/Esc wait
+  let lastText = ''; // composer text in preview or kept; recorded if Instagram's Send button sends it
+  let writing = false; // a composer write is queued or running: its input events are ours, and Enter/Esc/Alt+Z wait
+  let checking = false; // the translation was written and is being checked: Enter/Esc/Alt+Z wait for the check
   let writeGen = 0;
   let writeChain = Promise.resolve();
   let srcText = ''; // composer text when the current translation was requested
@@ -139,9 +140,15 @@ export function mountOutgoing(cur) {
           break;
         }
         const korean = state.korean;
-        const ok = await write(c, effect.translation);
-        await new Promise((r) => setTimeout(r, WRITE_SETTLE_MS));
-        if (!live() || state.mode !== 'preview') break; // Esc, reset or thread switch meanwhile
+        checking = true; // until the write is checked, a key would keep or send text nobody has checked
+        let ok;
+        try {
+          ok = await write(c, effect.translation);
+          await new Promise((r) => setTimeout(r, WRITE_SETTLE_MS));
+        } finally {
+          checking = false;
+        }
+        if (!live() || state.mode !== 'preview') break; // reset or thread switch meanwhile
         if (!ok || norm(getComposerText(c)) !== norm(effect.translation)) {
           dispatch({ type: 'reset' });
           if (korean) await write(c, korean); // never leave an unpreviewed translation behind
@@ -161,6 +168,10 @@ export function mountOutgoing(cur) {
         if (c) await write(c, effect.korean);
         hideNote();
         lastText = '';
+        break;
+      case 'keep': // the box keeps what it holds; the user edits it and presses Enter or Alt+T again
+        hideNote();
+        lastText = state.mode === 'kept' ? state.shown : '';
         break;
       case 'sent': {
         // Runs synchronously inside the Enter keydown, before Instagram reads and clears the composer.
@@ -186,9 +197,9 @@ export function mountOutgoing(cur) {
     return r.effect;
   }
 
-  // Composer emptied while previewing: Instagram's Send button sent it, or the user deleted it.
+  // Composer emptied in preview or kept: Instagram's Send button sent it, or the user deleted it.
   function checkEmpty() {
-    if (state.mode !== 'preview') return;
+    if (state.mode !== 'preview' && state.mode !== 'kept') return;
     const c = composer();
     if (!c || getComposerText(c).trim() !== '') return;
     const cur2 = getCurrent();
@@ -200,7 +211,7 @@ export function mountOutgoing(cur) {
 
   function onInput(e) {
     const c = composer();
-    if (writing || state.mode !== 'preview' || !c || !c.contains(e.target)) return;
+    if (writing || (state.mode !== 'preview' && state.mode !== 'kept') || !c || !c.contains(e.target)) return;
     const t = getComposerText(c);
     if (t.trim()) lastText = t; else checkEmpty();
   }
@@ -226,8 +237,9 @@ export function mountOutgoing(cur) {
       return;
     }
 
-    // A write is landing: the composer does not yet match the state, so Enter/Esc would act on stale text.
-    if (writing && (e.key === 'Escape' || isEnter(e))) { block(e); return; }
+    // A write is landing or being checked: the composer does not yet match the state, so Enter/Esc/Alt+Z would act
+    // on stale text.
+    if ((writing || checking) && (e.key === 'Escape' || isEnter(e) || isUndoKey(e))) { block(e); return; }
     if (isEnter(e) && e.repeat) { block(e); return; } // a held Enter must not confirm a preview it never showed
 
     if (e.key === 'Escape') {
@@ -236,13 +248,17 @@ export function mountOutgoing(cur) {
       if (escHeld) block(e);
       return;
     }
+    if (isUndoKey(e)) {
+      if (!e.isComposing && !composing && dispatch({ type: 'undo' }).type !== 'pass') block(e);
+      return;
+    }
     if (!isEnter(e) || e.shiftKey) return;
 
     // Korean IME: Enter mid-composition. Never let it reach Instagram while a translation is pending
     // or while the box holds Hangul; handle the Enter once the composition is committed.
     if (e.isComposing || composing) {
       if (state.mode === 'translating') { block(e); return; }
-      if (hasHangul(getComposerText(c)) && !(state.mode === 'preview' && state.lang === 'ko')) {
+      if (hasHangul(getComposerText(c)) && !((state.mode === 'preview' || state.mode === 'kept') && state.lang === 'ko')) {
         block(e);
         enterAfterComposition = { hard: e.altKey, at: Date.now() };
       }

@@ -157,8 +157,8 @@ test('WhatsApp: Hangul Enter is never let through, from a title miss to a chat s
     assert.equal(rowSaw, 0);
     assert.deepEqual(asked.filter((m) => m.type === 'outgoing').map((m) => [m.threadId, m.korean]), [[idB, '안녕']]);
 
-    // 9. Escape while translating is protly's undo: neither its keydown nor its keyup reaches WhatsApp's own early
-    // listener, so a quote-reply survives. With nothing to undo, Escape is WhatsApp's again.
+    // 9. Escape while translating is protly's cancel: neither its keydown nor its keyup reaches WhatsApp's own early
+    // listener, so a quote-reply survives. With nothing to cancel, Escape is WhatsApp's again.
     const esc = (type) => {
       const e = new win.KeyboardEvent(type, { key: 'Escape', code: 'Escape', bubbles: true, cancelable: true });
       composer.dispatchEvent(e);
@@ -169,11 +169,27 @@ test('WhatsApp: Hangul Enter is never let through, from a title miss to a chat s
     esc('keyup');
     await flush();
     assert.equal(pageEsc, 0);
-    await advance(300); // the undo's write lands
+    await advance(300);
     esc('keydown');
     esc('keyup');
     _trustSyntheticEvents(false);
     assert.equal(pageEsc, 2);
+
+    // 10. Alt+Z while translating is protly's undo and is swallowed; with nothing to undo it is the page's.
+    const altZ = () => {
+      const e = new win.KeyboardEvent('keydown', { key: 'z', code: 'KeyZ', altKey: true, bubbles: true, cancelable: true });
+      composer.dispatchEvent(e);
+      return e;
+    };
+    _trustSyntheticEvents(true);
+    const before = asked.filter((m) => m.type === 'outgoing').length;
+    assert.equal(hangulEnter(composer).defaultPrevented, true);
+    await flush();
+    assert.equal(asked.filter((m) => m.type === 'outgoing').length, before + 1);
+    assert.equal(altZ().defaultPrevented, true);
+    await advance(300); // the undo's write lands
+    assert.equal(altZ().defaultPrevented, false);
+    _trustSyntheticEvents(false);
   } finally {
     _trustSyntheticEvents(false);
     mock.timers.reset();

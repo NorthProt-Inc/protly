@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { GSEL } from '../src/content/gmail/selectors.js';
 import { userNodes, nodesToText } from '../src/content/gmail/body.js';
-import { mountCompose, translate, undo, escape } from '../src/content/gmail/compose.js';
+import { mountCompose, translate, undo, keep, undoKey } from '../src/content/gmail/compose.js';
 import { flags } from '../src/lib/flags.js';
 import { shadowOf } from '../src/ui/card.js';
 
@@ -300,19 +300,34 @@ test('Korean typed over a polish preview starts a translation', async () => {
   assert.ok(note().querySelector('select')); // back to a translate preview
 });
 
-test('Esc undoes a preview and cancels a translation in flight', async () => {
+test('Esc keeps a preview, Alt+Z undoes it, and either cancels a translation in flight', async () => {
   const { inline, reply, note } = setup();
-  assert.equal(escape(inline), false); // idle: Gmail keeps the key
+  assert.equal(keep(inline), false); // idle: Gmail keeps the key
+  assert.equal(undoKey(inline), false);
   translate(inline);
   await reply(ok('First'));
-  assert.equal(escape(inline), true);
-  assert.equal(userText(inline), KOREAN);
+  inline.firstChild.textContent = 'First, edited';
+  assert.equal(keep(inline), true);
+  assert.equal(userText(inline), 'First, edited');
   assert.equal(note(), null);
+  assert.equal(keep(inline), false); // accepted: nothing left to act on
+  assert.equal(undoKey(inline), false);
+
+  inline.firstChild.textContent = KOREAN;
   translate(inline);
-  assert.equal(escape(inline), true);
-  await reply(ok('Late'));
+  await reply(ok('Second'));
+  inline.firstChild.textContent = 'Second, edited';
+  assert.equal(undoKey(inline), true); // an edited translation too
   assert.equal(userText(inline), KOREAN);
   assert.equal(note(), null);
+
+  for (const act of [keep, undoKey]) {
+    translate(inline);
+    assert.equal(act(inline), true);
+    await reply(ok('Late'));
+    assert.equal(userText(inline), KOREAN);
+    assert.equal(note(), null);
+  }
 });
 
 test('the preview card shows the model and the Esc hint', async () => {
@@ -320,15 +335,15 @@ test('the preview card shows the model and the Esc hint', async () => {
   translate(inline);
   await reply(ok('First', 'claude-opus-5-5'));
   assert.equal(note().querySelector('.model').textContent, 'Opus');
-  assert.equal(note().querySelector('.hints').textContent, 'Esc undo');
+  assert.equal(note().querySelector('.hints').textContent, 'Esc keep · Alt+Z undo');
 });
 
-test('Esc after editing the translation keeps the edit and asks instead', async () => {
+test('Opus after editing the translation keeps the edit and asks instead', async () => {
   const { inline, calls, reply, note, buttonIn } = setup();
   translate(inline);
   await reply(ok('First'));
   inline.firstChild.textContent = 'First, edited';
-  assert.equal(escape(inline), true); // swallowed: the prompt answers it
+  buttonIn('Opus').click();
   assert.equal(userText(inline), 'First, edited');
   assert.equal(calls.length, 1);
   assert.match(note().textContent, /You edited the translation/);

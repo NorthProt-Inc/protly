@@ -92,20 +92,74 @@ test('language change in preview re-translates with same profile', () => {
   assert.equal(c.effect.korean, '가자');
 });
 
-test('Esc in preview restores Korean', () => {
-  const c = reduce(toPreview('가자'), { type: 'esc' });
-  assert.equal(c.state.mode, 'idle');
-  assert.deepEqual(c.effect, { type: 'restore', korean: '가자' });
+test('Esc in preview keeps the translation; Alt+Z restores Korean, also after Esc', () => {
+  const k = reduce(toPreview('가자'), { type: 'esc' });
+  assert.equal(k.state.mode, 'kept');
+  assert.deepEqual(k.effect, { type: 'keep' });
+  assert.deepEqual(reduce(k.state, { type: 'esc' }).effect, { type: 'pass' }); // the page's Esc again
+  const u = reduce(toPreview('가자'), { type: 'undo' });
+  assert.equal(u.state.mode, 'idle');
+  assert.deepEqual(u.effect, { type: 'restore', korean: '가자' });
+  const ku = reduce(k.state, { type: 'undo' });
+  assert.equal(ku.state.mode, 'idle');
+  assert.deepEqual(ku.effect, { type: 'restore', korean: '가자' });
 });
 
-test('Esc while translating restores Korean; late result ignored', () => {
-  const a = reduce(initial(), { type: 'enter', text: '가자', hard: false });
-  const b = reduce(a.state, { type: 'esc' });
-  assert.equal(b.state.mode, 'idle');
-  assert.deepEqual(b.effect, { type: 'restore', korean: '가자' });
-  const c = reduce(b.state, { type: 'result', reqId: a.effect.reqId, translation: 'go', back_translation: '가자', lang: 'en', model: 'm' });
-  assert.equal(c.state.mode, 'idle');
-  assert.deepEqual(c.effect, { type: 'none' });
+// toPreview('가자') shows 'T'; a translation that keeps Hangul shows it here.
+const kept = (shown, lang = 'en') => {
+  const a = reduce(initial(), { type: 'enter', text: '지민아 가자 ㅋㅋ' });
+  const b = reduce(a.state, { type: 'result', reqId: a.effect.reqId, translation: shown, back_translation: 'x', lang, model: 'm' });
+  return reduce(b.state, { type: 'esc' }).state;
+};
+
+test('kept: Enter sends the translation, edited or not, with its Korean source; Polish never runs', () => {
+  const s = kept("Let's go 지민 ㅋㅋ");
+  for (const text of ["Let's go 지민 ㅋㅋ", "Let's go now 지민 ㅋㅋ", 'Go'] ) {
+    const r = reduce(s, { type: 'enter', text, polish: true });
+    assert.equal(r.state.mode, 'idle');
+    assert.deepEqual(r.effect, { type: 'sent', korean: '지민아 가자 ㅋㅋ' });
+  }
+});
+
+test('kept: Enter translates again only when the edit adds Hangul the translation did not have', () => {
+  const r = reduce(kept("Let's go 지민 ㅋㅋ"), { type: 'enter', text: "Let's go 지민 ㅋㅋ 빨리" });
+  assert.equal(r.effect.type, 'translate');
+  assert.equal(r.effect.korean, "Let's go 지민 ㅋㅋ 빨리");
+  // A Korean target is all Hangul: an edit to it is sent as is.
+  assert.equal(reduce(kept('지민아 가자', 'ko'), { type: 'enter', text: '지민아 빨리 가자' }).effect.type, 'sent');
+});
+
+test('kept: Alt+T polishes English and translates Hangul; the chip and results do nothing', () => {
+  const s = kept("Let's go");
+  const p = reduce(s, { type: 'run', text: "Let's go now" });
+  assert.equal(p.effect.kind, 'polish');
+  assert.equal(p.effect.korean, "Let's go now");
+  assert.equal(reduce(s, { type: 'run', text: "Let's go 빨리" }).effect.kind, 'translate');
+  assert.deepEqual(reduce(s, { type: 'lang', lang: 'ja' }).effect, { type: 'none' });
+});
+
+test('Esc during a re-run keeps the translation the box still holds', () => {
+  const p = toPreview('가자');
+  const r = reduce(p, { type: 'enter', text: 'T', hard: true });
+  assert.equal(r.state.mode, 'translating');
+  const k = reduce(r.state, { type: 'esc' });
+  assert.equal(k.state.mode, 'kept');
+  assert.equal(k.state.shown, 'T');
+  assert.deepEqual(reduce(k.state, { type: 'enter', text: 'T' }).effect, { type: 'sent', korean: '가자' });
+  const l = reduce(reduce(p, { type: 'lang', lang: 'ja' }).state, { type: 'esc' });
+  assert.equal(l.state.mode, 'kept');
+});
+
+test('Esc or Alt+Z while translating drops the late result', () => {
+  for (const [key, effect] of [['esc', { type: 'keep' }], ['undo', { type: 'restore', korean: '가자' }]]) {
+    const a = reduce(initial(), { type: 'enter', text: '가자', hard: false });
+    const b = reduce(a.state, { type: key });
+    assert.equal(b.state.mode, 'idle'); // the box still holds the draft: nothing to keep
+    assert.deepEqual(b.effect, effect);
+    const c = reduce(b.state, { type: 'result', reqId: a.effect.reqId, translation: 'go', back_translation: '가자', lang: 'en', model: 'm' });
+    assert.equal(c.state.mode, 'idle');
+    assert.deepEqual(c.effect, { type: 'none' });
+  }
 });
 
 test('failure returns to idle and carries the Korean', () => {
@@ -122,8 +176,9 @@ test('failed re-translate from preview still carries the Korean', () => {
   assert.deepEqual(d.effect, { type: 'fail', message: 'host', korean: '가자' });
 });
 
-test('Esc in idle passes; reset always returns idle', () => {
+test('Esc and Alt+Z in idle pass; reset always returns idle', () => {
   assert.deepEqual(reduce(initial(), { type: 'esc' }).effect, { type: 'pass' });
+  assert.deepEqual(reduce(initial(), { type: 'undo' }).effect, { type: 'pass' });
   const a = reduce(initial(), { type: 'enter', text: '가자', hard: false });
   assert.equal(reduce(a.state, { type: 'reset' }).state.mode, 'idle');
 });
@@ -170,9 +225,9 @@ test('polish preview: lang stays null, Enter sends, an edit is sent as is', () =
   assert.equal(reduce(s, { type: 'enter', text: 'I think it is great.', polish: true }).effect.type, 'sent');
 });
 
-test('polish preview: Esc restores the English original, Alt+Enter re-polishes with hard', () => {
+test('polish preview: Alt+Z restores the English original, Alt+Enter re-polishes with hard', () => {
   const s = polishPreview();
-  assert.deepEqual(reduce(s, { type: 'esc' }).effect, { type: 'restore', korean: 'i think its good' });
+  assert.deepEqual(reduce(s, { type: 'undo' }).effect, { type: 'restore', korean: 'i think its good' });
   const h = reduce(s, { type: 'enter', text: 'I think it is good.', hard: true, polish: true }).effect;
   assert.equal(h.kind, 'polish');
   assert.equal(h.profile, 'hard');
@@ -185,12 +240,12 @@ test('Hangul typed over a polish preview starts a translation', () => {
   assert.equal(r.effect.korean, '내일 보자');
 });
 
-test('prefix: ru: picks the language for the request, Esc restores the prefixed draft', () => {
+test('prefix: ru: picks the language for the request, Alt+Z restores the prefixed draft', () => {
   const a = reduce(initial(), { type: 'enter', text: 'ru: 안녕' });
   assert.equal(a.effect.lang, 'ru');
   assert.equal(a.effect.korean, '안녕');
   assert.equal(a.state.korean, 'ru: 안녕');
-  assert.deepEqual(reduce(a.state, { type: 'esc' }).effect, { type: 'restore', korean: 'ru: 안녕' });
+  assert.deepEqual(reduce(a.state, { type: 'undo' }).effect, { type: 'restore', korean: 'ru: 안녕' });
 });
 
 test('prefix: the chip overrides it', () => {
@@ -241,8 +296,8 @@ test('run is ignored while translating and in preview', () => {
   assert.deepEqual(c.effect, { type: 'none' });
 });
 
-test('a draft with a span sends the tagged text and no language; Esc restores the raw draft', () => {
-  const { effects } = run([{ type: 'enter', text: '안녕 fr:고마워; 잘가' }, { type: 'esc' }]);
+test('a draft with a span sends the tagged text and no language; Alt+Z restores the raw draft', () => {
+  const { effects } = run([{ type: 'enter', text: '안녕 fr:고마워; 잘가' }, { type: 'undo' }]);
   assert.equal(effects[0].korean, '안녕 <fr>고마워</fr> 잘가');
   assert.equal(effects[0].lang, null);
   assert.deepEqual(effects[1], { type: 'restore', korean: '안녕 fr:고마워; 잘가' });

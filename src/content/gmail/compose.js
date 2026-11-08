@@ -8,7 +8,7 @@ import { trusted } from '../../ui/trust.js';
 import { LIMITS } from '../../lib/limits.js';
 
 const MOUNT_GRACE_MS = 3000; // Gmail can render a body before its toolbar
-const HINTS = 'Esc undo';
+const HINTS = 'Esc keep · Alt+Z undo';
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 // The user changed the translation in the body since the preview appeared.
 const edited = (body, s) => norm(nodesToText(userNodes(body))) !== norm(s.shown);
@@ -91,7 +91,7 @@ function cardOf(body, s) {
 
 const act = (label, onClick) => ({ label, onClick });
 // A polish preview has no target language, so no picker.
-// The chip takes focus and the working card removes it, so give focus back to the body for the next Esc.
+// The chip takes focus and the working card removes it, so give focus back to the body for the next Esc or Alt+Z.
 const pickerOf = (body, s) => (s.kind === 'polish' ? {} : {
   lang: s.lang, onLang: (lang) => { body.focus(); retranslate(body, { lang }); },
 });
@@ -166,24 +166,32 @@ function retranslate(body, { lang, profile, force = false }) {
   return request(body, opts);
 }
 
-export function undo(body) {
-  const s = stateOf(body);
-  if (s.saved) replaceUserNodes(body, s.saved);
+// Back to idle with whatever the body holds now, dropping any result still in flight.
+function settle(s) {
   Object.assign(s, { mode: 'idle', saved: null, kind: 'translate', korean: null, shown: null, lang: 'auto', profile: 'email', last: null });
-  s.reqId++; // drop any result still in flight
+  s.reqId++;
   hideNote(s);
 }
 
-// Esc in a compose body: undo a preview or a translation in flight. False when there is nothing to undo.
-// An edited translation is never undone by Esc (the DOM swap is outside Ctrl+Z): retranslate's
-// edited-translation prompt asks instead, with Undo as one of its choices.
-export function escape(body) {
+export function undo(body) {
+  const s = stateOf(body);
+  if (s.saved) replaceUserNodes(body, s.saved);
+  settle(s);
+}
+
+// Keys in a compose body. False when there is nothing to act on, so Gmail keeps the key.
+// Esc keeps the body as it is (the translation, edited or not; the draft while a request is in flight).
+export function keep(body) {
   const s = states.get(body);
   if (!s || s.mode === 'idle') return false;
-  if (s.mode === 'preview' && edited(body, s)) {
-    retranslate(body, {});
-    return true;
-  }
+  settle(s);
+  return true;
+}
+
+// Alt+Z puts the original draft back, an edited translation included.
+export function undoKey(body) {
+  const s = states.get(body);
+  if (!s || s.mode === 'idle') return false;
   undo(body);
   return true;
 }

@@ -6,6 +6,7 @@ import { commitByRefocus, nextFrame, settleComposition } from '../lib/ime.js';
 import { decideBox, decideSelection } from './decide.js';
 import { deepActive, findTarget, selectionInfo } from './target.js';
 import { boxHolds, readBox, writeBox } from './writer.js';
+import { isUndoKey } from '../lib/command.js';
 
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 const NOTHING = 'Put the cursor in a text box or select text.';
@@ -62,15 +63,18 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     return card && (a === cur.card.host || a.getRootNode?.() === cur.card.shadow);
   }
 
+  // Esc keeps what the box holds now and closes the card (a write in flight is dropped or rolled back).
+  // Alt+Z puts the original back; while a request is in flight it cancels it first.
   function onKeyDown(e) {
-    if (e.key !== 'Escape' || e.isComposing) return;
+    const esc = e.key === 'Escape';
+    if (!(esc || isUndoKey(e)) || e.isComposing) return;
     if (box && (box.mode === 'preview' || box.mode === 'working') && inBox(box, e)) {
       e.preventDefault();
       e.stopImmediatePropagation();
-      if (box.mode === 'working') cancel(box); else undo();
+      if (esc) close(); else if (box.mode === 'working') cancel(box); else undo();
       return;
     }
-    if (pop) { pop.hide(); pop = null; } // the page still gets its Esc
+    if (esc && pop) { pop.hide(); pop = null; } // the page still gets its Esc
   }
 
   // Focus moved elsewhere: the preview is accepted as it is and the card closes.
@@ -112,7 +116,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       model: cur.last.model, // the card turns the id into 'Sonnet' or 'Opus'
       ...(polish ? {} : { lang: cur.lang, onLang: (code) => rerun({ lang: code }) }),
       actions: actionsFor(cur),
-      hints: 'Esc undo',
+      hints: 'Esc keep · Alt+Z undo',
     });
   }
 
@@ -168,7 +172,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     const focusMoved = () => { close(); toast(FOCUS_MOVED); };
     if (!focusOk()) { focusMoved(); return; }
     const w = await writeBox(cur.t, r.translation, { stillOk: () => live() && focusOk() });
-    if (w === null) { if (live()) focusMoved(); return; } // Esc or a focus change during the select settle
+    if (w === null) { if (live()) focusMoved(); return; } // Esc, an Alt+Z cancel or a focus change during the select settle
     if (!w) {
       const back = (await boxHolds(cur.t, before)) || (await writeBox(cur.t, before));
       cur.mode = cur.prev;

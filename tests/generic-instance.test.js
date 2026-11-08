@@ -85,16 +85,27 @@ test('Alt+T again while the preview is open re-runs on Opus', async () => {
   assert.equal(calls[1].text, '내일 봐'); // the original, not the shown translation
 });
 
-test('Esc in the box during the preview undoes', async () => {
-  const { dom, calls, pending, inst, btn, box } = setup();
+test('Esc in the box during the preview keeps the translation; Alt+Z undoes', async () => {
+  const { dom, calls, pending, inst, btn, box, root } = setup();
+  const key = (init) => { const e = new dom.window.KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init }); box.dispatchEvent(e); return e; };
   box.value = '내일 봐';
   box.focus();
   inst.run({ source: 'command' });
   await until(() => calls.length === 1);
   pending[0].res(reply('see you tomorrow'));
   await until(() => btn('Undo'));
-  box.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-  await until(() => box.value === '내일 봐');
+  box.value = 'see you tomorrow!';
+  assert.equal(key({ key: 'Escape' }).defaultPrevented, true);
+  assert.equal(box.value, 'see you tomorrow!');
+  assert.equal(root(), undefined);
+  assert.equal(key({ key: 'Escape' }).defaultPrevented, false); // nothing left to keep: the page gets it
+
+  inst.run({ source: 'command' });
+  await until(() => calls.length === 2);
+  pending[1].res(reply('see you tomorrow'));
+  await until(() => btn('Undo'));
+  assert.equal(key({ key: 'Ω', code: 'KeyZ', altKey: true }).defaultPrevented, true); // Option+Z on a Mac
+  await until(() => box.value === 'see you tomorrow!');
 });
 
 test('text typed while working: the result is dropped, the box is left alone', async () => {
@@ -234,7 +245,7 @@ test('focus moved while working: a contenteditable is left alone, with a toast',
   assert.equal(s.root(), undefined);
 });
 
-test('a box inside a shadow root: Esc in it undoes', async () => {
+test('a box inside a shadow root: Alt+Z in it undoes', async () => {
   const s = setup('<div id="h"></div>');
   const sr = s.doc.getElementById('h').attachShadow({ mode: 'open' });
   const box = s.doc.createElement('textarea');
@@ -245,7 +256,7 @@ test('a box inside a shadow root: Esc in it undoes', async () => {
   await until(() => s.calls.length === 1);
   s.pending[0].res(reply('see you tomorrow'));
   await until(() => s.btn('Undo'));
-  box.dispatchEvent(new s.dom.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }));
+  box.dispatchEvent(new s.dom.window.KeyboardEvent('keydown', { key: 'z', code: 'KeyZ', altKey: true, bubbles: true, composed: true }));
   await until(() => box.value === '내일 봐');
 });
 
