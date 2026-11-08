@@ -228,7 +228,7 @@ test('focus moved while working: a textarea is written without taking focus back
   assert.equal(s.doc.activeElement, other);
 });
 
-test('focus moved while working: a contenteditable is left alone, with a toast', async () => {
+test('focus moved into an input while working: a contenteditable is left alone, with a toast', async () => {
   const s = setup(CE);
   const writes = editable(s);
   s.box.textContent = '내일 봐';
@@ -243,6 +243,63 @@ test('focus moved while working: a contenteditable is left alone, with a toast',
   assert.equal(s.box.textContent, '내일 봐');
   assert.equal(s.doc.activeElement, other);
   assert.equal(s.root(), undefined);
+});
+
+// Outlook: a long email takes a while, and a click on the page, a scroll or the autosave blurs the body.
+for (const [what, move] of [
+  ['blurred to the page', (s) => s.box.blur()],
+  ['onto a button', (s) => s.doc.getElementById('btn').focus()],
+  ['onto a non-editable element with tabindex', (s) => s.doc.getElementById('pane').focus()],
+]) {
+  test(`focus ${what} while working: a contenteditable is still written and keeps the preview`, async () => {
+    const s = setup(`${CE}<button id="btn">Send</button><div id="pane" tabindex="0">quoted mail</div>`);
+    const writes = editable(s);
+    s.box.textContent = '내일 봐';
+    s.box.focus();
+    s.inst.run({ source: 'command' });
+    await until(() => s.calls.length === 1);
+    move(s);
+    assert.notEqual(s.doc.activeElement, s.box);
+    s.pending[0].res(reply('see you tomorrow'));
+    await until(() => s.btn('Undo'));
+    assert.deepEqual(writes, ['see you tomorrow']);
+    assert.equal(s.box.textContent, 'see you tomorrow');
+    assert.equal(s.doc.activeElement, s.box);
+    assert.doesNotMatch(s.toasts(), /Focus moved/);
+  });
+}
+
+for (const field of ['<input id="f" type="password">', '<input id="f" type="number">', '<input id="f" readonly>', '<select id="f"><option>a</option></select>']) {
+  test(`focus moved into ${field} while working: a contenteditable is left alone`, async () => {
+    const s = setup(`${CE}${field}`);
+    const writes = editable(s);
+    s.box.textContent = '내일 봐';
+    s.box.focus();
+    s.inst.run({ source: 'command' });
+    await until(() => s.calls.length === 1);
+    const f = s.doc.getElementById('f');
+    f.focus();
+    s.pending[0].res(reply('see you tomorrow'));
+    await until(() => /Focus moved, so the translation was not written\./.test(s.toasts()));
+    assert.deepEqual(writes, []);
+    assert.equal(s.doc.activeElement, f);
+  });
+}
+
+test('focus moved into another contenteditable while working: left alone, with a toast', async () => {
+  const s = setup(`${CE}<div id="o2" contenteditable="true" tabindex="0"></div>`);
+  const writes = editable(s);
+  s.box.textContent = '내일 봐';
+  s.box.focus();
+  s.inst.run({ source: 'command' });
+  await until(() => s.calls.length === 1);
+  const other = s.doc.getElementById('o2');
+  other.focus();
+  s.pending[0].res(reply('see you tomorrow'));
+  await until(() => /Focus moved, so the translation was not written\./.test(s.toasts()));
+  assert.deepEqual(writes, []);
+  assert.equal(s.box.textContent, '내일 봐');
+  assert.equal(s.doc.activeElement, other);
 });
 
 test('a box inside a shadow root: Alt+Z in it undoes', async () => {
