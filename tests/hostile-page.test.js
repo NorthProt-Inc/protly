@@ -173,7 +173,7 @@ test('Instagram: an oversized partner message neither blocks the batch nor the r
   const { checkShape } = await import('../src/lib/messages.js');
   const doc = igThread(['hello', `${'x'.repeat(1999)}${'😀'.repeat(20000)}`, 'привет']);
   const root = doc.querySelector('[role="main"]');
-  const ctx = contextFor(root);
+  const ctx = contextFor(readMessages(root, 'me'));
   checkShape('outgoing', { threadId: '1', context: ctx, korean: '안녕', profile: 'outgoing' });
   checkShape('suggestMemo', { threadId: '1', context: ctx });
   assert.match(ctx[1].text, /\[\.\.\.\]$/);

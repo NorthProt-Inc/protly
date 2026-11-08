@@ -1,8 +1,7 @@
 import { initial, reduce } from '../lib/preview.js';
 import { hasHangul } from '../lib/lang.js';
-import { findComposer, getComposerText, setComposerText } from './dom.js';
-import { ask, getCurrent, contextFor, bannerFor } from './main.js';
-import { threadIdFromPath } from '../lib/keys.js';
+import { getComposerText, setComposerText } from './dom.js';
+import { ask, getCurrent, getSite, contextFor, bannerFor } from './main.js';
 import { flags } from '../lib/flags.js';
 import { createCard } from '../ui/card.js';
 import { showToast } from '../ui/toast.js';
@@ -43,8 +42,8 @@ export function mountOutgoing(cur) {
 
   // This mount still owns the page: not torn down and the URL still shows its thread. Between a thread
   // switch and the next 500 ms tick, composer() already finds the NEW thread's box.
-  const live = () => !dead && getCurrent() === cur && threadIdFromPath(location.pathname) === cur.threadId;
-  const composer = () => findComposer(document);
+  const live = () => !dead && getCurrent() === cur && getSite().threadId() === cur.threadId;
+  const composer = () => getSite().findComposer(document);
   // Writes run one at a time; a newer write supersedes queued or settling older ones.
   const write = (c, s) => {
     const gen = ++writeGen;
@@ -61,7 +60,7 @@ export function mountOutgoing(cur) {
   const checkComposer = (tries = 0) => {
     if (!live() || composer()) return;
     if (tries < 9) return void setTimeout(() => checkComposer(tries + 1), 1000);
-    ask({ type: 'badge', text: '!', reason: 'Instagram message box not found' }).catch(() => {});
+    ask({ type: 'badge', text: '!', reason: `${getSite().name} message box not found` }).catch(() => {});
     console.warn('[protly] composer not found after 10 s; outgoing translation inactive');
   };
   setTimeout(checkComposer, 1000);
@@ -72,7 +71,7 @@ export function mountOutgoing(cur) {
   const cardFor = () => {
     const c = composer();
     if (!c) return null;
-    const row = c.closest('form, [role="group"]') || c.parentElement;
+    const row = getSite().cardAnchor(c);
     if (!card || cardRow !== row) {
       card?.hide();
       card = createCard({ place: { before: row } });
@@ -114,7 +113,7 @@ export function mountOutgoing(cur) {
           const r = effect.kind === 'polish'
             ? await ask({ type: 'polish', text: effect.korean, profile: effect.profile })
             : await ask({
-              type: 'outgoing', threadId: cur2.threadId, context: contextFor(cur2.root),
+              type: 'outgoing', threadId: cur2.threadId, context: contextFor(getSite().readMessages(cur2.root)),
               korean: effect.korean, profile: effect.profile, lang: effect.lang,
             });
           dispatch({ type: 'result', reqId: effect.reqId, ...r });

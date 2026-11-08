@@ -34,7 +34,7 @@ async function mountInstagram() {
   globalThis.fetch = async () => ({ ok: false, status: 404 }); // fonts: the monospace fallback
   const realSetInterval = globalThis.setInterval;
   globalThis.setInterval = (f, ms) => realSetInterval(f, ms).unref(); // the path poll must not keep the test alive
-  const { start } = await import('../src/content/main.js');
+  const { start } = await import('../src/content/instagram.js');
   await start();
   await isMounted; // an empty thread is accepted after about 1 s
   const composer = win.document.querySelector('div[role="textbox"]');

@@ -1,14 +1,12 @@
-import { threadIdFromPath } from '../lib/keys.js';
 import { LIMITS, chunks } from '../lib/limits.js';
 import { watchFlags, siteEnabled } from '../lib/flags.js';
 import { isKoreanOnly, hasHangul as isHangulText } from '../lib/lang.js';
 import { classifyAdded } from '../lib/classify.js';
-import { findViewerName } from './selectors.js';
 import { ERRORS, GLOBAL_KINDS, errorText } from '../ui/errors.js';
 import { showToast } from '../ui/toast.js';
 import { addFonts, fetchFonts } from '../ui/fonts.js';
 import {
-  findThreadRoot, readMessages, renderTranslation, renderRetry, setHoverOriginal, clearTranslation,
+  renderTranslation, renderRetry, setHoverOriginal, clearTranslation,
   clearAllTranslations, stillShows,
 } from './dom.js';
 
@@ -38,34 +36,38 @@ export const ask = async (msg) => {
 };
 
 export const initHooks = [];
+let site = null; // the site adapter passed to start(): src/content/instagram.js, src/content/whatsapp/site.js
+export const getSite = () => site;
 let current = null; // { threadId, thread, root, observer, known, timer, onTeardown, onThreadUpdate, onMutate }
 // Text signature of the thread we just left. Instagram reuses row nodes across threads, so node identity
 // cannot tell old rows from new ones; the visible texts can.
 let staleSig = null;
 const sigOf = (msgs) => msgs.map((m) => m.text).join('\u0001');
 
-export async function start() {
-  if (!(await siteEnabled('instagram'))) return; // switched off in the popup: mount nothing
+export async function start(s) {
+  site = s;
+  if (!(await siteEnabled(site.key))) return; // switched off in the popup: mount nothing
   fetchFonts((p) => chrome.runtime.getURL(p)).then((f) => addFonts(document, f))
     .catch((e) => console.warn('[protly] fonts not loaded; using the monospace fallback', e));
   watchFlags();
   const [{ mountPanel }, { mountOutgoing }] = await Promise.all([import('./panel.js'), import('./outgoing.js')]);
   initHooks.push(mountPanel, mountOutgoing);
-  let lastPath = null;
+  const NONE = {}; // never equal to an id: forces the next tick to re-init
+  let lastId = NONE;
   const tick = () => {
-    if (location.pathname === lastPath) return;
-    lastPath = location.pathname;
+    const id = site.threadId();
+    if (id === lastId) return;
+    lastId = id;
     teardown();
-    const id = threadIdFromPath(location.pathname);
     if (id) waitForThread(id);
   };
   tick();
   setInterval(() => {
-    // Instagram may swap [role=main] without a path change; the observer would watch a detached node.
+    // The site may swap the thread root without a thread change; the observer would watch a detached node.
     // Same thread, so its texts are not stale: re-init without the stale-signature wait.
-    if (current && !current.root.isConnected) { teardown(); staleSig = null; lastPath = null; }
+    if (current && !current.root.isConnected) { teardown(); staleSig = null; lastId = NONE; }
     tick();
-  }, 500); // SPA navigation: poll the path; cheap and reliable
+  }, 500); // SPA navigation: poll the thread id; cheap and reliable
   window.addEventListener('keydown', guardUnownedEnter, true);
 }
 
@@ -73,7 +75,7 @@ export async function start() {
 // out untranslated. Block it unless translation is known to be off for the thread on screen.
 function guardUnownedEnter(e) {
   if (!(e.key === 'Enter' || e.code === 'Enter' || e.code === 'NumpadEnter') || e.shiftKey) return;
-  const id = threadIdFromPath(location.pathname);
+  const id = site.threadId();
   if (!id || (current && current.threadId === id)) return; // the mounted handler decides
   const t = e.target;
   if (!t?.isContentEditable || !isHangulText(t.innerText || t.textContent || '')) return;
@@ -85,7 +87,7 @@ function guardUnownedEnter(e) {
 function teardown() {
   if (!current) return;
   current.observer?.disconnect();
-  staleSig = sigOf(readMessages(current.root));
+  staleSig = sigOf(site.readMessages(current.root));
   clearAllTranslations(current.root);
   clearTimeout(current.timer);
   current.onTeardown.forEach((f) => f());
@@ -93,10 +95,9 @@ function teardown() {
 }
 
 function waitForThread(threadId, tries = 0, lastSig = null) {
-  if (threadIdFromPath(location.pathname) !== threadId) return; // navigated away meanwhile
-  // No viewer name means senders cannot be told apart: treat it like a missing root (selector miss).
-  const root = findViewerName(document) ? findThreadRoot(document) : null;
-  const msgs = root ? readMessages(root) : [];
+  if (site.threadId() !== threadId) return; // navigated away meanwhile
+  const root = site.findThreadRoot(document); // null on a selector miss
+  const msgs = root ? site.readMessages(root) : [];
   const sig = sigOf(msgs);
   const clean = msgs.length === 0 || sig !== staleSig;
   // Same texts over two checks; an empty thread (new chat) must stay empty for about 1 s.
@@ -106,7 +107,7 @@ function waitForThread(threadId, tries = 0, lastSig = null) {
       if (!clean) console.warn('[protly] old thread rows still present after 10 s; initialising anyway');
       return initThread(threadId, root);
     }
-    ask({ type: 'badge', text: '!', reason: 'Instagram thread not found' }).catch(() => {});
+    ask({ type: 'badge', text: '!', reason: `${site.name} thread not found` }).catch(() => {});
     console.warn('[protly] thread root not found; extension inactive on this page');
     return;
   }
@@ -122,7 +123,7 @@ async function initThread(threadId, root) {
     showToast(bannerFor(e) || `Could not load thread settings: ${e.message}`, { error: true });
     return;
   }
-  if (threadIdFromPath(location.pathname) !== threadId) return;
+  if (site.threadId() !== threadId) return;
   teardown(); // anything a racing init set up meanwhile
   ask({ type: 'badge', text: '' }).catch(() => {});
   current = {
@@ -131,7 +132,7 @@ async function initThread(threadId, root) {
     onTeardown: [], onThreadUpdate: [], onMutate: [],
   };
 
-  const msgs = readMessages(root);
+  const msgs = site.readMessages(root);
   msgs.forEach((m) => current.known.set(m.row, m.text));
   if (thread.enabled) {
     translate(msgs, thread.pastMode, true);
@@ -150,7 +151,7 @@ function onMutate(threadId) {
   current.timer = setTimeout(() => {
     if (!current || current.threadId !== threadId) return;
     current.onMutate.forEach((f) => f());
-    const msgs = readMessages(current.root);
+    const msgs = site.readMessages(current.root);
     // A row counts as known only with the same text: a reused node showing another message is new.
     const { past, fresh } = classifyAdded(msgs, (m) => current.known.get(m.row) === m.text);
     for (const m of [...past, ...fresh]) { current.known.set(m.row, m.text); clearTranslation(m); }
@@ -169,8 +170,9 @@ const CONTEXT_CHARS = 2000;
 const cut = (text) => (text.length > CONTEXT_CHARS
   ? `${text.slice(0, CONTEXT_CHARS).replace(/[\uD800-\uDBFF]$/, '')} [...]` : text); // whole emoji only
 
-export function contextFor(root) {
-  return readMessages(root).slice(-CONTEXT_N).map(({ from, text }) => ({ from, text: cut(text) }));
+// msgs: the site's readMessages() of the thread root.
+export function contextFor(msgs) {
+  return msgs.slice(-CONTEXT_N).map(({ from, text }) => ({ from, text: cut(text) }));
 }
 
 // incomingItems split so no request carries more than LIMITS.items (the background refuses a longer list).
@@ -204,7 +206,7 @@ async function translate(msgs, mode, updateLang) {
   const [{ todo, items }] = batches;
   const threadId = current.threadId;
   try {
-    const data = await ask({ type: 'incoming', threadId, context: contextFor(current.root), items, updateLang });
+    const data = await ask({ type: 'incoming', threadId, context: contextFor(site.readMessages(current.root)), items, updateLang });
     if (current?.threadId !== threadId) return;
     todo.forEach((m, i) => {
       const r = data[String(i)];
@@ -249,7 +251,7 @@ async function hoverSent(msgs) {
 // Re-render everything after a panel toggle change.
 export function rerender() {
   if (!current) return;
-  const msgs = readMessages(current.root);
+  const msgs = site.readMessages(current.root);
   msgs.forEach(clearTranslation);
   if (!current.thread.enabled) return;
   const isFresh = (m) => current.freshRows.has(m.row);

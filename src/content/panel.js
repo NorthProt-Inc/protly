@@ -1,4 +1,4 @@
-import { ask, rerender, getCurrent, contextFor } from './main.js';
+import { ask, rerender, getCurrent, getSite, contextFor } from './main.js';
 import { LANG_NAMES } from '../lib/lang.js';
 import { TOKENS, BASE } from '../ui/tokens.css.js';
 import { PANEL_CSS } from '../ui/panel.css.js';
@@ -71,7 +71,7 @@ export function mountPanel(cur) {
     if (!c) return;
     $('suggest').disabled = true;
     try {
-      const memo = await ask({ type: 'suggestMemo', threadId: c.threadId, context: contextFor(c.root) });
+      const memo = await ask({ type: 'suggestMemo', threadId: c.threadId, context: contextFor(getSite().readMessages(c.root)) });
       // .value ignores maxLength (Save would be refused); never leave half an emoji at the cut
       $('memo').value = String(memo).slice(0, LIMITS.memo).replace(/[\uD800-\uDBFF]$/, '');
     } catch (e) {

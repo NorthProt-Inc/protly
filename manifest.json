@@ -67,6 +67,7 @@
     {
       "resources": [
         "src/content/dom.js",
+        "src/content/instagram.js",
         "src/content/main.js",
         "src/content/outgoing.js",
         "src/content/panel.js",

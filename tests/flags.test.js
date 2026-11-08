@@ -101,7 +101,7 @@ test('Gmail start mounts nothing when Gmail is off, and mounts the button when o
 });
 
 test('Instagram start returns before any timer or listener when Instagram is off', async () => {
-  const { start } = await import('../src/content/main.js');
+  const { start } = await import('../src/content/instagram.js');
   stubChrome({ sites: { instagram: false } });
   const realSetInterval = globalThis.setInterval;
   let timers = 0;

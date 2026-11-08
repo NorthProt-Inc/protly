@@ -4,13 +4,31 @@ import { trusted } from '../ui/trust.js';
 export const findThreadRoot = (doc) => doc.querySelector(SEL.threadRoot);
 export const findComposer = (doc) => doc.querySelector(SEL.composer);
 
+// Visible text of a bubble. WhatsApp renders emoji as <img alt="😀">, which innerText and textContent drop, so an
+// element holding an <img> is walked: text nodes, <br> as a newline, img alt. Without one, the plain read as before.
+export function textOf(el) {
+  if (!el) return '';
+  if (!el.querySelector('img')) return el.innerText ?? el.textContent ?? '';
+  let out = '';
+  const walk = (n) => {
+    for (const c of n.childNodes) {
+      if (c.nodeType === 3) out += c.data;
+      else if (c.nodeName === 'BR') out += '\n';
+      else if (c.nodeName === 'IMG') out += c.getAttribute('alt') ?? '';
+      else if (c.nodeType === 1) walk(c);
+    }
+  };
+  walk(el);
+  return out;
+}
+
 // Text bubbles only, top to bottom. Rows without a text element (media, stickers) are skipped.
 // viewer defaults to the live page's sidebar username; tests pass it explicitly.
 export function readMessages(root, viewer = findViewerName(root.ownerDocument)) {
   const out = [];
   for (const row of root.querySelectorAll(SEL.messageRow)) {
     const textEl = row.querySelector(SEL.messageText);
-    const text = textEl?.innerText ?? textEl?.textContent ?? '';
+    const text = textOf(textEl);
     if (!text.trim()) continue;
     out.push({ row, textEl, text: text.trim(), from: senderOf(row, viewer) });
   }
@@ -50,7 +68,7 @@ export function clearAllTranslations(root) {
 // True while the row still shows the text it was read with (nodes get reused for other messages).
 export function stillShows(m) {
   const el = m.textEl;
-  return el.isConnected && (el.innerText ?? el.textContent ?? '').trim() === m.text;
+  return el.isConnected && textOf(el).trim() === m.text;
 }
 
 export function renderRetry(m, onClick) {
