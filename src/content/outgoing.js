@@ -1,5 +1,5 @@
 import { initial, reduce } from '../lib/preview.js';
-import { hasHangul } from '../lib/lang.js';
+import { hasHangul, hasNotes } from '../lib/lang.js';
 import { getComposerText, setComposerText } from './dom.js';
 import { ask, getCurrent, getSite, contextFor, bannerFor } from './main.js';
 import { flags } from '../lib/flags.js';
@@ -22,7 +22,8 @@ const onKey = (type, f) => (globalThis.protlyEarlyKeys ? globalThis.protlyEarlyK
 const offKey = (type, f) => (globalThis.protlyEarlyKeys ? globalThis.protlyEarlyKeys[type].delete(f) : window.removeEventListener(type, f, true));
 
 // An Enter the user did not make (isTrusted false) never starts a translation. It is held whenever the user's own
-// Enter would not simply send: Hangul in the box (or in any editable box when the composer selector is broken),
+// Enter would not simply send: Hangul or a bracket note in the box (or in any editable box when the composer selector
+// is broken),
 // English with Polish on, a translation or write in progress, or a preview only the user may confirm.
 // sendsComposer(target): the site sends the box on an Enter from that target too (WhatsApp: a focused message).
 export function holdUntrustedEnter(e, { composer: c, writing, mode, polish = false, sendsComposer = () => false }) {
@@ -31,7 +32,7 @@ export function holdUntrustedEnter(e, { composer: c, writing, mode, polish = fal
   if (!box) return false;
   const text = box.innerText || box.textContent || '';
   // With Polish on, the user's own Enter on English polishes first; a synthetic one must not skip that.
-  return writing || mode !== 'idle' || hasHangul(text) || (polish && !!c && /\p{L}/u.test(text));
+  return writing || mode !== 'idle' || hasHangul(text) || hasNotes(text) || (polish && !!c && /\p{L}/u.test(text));
 }
 
 export function mountOutgoing(cur) {
@@ -118,11 +119,12 @@ export function mountOutgoing(cur) {
         try {
           const cur2 = getCurrent();
           if (!cur2) throw new Error('thread closed');
+          const notes = effect.notes.length ? { notes: effect.notes } : {};
           const r = effect.kind === 'polish'
-            ? await ask({ type: 'polish', text: effect.korean, profile: effect.profile })
+            ? await ask({ type: 'polish', text: effect.korean, profile: effect.profile, ...notes })
             : await ask({
               type: 'outgoing', threadId: cur2.threadId, context: contextFor(getSite().readMessages(cur2.root)),
-              korean: effect.korean, profile: effect.profile, lang: effect.lang,
+              korean: effect.korean, profile: effect.profile, lang: effect.lang, ...notes,
             });
           dispatch({ type: 'result', reqId: effect.reqId, ...r });
         } catch (e) {
@@ -183,6 +185,9 @@ export function mountOutgoing(cur) {
         if (cur2 && sentText) ask({ type: 'sent', threadId: cur2.threadId, text: sentText, korean: effect.korean }).catch(() => {});
         break;
       }
+      case 'hold': // a draft of notes only, or a note typed into the translation: nothing runs, nothing is sent
+        say(effect.message);
+        break;
       case 'fail':
         if (c && effect.korean != null && norm(getComposerText(c)) !== norm(effect.korean)) await write(c, effect.korean);
         lastText = '';
@@ -229,9 +234,9 @@ export function mountOutgoing(cur) {
 
     // An Enter the site turns into a send of the box counts as an Enter in the box.
     if (!c || !(c.contains(e.target) || (isEnter(e) && sendsComposer(e.target)))) {
-      // Composer selector broken: never let Hangul go out untranslated by accident.
-      if (!c && isEnter(e) && !e.shiftKey && e.target?.isContentEditable
-          && hasHangul(e.target.innerText || e.target.textContent || '')) {
+      // Composer selector broken: never let Hangul or a note go out untranslated by accident.
+      const t = !c && isEnter(e) && !e.shiftKey && e.target?.isContentEditable ? e.target.innerText || e.target.textContent || '' : '';
+      if (hasHangul(t) || hasNotes(t)) {
         block(e);
         showToast('Message box not recognised, so nothing was sent. The selectors need updating.', { error: true });
       }
@@ -256,10 +261,12 @@ export function mountOutgoing(cur) {
     if (!isEnter(e) || e.shiftKey) return;
 
     // Korean IME: Enter mid-composition. Never let it reach Instagram while a translation is pending
-    // or while the box holds Hangul; handle the Enter once the composition is committed.
+    // or while the box holds Hangul (unless it is a Korean translation) or a note; handle the Enter once the
+    // composition is committed.
     if (e.isComposing || composing) {
       if (state.mode === 'translating') { block(e); return; }
-      if (hasHangul(getComposerText(c)) && !((state.mode === 'preview' || state.mode === 'kept') && state.lang === 'ko')) {
+      const raw = getComposerText(c);
+      if (hasNotes(raw) || (hasHangul(raw) && !((state.mode === 'preview' || state.mode === 'kept') && state.lang === 'ko'))) {
         block(e);
         enterAfterComposition = { hard: e.altKey, at: Date.now() };
       }
