@@ -7,6 +7,7 @@ import { decideBox, decideSelection } from './decide.js';
 import { deepActive, findTarget, selectionInfo } from './target.js';
 import { boxHolds, readBox, writeBox } from './writer.js';
 import { isUndoKey } from '../lib/command.js';
+import { addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../lib/lang.js';
 
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 const NOTHING = 'Put the cursor in a text box or select text.';
@@ -34,7 +35,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   const host = () => hostname || top.defaultView?.location?.hostname || '';
   // box: { t, d, card, mode: 'idle'|'working'|'preview', original, shown, lang, hard, reqId, last }
   let box = null;
-  let kept = null; // { t, original }: Esc kept a translation; Alt+Z in that box restores the original until focus leaves
+  let kept = null; // { t, original, shown }: Esc kept a translation; Alt+Z in that box restores the original until focus leaves
   let pop = null; // selection popover card
   let seq = 0;
   let composing = false;
@@ -76,7 +77,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       e.stopImmediatePropagation();
       if (!esc) { if (box.mode === 'working') cancel(box); else undo(); return; }
       // A translation is on screen (a preview, or the one a re-run would replace): keep the way back to the original.
-      const k = box.mode === 'preview' || box.prev === 'preview' ? { t: box.t, original: box.original } : null;
+      const k = box.mode === 'preview' || box.prev === 'preview' ? { t: box.t, original: box.original, shown: box.shown } : null;
       close();
       kept = k;
       return;
@@ -156,6 +157,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     cur.prev = cur.mode;
     cur.mode = 'working';
     const polish = cur.d.kind === 'polish';
+    const notes = cur.d.notes ? { notes: cur.d.notes } : {}; // decideBox's notes, sent again on every re-run
     cur.card.working(`${polish ? 'Polishing' : 'Translating'}${cur.hard ? ' deeply' : ''}`, { onCancel: () => cancel(cur) });
     lift(cur);
     const before = readBox(cur.t); // what the box must still hold when the result lands
@@ -163,8 +165,8 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     let r;
     try {
       r = polish
-        ? await ask({ type: 'polish', text: cur.d.text, profile: cur.hard ? 'hard' : 'polish' })
-        : await ask({ type: 'box', text: cur.d.text, lang: cur.lang, profile: cur.hard ? 'hard' : 'outgoing', hostname: host() });
+        ? await ask({ type: 'polish', text: cur.d.text, profile: cur.hard ? 'hard' : 'polish', ...notes })
+        : await ask({ type: 'box', text: cur.d.text, lang: cur.lang, profile: cur.hard ? 'hard' : 'outgoing', hostname: host(), ...notes });
     } catch (e) {
       if (!live()) return;
       cur.mode = cur.prev;
@@ -209,6 +211,11 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   async function rerun({ hard = box?.hard, lang = box?.lang, force = false } = {}) {
     const cur = box;
     if (!cur || cur.mode !== 'preview') return;
+    // No refine: a note typed into the translation never runs (Alt+T, Deep, the chip). Undo first.
+    if (addsNote(readBox(cur.t), cur.shown)) {
+      cur.card.message(NOTE_ON_TRANSLATION, { error: true, actions: actionsFor(cur) });
+      return;
+    }
     if (!force && norm(readBox(cur.t)) !== norm(cur.shown)) {
       cur.card.message('You edited the text. Running again replaces your edit.', {
         actions: [
@@ -245,7 +252,10 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       await nextFrame();
       const original = readBox(t);
       if (original.length > MAX_CHARS) { toast(TOO_LONG); return; }
+      // A note typed into a kept translation never runs; kept stays, so Alt+Z still restores the original.
+      if (kept?.t.el === t.el && addsNote(original, kept.shown)) { toast(NOTE_ON_TRANSLATION); return; }
       const d = decideBox(original);
+      if (d.kind === 'notes-only') { toast(NOTES_ONLY); return; }
       if (d.kind === 'none') { toast('Nothing to translate or polish in this box.'); return; }
       close();
       kept = null;

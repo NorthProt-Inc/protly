@@ -36,3 +36,23 @@ test('decideSelection', () => {
   assert.equal(decideSelection('  '), 'none');
   assert.equal(decideSelection('123'), 'none');
 });
+
+// Bracket notes (plan docs/plans/2026-11-08-notes-and-iphone-port.md, rules 4, 5 and 7).
+test('decideBox: notes leave the text and come back with the decision', () => {
+  assert.deepEqual(decideBox('내일 봐 [정중하게]'), { kind: 'translate', lang: 'en', text: '내일 봐', notes: ['정중하게'] });
+  assert.deepEqual(decideBox('[formal] ru: 안녕'), { kind: 'translate', lang: 'ru', text: '안녕', notes: ['formal'] });
+  assert.deepEqual(decideBox('see you [formal]'), { kind: 'polish', text: 'see you', notes: ['formal'] });
+  assert.deepEqual(decideBox('123 [as words]'), { kind: 'polish', text: '123', notes: ['as words'] }); // a note always runs
+  assert.deepEqual(decideBox('see you [1]'), { kind: 'polish', text: 'see you [1]' }); // digits only: text
+  assert.deepEqual(decideBox('안녕 [fr:로 하지 마]'), { kind: 'translate', lang: 'en', text: '안녕', notes: ['fr:로 하지 마'] });
+  assert.deepEqual(decideBox('see you [짧게]'), { kind: 'polish', text: 'see you', notes: ['짧게'] }); // Hangul in a note only
+});
+
+test('decideBox: notes only is its own case', () => {
+  assert.deepEqual(decideBox('[formal] [short]'), { kind: 'notes-only' });
+});
+
+test('decideSelection never reads notes: someone else wrote the text', () => {
+  assert.equal(decideSelection('[참고] hello'), 'translate');
+  assert.equal(decideSelection('[note]'), 'translate');
+});

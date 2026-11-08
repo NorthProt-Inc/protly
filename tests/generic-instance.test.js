@@ -358,3 +358,103 @@ test('focus in a cross-origin frame: a toast, no stale re-run', async () => {
   assert.match(s.toasts(), /protly cannot reach this frame\. Right-click inside the box instead\./);
   assert.equal(s.calls.length, 1);
 });
+
+// Bracket notes (plan docs/plans/2026-11-08-notes-and-iphone-port.md, Part A).
+const NOTES_ONLY = 'Add the message too. [Brackets] are notes for protly.';
+const NOTE_ON_TRANSLATION = 'Notes work on a new draft. Undo first, then add the note.';
+
+test('notes: Korean with a note sends the text and the notes, Deep keeps them, Undo restores the draft', async () => {
+  const { calls, pending, inst, btn, box } = setup();
+  box.value = '내일 봐 [정중하게]';
+  box.focus();
+  inst.run({ source: 'command' });
+  await until(() => calls.length === 1);
+  assert.deepEqual(calls[0], { type: 'box', text: '내일 봐', lang: 'en', profile: 'outgoing', hostname: 'forum.example.org', notes: ['정중하게'] });
+  pending[0].res(reply('see you tomorrow'));
+  await until(() => btn('Deep'));
+  btn('Deep').click();
+  await until(() => calls.length === 2);
+  assert.deepEqual([calls[1].profile, calls[1].text, calls[1].notes], ['hard', '내일 봐', ['정중하게']]);
+  pending[1].res(reply('See you tomorrow.'));
+  await until(() => box.value === 'See you tomorrow.');
+  await until(() => btn('Undo'));
+  btn('Undo').click();
+  await until(() => box.value === '내일 봐 [정중하게]');
+});
+
+test('notes: English with a note is polished with its notes', async () => {
+  const { calls, inst, box } = setup();
+  box.value = 'see you [formal]';
+  box.focus();
+  inst.run({ source: 'command' });
+  await until(() => calls.length === 1);
+  assert.deepEqual(calls[0], { type: 'polish', text: 'see you', profile: 'polish', notes: ['formal'] });
+});
+
+test('notes: a box of notes only runs nothing and says why', async () => {
+  const { calls, inst, box, toasts } = setup();
+  box.value = '[formal]';
+  box.focus();
+  await inst.run({ source: 'command' });
+  await until(() => toasts().includes(NOTES_ONLY));
+  assert.equal(calls.length, 0);
+});
+
+test('notes: a note typed into the preview holds Alt+T and Deep; the original still comes back', async () => {
+  const { calls, pending, inst, btn, box, msg } = setup();
+  box.value = '내일 봐';
+  box.focus();
+  inst.run({ source: 'command' });
+  await until(() => calls.length === 1);
+  pending[0].res(reply('see you tomorrow'));
+  await until(() => btn('Undo'));
+  box.value = 'see you tomorrow [shorter]';
+  await inst.run({ source: 'command' });
+  assert.equal(msg(), NOTE_ON_TRANSLATION);
+  btn('Deep').click();
+  await sleep(10);
+  assert.equal(msg(), NOTE_ON_TRANSLATION);
+  assert.equal(calls.length, 1);
+  btn('Undo').click();
+  await until(() => box.value === '내일 봐');
+});
+
+test('notes: a note typed into a kept translation holds Alt+T; Alt+Z still restores the original', async () => {
+  const { dom, calls, pending, inst, btn, box, toasts } = setup();
+  const key = (init) => { const e = new dom.window.KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init }); box.dispatchEvent(e); return e; };
+  box.value = '내일 봐';
+  box.focus();
+  inst.run({ source: 'command' });
+  await until(() => calls.length === 1);
+  pending[0].res(reply('see you tomorrow'));
+  await until(() => btn('Undo'));
+  assert.equal(key({ key: 'Escape' }).defaultPrevented, true);
+  box.value = 'see you tomorrow [shorter]';
+  await inst.run({ source: 'command' });
+  await until(() => toasts().includes(NOTE_ON_TRANSLATION));
+  assert.equal(calls.length, 1);
+  assert.equal(key({ key: 'z', code: 'KeyZ', altKey: true }).defaultPrevented, true);
+  await until(() => box.value === '내일 봐');
+});
+
+test('notes: brackets the kept translation already had are not a new note', async () => {
+  const { dom, calls, pending, inst, btn, box } = setup();
+  const key = (init) => { const e = new dom.window.KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init }); box.dispatchEvent(e); return e; };
+  box.value = '내일 봐';
+  box.focus();
+  inst.run({ source: 'command' });
+  await until(() => calls.length === 1);
+  pending[0].res(reply('see you [tomorrow]'));
+  await until(() => btn('Undo'));
+  assert.equal(key({ key: 'Escape' }).defaultPrevented, true);
+  inst.run({ source: 'command' }); // Alt+T on the kept translation polishes it, as without brackets
+  await until(() => calls.length === 2);
+  assert.equal(calls[1].type, 'polish');
+});
+
+test('notes: a selection keeps its brackets and sends no notes', async () => {
+  const { calls, inst } = setup();
+  inst.run({ source: 'menu-selection', selectionText: 'see [you] later' });
+  await until(() => calls.length === 1);
+  assert.deepEqual(calls[0], { type: 'selection', text: 'see [you] later' });
+});
