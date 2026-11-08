@@ -28,10 +28,10 @@ test('the toolbar popup is wired and has the control-center fields', () => {
   const m = JSON.parse(readFileSync(new URL('../manifest.json', import.meta.url)));
   assert.equal(m.action.default_popup, 'popup/popup.html');
   const html = readFileSync(new URL('../popup/popup.html', import.meta.url), 'utf8');
-  for (const id of ['polish', 'site-instagram', 'site-gmail', 'status', 'today', 'month', 'options']) {
+  for (const id of ['polish', 'site-instagram', 'site-whatsapp', 'site-gmail', 'status', 'today', 'month', 'options']) {
     assert.match(html, new RegExp(`id="${id}"`), id);
   }
-  assert.match(html, /Polish English on Enter \(Instagram\)/);
+  assert.match(html, /Polish English on Enter \(Instagram, WhatsApp\)/);
   assert.match(html, /wordmark\.svg/);
 });
 
@@ -67,9 +67,9 @@ test('manifest icons point at the built p icon PNGs', () => {
   assert.match(readFileSync(new URL('../icons/wordmark.svg', import.meta.url), 'utf8'), /fill="currentColor"/);
 });
 
-test('both content-script origins can load the shared UI modules and fonts', () => {
+test('every content-script origin can load the shared UI modules and fonts', () => {
   const m = JSON.parse(readFileSync(new URL('../manifest.json', import.meta.url)));
-  for (const origin of ['https://www.instagram.com/*', 'https://mail.google.com/*']) {
+  for (const origin of ['https://www.instagram.com/*', 'https://web.whatsapp.com/*', 'https://mail.google.com/*']) {
     const war = m.web_accessible_resources.find((w) => w.matches.includes(origin));
     assert.ok(war.resources.includes('src/ui/card.js'), origin);
     assert.ok(war.resources.includes('src/ui/fonts/protly-mono-400.woff2'), origin);

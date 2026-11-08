@@ -8,7 +8,11 @@ const RESTRICTED = [
 const UNAVAILABLE = { state: 'unavailable', text: 'Unavailable here' };
 export const GENERIC_TEXT = 'Alt+T ready';
 
-const SITES = { 'www.instagram.com': ['instagram', 'Instagram'], 'mail.google.com': ['gmail', 'Gmail'] };
+const SITES = {
+  'www.instagram.com': ['instagram', 'Instagram'],
+  'web.whatsapp.com': ['whatsapp', 'WhatsApp'],
+  'mail.google.com': ['gmail', 'Gmail'],
+};
 
 // The popup's one-line status for the active tab. badge: { text, reason } from the badge store, or null.
 export function statusFor({ url, sites = DEFAULT_SITES, badge = null }) {

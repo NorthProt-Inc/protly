@@ -1,6 +1,6 @@
 // Global toggles set from the toolbar popup. Mutable on purpose: tests set flags.polish directly.
 // Cached here because Enter has to be blocked synchronously, before a storage read could return.
-export const DEFAULT_SITES = { instagram: true, gmail: true };
+export const DEFAULT_SITES = { instagram: true, whatsapp: true, gmail: true };
 export const flags = { polish: false, sites: { ...DEFAULT_SITES } };
 
 let ready = null;

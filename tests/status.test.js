@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { statusFor, GENERIC_TEXT } from '../src/lib/status.js';
 
-const ON = { instagram: true, gmail: true };
+const ON = { instagram: true, whatsapp: true, gmail: true };
 
 test('restricted or unknown pages are unavailable', () => {
   for (const url of [
@@ -24,6 +24,13 @@ test('Instagram and Gmail: active when on, site-off when off', () => {
     { state: 'site-off', text: 'Instagram: off' });
   assert.deepEqual(statusFor({ url: 'https://mail.google.com/', sites: { ...ON, gmail: false } }),
     { state: 'site-off', text: 'Gmail: off' });
+});
+
+test('WhatsApp Web: active when on, site-off when off', () => {
+  assert.deepEqual(statusFor({ url: 'https://web.whatsapp.com/', sites: ON }),
+    { state: 'whatsapp', text: 'WhatsApp: active' });
+  assert.deepEqual(statusFor({ url: 'https://web.whatsapp.com/', sites: { ...ON, whatsapp: false } }),
+    { state: 'site-off', text: 'WhatsApp: off' });
 });
 
 test('a badge with a reason is a problem', () => {
