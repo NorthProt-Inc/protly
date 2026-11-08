@@ -300,8 +300,8 @@ test('Korean typed over a polish preview starts a translation', async () => {
   assert.ok(note().querySelector('select')); // back to a translate preview
 });
 
-test('Esc keeps a preview, Alt+Z undoes it, and either cancels a translation in flight', async () => {
-  const { inline, reply, note } = setup();
+test('Esc keeps a preview, Alt+Z undoes it (also after Esc), and either cancels a translation in flight', async () => {
+  const { inline, reply, note, buttonIn } = setup();
   assert.equal(keep(inline), false); // idle: Gmail keeps the key
   assert.equal(undoKey(inline), false);
   translate(inline);
@@ -310,14 +310,21 @@ test('Esc keeps a preview, Alt+Z undoes it, and either cancels a translation in 
   assert.equal(keep(inline), true);
   assert.equal(userText(inline), 'First, edited');
   assert.equal(note(), null);
-  assert.equal(keep(inline), false); // accepted: nothing left to act on
-  assert.equal(undoKey(inline), false);
+  assert.equal(keep(inline), false); // kept: the next Esc is Gmail's
+  assert.equal(undoKey(inline), true); // unchanged since Esc: restored at once
+  assert.equal(userText(inline), KOREAN);
+  assert.equal(undoKey(inline), false); // nothing left to undo
 
-  inline.firstChild.textContent = KOREAN;
   translate(inline);
   await reply(ok('Second'));
   inline.firstChild.textContent = 'Second, edited';
-  assert.equal(undoKey(inline), true); // an edited translation too
+  assert.equal(undoKey(inline), true); // an edited translation asks first: Ctrl+Z cannot bring an edit back
+  assert.equal(userText(inline), 'Second, edited');
+  assert.match(note().textContent, /drops your changes/);
+  buttonIn('Keep my text').click();
+  assert.match(note().textContent, /역번역/); // back to the preview
+  assert.equal(undoKey(inline), true);
+  buttonIn('Undo anyway').click();
   assert.equal(userText(inline), KOREAN);
   assert.equal(note(), null);
 

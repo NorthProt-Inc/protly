@@ -180,18 +180,29 @@ export function undo(body) {
 }
 
 // Keys in a compose body. False when there is nothing to act on, so Gmail keeps the key.
-// Esc keeps the body as it is (the translation, edited or not; the draft while a request is in flight).
+// Esc keeps the body as it is (the translation, edited or not; the draft while a first request is in flight) and
+// closes the card. With an original to go back to, the compose stays 'kept' so Alt+Z can still restore it.
 export function keep(body) {
   const s = states.get(body);
   if (!s || s.mode === 'idle') return false;
+  if (s.mode === 'kept') { hideNote(s); return false; } // an Undo prompt closes; Gmail still gets its Esc
+  const saved = s.saved;
   settle(s);
+  if (saved) Object.assign(s, { mode: 'kept', saved, shown: nodesToText(userNodes(body)) });
   return true;
 }
 
-// Alt+Z puts the original draft back, an edited translation included.
+// Alt+Z puts the original draft back. The swap is outside Gmail's Ctrl+Z, so text the user changed since the
+// translation (or since Esc) is replaced only after a confirm on the card.
 export function undoKey(body) {
   const s = states.get(body);
   if (!s || s.mode === 'idle') return false;
+  if ((s.mode === 'preview' || s.mode === 'kept') && edited(body, s)) {
+    say(body, s, 'You changed the text. Undo puts the original draft back and drops your changes.', {
+      actions: [act('Undo anyway', () => undo(body)), act('Keep my text', () => (s.mode === 'kept' ? hideNote(s) : showPreview(body, s)))],
+    });
+    return true;
+  }
   undo(body);
   return true;
 }

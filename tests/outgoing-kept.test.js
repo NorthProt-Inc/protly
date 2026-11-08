@@ -72,6 +72,15 @@ test('Instagram: Esc keeps the translation, an edit is sent with the Korean sour
     assert.equal(key({ key: 'z', code: 'KeyZ', altKey: true }).defaultPrevented, true);
     await until(() => composer.textContent === '지민아 또 봐');
     assert.equal(key({ key: 'z', code: 'KeyZ', altKey: true }).defaultPrevented, false);
+
+    // 4. Kept, edited, then Instagram's Send button empties the box: the edit is what is recorded.
+    await translate();
+    esc();
+    composer.textContent = 'See you tomorrow, 지민';
+    composer.dispatchEvent(new win.Event('input', { bubbles: true }));
+    composer.textContent = '';
+    await until(() => sent().length === 3);
+    assert.deepEqual(sent()[2], { text: 'See you tomorrow, 지민', korean: '지민아 또 봐' });
   } finally {
     _trustSyntheticEvents(false);
   }

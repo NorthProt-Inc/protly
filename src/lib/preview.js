@@ -30,8 +30,10 @@ function polish(s, text, profile, rerun = false) {
 const idle = (s) => ({ ...s, mode: 'idle', kind: null, korean: null, profile: null, lang: null, shown: null });
 
 // Hangul in the text that the kept translation did not have (it may keep ㅋㅋ or a Korean name).
-// A Korean target never counts: its output is all Hangul.
-const newHangul = (text, s) => s.lang !== 'ko' && hangulRuns(text).some((run) => !s.shown.includes(run));
+// A Korean target never counts: its output is all Hangul. Nor do runs of bare jamo (ㅋㅋㅋ, ㅠㅠ): nothing to translate.
+const JAMO_ONLY = /^[ᄀ-ᇿ㄰-㆏]+$/;
+const newHangul = (text, s) => s.lang !== 'ko'
+  && hangulRuns(text).some((run) => !JAMO_ONLY.test(run) && !s.shown.includes(run));
 
 export function reduce(s, e) {
   switch (e.type) {

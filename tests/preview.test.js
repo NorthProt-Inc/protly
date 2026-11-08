@@ -302,3 +302,88 @@ test('a draft with a span sends the tagged text and no language; Alt+Z restores 
   assert.equal(effects[0].lang, null);
   assert.deepEqual(effects[1], { type: 'restore', korean: '안녕 fr:고마워; 잘가' });
 });
+
+// Kept mode, beyond the basics above.
+
+test('kept: a late result or failure after Esc during a re-run is dropped and the kept translation stays', () => {
+  const p = toPreview('가자');
+  for (const rerun of [reduce(p, { type: 'enter', text: 'T', hard: true }), reduce(p, { type: 'lang', lang: 'ja' })]) {
+    const k = reduce(rerun.state, { type: 'esc' });
+    assert.equal(k.state.mode, 'kept');
+    const reqId = rerun.effect.reqId;
+    const late = reduce(k.state, { type: 'result', reqId, translation: 'Opus T', back_translation: '가자', lang: 'en', model: 'm' });
+    assert.equal(late.state, k.state);
+    assert.deepEqual(late.effect, { type: 'none' });
+    const failed = reduce(k.state, { type: 'fail', reqId, message: 'host' });
+    assert.equal(failed.state, k.state);
+    assert.deepEqual(failed.effect, { type: 'none' });
+    assert.deepEqual(reduce(k.state, { type: 'enter', text: 'T' }).effect, { type: 'sent', korean: '가자' });
+  }
+});
+
+test('kept: a prefixed draft keeps its prefix for the sent record and for Alt+Z', () => {
+  const a = reduce(initial(), { type: 'enter', text: 'ru: 안녕' });
+  const b = reduce(a.state, { type: 'result', reqId: a.effect.reqId, translation: 'Привет', back_translation: '안녕', lang: 'ru', model: 'm' });
+  const k = reduce(b.state, { type: 'esc' }).state;
+  assert.equal(k.mode, 'kept');
+  assert.equal(k.lang, 'ru');
+  assert.deepEqual(reduce(k, { type: 'enter', text: 'Привет!' }).effect, { type: 'sent', korean: 'ru: 안녕' });
+  assert.deepEqual(reduce(k, { type: 'undo' }).effect, { type: 'restore', korean: 'ru: 안녕' });
+});
+
+test('kept: a polish preview kept by Esc sends with its English source', () => {
+  const k = reduce(polishPreview(), { type: 'esc' });
+  assert.equal(k.state.mode, 'kept');
+  assert.deepEqual(reduce(k.state, { type: 'enter', text: 'I think it is great.', polish: true }).effect,
+    { type: 'sent', korean: 'i think its good' });
+  assert.equal(reduce(k.state, { type: 'enter', text: 'I think it is great. 진짜', polish: true }).effect.kind, 'translate');
+});
+
+test('kept: Hangul runs at the edge of the kept translation', () => {
+  const s = kept('See you 지민 ㅋㅋ');
+  const enter = (text) => reduce(s, { type: 'enter', text }).effect.type;
+  assert.equal(enter('See you 민 ㅋ'), 'sent'); // a part of a kept run is not new
+  assert.equal(enter('See you 지민 ㅋㅋ ㅋㅋ'), 'sent'); // a kept run repeated
+  assert.equal(enter('See you 지민아 ㅋㅋ'), 'translate'); // a kept run grown into a new word
+  assert.equal(enter('See you 지민 ㅎㅎ'), 'sent'); // bare jamo (laughter) is never new
+  assert.equal(enter('See you 민지'), 'translate'); // the same syllables in another order
+});
+
+// Seeded, so a failure is reproducible.
+function rng(seed) {
+  return () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x80000000; };
+}
+
+test('kept: generated edits re-translate exactly when a Hangul word is not part of the kept translation', () => {
+  const rand = rng(42);
+  const pick = (xs) => xs[Math.floor(rand() * xs.length)];
+  const shown = 'Hey 지민, see you at 홍대 ㅋㅋ';
+  const s = kept(shown);
+  const ko = kept('지민아 홍대에서 봐 ㅋㅋ', 'ko');
+  const keptParts = ['지민', '지', '민', '홍대', '대', 'ㅋㅋ', 'ㅋ', 'ㅎㅎ', 'ㅠ']; // bare jamo is never new either
+  const newParts = ['빨리', '지민아', '홍대입구', '내일', '민지'];
+  const english = ['ok', 'see you', 'at 7', '!', 'tmrw', '🙂'];
+  for (let i = 0; i < 300; i++) {
+    const words = Array.from({ length: 1 + Math.floor(rand() * 5) }, () => pick(rand() < 0.5 ? english : keptParts));
+    const old = words.join(' ');
+    // Only kept parts and English: sent as is, edited or not.
+    assert.deepEqual(reduce(s, { type: 'enter', text: old }).effect, { type: 'sent', korean: '지민아 가자 ㅋㅋ' }, old);
+    // One new run anywhere: translate the whole text.
+    words.splice(Math.floor(rand() * (words.length + 1)), 0, pick(newParts));
+    const text = words.join(' ');
+    const r = reduce(s, { type: 'enter', text, polish: rand() < 0.5 });
+    assert.equal(r.effect.type, 'translate', text);
+    assert.equal(r.effect.kind, 'translate', text);
+    assert.equal(r.effect.korean, text);
+    // A Korean target never re-translates, whatever the edit.
+    assert.equal(reduce(ko, { type: 'enter', text }).effect.type, 'sent', text);
+  }
+});
+
+test('kept: laughter or crying in bare jamo never counts as new Hangul', () => {
+  const s = kept("Let's go 지민 ㅋㅋ");
+  for (const text of ["Let's go 지민 ㅋㅋㅋㅋ", "Let's go 지민 ㅠㅠ", "Let's go ㅎㅎ"]) {
+    assert.equal(reduce(s, { type: 'enter', text }).effect.type, 'sent', text);
+  }
+  assert.equal(reduce(s, { type: 'enter', text: "Let's go 지민 ㅋㅋ 빨리" }).effect.type, 'translate');
+});

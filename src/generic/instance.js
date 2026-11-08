@@ -34,6 +34,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   const host = () => hostname || top.defaultView?.location?.hostname || '';
   // box: { t, d, card, mode: 'idle'|'working'|'preview', original, shown, lang, hard, reqId, last }
   let box = null;
+  let kept = null; // { t, original }: Esc kept a translation; Alt+Z in that box restores the original until focus leaves
   let pop = null; // selection popover card
   let seq = 0;
   let composing = false;
@@ -63,23 +64,38 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     return card && (a === cur.card.host || a.getRootNode?.() === cur.card.shadow);
   }
 
+  const inKept = (e) => !!kept && (e.composedPath?.() ?? [e.target]).includes(kept.t.el);
+
   // Esc keeps what the box holds now and closes the card (a write in flight is dropped or rolled back).
-  // Alt+Z puts the original back; while a request is in flight it cancels it first.
+  // Alt+Z puts the original back, also after Esc kept a translation; while a request is in flight it cancels it first.
   function onKeyDown(e) {
     const esc = e.key === 'Escape';
     if (!(esc || isUndoKey(e)) || e.isComposing) return;
     if (box && (box.mode === 'preview' || box.mode === 'working') && inBox(box, e)) {
       e.preventDefault();
       e.stopImmediatePropagation();
-      if (esc) close(); else if (box.mode === 'working') cancel(box); else undo();
+      if (!esc) { if (box.mode === 'working') cancel(box); else undo(); return; }
+      // A translation is on screen (a preview, or the one a re-run would replace): keep the way back to the original.
+      const k = box.mode === 'preview' || box.prev === 'preview' ? { t: box.t, original: box.original } : null;
+      close();
+      kept = k;
+      return;
+    }
+    if (!esc && inKept(e)) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const k = kept;
+      kept = null;
+      restore(k.t, k.original);
       return;
     }
     if (esc && pop) { pop.hide(); pop = null; } // the page still gets its Esc
   }
 
-  // Focus moved elsewhere: the preview is accepted as it is and the card closes.
+  // Focus moved elsewhere: the preview is accepted as it is and the card closes, and Alt+Z no longer undoes.
   function onFocusIn(e) {
     if (box?.mode === 'preview' && !inBox(box, e)) close();
+    if (kept && !inKept(e)) kept = null;
   }
 
   // A click on plain text fires no focusin, so blur closes too. Checked a tick later, when focus has landed:
@@ -210,7 +226,11 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     const cur = box;
     if (!cur) return;
     close();
-    if (norm(readBox(cur.t)) !== norm(cur.original) && !(await writeBox(cur.t, cur.original))) {
+    await restore(cur.t, cur.original);
+  }
+
+  async function restore(t, original) {
+    if (norm(readBox(t)) !== norm(original) && !(await writeBox(t, original))) {
       toast('Could not restore the original text. Ctrl+Z may bring it back.', { error: true });
     }
   }
@@ -227,6 +247,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       const d = decideBox(original);
       if (d.kind === 'none') { toast('Nothing to translate or polish in this box.'); return; }
       close();
+      kept = null;
       const card = createCard({ doc: t.doc, place: { float: () => t.el.getBoundingClientRect() } });
       box = cur = { t, d, card, mode: 'idle', prev: 'idle', original, shown: null, lang: d.lang ?? null, hard: false, reqId: 0, last: null };
       t.el.addEventListener('focusout', onFocusOut);
