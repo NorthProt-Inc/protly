@@ -285,4 +285,14 @@ test('Instagram: an Enter the user did not press never sends Hangul or an unconf
   const other = win.document.getElementById('o');
   other.textContent = '안녕';
   assert.equal(holdUntrustedEnter(key(other), { composer: null, writing: false, mode: 'idle' }), true);
+  // A target the site says sends the box (WhatsApp: a focused message) reads the box, not the target.
+  const row = win.document.createElement('div');
+  win.document.body.append(row);
+  const sendsComposer = (t) => t === row;
+  c.textContent = '안녕';
+  assert.equal(hold(key(row), { sendsComposer }), true);
+  assert.equal(hold(key(row)), false); // no such site rule: outside the composer
+  c.textContent = 'hello';
+  assert.equal(hold(key(row), { sendsComposer }), false);
+  assert.equal(hold(key(row), { sendsComposer, mode: 'preview' }), true);
 });

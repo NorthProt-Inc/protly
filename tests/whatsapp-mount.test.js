@@ -59,6 +59,16 @@ test('WhatsApp: Hangul Enter is never let through, from a title miss to a chat s
     c.dispatchEvent(e);
     return e;
   };
+  // Reply with text already in the box leaves focus on the message row; WhatsApp sends the box on its Enter.
+  let rowSaw = 0;
+  const rowEnter = (c) => {
+    c.textContent = '안녕';
+    const r = doc.querySelector('#main [data-testid^="conv-msg-"]');
+    r.addEventListener('keydown', () => { rowSaw++; });
+    const e = new win.KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', bubbles: true, cancelable: true });
+    r.dispatchEvent(e);
+    return e;
+  };
   const threadIds = () => asked.filter((m) => m.type === 'getThread').map((m) => m.threadId);
 
   let composer = openChat(null);
@@ -98,6 +108,8 @@ test('WhatsApp: Hangul Enter is never let through, from a title miss to a chat s
     composer = openChat('Other Chat', ['hello']);
     assert.equal(hangulEnter(composer).defaultPrevented, true);
     assert.equal(pageSaw, 0);
+    assert.equal(rowEnter(composer).defaultPrevented, true); // also from a focused message
+    assert.equal(rowSaw, 0);
     await advance(3000);
     assert.equal(mounts, 2);
     const idB = threadIds().at(-1);
@@ -121,6 +133,20 @@ test('WhatsApp: Hangul Enter is never let through, from a title miss to a chat s
     await advance(2000);
     assert.equal(mounts, 3);
     assert.equal(threadIds().at(-1), idB);
+
+    // 8. Enter on a focused message (Reply with text in the box): a synthetic one is held, the user's own one
+    // translates the box for B instead of letting WhatsApp send the Hangul.
+    asked.length = 0;
+    assert.equal(rowEnter(composer).defaultPrevented, true);
+    await flush();
+    assert.deepEqual(asked.filter((m) => m.type === 'outgoing'), []);
+    _trustSyntheticEvents(true);
+    const fromRow = rowEnter(composer);
+    await flush();
+    _trustSyntheticEvents(false);
+    assert.equal(fromRow.defaultPrevented, true);
+    assert.equal(rowSaw, 0);
+    assert.deepEqual(asked.filter((m) => m.type === 'outgoing').map((m) => [m.threadId, m.korean]), [[idB, '안녕']]);
   } finally {
     _trustSyntheticEvents(false);
     mock.timers.reset();

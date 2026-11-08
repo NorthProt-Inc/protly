@@ -74,6 +74,9 @@ export const SITE = {
   findThreadRoot: (doc) => (chatTitle(doc) ? mainOf(doc) : null), // no title: waitForThread times out -> badge
   readMessages,
   findComposer: (doc) => mainOf(doc)?.querySelector(SEL.composer) ?? null,
+  // Reply leaves focus on the message row when the box already holds text, and WhatsApp sends the box on that
+  // row's Enter (live check 2026-11-08). The row itself only: a focused link or button inside it does its own thing.
+  sendsComposer: (t) => !!t?.matches?.(SEL.messageRow) && !!t.closest(SEL.threadRoot),
   // Inside the footer, before the composer's row. Placed before the footer itself, WhatsApp's flex column showed the
   // card at the top of the chat.
   cardAnchor: (c) => {

@@ -71,6 +71,23 @@ test('WhatsApp: the card goes inside the footer, before the composer row', () =>
   assert.ok(anchor.contains(box));
 });
 
+test('WhatsApp: an Enter on a focused message sends the box, an Enter elsewhere does not', () => {
+  // Reply leaves focus on the message row when the box already holds text, and WhatsApp sends the box on that
+  // Enter (live check 2026-11-08).
+  const doc = chat();
+  const row = doc.querySelector('[data-testid="conv-msg-A2"]');
+  assert.equal(SITE.sendsComposer(row), true);
+  assert.equal(SITE.sendsComposer(row.querySelector('[data-testid="selectable-text"]')), false); // a link or a child
+  assert.equal(SITE.sendsComposer(SITE.findComposer(doc)), false); // the box itself takes the normal path
+  assert.equal(SITE.sendsComposer(doc.getElementById('outside-box')), false);
+  assert.equal(SITE.sendsComposer(doc.body), false);
+  assert.equal(SITE.sendsComposer(null), false);
+  const stray = doc.createElement('div');
+  stray.dataset.testid = 'conv-msg-Z';
+  doc.body.append(stray);
+  assert.equal(SITE.sendsComposer(stray), false); // not in the open chat
+});
+
 test('WhatsApp: no thread root until the title is there', () => {
   assert.equal(SITE.findThreadRoot(withTitle(null)), null);
   assert.equal(SITE.findThreadRoot(chat()).id, 'main');

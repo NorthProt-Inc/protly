@@ -78,7 +78,8 @@ function guardUnownedEnter(e) {
   const id = site.threadId();
   if (!id || (current && current.threadId === id)) return; // the mounted handler decides
   const t = e.target;
-  if (!t?.isContentEditable || !isHangulText(t.innerText || t.textContent || '')) return;
+  const box = t?.isContentEditable ? t : site.sendsComposer?.(t) ? site.findComposer(document) : null;
+  if (!box || !isHangulText(box.innerText || box.textContent || '')) return;
   e.preventDefault();
   e.stopImmediatePropagation();
   showToast('Still loading this thread. Nothing was sent; press Enter again in a moment.', { transient: true });

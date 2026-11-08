@@ -20,9 +20,10 @@ const block = (e) => { e.preventDefault(); e.stopImmediatePropagation(); };
 // An Enter the user did not make (isTrusted false) never starts a translation. It is held whenever the user's own
 // Enter would not simply send: Hangul in the box (or in any editable box when the composer selector is broken),
 // English with Polish on, a translation or write in progress, or a preview only the user may confirm.
-export function holdUntrustedEnter(e, { composer: c, writing, mode, polish = false }) {
+// sendsComposer(target): the site sends the box on an Enter from that target too (WhatsApp: a focused message).
+export function holdUntrustedEnter(e, { composer: c, writing, mode, polish = false, sendsComposer = () => false }) {
   if (!isEnter(e) || e.shiftKey) return false;
-  const box = c ? (c.contains(e.target) ? c : null) : (e.target?.isContentEditable || e.target?.getAttribute?.('contenteditable') === 'true' ? e.target : null);
+  const box = c ? (c.contains(e.target) || sendsComposer(e.target) ? c : null) : (e.target?.isContentEditable || e.target?.getAttribute?.('contenteditable') === 'true' ? e.target : null);
   if (!box) return false;
   const text = box.innerText || box.textContent || '';
   // With Polish on, the user's own Enter on English polishes first; a synthetic one must not skip that.
@@ -44,6 +45,7 @@ export function mountOutgoing(cur) {
   // switch and the next 500 ms tick, composer() already finds the NEW thread's box.
   const live = () => !dead && getCurrent() === cur && getSite().threadId() === cur.threadId;
   const composer = () => getSite().findComposer(document);
+  const sendsComposer = (t) => !!getSite().sendsComposer?.(t);
   // Writes run one at a time; a newer write supersedes queued or settling older ones.
   const write = (c, s) => {
     const gen = ++writeGen;
@@ -204,11 +206,12 @@ export function mountOutgoing(cur) {
     if (!cur2?.thread.enabled) return;
     const c = composer();
     if (!trusted(e)) { // a page script or another extension: never a billed translation, never an unconfirmed send
-      if (holdUntrustedEnter(e, { composer: c, writing, mode: state.mode, polish: flags.polish })) block(e);
+      if (holdUntrustedEnter(e, { composer: c, writing, mode: state.mode, polish: flags.polish, sendsComposer })) block(e);
       return;
     }
 
-    if (!c || !c.contains(e.target)) {
+    // An Enter the site turns into a send of the box counts as an Enter in the box.
+    if (!c || !(c.contains(e.target) || (isEnter(e) && sendsComposer(e.target)))) {
       // Composer selector broken: never let Hangul go out untranslated by accident.
       if (!c && isEnter(e) && !e.shiftKey && e.target?.isContentEditable
           && hasHangul(e.target.innerText || e.target.textContent || '')) {
