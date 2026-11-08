@@ -13,7 +13,7 @@ cyanprot/protly`). The iPhone side is in `docs/security-review-ios.md`.
 - R3, in part: the host's ping reports `key_shared` when `~/.config/anthropic/api-key` has group or other
   permission bits (mode only), and Diagnostics shows a `chmod 600` hint.
 - iOS Q6: `tests/make-secrets.test.js` runs `ios-app/scripts/make-secrets.sh` with a fake HOME and key.
-- The any-site box, polish and selection paths already refuse text over 8000 characters with a "Too long"
+- The any-site box, polish and selection paths already refuse text over 12000 characters (8000 until 2026-11-04) with a "Too long"
   toast before any request (`src/generic/instance.js` `MAX_CHARS`, tests in `tests/generic-instance.test.js`
   and `tests/hostile-page.test.js`), below `LIMITS.text`, so no change was needed there.
 - The Diagnostics `chmod 600` hint is tested on the options page (`tests/options.test.js`): shown as an error for

@@ -13,7 +13,9 @@ import { addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../lib/lang.js';
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 const NOTHING = 'Put the cursor in a text box or select text.';
 const BLOCKED = 'protly cannot reach this frame. Right-click inside the box instead.';
-const MAX_CHARS = 8000;
+// Below LIMITS.text on purpose: the box reply carries the translation plus a Korean back_translation, and both
+// (with thinking) must fit the 32000-token outgoing budget in src/lib/prompts.js.
+const MAX_CHARS = 12000;
 const TOO_LONG = `Too long for protly (over ${MAX_CHARS} characters).`;
 const FOCUS_MOVED = 'Focus moved, so the translation was not written.';
 const CORNER = { top: 16, bottom: 16, left: 16, right: 16, width: 0, height: 0, x: 16, y: 16 };

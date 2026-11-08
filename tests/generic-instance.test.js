@@ -332,14 +332,14 @@ test('a second Alt+T while the box is being read sends no second request', async
   assert.equal(s.calls.length, 1);
 });
 
-test('over 8000 characters: a toast, no call', async () => {
+test('over 12000 characters: a toast, no call', async () => {
   const s = setup();
-  s.box.value = '가'.repeat(8001);
+  s.box.value = '가'.repeat(12001);
   s.box.focus();
   await s.inst.run({ source: 'command' });
-  assert.match(s.toasts(), /Too long for protly \(over 8000 characters\)\./);
+  assert.match(s.toasts(), /Too long for protly \(over 12000 characters\)\./);
   _resetToasts();
-  await s.inst.run({ source: 'menu-selection', selectionText: 'a'.repeat(8001) });
+  await s.inst.run({ source: 'menu-selection', selectionText: 'a'.repeat(12001) });
   assert.match(s.toasts(), /Too long for protly/);
   assert.equal(s.calls.length, 0);
 });
