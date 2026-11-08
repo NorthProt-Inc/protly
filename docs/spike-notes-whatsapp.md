@@ -66,3 +66,20 @@ panel's `shadow.innerHTML` is allowed.
   Instagram, both are Lexical).
 - Card placement above the footer, and the floating panel button against WhatsApp's layout.
 - Content-script `import()` of extension modules under this CSP (works on Instagram and Gmail).
+
+## Live check (2026-11-07, branch feat/whatsapp)
+
+Chats opened had no unread messages. Enter and Esc were pressed only in "Message yourself"; nothing was sent.
+
+- Past partner messages translate on open, emoji kept (a bubble with `<img alt="😓">` translated with the emoji).
+  Mode followed the stored default (`Below` here), so no init race was seen.
+- A -> B -> A: B showed exactly one translation per partner text bubble (8 of 8), none of A's; back in A the two
+  translations were intact, no duplicates.
+- Emoji bubble read: the `textOf` walk equals the bubble with each `<img>` replaced by its alt, no hidden
+  descendants, alt `U+1F613`.
+- Group title `YMCA Football Club ⚽`: the ⚽ is an `<img alt>` in the header title (textContent drops it), so the
+  `textOf` title read is needed.
+- Self chat: Korean + 😀, Enter: the box held the English translation with the emoji, card showed the original,
+  the language chip and `Esc undo · Alt+Enter Opus`. Esc restored the Korean. Cleared with Ctrl+A, Backspace.
+- Bug found and fixed: the card placed before `<footer>` rendered at the top of `#main` (flex column). It now goes
+  inside the footer, before the composer's row, right above the box.

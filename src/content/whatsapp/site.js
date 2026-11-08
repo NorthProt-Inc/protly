@@ -74,7 +74,12 @@ export const SITE = {
   findThreadRoot: (doc) => (chatTitle(doc) ? mainOf(doc) : null), // no title: waitForThread times out -> badge
   readMessages,
   findComposer: (doc) => mainOf(doc)?.querySelector(SEL.composer) ?? null,
-  cardAnchor: (c) => c.closest('footer') || c.parentElement,
+  // Inside the footer, before the composer's row. Placed before the footer itself, WhatsApp's flex column showed the
+  // card at the top of the chat.
+  cardAnchor: (c) => {
+    const footer = c.closest('footer');
+    return (footer && [...footer.children].find((n) => n.contains(c))) || c.parentElement;
+  },
 };
 
 export const start = () => run(SITE);

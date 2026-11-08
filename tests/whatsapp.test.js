@@ -62,6 +62,15 @@ test('WhatsApp: findComposer takes the footer box and ignores one outside #main'
   assert.equal(SITE.findComposer(new JSDOM('<div contenteditable="true" role="textbox"></div>').window.document), null);
 });
 
+test('WhatsApp: the card goes inside the footer, before the composer row', () => {
+  // Before the footer itself, WhatsApp's flex column put the card at the top of the chat (live check).
+  const doc = chat();
+  const box = SITE.findComposer(doc);
+  const anchor = SITE.cardAnchor(box);
+  assert.equal(anchor.parentElement.tagName, 'FOOTER');
+  assert.ok(anchor.contains(box));
+});
+
 test('WhatsApp: no thread root until the title is there', () => {
   assert.equal(SITE.findThreadRoot(withTitle(null)), null);
   assert.equal(SITE.findThreadRoot(chat()).id, 'main');
