@@ -46,7 +46,7 @@ public enum Languages {
 
     /// JavaScript's \s: its white space and line terminators. Not Foundation's set, which adds U+0085 and
     /// leaves out U+FEFF.
-    private static func isSpace(_ c: Unicode.Scalar) -> Bool {
+    static func isSpace(_ c: Unicode.Scalar) -> Bool {
         switch c.value {
         case 0x09...0x0D, 0x20, 0xA0, 0x1680, 0x2000...0x200A, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFEFF: return true
         default: return false
