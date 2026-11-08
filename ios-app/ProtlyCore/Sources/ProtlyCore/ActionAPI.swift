@@ -21,7 +21,7 @@ public struct ActionResult: Sendable, Equatable {
 public struct ActionError: Error, Sendable, Equatable {
     public enum Kind: String, Sendable {
         case auth, spendLimit, rate, overloaded, server, badRequest, network, timeout, refused, truncated, parse
-        case tooLong, noKey, setup
+        case tooLong, noKey, setup, notesOnly
     }
     public let kind: Kind
     /// Trying again can work: the network, a timeout, an overloaded API, a rate limit (P4), a server error or a reply
@@ -49,6 +49,7 @@ public struct ActionError: Error, Sendable, Equatable {
         case .tooLong: return "The text is too long. Try a shorter text."
         case .noKey: return "protly was built without an API key. Run make-secrets.sh and rebuild."
         case .setup: return "protly could not build the request. Rebuild protly."
+        case .notesOnly: return "Add the message too. [Brackets] are notes for protly."
         }
     }
     public init(_ kind: Kind) { self.kind = kind }
@@ -67,15 +68,24 @@ public enum ActionAPI {
         return try String(contentsOf: url, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// The action for the user's own draft: a Korean draft after "ko:" -> polish, else Korean anywhere ->
-    /// translate out, else polish.
-    public static func mode(forDraft text: String) -> ActionMode {
-        isKoreanPolish(text) ? .fix : hasHangul(text) ? .out : .fix
+    /// The action for the user's own draft, decided on its text without notes (Notes.split): a Korean draft after
+    /// "ko:" -> polish, else Korean anywhere -> translate out, else polish.
+    public static func mode(forDraft draft: String) -> ActionMode {
+        mode(forText: Notes.split(draft).text)
     }
 
     /// "ko: 낼 봐": the writer asks for his Korean draft polished in Korean. Without Korean after the prefix the
-    /// draft is handled as before, prefix and all.
-    public static func isKoreanPolish(_ text: String) -> Bool {
+    /// draft is handled as before, prefix and all. Notes do not count: "[짧게] ko: 낼 봐" is one too.
+    public static func isKoreanPolish(_ draft: String) -> Bool {
+        koreanPolish(Notes.split(draft).text)
+    }
+
+    /// mode(forDraft:) for a text already split: a draft is split once, so what one pass leaves stays text.
+    static func mode(forText text: String) -> ActionMode {
+        koreanPolish(text) ? .fix : hasHangul(text) ? .out : .fix
+    }
+
+    static func koreanPolish(_ text: String) -> Bool {
         let p = Languages.prefix(of: text)
         return p.code == "ko" && hasHangul(p.text)
     }
@@ -118,6 +128,11 @@ public enum ActionAPI {
             return .failure(ActionError(.noKey))
         }
         guard text.utf16.count <= maxInputLength else { return .failure(ActionError(.tooLong)) }
+        // A draft of notes only has nothing to translate or polish (Read never splits).
+        if mode != .in {
+            let draft = Notes.split(text)
+            guard draft.notes.isEmpty || !draft.text.isEmpty else { return .failure(ActionError(.notesOnly)) }
+        }
         guard let url = URL(string: url), let body = try? body(mode: mode, text: text, system: system) else {
             return .failure(ActionError(.setup))
         }
@@ -175,17 +190,19 @@ public enum ActionAPI {
 
     /// MODE out names its TARGET: the language of the draft's prefix ("ru: 안녕", the prefix dropped), else
     /// English, and sends mid-draft spans tagged ("fr:고마워;" -> "<fr>고마워</fr>", Languages.parse). MODE fix drops
-    /// a "ko:" prefix (isKoreanPolish) and tags nothing. The system prompt stays the same for every call.
+    /// a "ko:" prefix (isKoreanPolish) and tags nothing. Both send the draft without its notes and put the notes in a
+    /// NOTES block right before the DRAFT. Read (MODE in) sends someone else's text as it is. The system prompt stays
+    /// the same for every call.
     static func userMessage(mode: ActionMode, text: String) -> String {
-        switch mode {
-        case .in:
-            return "MODE: in\n\nTEXT:\n\(text)"
-        case .out:
-            let p = Languages.parse(text)
-            return "MODE: out\nTARGET: \(p.lang.flatMap(Languages.name(of:)) ?? "English")\n\nDRAFT:\n\(p.text)"
-        case .fix:
-            return "MODE: fix\n\nDRAFT:\n\(isKoreanPolish(text) ? Languages.prefix(of: text).text : text)"
+        if mode == .in { return "MODE: in\n\nTEXT:\n\(text)" }
+        let draft = Notes.split(text)
+        let notes = draft.notes.isEmpty ? "" : "NOTES:\n" + draft.notes.map { "- \($0)\n" }.joined() + "\n"
+        if mode == .out {
+            let p = Languages.parse(draft.text)
+            return "MODE: out\nTARGET: \(p.lang.flatMap(Languages.name(of:)) ?? "English")\n\n\(notes)DRAFT:\n\(p.text)"
         }
+        let polish = koreanPolish(draft.text) ? Languages.prefix(of: draft.text).text : draft.text
+        return "MODE: fix\n\n\(notes)DRAFT:\n\(polish)"
     }
 
     /// The reply's bytes, or nil once they pass `limit`: a huge or endless body never takes the keyboard's

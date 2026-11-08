@@ -93,7 +93,7 @@ final class ActionAPITests: XCTestCase {
     func testRetryOnlyWhereItCanWork() {
         let retry: Set<ActionError.Kind> = [.network, .timeout, .overloaded, .rate, .server, .parse]
         for k in [ActionError.Kind.auth, .spendLimit, .rate, .overloaded, .server, .badRequest, .network, .timeout,
-                  .refused, .truncated, .parse, .tooLong, .noKey, .setup] {
+                  .refused, .truncated, .parse, .tooLong, .noKey, .setup, .notesOnly] {
             XCTAssertEqual(ActionError(k).canRetry, retry.contains(k), "\(k)")
             // Each line says what happened and what to do next: at least two sentences.
             let m = ActionError(k).message

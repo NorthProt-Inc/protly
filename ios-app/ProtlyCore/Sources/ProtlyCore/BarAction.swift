@@ -62,18 +62,20 @@ public enum BarAction: Hashable, Sendable {
     }
 
     /// The center slot: Undo after an Insert, else the action that fits the field text, else Read when the field
-    /// is empty and new text was copied, else nothing.
-    public static func center(text: String, canUndo: Bool, clipboardIsNew: Bool) -> BarAction? {
+    /// is empty and new text was copied, else nothing. Decided on the text without notes (Notes.split): a field of
+    /// notes only shows what an empty one shows.
+    public static func center(text field: String, canUndo: Bool, clipboardIsNew: Bool) -> BarAction? {
         if canUndo { return .undo }
+        let text = Notes.split(field).text
         if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return clipboardIsNew ? .read : nil }
-        switch ActionAPI.mode(forDraft: text) {
+        switch ActionAPI.mode(forText: text) {
         case .out:
             // As ActionAPI.userMessage: the prefix's language, "ko" never (that is a polish), else English.
             let code = Languages.prefix(of: text).code
             let target = code == "ko" ? "en" : code ?? "en"
             return .translate(target: Languages.endonym(of: target) ?? Languages.name(of: target) ?? "English")
         case .fix:
-            return .polish(korean: ActionAPI.isKoreanPolish(text))
+            return .polish(korean: ActionAPI.koreanPolish(text))
         case .in:
             return .read  // mode(forDraft:) never answers .in
         }
