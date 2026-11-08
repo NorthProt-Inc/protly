@@ -95,20 +95,23 @@ export function parseLangPrefix(s) {
 // where the content holds no bracket and at least one letter, is an instruction to the model for this message.
 // Notes leave the text; a run of notes and the spaces around it becomes one space when the line has text on both
 // sides of it, else nothing (also before closing punctuation: "Hello [x]." -> "Hello."). Line breaks stay. One pass:
-// only the innermost pair of a nested one is a note. Never applied to text someone else wrote (incoming, selection).
+// only the innermost pair of a nested one is a note, and its content may span lines. Never applied to text someone
+// else wrote (incoming, selection). A draft without notes comes back unchanged; with notes the text is trimmed.
 // The iPhone keyboard's Notes.swift follows the same rules; tests/fixtures/notes-cases.json holds both to them.
+// "Spaces" are JS \s minus the JS line terminators (\n \r U+2028 U+2029), NBSP and tabs included.
 const BRACKET = /\[([^[\]]*)\]/g;
 const LETTER = /\p{L}/u;
-const H_SPACE = /[^\S\r\n]/;
-const ONLY_H_SPACE = /^[^\S\r\n]*$/;
-const CLOSING = /[\p{Pe}\p{Pf}.,;:!?…。、，！？；：]/u;
-const lineEdge = (c) => c === undefined || c === '\n' || c === '\r';
+const H_SPACE = /[^\S\n\r\u2028\u2029]/;
+const ONLY_H_SPACE = /^[^\S\n\r\u2028\u2029]*$/;
+const CLOSING = new Set([...'.,;:!?)]}…。、！？，）」』']);
+const lineEdge = (c) => c === undefined || c === '\n' || c === '\r' || c === '\u2028' || c === '\u2029';
 
 export function splitNotes(s) {
   const found = [];
   for (const m of s.matchAll(BRACKET)) {
     if (LETTER.test(m[1])) found.push({ from: m.index, to: m.index + m[0].length, note: m[1].trim() });
   }
+  if (!found.length) return { text: s, notes: [] };
   const notes = [];
   let out = '';
   let i = 0;
@@ -123,7 +126,7 @@ export function splitNotes(s) {
     while (to < s.length && H_SPACE.test(s[to])) to++;
     const before = from > 0 ? s[from - 1] : undefined;
     const after = s[to];
-    out += s.slice(i, from) + (lineEdge(before) || lineEdge(after) || CLOSING.test(after) ? '' : ' ');
+    out += s.slice(i, from) + (lineEdge(before) || lineEdge(after) || CLOSING.has(after) ? '' : ' ');
     i = to;
   }
   return { text: (out + s.slice(i)).trim(), notes };

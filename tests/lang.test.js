@@ -163,3 +163,28 @@ test('hasNotes and addsNote', () => {
   assert.equal(lang.addsNote('see you', 'see you'), false);
   assert.equal(lang.addsNote('[x] see you', null), true);
 });
+
+// Spacing details pinned with the iPhone Notes.split (tower, 2026-11-08), so both parsers agree.
+test('splitNotes: no space before exactly these closing marks; one space before anything else', () => {
+  for (const c of ['.', ',', ';', ':', '!', '?', ')', ']', '}', '…', '。', '、', '！', '？', '，', '）', '」', '』']) {
+    assert.deepEqual(lang.splitNotes(`a [x]${c}`), { text: `a${c}`, notes: ['x'] }, c);
+  }
+  for (const c of ['”', '»', '；', '：', '】', '(', '-', '👍']) {
+    assert.deepEqual(lang.splitNotes(`a [x]${c}`), { text: `a ${c}`, notes: ['x'] }, c);
+  }
+});
+
+test('splitNotes: spaces next to a note are JS \\s minus line breaks (NBSP, tabs, ideographic space)', () => {
+  assert.deepEqual(lang.splitNotes('a [x]　b'), { text: 'a b', notes: ['x'] });
+  assert.deepEqual(lang.splitNotes('a [x] b'), { text: 'a b', notes: ['x'] }); // a JS line terminator stays
+});
+
+test('splitNotes: note content may hold a line break', () => {
+  assert.deepEqual(lang.splitNotes('x [a\nb] y'), { text: 'x y', notes: ['a\nb'] });
+  assert.deepEqual(lang.splitNotes('x [\n a \n] y'), { text: 'x y', notes: ['a'] });
+});
+
+test('splitNotes: a draft without notes comes back unchanged, untrimmed; with notes the text is trimmed', () => {
+  for (const s of ['  hi  ', ' [1] \n', '\n안녕\n', '']) assert.deepEqual(lang.splitNotes(s), { text: s, notes: [] }, JSON.stringify(s));
+  assert.deepEqual(lang.splitNotes('\n hi [x] \n'), { text: 'hi', notes: ['x'] });
+});
