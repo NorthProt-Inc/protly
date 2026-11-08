@@ -4,6 +4,7 @@
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
+import { readFileSync } from 'node:fs';
 
 const PAGE = '<body><div id="app"></div></body>';
 const TITLE = 'conversation-info-header-chat-title';
@@ -70,6 +71,14 @@ test('WhatsApp: Hangul Enter is never let through, from a title miss to a chat s
     return e;
   };
   const threadIds = () => asked.filter((m) => m.type === 'getThread').map((m) => m.threadId);
+
+  // The real loader, as at document_start: its key relay goes on window before WhatsApp's own listener. Its import
+  // fails here on purpose (this test starts site.js itself).
+  const loaderSrc = readFileSync(new URL('../src/content/whatsapp/loader.js', import.meta.url), 'utf8');
+  new Function('window', 'document', 'chrome', 'console', loaderSrc)(
+    win, doc, { runtime: { getURL: () => 'data:text/javascript,throw 0' } }, { error() {} });
+  let pageEsc = 0; // WhatsApp's own early listener: it cancels a quote-reply on Escape
+  for (const type of ['keydown', 'keyup']) win.addEventListener(type, (e) => { if (e.key === 'Escape') pageEsc++; }, true);
 
   let composer = openChat(null);
   mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
@@ -147,6 +156,24 @@ test('WhatsApp: Hangul Enter is never let through, from a title miss to a chat s
     assert.equal(fromRow.defaultPrevented, true);
     assert.equal(rowSaw, 0);
     assert.deepEqual(asked.filter((m) => m.type === 'outgoing').map((m) => [m.threadId, m.korean]), [[idB, '안녕']]);
+
+    // 9. Escape while translating is protly's undo: neither its keydown nor its keyup reaches WhatsApp's own early
+    // listener, so a quote-reply survives. With nothing to undo, Escape is WhatsApp's again.
+    const esc = (type) => {
+      const e = new win.KeyboardEvent(type, { key: 'Escape', code: 'Escape', bubbles: true, cancelable: true });
+      composer.dispatchEvent(e);
+      return e;
+    };
+    _trustSyntheticEvents(true);
+    assert.equal(esc('keydown').defaultPrevented, true);
+    esc('keyup');
+    await flush();
+    assert.equal(pageEsc, 0);
+    await advance(300); // the undo's write lands
+    esc('keydown');
+    esc('keyup');
+    _trustSyntheticEvents(false);
+    assert.equal(pageEsc, 2);
   } finally {
     _trustSyntheticEvents(false);
     mock.timers.reset();

@@ -16,6 +16,10 @@ const WRITE_SETTLE_MS = 50;   // editors such as Lexical commit DOM updates asyn
 const norm = (s) => s.replace(/\s+/g, ' ').trim();
 const isEnter = (e) => e.key === 'Enter' || e.code === 'Enter' || e.code === 'NumpadEnter';
 const block = (e) => { e.preventDefault(); e.stopImmediatePropagation(); };
+// WhatsApp's loader puts a key relay on window before the page's own listeners (whatsapp/loader.js), so a blocked key
+// never reaches them. Elsewhere, window directly.
+const onKey = (type, f) => (globalThis.protlyEarlyKeys ? globalThis.protlyEarlyKeys[type].add(f) : window.addEventListener(type, f, true));
+const offKey = (type, f) => (globalThis.protlyEarlyKeys ? globalThis.protlyEarlyKeys[type].delete(f) : window.removeEventListener(type, f, true));
 
 // An Enter the user did not make (isTrusted false) never starts a translation. It is held whenever the user's own
 // Enter would not simply send: Hangul in the box (or in any editable box when the composer selector is broken),
@@ -39,6 +43,7 @@ export function mountOutgoing(cur) {
   let writeChain = Promise.resolve();
   let srcText = ''; // composer text when the current translation was requested
   let composing = false;
+  let escHeld = false; // protly took this Escape's keydown, so its keyup is not the page's either
   let dead = false;
 
   // This mount still owns the page: not torn down and the URL still shows its thread. Between a thread
@@ -227,7 +232,8 @@ export function mountOutgoing(cur) {
 
     if (e.key === 'Escape') {
       const eff = dispatch({ type: 'esc' });
-      if (eff.type !== 'pass') block(e);
+      escHeld = eff.type !== 'pass';
+      if (escHeld) block(e);
       return;
     }
     if (!isEnter(e) || e.shiftKey) return;
@@ -246,6 +252,10 @@ export function mountOutgoing(cur) {
     const eff = dispatch({ type: 'enter', text: getComposerText(c), hard: e.altKey, polish: flags.polish });
     // 'sent' lets the real Enter through so Instagram sends the composer text itself.
     if (eff.type !== 'pass' && eff.type !== 'sent') block(e);
+  }
+
+  function onKeyUp(e) {
+    if (e.key === 'Escape' && escHeld) { escHeld = false; block(e); }
   }
 
   function onCompositionStart() { composing = true; }
@@ -281,14 +291,16 @@ export function mountOutgoing(cur) {
   });
   chrome.runtime.onMessage.addListener(onCommand);
 
-  window.addEventListener('keydown', onKeyDown, true);
+  onKey('keydown', onKeyDown);
+  onKey('keyup', onKeyUp);
   window.addEventListener('compositionstart', onCompositionStart, true);
   window.addEventListener('compositionend', onCompositionEnd, true);
   window.addEventListener('input', onInput, true);
   cur.onMutate.push(checkEmpty);
   cur.onThreadUpdate.push((t) => { if (!t.enabled && state.mode !== 'idle') resetPreview(); });
   cur.onTeardown.push(() => {
-    window.removeEventListener('keydown', onKeyDown, true);
+    offKey('keydown', onKeyDown);
+    offKey('keyup', onKeyUp);
     window.removeEventListener('compositionstart', onCompositionStart, true);
     window.removeEventListener('compositionend', onCompositionEnd, true);
     window.removeEventListener('input', onInput, true);

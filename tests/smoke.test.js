@@ -24,6 +24,13 @@ test('manifest injects the Gmail loader on mail.google.com', () => {
   assert.ok(war.resources.includes('src/lib/lang.js'));
 });
 
+test('the WhatsApp loader runs at document_start, before WhatsApp adds its own key listeners', () => {
+  const m = JSON.parse(readFileSync(new URL('../manifest.json', import.meta.url)));
+  const w = m.content_scripts.find((c) => c.matches.includes('https://web.whatsapp.com/*'));
+  assert.deepEqual(w.js, ['src/content/whatsapp/loader.js']);
+  assert.equal(w.run_at, 'document_start');
+});
+
 test('the toolbar popup is wired and has the control-center fields', () => {
   const m = JSON.parse(readFileSync(new URL('../manifest.json', import.meta.url)));
   assert.equal(m.action.default_popup, 'popup/popup.html');
