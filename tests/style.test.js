@@ -47,7 +47,8 @@ test('the blocks are the user text of 2026-10-29, bullets only', () => {
     assert.ok(ENGLISH_STYLE.includes(phrase), phrase);
   }
   assert.match(POLISH_VOICE, /^- Voice: direct\. Humour stays dry and understated\./);
-  assert.match(TRANSLATE_TONE, /^- ㅋㅋ used as a softener becomes "lol" or is dropped\.$/m);
+  assert.match(TRANSLATE_TONE, /^- ㅋㅋ is usually dropped\. Write "lol" at most once, only when the draft is clearly joking and nothing else carries it\.$/m);
+  assert.match(TRANSLATE_TONE, /calm and even.*Add no hype, slang or intensifiers/);
   assert.match(EMAIL_SHAPE, /^- Email: the ask goes first, context after\./);
 });
 
@@ -83,9 +84,9 @@ test('Korean chat marks never survive in a translation', () => {
   }
 });
 
-test('ㅋㅋ becomes lol or is dropped, never haha (the user text of 2026-10-29)', () => {
+test('ㅋㅋ is usually dropped, lol at most once, never haha (the user text of 2026-11-08)', () => {
   for (const [name, s] of Object.entries({ outgoing: outgoing('en'), russian: outgoing('ru'), box: box('en'), email, keyboard, polish })) {
     assert.doesNotMatch(s, /haha/i, name);
   }
-  for (const s of [email, outgoing('ru')]) assert.match(s, /ㅋㅋ becomes lol or is dropped/);
+  for (const s of [email, outgoing('ru')]) assert.match(s, /ㅋㅋ is usually dropped \(lol at most once, only for a clear joke\)/);
 });

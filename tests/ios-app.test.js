@@ -25,7 +25,8 @@ test('keyboard prompt carries the shared English style verbatim (src/lib/style.j
 });
 
 test('keyboard prompt stays inside its size budget (it is sent on every call from the phone)', () => {
-  assert.ok(prompt.length <= 4300, `keyboard prompt is ${prompt.length} characters, budget 4300`);
+  // 4500 since 2026-11-08: the calmer tone rules (fewer lol) added about 160 characters.
+  assert.ok(prompt.length <= 4500, `keyboard prompt is ${prompt.length} characters, budget 4500`);
 });
 
 test('the keyboard translates into the extension languages (ProtlyCore Languages.swift equals LANG_NAMES)', () => {

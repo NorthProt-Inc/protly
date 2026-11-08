@@ -1,4 +1,4 @@
-// The user's own English style, written by Cyan on 2026-10-29. The bullets are the user's text verbatim: edit
+// The user's own English style, written by Cyan on 2026-10-29 (tone made calmer, fewer lol, 2026-11-08). The bullets are the user's text verbatim: edit
 // them only with the user. Each block's scope is fixed by the user too, and tests/style.test.js pins it:
 // ENGLISH_STYLE goes into every call whose output is English, POLISH_VOICE into Polish (the rewrite mode, not the
 // language) only, TRANSLATE_TONE into Korean -> English translation only, EMAIL_SHAPE into email only.
@@ -14,11 +14,11 @@ export const ENGLISH_STYLE = `- Meaning: keep every fact, name, number, request 
 - Emoji and exclamation marks: keep the draft's own and add none.
 - Say it plainly instead of: delve into, multifaceted, nuanced, it is important to note that, plays a crucial role, deep dive, holistic, I'd love to, passionate about, excited to, I'm just a student but, thank you for reaching out, I hope this finds you well, just circling back, hope this helps, please find attached. Open no sentence with Furthermore, Moreover, Additionally, Ultimately or Interestingly. End on the last real sentence, never on "Thank you for your time".`;
 
-export const POLISH_VOICE = `- Voice: direct. Humour stays dry and understated. Keep the draft's register: casual stays casual, warm stays warm, and softeners like lol stay.
+export const POLISH_VOICE = `- Voice: direct. Humour stays dry and understated. Keep the draft's register: casual stays casual, warm stays warm, and a softener like lol stays, once at most.
 - The main point or the ask goes first, reasons after, unless the draft is casual chat. Side context goes in parentheses inside its sentence.
 - A change of mind stays plain: "I thought X. Now I think Y." Length stays close to the draft: cut repetition and filler.`;
 
-export const TRANSLATE_TONE = `- Keep the draft's tone: warm stays warm, blunt stays blunt.
-- ㅋㅋ used as a softener becomes "lol" or is dropped.`;
+export const TRANSLATE_TONE = `- Keep the draft's tone, calm and even: warm stays warm, blunt stays blunt. Add no hype, slang or intensifiers (so, super, totally, literally).
+- ㅋㅋ is usually dropped. Write "lol" at most once, only when the draft is clearly joking and nothing else carries it.`;
 
 export const EMAIL_SHAPE = `- Email: the ask goes first, context after. Keep "Hi <Name>," when the draft has it. Keep the draft's sign-off.`;
