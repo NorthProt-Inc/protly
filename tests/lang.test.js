@@ -1,5 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import * as lang from '../src/lib/lang.js';
 import { hasHangul, isKoreanOnly, incomingTarget, resolveOutputLang, latestPartnerLang, parseLangPrefix } from '../src/lib/lang.js';
 
 test('hasHangul', () => {
@@ -98,4 +100,20 @@ test('parseLangPrefix: mid-draft look-alikes stay text', () => {
 
 test('parseLangPrefix: known false positive, a lowercase id: before Hangul opens Indonesian (previewed before sending)', () => {
   assert.deepEqual(parseLangPrefix('내 아이디 id:홍길동'), { lang: null, text: '내 아이디 <id>홍길동</id>' });
+});
+
+// Shared with the iPhone keyboard (ProtlyCore LanguagesTests and NotesTests read the same files), so the two parsers
+// cannot drift. Plan: docs/plans/2026-11-08-notes-and-iphone-port.md.
+const fixture = (name) => JSON.parse(readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8'));
+
+test('parseLangPrefix matches the shared span cases', () => {
+  for (const c of fixture('span-cases.json')) {
+    assert.deepEqual(parseLangPrefix(c.draft), { lang: c.lang, text: c.text }, c.draft);
+  }
+});
+
+test('splitNotes matches the shared note cases', { skip: !lang.splitNotes && 'splitNotes lands in Sprint S1' }, () => {
+  for (const c of fixture('notes-cases.json')) {
+    assert.deepEqual(lang.splitNotes(c.draft), { text: c.text, notes: c.notes }, `${c.why}: ${JSON.stringify(c.draft)}`);
+  }
 });

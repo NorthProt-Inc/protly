@@ -1,0 +1,147 @@
+[
+  {
+    "draft": "ru: 안녕",
+    "lang": "ru",
+    "text": "안녕"
+  },
+  {
+    "draft": "ja: 첫줄\n둘째 줄",
+    "lang": "ja",
+    "text": "첫줄\n둘째 줄"
+  },
+  {
+    "draft": "ko: 안녕",
+    "lang": null,
+    "text": "ko: 안녕"
+  },
+  {
+    "draft": "ok: 안녕",
+    "lang": null,
+    "text": "ok: 안녕"
+  },
+  {
+    "draft": "안녕 ru:",
+    "lang": null,
+    "text": "안녕 ru:"
+  },
+  {
+    "draft": "https://x.com 안녕",
+    "lang": null,
+    "text": "https://x.com 안녕"
+  },
+  {
+    "draft": "오늘 고마웠어 fr:정말 고마워; 다음에 또 보자",
+    "lang": null,
+    "text": "오늘 고마웠어 <fr>정말 고마워</fr> 다음에 또 보자"
+  },
+  {
+    "draft": "안녕 fr:고마워; 그리고 ja:잘가; 끝",
+    "lang": null,
+    "text": "안녕 <fr>고마워</fr> 그리고 <ja>잘가</ja> 끝"
+  },
+  {
+    "draft": "안녕 fr:고마워 잘가",
+    "lang": null,
+    "text": "안녕 <fr>고마워 잘가</fr>"
+  },
+  {
+    "draft": "안녕 fr:  고마워;",
+    "lang": null,
+    "text": "안녕 <fr>고마워</fr>"
+  },
+  {
+    "draft": "고마워fr:안녕;",
+    "lang": null,
+    "text": "고마워<fr>안녕</fr>"
+  },
+  {
+    "draft": "안녕 fr:고마워 ja:잘가; 끝",
+    "lang": null,
+    "text": "안녕 <fr>고마워 ja:잘가</fr> 끝"
+  },
+  {
+    "draft": "안녕 fr:미안;; 늦었어",
+    "lang": null,
+    "text": "안녕 <fr>미안;; 늦었어</fr>"
+  },
+  {
+    "draft": "안녕 fr:고마워;;; 응",
+    "lang": null,
+    "text": "안녕 <fr>고마워;;; 응</fr>"
+  },
+  {
+    "draft": "안녕 fr:고마워; ;",
+    "lang": null,
+    "text": "안녕 <fr>고마워</fr> ;"
+  },
+  {
+    "draft": "안녕; 잘가",
+    "lang": null,
+    "text": "안녕; 잘가"
+  },
+  {
+    "draft": "ru: 미안;; 늦었어",
+    "lang": "ru",
+    "text": "미안;; 늦었어"
+  },
+  {
+    "draft": "ru: 안녕; 잘가",
+    "lang": "ru",
+    "text": "안녕; 잘가"
+  },
+  {
+    "draft": "ru: 안녕 fr:고마워;",
+    "lang": "ru",
+    "text": "안녕 <fr>고마워</fr>"
+  },
+  {
+    "draft": "x ID: abc 추가해줘",
+    "lang": null,
+    "text": "x ID: abc 추가해줘"
+  },
+  {
+    "draft": "x UK: 런던",
+    "lang": null,
+    "text": "x UK: 런던"
+  },
+  {
+    "draft": "x No: 3",
+    "lang": null,
+    "text": "x No: 3"
+  },
+  {
+    "draft": "링크 http://안녕",
+    "lang": null,
+    "text": "링크 http://안녕"
+  },
+  {
+    "draft": "10:30 만나",
+    "lang": null,
+    "text": "10:30 만나"
+  },
+  {
+    "draft": "안녕 ok:안녕",
+    "lang": null,
+    "text": "안녕 ok:안녕"
+  },
+  {
+    "draft": "안녕 ko:안녕",
+    "lang": null,
+    "text": "안녕 ko:안녕"
+  },
+  {
+    "draft": "안녕 fr: Bonjour",
+    "lang": null,
+    "text": "안녕 fr: Bonjour"
+  },
+  {
+    "draft": "안녕 abc:안녕",
+    "lang": null,
+    "text": "안녕 abc:안녕"
+  },
+  {
+    "draft": "내 아이디 id:홍길동",
+    "lang": null,
+    "text": "내 아이디 <id>홍길동</id>"
+  }
+]
