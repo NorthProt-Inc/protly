@@ -42,7 +42,7 @@ test('Korean in a textarea: box call with the hostname, write, preview, Undo res
   await until(() => box.value === 'see you tomorrow');
   await until(() => btn('Undo'));
   assert.match(msg(), /내일 봐/);
-  assert.ok(btn('Opus'));
+  assert.ok(btn('Deep'));
   assert.ok(root().querySelector('select.pl-chip'));
   btn('Undo').click();
   await until(() => box.value === '내일 봐');

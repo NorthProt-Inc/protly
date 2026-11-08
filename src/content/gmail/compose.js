@@ -95,7 +95,7 @@ const act = (label, onClick) => ({ label, onClick });
 const pickerOf = (body, s) => (s.kind === 'polish' ? {} : {
   lang: s.lang, onLang: (lang) => { body.focus(); retranslate(body, { lang }); },
 });
-const previewActions = (body) => [act('Opus', () => retranslate(body, { profile: 'hard' })), act('Undo', () => undo(body))];
+const previewActions = (body) => [act('Deep', () => retranslate(body, { profile: 'hard' })), act('Undo', () => undo(body))];
 
 function say(body, s, text, { error = false, actions = [], picker = false } = {}) {
   cardOf(body, s).message(text, { error, actions, ...(picker ? pickerOf(body, s) : {}) });
@@ -107,7 +107,7 @@ function hideNote(s) {
 
 function showPreview(body, s) {
   cardOf(body, s).preview({
-    text: s.last.back_translation, model: s.last.model, ...pickerOf(body, s), actions: previewActions(body), hints: HINTS,
+    text: s.last.back_translation, model: s.last.model, deep: s.profile === 'hard', ...pickerOf(body, s), actions: previewActions(body), hints: HINTS,
   });
 }
 
@@ -149,7 +149,7 @@ export function translate(body) {
   return request(body, opts);
 }
 
-// Picker and Opus in preview: same source and kind, other language or model.
+// Picker and Deep in preview: same source and kind, other language or profile.
 function retranslate(body, { lang, profile, force = false }) {
   const s = stateOf(body);
   if (s.mode !== 'preview') return;
@@ -235,7 +235,7 @@ async function request(body, { kind = 'translate', korean, profile, lang }) {
   s.mode = 'translating';
   const polish = kind === 'polish';
   const verb = polish ? 'Polishing' : 'Translating';
-  cardOf(body, s).working(profile === 'hard' ? `${verb} with Opus` : verb, { onCancel: () => cancel(body, reqId, prevMode) });
+  cardOf(body, s).working(profile === 'hard' ? `${verb} deeply` : verb, { onCancel: () => cancel(body, reqId, prevMode) });
   try {
     // Polish takes no thread context: one draft does not need it.
     const r = polish

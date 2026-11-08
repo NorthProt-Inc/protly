@@ -175,7 +175,19 @@ test('Esc during a first request keeps the draft, closes the card, and the late 
   assert.equal(composer.textContent, KOREAN);
 });
 
-test('Esc during an Opus re-run keeps the first translation, and Enter records it with the Korean draft', async () => {
+test('Alt+Enter re-runs deep: the card says Translating deeply, then marks the result deep', async () => {
+  await toPreview();
+  assert.equal(cardPart('.model'), 'Sonnet'); // a first run: no 'deep'
+  assert.equal(cardPart('.hints'), 'Enter send · Esc keep · Alt+Z undo · Alt+Enter deep');
+  assert.equal(enter({ altKey: true }).defaultPrevented, true);
+  assert.equal(billed().at(-1).profile, 'hard');
+  assert.match(cardPart('.msg'), /^Translating deeply/);
+  answer('see you then, 지민');
+  await until(() => cardPart('.model') === 'Sonnet deep');
+  await undo();
+});
+
+test('Esc during a deep re-run keeps the first translation, and Enter records it with the Korean draft', async () => {
   await toPreview();
   assert.equal(enter({ altKey: true }).defaultPrevented, true);
   assert.equal(billed().at(-1).profile, 'hard');

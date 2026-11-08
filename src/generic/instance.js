@@ -122,7 +122,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   }
 
   const actionsFor = (cur) => (cur.mode === 'preview'
-    ? [{ label: 'Opus', onClick: () => rerun({ hard: true }) }, { label: 'Undo', onClick: () => undo() }]
+    ? [{ label: 'Deep', onClick: () => rerun({ hard: true }) }, { label: 'Undo', onClick: () => undo() }]
     : [{ label: 'Close', onClick: () => close() }]);
 
   function showPreview(cur) {
@@ -130,6 +130,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     cur.card.preview({
       text: cur.last.back_translation,
       model: cur.last.model, // the card turns the id into 'Sonnet' or 'Opus'
+      deep: cur.hard,
       ...(polish ? {} : { lang: cur.lang, onLang: (code) => rerun({ lang: code }) }),
       actions: actionsFor(cur),
       hints: 'Esc keep · Alt+Z undo',
@@ -155,7 +156,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     cur.prev = cur.mode;
     cur.mode = 'working';
     const polish = cur.d.kind === 'polish';
-    cur.card.working(`${polish ? 'Polishing' : 'Translating'}${cur.hard ? ' with Opus' : ''}`, { onCancel: () => cancel(cur) });
+    cur.card.working(`${polish ? 'Polishing' : 'Translating'}${cur.hard ? ' deeply' : ''}`, { onCancel: () => cancel(cur) });
     lift(cur);
     const before = readBox(cur.t); // what the box must still hold when the result lands
     const live = () => box === cur && cur.reqId === reqId;

@@ -43,7 +43,8 @@ test('Instagram: Esc keeps the translation, an edit is sent with the Korean sour
     assert.equal(esc().defaultPrevented, true);
     assert.equal(enter().defaultPrevented, true);
     await until(() => hints());
-    assert.equal(hints(), 'Enter send · Esc keep · Alt+Z undo · Alt+Enter Opus');
+    assert.equal(hints(), 'Enter send · Esc keep · Alt+Z undo · Alt+Enter deep');
+    assert.equal(shadowOf(card()).querySelector('.model').textContent, 'Sonnet'); // a first run: no 'deep'
   };
 
   _trustSyntheticEvents(true);

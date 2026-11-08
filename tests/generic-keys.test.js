@@ -76,7 +76,7 @@ test('Esc during a re-run from the preview keeps the previous translation and cl
   await toPreview(s);
   s.inst.run({ source: 'command' }); // Alt+T again: Opus
   await until(() => s.calls.length === 2);
-  assert.match(s.msg(), /with Opus/);
+  assert.match(s.msg(), /deeply/);
   assert.equal(s.key(s.ESC).defaultPrevented, true);
   assert.equal(s.root(), undefined); // closed, not back to the old preview
   s.pending[1].res(reply('see you tomorrow then', '내일 봐', 'claude-opus-5-5'));
@@ -102,7 +102,7 @@ test('Alt+Z while the first request is in flight: closes, the box keeps the draf
 test('Alt+Z during a re-run returns to the preview; a second Alt+Z, after an edit, restores the original', async () => {
   const s = setup();
   await toPreview(s);
-  s.btn('Opus').click();
+  s.btn('Deep').click();
   await until(() => s.calls.length === 2);
   assert.equal(s.btn('Undo'), undefined); // working
   assert.equal(s.key(s.ALT_Z).defaultPrevented, true);
@@ -245,7 +245,7 @@ test('contenteditable: Alt+Z during the select settle of a re-run writes nothing
   await until(() => s.calls.length === 1);
   s.pending[0].res(reply('see you tomorrow', '내일 봐'));
   await until(() => s.btn('Undo'));
-  s.btn('Opus').click();
+  s.btn('Deep').click();
   await until(() => s.calls.length === 2);
   s.pending[1].res(reply('see you tomorrow then', '내일 봐', 'claude-opus-5-5'));
   await sleep(10); // inside the 60 ms settle
@@ -310,4 +310,16 @@ test('after Esc kept the translation, Alt+Z from another box is left alone', asy
   const other = s.doc.getElementById('o');
   assert.equal(s.key(s.ALT_Z, other).defaultPrevented, false); // focus never left the box; the key came from elsewhere
   assert.equal(s.box.value, 'see you tomorrow');
+});
+
+test('Deep re-runs with the hard profile and the card says so; a first run does not', async () => {
+  const s = setup();
+  await toPreview(s);
+  assert.equal(s.root().querySelector('.model').textContent, 'Sonnet');
+  assert.equal(s.btn('Opus'), undefined); // the default model is Opus already: the button names the difference
+  s.btn('Deep').click();
+  await until(() => s.calls.length === 2);
+  assert.match(s.msg(), /^Translating deeply/);
+  s.pending[1].res(reply('see you tomorrow then', '내일 봐', 'claude-opus-5-5'));
+  await until(() => s.root()?.querySelector('.model')?.textContent === 'Opus deep');
 });

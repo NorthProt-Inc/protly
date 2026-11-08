@@ -226,8 +226,8 @@ test('Esc while the first request is in flight keeps the Korean and drops the la
 test('Esc during an Opus re-run keeps the previous translation; the late result never lands', async () => {
   const t = await setup();
   await preview(t);
-  [...t.note()[0].querySelectorAll('button')].find((b) => b.textContent === 'Opus').click();
-  assert.match(t.noteText(), /with Opus/);
+  [...t.note()[0].querySelectorAll('button')].find((b) => b.textContent === 'Deep').click();
+  assert.match(t.noteText(), /deeply/);
   assert.deepEqual(t.press(t.inline, t.ESC), SWALLOWED);
   assert.equal(userText(t.inline), 'First');
   assert.equal(t.note(), null);
@@ -257,7 +257,7 @@ test('Esc on the "you edited the translation" prompt keeps the edit and sends no
   const t = await setup();
   await preview(t);
   t.inline.firstChild.textContent = 'First, edited';
-  [...t.note()[0].querySelectorAll('button')].find((b) => b.textContent === 'Opus').click();
+  [...t.note()[0].querySelectorAll('button')].find((b) => b.textContent === 'Deep').click();
   assert.match(t.noteText(), /You edited the translation/);
   assert.deepEqual(t.press(t.inline, t.ESC), SWALLOWED);
   assert.equal(userText(t.inline), 'First, edited');
@@ -275,7 +275,7 @@ test('after a failed first request Esc is Gmail\'s; after a failed re-run it kee
   assert.equal(userText(t.inline), KOREAN);
 
   await preview(t);
-  [...t.note()[0].querySelectorAll('button')].find((b) => b.textContent === 'Opus').click();
+  [...t.note()[0].querySelectorAll('button')].find((b) => b.textContent === 'Deep').click();
   await t.reply({ ok: false, error: { kind: 'timeout', message: 'slow' } });
   assert.match(t.noteText(), /too long/);
   assert.deepEqual(t.press(t.inline, t.ESC), SWALLOWED);

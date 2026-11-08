@@ -9,7 +9,7 @@ import { errorText } from '../ui/errors.js';
 import { trusted } from '../ui/trust.js';
 import { commandListener, isUndoKey } from '../lib/command.js';
 
-const HINTS = 'Enter send · Esc keep · Alt+Z undo · Alt+Enter Opus';
+const HINTS = 'Enter send · Esc keep · Alt+Z undo · Alt+Enter deep';
 
 const COMPOSE_ENTER_MS = 300; // a deferred IME Enter must be followed by compositionend within this window
 const WRITE_SETTLE_MS = 50;   // editors such as Lexical commit DOM updates asynchronously
@@ -114,7 +114,7 @@ export function mountOutgoing(cur) {
       case 'translate': {
         if (c) srcText = getComposerText(c);
         const verb = effect.kind === 'polish' ? 'Polishing' : 'Translating';
-        cardFor()?.working(effect.profile === 'hard' ? `${verb} with Opus` : verb);
+        cardFor()?.working(effect.profile === 'hard' ? `${verb} deeply` : verb);
         try {
           const cur2 = getCurrent();
           if (!cur2) throw new Error('thread closed');
@@ -159,6 +159,7 @@ export function mountOutgoing(cur) {
         cardFor()?.preview({
           text: effect.back_translation,
           model: effect.model,
+          deep: effect.profile === 'hard',
           ...(state.kind === 'polish' ? {} : { lang: effect.lang, onLang: saveLang }), // polish has no target language
           hints: HINTS,
         });

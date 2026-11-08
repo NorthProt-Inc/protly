@@ -12,7 +12,7 @@ export const ERRORS = {
   overloaded: 'The API is overloaded. Try again in a moment.',
   server: 'The API had a server error. Try again.',
   refused: 'The model declined this text.',
-  truncated: 'The reply was cut off. Try Opus or a shorter text.',
+  truncated: 'The reply was cut off. Try Deep or a shorter text.',
   parse: 'The reply was not readable. Try again.',
   forbidden: 'protly refused a request from this page. Reload the tab; if it keeps happening, report it.',
   bad_message: 'protly could not send this request. Reload the tab; if it keeps happening, report it.',

@@ -127,11 +127,11 @@ test('a failed Opus retry keeps the preview controls', async () => {
   const { inline, reply, note, buttonIn } = setup();
   translate(inline);
   await reply(ok('First'));
-  buttonIn('Opus').click();
+  buttonIn('Deep').click();
   await reply({ ok: false, error: { kind: 'timeout', message: 'slow' } });
   assert.equal(userText(inline), 'First');
   assert.match(note().textContent, /too long/);
-  assert.ok(buttonIn('Opus') && buttonIn('Undo') && note().querySelector('select'));
+  assert.ok(buttonIn('Deep') && buttonIn('Undo') && note().querySelector('select'));
   buttonIn('Undo').click();
   assert.equal(userText(inline), KOREAN);
 });
@@ -141,7 +141,7 @@ test('Opus after editing the translation asks before replacing the edit', async 
   translate(inline);
   await reply(ok('First'));
   inline.firstChild.textContent = 'First, edited';
-  buttonIn('Opus').click();
+  buttonIn('Deep').click();
   assert.equal(calls.length, 1); // nothing sent yet
   assert.match(note().textContent, /You edited the translation/);
   buttonIn('Replace anyway').click();
@@ -150,7 +150,7 @@ test('Opus after editing the translation asks before replacing the edit', async 
   assert.equal(calls[1].korean, KOREAN);
   await reply(ok('Second', 'claude-opus-5-5'));
   assert.equal(userText(inline), 'Second');
-  assert.match(note().textContent, /Opus/);
+  assert.equal(note().querySelector('.model').textContent, 'Opus deep');
   undo(inline);
   assert.equal(userText(inline), KOREAN); // Undo still goes back to the original Korean
 });
@@ -223,7 +223,7 @@ test('an English edit in a polish preview is an error, no call, Undo keeps the o
   translate(dialog);
   assert.equal(calls.length, 1);
   assert.match(note().textContent, /To polish this English, press Undo first/);
-  assert.ok(buttonIn('Opus') && buttonIn('Undo'));
+  assert.ok(buttonIn('Deep') && buttonIn('Undo'));
   buttonIn('Undo').click();
   assert.equal(userText(dialog), ENGLISH);
 });
@@ -268,7 +268,7 @@ test('a polish preview has Opus and Undo but no language picker', async () => {
   translate(dialog);
   await reply(polished('Polished'));
   assert.equal(note().querySelector('select'), null);
-  assert.ok(buttonIn('Opus') && buttonIn('Undo'));
+  assert.ok(buttonIn('Deep') && buttonIn('Undo'));
 });
 
 test('Opus in a polish preview re-polishes with the hard profile', async () => {
@@ -276,12 +276,12 @@ test('Opus in a polish preview re-polishes with the hard profile', async () => {
   draft(dialog, ENGLISH);
   translate(dialog);
   await reply(polished('Polished'));
-  buttonIn('Opus').click();
-  assert.match(note().textContent, /Polishing with Opus/);
+  buttonIn('Deep').click();
+  assert.match(note().textContent, /Polishing deeply/);
   assert.deepEqual(calls[1], { type: 'polish', text: ENGLISH, profile: 'hard' });
   await reply(polished('Polished harder', 'claude-opus-5-5'));
   assert.equal(userText(dialog), 'Polished harder');
-  assert.match(note().textContent, /Opus/);
+  assert.equal(note().querySelector('.model').textContent, 'Opus deep');
   assert.equal(note().querySelector('select'), null);
   undo(dialog);
   assert.equal(userText(dialog), ENGLISH);
@@ -350,7 +350,7 @@ test('Opus after editing the translation keeps the edit and asks instead', async
   translate(inline);
   await reply(ok('First'));
   inline.firstChild.textContent = 'First, edited';
-  buttonIn('Opus').click();
+  buttonIn('Deep').click();
   assert.equal(userText(inline), 'First, edited');
   assert.equal(calls.length, 1);
   assert.match(note().textContent, /You edited the translation/);

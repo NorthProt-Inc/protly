@@ -212,7 +212,7 @@ const EMAIL_SCHEMA = {
 const formatEmailThread = (context) =>
   context.map((m) => `--- ${m.from === 'me' ? 'ME' : 'THEM'}:\n${m.text}`).join('\n\n') || '(none: this is a new email)';
 
-// profile: 'email' (Sonnet, medium) or 'hard' (Opus, high). lang: 'auto' or an ISO 639-1 code.
+// profile: 'email' (low effort) or 'hard' (high effort; Deep in the card). lang: 'auto' or an ISO 639-1 code.
 export function buildEmailRequest({ model, profile = 'email', context, korean, lang = 'auto' }) {
   const text = [
     `TARGET: ${lang === 'auto' ? 'auto' : langName(lang)}`,
