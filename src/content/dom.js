@@ -96,10 +96,20 @@ export function getComposerText(el) {
 export const SELECT_SETTLE_MS = 60;
 // stillOk() is re-checked after the settle; false aborts the insert (thread switched, write superseded).
 // Returns true when the text was inserted.
+// Focus coming in from elsewhere (WhatsApp's Reply leaves it on the message row) makes Lexical restore its own caret a
+// moment later, which collapses the first select-all; then insertText would append. Select once more if so.
 export async function setComposerText(el, text, stillOk = () => true) {
-  el.focus();
-  el.ownerDocument.getSelection().selectAllChildren(el);
-  await new Promise((r) => setTimeout(r, SELECT_SETTLE_MS));
+  const sel = el.ownerDocument.getSelection();
+  const flat = (t) => t.replace(/\s+/g, '');
+  const selectsAll = () => !flat(el.innerText || el.textContent || '')
+    || (!sel.isCollapsed && el.contains(sel.anchorNode) && flat(sel.toString()) === flat(el.innerText || el.textContent || ''));
+  const select = async () => {
+    el.focus();
+    sel.selectAllChildren(el);
+    await new Promise((r) => setTimeout(r, SELECT_SETTLE_MS));
+  };
+  await select();
+  if (el.isConnected && stillOk() && !selectsAll()) await select();
   if (!el.isConnected || !stillOk()) return false;
   el.focus();
   el.ownerDocument.execCommand('insertText', false, text);
