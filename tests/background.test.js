@@ -271,3 +271,22 @@ test('Alt+T and the context menu call the instance under Symbol.for("protly"), n
     delete globalThis.__protly;
   }
 });
+
+test('notes reach the outgoing, email, polish and box prompts; without notes no NOTES block', async () => {
+  native.replyWith = (m) => (m.ping ? { ping: { ok: true } } : apiReply({ lang: 'en', translation: 'hi', back_translation: '안녕' }));
+  const cases = [
+    [{ type: 'outgoing', threadId: '1', context: [], korean: '안녕', profile: 'outgoing' }, 'instagram'],
+    [{ type: 'email', context: [], korean: '안녕', profile: 'email', lang: 'auto' }, 'gmail'],
+    [{ type: 'polish', text: 'hi', profile: 'polish' }, 'page'],
+    [{ type: 'box', text: '안녕', lang: 'en', profile: 'outgoing' }, 'page'],
+  ];
+  for (const [msg, s] of cases) {
+    for (const notes of [['formal', 'short'], undefined]) {
+      native.sent.length = 0;
+      const r = await send({ ...msg, notes }, senders[s]);
+      assert.equal(r.ok, true, `${msg.type}: ${JSON.stringify(r)}`);
+      const content = native.sent.find((m) => m.body)?.body.messages[0].content;
+      assert.equal(content.includes('NOTES:\n- formal\n- short\n\n'), !!notes, `${msg.type} ${notes}`);
+    }
+  }
+});

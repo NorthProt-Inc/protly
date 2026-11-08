@@ -67,6 +67,8 @@ export const isLangCode = lang;
 const autoOrLang = (v) => v === 'auto' || lang(v);
 const threadId = match(THREAD_ID);
 const context = listOf(LIMITS.context, record({ from: oneOf('me', 'partner', 'them'), text }));
+// Bracket notes from the user's own draft (src/lib/lang.js splitNotes). A shape bound only; drafts have no note limit.
+const notes = opt(listOf(20, str(500, 1)));
 
 // setThread: only the fields the thread panel and the language chip change, at least one of them.
 const PATCH = {
@@ -83,13 +85,13 @@ export const SHAPES = {
     threadId, context, updateLang: opt(bool),
     items: listOf(LIMITS.items, record({ id: match(ITEM_ID), text, from: oneOf('me', 'partner') })),
   },
-  outgoing: { threadId, context, korean: someText, profile: oneOf('outgoing', 'hard'), lang: opt(lang) },
+  outgoing: { threadId, context, korean: someText, profile: oneOf('outgoing', 'hard'), lang: opt(lang), notes },
   suggestMemo: { threadId, context },
   sent: { threadId, text: someText, korean: opt(text) },
   lookupSent: { threadId, texts: listOf(LIMITS.texts, text) },
-  email: { context, korean: someText, profile: oneOf('email', 'hard'), lang: opt(autoOrLang) },
-  polish: { text: someText, profile: opt(oneOf('outgoing', 'polish', 'email', 'hard')) },
-  box: { text: someText, lang: opt(lang), profile: opt(oneOf('outgoing', 'hard')), hostname: opt(match(HOSTNAME)) },
+  email: { context, korean: someText, profile: oneOf('email', 'hard'), lang: opt(autoOrLang), notes },
+  polish: { text: someText, profile: opt(oneOf('outgoing', 'polish', 'email', 'hard')), notes },
+  box: { text: someText, lang: opt(lang), profile: opt(oneOf('outgoing', 'hard')), hostname: opt(match(HOSTNAME)), notes },
   selection: { text: someText },
   badge: { text: oneOf('', '!'), reason: opt(str(LIMITS.reason)) },
   tabStatus: { tabId: opt(Number.isInteger), url: opt(str(LIMITS.url)) },
