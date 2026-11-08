@@ -44,7 +44,7 @@ public struct ActionError: Error, Sendable, Equatable {
         case .network: return "Network error. Check the connection and try again."
         case .timeout: return "The model took too long. Try again."
         case .refused: return "The model declined this text. Edit it first."
-        case .truncated: return "The reply was cut off. Try a shorter text."
+        case .truncated: return "The reply was cut off. Try Deep or a shorter text."
         case .parse: return "The reply was not readable. Try again."
         case .tooLong: return "The text is too long. Try a shorter text."
         case .noKey: return "protly was built without an API key. Run make-secrets.sh and rebuild."
@@ -74,6 +74,44 @@ public struct ActionProfile: Sendable, Equatable {
     public static let deep = ActionProfile(
         effort: "high", maxTokens: 32000, idleTimeout: ActionAPI.idleTimeout, totalTimeout: 240,
         maxResponseBytes: 2 * ActionAPI.maxResponseBytes)
+
+    /// Where Deep is offered: on a finished Translate or Polish card, and with a cut-off reply (on the card, or on the
+    /// strip when no text came first), whose line says "Try Deep". Never for Read clipboard, never while the text
+    /// streams, never after any other error.
+    public static func offersDeep(_ mode: ActionMode, done: Bool, error: ActionError?) -> Bool {
+        guard mode != .in else { return false }
+        if let error { return error.kind == .truncated }
+        return done
+    }
+}
+
+/// One call as the keyboard sent it: what Deep and a deep Retry run again.
+public struct ActionCall: Sendable, Equatable {
+    public let mode: ActionMode
+    /// What the request sends.
+    public let text: String
+    /// What the field read returned, for Replace and the field check ("" for Read clipboard).
+    public let original: String
+    public let isSelection: Bool
+    public let profile: ActionProfile
+
+    public init(mode: ActionMode, text: String, original: String, isSelection: Bool, profile: ActionProfile = .normal) {
+        self.mode = mode
+        self.text = text
+        self.original = original
+        self.isSelection = isSelection
+        self.profile = profile
+    }
+
+    /// Deep: the same mode on what the field read returned, at effort high (plan 2026-11-08 Part B #2). The field is
+    /// not read again, so Replace checks the result against the same original. nil for Read clipboard.
+    public var deep: ActionCall? {
+        mode == .in ? nil : ActionCall(mode: mode, text: original, original: original, isSelection: isSelection, profile: .deep)
+    }
+
+    /// Retry of a failed deep call runs it again as sent, deep. nil for a normal call, which Retry starts over (the
+    /// field read again, or Read's own text).
+    public var deepRetry: ActionCall? { profile == .deep ? self : nil }
 }
 
 public enum ActionAPI {
