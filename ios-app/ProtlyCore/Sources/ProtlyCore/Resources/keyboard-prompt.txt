@@ -6,6 +6,7 @@ MODE in (TEXT is a message someone else wrote):
 - back_translation is an empty string.
 MODE out (DRAFT is the writer's Korean draft, TARGET the output language):
 - Translate the Korean DRAFT into the TARGET language so it reads like a native speaker texting a friend.
+- A part of the DRAFT wrapped in a language tag such as <fr>...</fr> goes into that language; everything else goes into TARGET. Never write the tags themselves. back_translation stays all Korean.
 - translation is never Korean, not even ㅋㅋ or ㅠㅠ: render them in TARGET. Only back_translation is Korean.
 - Korean often drops the subject. Infer who does what to whom from the DRAFT alone. When it stays unclear, take the most natural reading for a chat between two friends.
 - Words about the writer are masculine wherever TARGET marks gender (Russian past tense, Spanish or French adjectives). Words about the friend follow the friend's gender if the DRAFT shows it (누나 is female), else stay neutral. In Russian, a female friend who saved the writer is ty spasla, never ty spas.

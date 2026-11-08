@@ -25,8 +25,8 @@ test('keyboard prompt carries the shared English style verbatim (src/lib/style.j
 });
 
 test('keyboard prompt stays inside its size budget (it is sent on every call from the phone)', () => {
-  // 4500 since 2026-11-08: the calmer tone rules (fewer lol) added about 160 characters.
-  assert.ok(prompt.length <= 4500, `keyboard prompt is ${prompt.length} characters, budget 4500`);
+  // 4700 since 2026-11-08: the span tag rule (fr:...;) added about 200 characters.
+  assert.ok(prompt.length <= 4700, `keyboard prompt is ${prompt.length} characters, budget 4700`);
 });
 
 test('the keyboard translates into the extension languages (ProtlyCore Languages.swift equals LANG_NAMES)', () => {
@@ -50,6 +50,15 @@ test('keyboard MODE out writes the TARGET language, the English-only lines only 
   // The user's style stays under its English header; a Korean polish stays Korean.
   assert.match(prompt, /^English you write in MODE out and MODE fix:$/m);
   assert.match(prompt, /A Korean DRAFT stays Korean, with its speech level, ㅋㅋ and ㅠㅠ\./);
+});
+
+test('keyboard MODE out explains the span tags MODE out sends (Languages.parse, lang.js tagSpans)', () => {
+  const out = prompt.slice(prompt.indexOf('\nMODE out '), prompt.indexOf('\nMODE fix '));
+  assert.ok(
+    out.includes(
+      '\n- A part of the DRAFT wrapped in a language tag such as <fr>...</fr> goes into that language; everything else goes into TARGET. Never write the tags themselves. back_translation stays all Korean.\n',
+    ),
+  );
 });
 
 test('keyboard prompt has no screen or memo material from the Shortcut prompt', () => {

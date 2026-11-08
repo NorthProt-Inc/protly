@@ -174,17 +174,17 @@ public enum ActionAPI {
     }
 
     /// MODE out names its TARGET: the language of the draft's prefix ("ru: 안녕", the prefix dropped), else
-    /// English. MODE fix drops a "ko:" prefix (isKoreanPolish). The system prompt stays the same for every call.
+    /// English, and sends mid-draft spans tagged ("fr:고마워;" -> "<fr>고마워</fr>", Languages.parse). MODE fix drops
+    /// a "ko:" prefix (isKoreanPolish) and tags nothing. The system prompt stays the same for every call.
     static func userMessage(mode: ActionMode, text: String) -> String {
-        let p = Languages.prefix(of: text)
         switch mode {
         case .in:
             return "MODE: in\n\nTEXT:\n\(text)"
         case .out:
-            let target = p.code == "ko" ? nil : p.code.flatMap(Languages.name(of:))
-            return "MODE: out\nTARGET: \(target ?? "English")\n\nDRAFT:\n\(target == nil ? text : p.text)"
+            let p = Languages.parse(text)
+            return "MODE: out\nTARGET: \(p.lang.flatMap(Languages.name(of:)) ?? "English")\n\nDRAFT:\n\(p.text)"
         case .fix:
-            return "MODE: fix\n\nDRAFT:\n\(isKoreanPolish(text) ? p.text : text)"
+            return "MODE: fix\n\nDRAFT:\n\(isKoreanPolish(text) ? Languages.prefix(of: text).text : text)"
         }
     }
 

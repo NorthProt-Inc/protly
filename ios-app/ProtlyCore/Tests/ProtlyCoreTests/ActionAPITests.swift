@@ -142,6 +142,16 @@ final class ActionPromptTests: XCTestCase {
         XCTAssertEqual(ActionAPI.userMessage(mode: .fix, text: "no: see you"), "MODE: fix\n\nDRAFT:\nno: see you")
     }
 
+    func testOutSendsMidDraftSpansTagged() {
+        XCTAssertEqual(ActionAPI.userMessage(mode: .out, text: "오늘 fr:정말 고마워; 다음에"),
+                       "MODE: out\nTARGET: English\n\nDRAFT:\n오늘 <fr>정말 고마워</fr> 다음에")
+        XCTAssertEqual(ActionAPI.userMessage(mode: .out, text: "ru: 안녕 fr:고마워;"),
+                       "MODE: out\nTARGET: Russian\n\nDRAFT:\n안녕 <fr>고마워</fr>")
+        // Never on a polish ("ko:" or English) or on someone else's text.
+        XCTAssertEqual(ActionAPI.userMessage(mode: .fix, text: "ko: 안녕 fr:고마워;"), "MODE: fix\n\nDRAFT:\n안녕 fr:고마워;")
+        XCTAssertEqual(ActionAPI.userMessage(mode: .in, text: "안녕 fr:고마워;"), "MODE: in\n\nTEXT:\n안녕 fr:고마워;")
+    }
+
     func testAKoPrefixPolishesAKoreanDraft() {
         XCTAssertEqual(ActionAPI.mode(forDraft: "ko: 낼 봐"), .fix)
         XCTAssertEqual(ActionAPI.mode(forDraft: " KO:낼 봐"), .fix)
