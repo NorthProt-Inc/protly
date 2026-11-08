@@ -385,3 +385,83 @@ test('a reloaded extension shows the stale error, not Chrome\'s message', async 
     assert.doesNotMatch(note().textContent, /Receiving end|context invalidated/);
   }
 });
+
+// Bracket notes (plan docs/plans/2026-11-08-notes-and-iphone-port.md, Part A).
+const NOTES_ONLY = 'Add the message too. [Brackets] are notes for protly.';
+const NOTE_ON_TRANSLATION = 'Notes work on a new draft. Undo first, then add the note.';
+
+test('notes: the email request gets the text and the notes; Deep and the picker keep them; Undo restores the draft', async () => {
+  const { inline, calls, reply, note, buttonIn } = setup();
+  draft(inline, '[formal] ru: 내일 보자 [짧게]');
+  translate(inline);
+  assert.deepEqual([calls[0].type, calls[0].korean, calls[0].lang, calls[0].notes], ['email', '내일 보자', 'ru', ['formal', '짧게']]);
+  await reply(ok('До завтра'));
+  buttonIn('Deep').click();
+  assert.deepEqual([calls[1].profile, calls[1].korean, calls[1].notes], ['hard', '내일 보자', ['formal', '짧게']]);
+  await reply(ok('До завтра.'));
+  const sel = note().querySelector('select');
+  sel.value = 'ja';
+  sel.dispatchEvent(new document.defaultView.Event('change'));
+  assert.deepEqual([calls[2].lang, calls[2].korean, calls[2].notes], ['ja', '내일 보자', ['formal', '짧게']]);
+  await reply(ok('See you'));
+  buttonIn('Undo').click();
+  assert.equal(userText(inline), '[formal] ru: 내일 보자 [짧게]');
+  assert.equal(note(), null);
+  // Without notes the request carries none.
+  draft(inline, '내일 보자');
+  translate(inline);
+  assert.equal('notes' in calls[3], false);
+});
+
+test('notes: an English draft with a note is polished with its notes', async () => {
+  const { inline, calls, reply, buttonIn } = setup();
+  draft(inline, 'see you [formal]');
+  translate(inline);
+  assert.deepEqual([calls[0].type, calls[0].text, calls[0].notes], ['polish', 'see you', ['formal']]);
+  await reply(polished('See you.'));
+  buttonIn('Deep').click();
+  assert.deepEqual([calls[1].type, calls[1].text, calls[1].notes], ['polish', 'see you', ['formal']]);
+});
+
+test('notes: a draft of notes only runs nothing', () => {
+  const { inline, calls, note } = setup();
+  draft(inline, '[formal]');
+  translate(inline);
+  assert.equal(calls.length, 0);
+  assert.equal(note().textContent.includes(NOTES_ONLY), true);
+});
+
+test('notes: a note typed into the preview or the kept translation is held', async () => {
+  const { inline, calls, reply, note, buttonIn } = setup();
+  draft(inline, '내일 보자');
+  translate(inline);
+  await reply(ok('See you tomorrow'));
+  draft(inline, 'See you tomorrow [shorter]');
+  translate(inline);
+  assert.equal(calls.length, 1);
+  assert.equal(note().textContent.includes(NOTE_ON_TRANSLATION), true);
+  assert.ok(buttonIn('Undo'), 'the preview controls stay');
+  draft(inline, 'See you tomorrow');
+  assert.equal(keep(inline), true);
+  draft(inline, 'See you tomorrow [shorter]');
+  translate(inline);
+  assert.equal(calls.length, 1);
+  assert.equal(note().textContent.includes(NOTE_ON_TRANSLATION), true);
+  undo(inline);
+  assert.equal(userText(inline), '내일 보자');
+});
+
+test('notes: a note on a draft with no letters still polishes; a translation that has brackets is not a new note', async () => {
+  const { inline, calls, reply, note } = setup();
+  draft(inline, '3 [as words]');
+  translate(inline);
+  assert.deepEqual([calls[0].type, calls[0].text, calls[0].notes], ['polish', '3', ['as words']]);
+  await reply(polished('Three.'));
+  undo(inline);
+  draft(inline, '내일 보자');
+  translate(inline);
+  await reply(ok('See you [tomorrow]'));
+  translate(inline); // the body still holds the translation: nothing new
+  assert.equal(calls.length, 2);
+  assert.match(note().textContent, /역번역/);
+});

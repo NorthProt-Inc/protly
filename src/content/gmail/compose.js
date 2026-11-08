@@ -1,7 +1,7 @@
 import { GSEL, composeOf, findViewerEmail } from './selectors.js';
 import { userNodes, nodesToText, textToNodes, replaceUserNodes, hasMedia } from './body.js';
 import { readThread } from './thread.js';
-import { hasHangul, parseLangPrefix } from '../../lib/lang.js';
+import { hasHangul, parseLangPrefix, splitNotes, addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../../lib/lang.js';
 import { createCard } from '../../ui/card.js';
 import { ERRORS, errorText } from '../../ui/errors.js';
 import { trusted } from '../../ui/trust.js';
@@ -34,9 +34,10 @@ async function ask(msg) {
 function stateOf(body) {
   let s = states.get(body);
   if (!s) {
-    // korean is the source text: the Korean draft, or the English draft being polished (kind 'polish').
+    // korean is the source text: the Korean draft, or the English draft being polished (kind 'polish'), without its
+    // prefix and notes. notes: the draft's bracket notes, kept for the Deep and language re-runs.
     s = {
-      mode: 'idle', reqId: 0, saved: null, kind: 'translate', korean: null, shown: null, lang: 'auto', profile: 'email',
+      mode: 'idle', reqId: 0, saved: null, kind: 'translate', korean: null, notes: [], shown: null, lang: 'auto', profile: 'email',
       last: null, card: null, cardAnchor: null, anchor: null, btn: null, firstMiss: 0, warned: false,
     };
     states.set(body, s);
@@ -122,23 +123,28 @@ export function translate(body) {
   const s = stateOf(body);
   if (s.mode === 'translating') return;
   const nodes = userNodes(body);
-  const text = nodesToText(nodes).trim();
+  const raw = nodesToText(nodes).trim();
+  // No refine: a note typed into the shown translation (preview, or kept after Esc) runs nothing. Undo first.
+  if ((s.mode === 'preview' || s.mode === 'kept') && addsNote(raw, s.shown)) return showError(body, s, NOTE_ON_TRANSLATION);
+  // Decisions read the text without notes; the saved nodes keep the raw draft, so Undo brings the notes back.
+  const { text, notes } = splitNotes(raw);
   if (s.mode === 'preview') {
-    if (norm(text) === norm(s.shown)) return; // nothing new to translate
+    if (norm(raw) === norm(s.shown)) return; // nothing new to translate
     // Polish only starts from idle, so Undo always goes back to the original draft.
     if (!hasHangul(text)) return showError(body, s, 'No Korean text to translate. To polish this English, press Undo first.');
     // A new Korean draft replaced the preview. The body holds it, so the older Korean is not needed for Undo.
     Object.assign(s, { mode: 'idle', saved: null });
   }
-  if (text.length > LIMITS.text) return say(body, s, `Too long for protly (over ${LIMITS.text} characters).`, { error: true });
+  if (raw.length > LIMITS.text) return say(body, s, `Too long for protly (over ${LIMITS.text} characters).`, { error: true });
+  if (notes.length && !text) return say(body, s, NOTES_ONLY, { error: true });
   let opts;
   if (hasHangul(text)) {
     // The prefix ("ru: ...") is a one-off override; the saved nodes keep it, so Undo brings it back.
     const p = parseLangPrefix(text);
-    opts = { kind: 'translate', korean: p.text, profile: 'email', lang: p.lang ?? 'auto' };
-  } else if (/\p{L}/u.test(text)) {
+    opts = { kind: 'translate', korean: p.text, notes, profile: 'email', lang: p.lang ?? 'auto' };
+  } else if (notes.length || /\p{L}/u.test(text)) {
     // Explicit action (button or Alt+T): polish always. The popup toggle only governs Enter on Instagram.
-    opts = { kind: 'polish', korean: text, profile: 'email' };
+    opts = { kind: 'polish', korean: text, notes, profile: 'email' };
   } else {
     return say(body, s, 'Nothing to translate or polish.', { error: true });
   }
@@ -153,7 +159,7 @@ export function translate(body) {
 function retranslate(body, { lang, profile, force = false }) {
   const s = stateOf(body);
   if (s.mode !== 'preview') return;
-  const opts = { kind: s.kind, korean: s.korean, profile: profile ?? s.profile, lang: lang ?? s.lang };
+  const opts = { kind: s.kind, korean: s.korean, notes: s.notes, profile: profile ?? s.profile, lang: lang ?? s.lang };
   if (!force && edited(body, s)) {
     return say(body, s, 'You edited the translation. Translating again replaces your edit.', {
       actions: [
@@ -168,7 +174,7 @@ function retranslate(body, { lang, profile, force = false }) {
 
 // Back to idle with whatever the body holds now, dropping any result still in flight.
 function settle(s) {
-  Object.assign(s, { mode: 'idle', saved: null, kind: 'translate', korean: null, shown: null, lang: 'auto', profile: 'email', last: null });
+  Object.assign(s, { mode: 'idle', saved: null, kind: 'translate', korean: null, notes: [], shown: null, lang: 'auto', profile: 'email', last: null });
   s.reqId++;
   hideNote(s);
 }
@@ -227,7 +233,7 @@ function threadContext(body) {
   return readThread(root, viewer);
 }
 
-async function request(body, { kind = 'translate', korean, profile, lang }) {
+async function request(body, { kind = 'translate', korean, notes = [], profile, lang }) {
   const s = stateOf(body);
   const prevMode = s.mode;
   const expected = nodesToText(userNodes(body)); // what the body must still hold when the result lands
@@ -238,9 +244,10 @@ async function request(body, { kind = 'translate', korean, profile, lang }) {
   cardOf(body, s).working(profile === 'hard' ? `${verb} deeply` : verb, { onCancel: () => cancel(body, reqId, prevMode) });
   try {
     // Polish takes no thread context: one draft does not need it.
+    const withNotes = notes.length ? { notes } : {};
     const r = polish
-      ? await ask({ type: 'polish', text: korean, profile })
-      : await ask({ type: 'email', context: threadContext(body), korean, profile, lang });
+      ? await ask({ type: 'polish', text: korean, profile, ...withNotes })
+      : await ask({ type: 'email', context: threadContext(body), korean, profile, lang, ...withNotes });
     if (reqId !== s.reqId || !body.isConnected) return;
     s.mode = prevMode;
     // The draft changed while translating (the user kept typing): never overwrite it.
@@ -254,7 +261,7 @@ async function request(body, { kind = 'translate', korean, profile, lang }) {
     }
     if (prevMode !== 'preview') s.saved = removed; // first result: keep the original draft nodes for Undo
     // The polish result carries no lang, so keep the current one.
-    Object.assign(s, { mode: 'preview', kind, korean, shown: r.translation, lang: r.lang ?? s.lang, profile, last: r });
+    Object.assign(s, { mode: 'preview', kind, korean, notes, shown: r.translation, lang: r.lang ?? s.lang, profile, last: r });
     showPreview(body, s);
   } catch (e) {
     if (reqId !== s.reqId) return;
