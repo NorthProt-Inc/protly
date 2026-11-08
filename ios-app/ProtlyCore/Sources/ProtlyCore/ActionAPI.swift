@@ -55,6 +55,27 @@ public struct ActionError: Error, Sendable, Equatable {
     public init(_ kind: Kind) { self.kind = kind }
 }
 
+/// How hard one call works and how long and how much it may take. `normal` is every call from the bar and the key;
+/// `deep` re-runs a card on the same model at effort high (plan 2026-11-08 Part B #2). URLSession keeps the total
+/// timeout per session, so a deep call needs a session of its own (sessionConfiguration(profile:)), and its reply is
+/// read with `maxResponseBytes` as the limit (updates(limit:)).
+public struct ActionProfile: Sendable, Equatable {
+    public let effort: String
+    public let maxTokens: Int
+    public let idleTimeout: TimeInterval
+    public let totalTimeout: TimeInterval
+    public let maxResponseBytes: Int
+
+    public static let normal = ActionProfile(
+        effort: "low", maxTokens: 16000, idleTimeout: ActionAPI.idleTimeout, totalTimeout: ActionAPI.totalTimeout,
+        maxResponseBytes: ActionAPI.maxResponseBytes)
+    /// A 32000-token reply with high-effort thinking first: more time in all and twice the bytes. The idle timeout
+    /// stays, since thinking deltas and pings keep the stream busy.
+    public static let deep = ActionProfile(
+        effort: "high", maxTokens: 32000, idleTimeout: ActionAPI.idleTimeout, totalTimeout: 240,
+        maxResponseBytes: 2 * ActionAPI.maxResponseBytes)
+}
+
 public enum ActionAPI {
     public static let url = "https://api.anthropic.com/v1/messages"
     /// Public, the same workspace as ios/protly.cherri. The phone key is org-level: the header is required.
@@ -122,7 +143,8 @@ public enum ActionAPI {
     public static let totalTimeout: TimeInterval = 90
 
     /// The request for one action, or the error to show without sending anything.
-    public static func request(mode: ActionMode, text: String, system: String, apiKey: String) -> Result<URLRequest, ActionError> {
+    public static func request(mode: ActionMode, text: String, system: String, apiKey: String,
+                               profile: ActionProfile = .normal) -> Result<URLRequest, ActionError> {
         // Printable ASCII, no space: anything else is not a key and could not travel as a header value.
         guard !apiKey.isEmpty, apiKey.unicodeScalars.allSatisfy({ (0x21...0x7E).contains($0.value) }) else {
             return .failure(ActionError(.noKey))
@@ -133,10 +155,10 @@ public enum ActionAPI {
             let draft = Notes.split(text)
             guard draft.notes.isEmpty || !draft.text.isEmpty else { return .failure(ActionError(.notesOnly)) }
         }
-        guard let url = URL(string: url), let body = try? body(mode: mode, text: text, system: system) else {
+        guard let url = URL(string: url), let body = try? body(mode: mode, text: text, system: system, profile: profile) else {
             return .failure(ActionError(.setup))
         }
-        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: idleTimeout)
+        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: profile.idleTimeout)
         req.httpMethod = "POST"
         req.httpShouldHandleCookies = false
         for (name, value) in headers(apiKey: apiKey) { req.setValue(value, forHTTPHeaderField: name) }
@@ -145,15 +167,15 @@ public enum ActionAPI {
     }
 
     /// The session for action requests: the text and the reply stay in memory, never in a cache or cookie store.
-    public static func sessionConfiguration() -> URLSessionConfiguration {
+    public static func sessionConfiguration(profile: ActionProfile = .normal) -> URLSessionConfiguration {
         let c = URLSessionConfiguration.ephemeral
         c.urlCache = nil
         c.httpCookieStorage = nil
         c.httpShouldSetCookies = false
         c.urlCredentialStorage = nil
         c.requestCachePolicy = .reloadIgnoringLocalCacheData
-        c.timeoutIntervalForRequest = idleTimeout
-        c.timeoutIntervalForResource = totalTimeout
+        c.timeoutIntervalForRequest = profile.idleTimeout
+        c.timeoutIntervalForResource = profile.totalTimeout
         return c
     }
 
@@ -174,13 +196,14 @@ public enum ActionAPI {
     ] }
 
     /// Same shape as the extension and the Shortcut: thinking off on Sonnet is "between_tools", Opus is
-    /// "adaptive"; effort low; JSON schema output; no temperature. Streamed (keyboard-ui 003).
-    public static func body(mode: ActionMode, text: String, system: String) throws -> Data {
+    /// "adaptive"; effort and max_tokens from the profile (low and 16000 unless Deep); JSON schema output; no
+    /// temperature. Streamed (keyboard-ui 003).
+    public static func body(mode: ActionMode, text: String, system: String, profile: ActionProfile = .normal) throws -> Data {
         let body: [String: Any] = [
             "model": model(for: mode),
-            "max_tokens": 16000,
+            "max_tokens": profile.maxTokens,
             "thinking": ["type": mode == .in ? "between_tools" : "adaptive"],
-            "output_config": ["effort": "low", "format": ["type": "json_schema", "schema": schema]],
+            "output_config": ["effort": profile.effort, "format": ["type": "json_schema", "schema": schema]],
             "system": system,
             "messages": [["role": "user", "content": userMessage(mode: mode, text: text)]],
             "stream": true,
