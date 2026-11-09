@@ -67,7 +67,8 @@ public enum BarAction: Hashable, Sendable {
     public static func center(text field: String, canUndo: Bool, clipboardIsNew: Bool) -> BarAction? {
         if canUndo { return .undo }
         let text = Notes.split(field).text
-        if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return clipboardIsNew ? .read : nil }
+        // Blank by JavaScript's \s, as Notes.split trims: the bar shows an action exactly when the request sends one.
+        if text.unicodeScalars.allSatisfy(Languages.isSpace) { return clipboardIsNew ? .read : nil }
         switch ActionAPI.mode(forText: text) {
         case .out:
             // As ActionAPI.userMessage: the prefix's language, "ko" never (that is a polish), else English.

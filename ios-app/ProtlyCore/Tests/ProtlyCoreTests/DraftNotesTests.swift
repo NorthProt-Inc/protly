@@ -74,6 +74,10 @@ final class DraftNotesTests: XCTestCase {
         XCTAssertEqual(center(" [짧게] [x] ", clipboardIsNew: true), .read)
         XCTAssertEqual(BarAction.protlyKey(text: "[x]", canUndo: false, clipboardIsNew: false), .read)
         XCTAssertEqual(center("[x]", clipboardIsNew: false), center("", clipboardIsNew: false))
+        // Blank is JavaScript's \s, as Notes.split trims: U+0085 is text there (the request sends it), U+FEFF is not.
+        XCTAssertEqual(center("[x] \u{85}"), .polish(korean: false))
+        XCTAssertNil(center("[x] \u{FEFF}"))
+        XCTAssertNil(center(" \u{3000}\u{2028}\t"))
         XCTAssertEqual(center("see you [좀 더 정중하게]"), .polish(korean: false))
         XCTAssertEqual(center("[formal] ru: 안녕"), .translate(target: "Русский"))
         XCTAssertEqual(center("[짧게] ko: 낼 봐"), .polish(korean: true))
