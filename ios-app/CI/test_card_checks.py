@@ -97,7 +97,7 @@ class StripTests(unittest.TestCase):
 
 
 class CardTests(unittest.TestCase):
-    BUTTONS = "Cancel 76.0x44.0,Copy 60.0x44.0,Replace 82.0x44.0"
+    BUTTONS = "Cancel 76.0x44.0,Deep 58.0x44.0,Copy 60.0x44.0,Replace 82.0x44.0"
 
     def test_mid_stream_shows_the_start_of_the_result(self):
         c = resolve(f'CHECK card-mid-dark PENDING text="Thanks so much " final="{OK}" copy=disabled '
@@ -133,9 +133,14 @@ class CardTests(unittest.TestCase):
         self.assertIn("back translation", self.done(back="").evidence)
 
     def test_done_with_a_short_button_fails(self):
-        c = self.done(buttons="Cancel 76.0x30.0,Copy 60.0x44.0,Replace 82.0x44.0")
+        c = self.done(buttons="Cancel 76.0x30.0,Deep 58.0x44.0,Copy 60.0x44.0,Replace 82.0x44.0")
         self.assertEqual(c.status, "FAIL")
         self.assertIn("Cancel is 30 pt tall", c.evidence)
+
+    def test_done_without_deep_fails(self):
+        c = self.done(buttons="Cancel 76.0x44.0,Copy 60.0x44.0,Replace 82.0x44.0")
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("no Deep button", c.evidence)
 
     def test_replace_that_left_the_draft_fails(self):
         c = self.done(after="protly-stub ok 오늘 정말 고마워")
@@ -175,6 +180,15 @@ class CardTests(unittest.TestCase):
         c = resolve(line)
         self.assertEqual(c.status, "FAIL")
         self.assertIn("Replace offered", c.evidence)
+
+    def test_error_after_text_offering_deep_fails(self):
+        # Deep is for a cut-off reply only; the stub's `cut` ends in overloaded_error.
+        line = (f'CHECK card-err1-dark PENDING kept="Thanks so much for today" want-kept="Thanks so much for today" '
+                f'error="{ERROR}" want-error="{ERROR}" '
+                f'buttons="Cancel 76.0x44.0,Retry 60.0x44.0,Deep 58.0x44.0,Copy 60.0x44.0" strip=0 closed=1')
+        c = resolve(line)
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("Deep offered", c.evidence)
 
     def test_cancel_closes_and_nothing_comes_back(self):
         draft = "protly-stub ok 오늘 정말 고마워"

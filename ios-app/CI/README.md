@@ -218,10 +218,10 @@ methods after `test5c_pad`; every line is `PENDING` with its readings and `check
   `looks-changed.txt` remembers a look left changed, and the next method puts dark and the default size back.
 - **test5d_card**, in dark then light: `card-wait-*` (the strip names `Translating → English…`, its xmark at least
   44 x 44 pt, no card), `card-mid-*` (the first words are the start of the result while the strip runs),
-  `card-done-*` (the whole translation and back translation, Cancel, Copy and Replace at least 44 pt tall, the strip
-  gone; dark taps Replace and the field takes the result, light taps Copy (Copied) and Cancel), `card-err0-*` (the
+  `card-done-*` (the whole translation and back translation, Cancel, Deep, Copy and Replace at least 44 pt tall, the
+  strip gone; dark taps Replace and the field takes the result, light taps Copy (Copied) and Cancel), `card-err0-*` (the
   error line on the strip with Retry, no card), `card-err1-*` (the kept text with the error line under it, Copy and
-  Retry, no Replace). Then, dark: `card-slow` (`Still translating…` after 8 s), `mem-stream` (the keyboard's footprint
+  Retry, no Replace and no Deep, which only a cut-off reply offers). Then, dark: `card-slow` (`Still translating…` after 8 s), `mem-stream` (the keyboard's footprint
   from before the call through the long stream: at most 10 MB of growth; the 40 MB limit is the phone's) and
   `card-cancel` (the strip's xmark mid-stream closes everything, a later delta brings nothing back, the draft stays).
   Each item's `c-<id>.png` is the screen at the moment it was read.
