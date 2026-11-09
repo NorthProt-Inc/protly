@@ -336,6 +336,29 @@ final class KeyboardSourceRulesTests: XCTestCase {
         XCTAssertTrue(client.contains("ActionAPI.updates"), "ActionClient.swift must read the reply through ActionAPI.updates")
     }
 
+    /// Plan 2026-11-08 Part B #2: a Deep call has its own session (URLSession fixes the total timeout per session)
+    /// and reads twice the bytes; Deep on the strip and on the card reach deep(); Deep and a deep Retry run the call on
+    /// screen, which is forgotten when the next call begins.
+    func testDeepWiring() throws {
+        let all = try sources()
+        let client = all.first(where: { $0.name == "ActionClient.swift" })?.text ?? ""
+        for needle in ["sessionConfiguration(profile: .deep)", "profile == .deep ? deepSession : session",
+                       "ActionAPI.updates(limit: profile.maxResponseBytes)", "apiKey: Secrets.apiKey, profile: profile)"] {
+            XCTAssertTrue(client.contains(needle), "ActionClient: \(needle)")
+        }
+        let controller = all.first(where: { $0.name == "KeyboardViewController.swift" })?.text ?? ""
+        XCTAssertEqual(matches(#"deep: \{ \[unowned host\] in host\.deep\(\) \}"#, in: controller).count, 2)
+        let cns = controller as NSString
+        func fn(_ declaration: String) -> String { body(of: declaration, in: cns).map { cns.substring(with: $0) } ?? "" }
+        XCTAssertTrue(fn("func deep()").contains("onScreen?.deep, beginCall()"), "deep() runs the call on screen")
+        XCTAssertTrue(fn("func retry(").contains("onScreen?.deepRetry"), "a failed Deep retries deep")
+        XCTAssertTrue(fn("private func beginCall()").contains("onScreen = nil"), "a new call forgets the last one")
+        let run = fn("private func run(")
+        XCTAssertTrue(run.contains("onScreen = sent"), "run() records the call on screen")
+        XCTAssertTrue(run.contains("profile: sent.profile"), "run() sends the call's profile")
+        XCTAssertTrue(run.contains("deep: sent.profile == .deep"), "the strip says deeply")
+    }
+
     /// keyboard-ui 003, Task 3.5: the CI stub compiles only into the simulator's ProtlyCIKeyboard. `PROTLY_CI_STUB`
     /// wraps the whole stub file and its one call site, before the key; only ios-app/CI/project.yml defines it.
     func testTheCIStubIsCompiledOutOfThePhone() throws {
