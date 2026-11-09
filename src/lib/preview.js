@@ -42,24 +42,30 @@ const newHangul = (text, s) => s.lang !== 'ko'
 // Undo first, then add the note to the draft).
 const hold = (s, message) => ({ state: s, effect: { type: 'hold', message } });
 const shownMode = (s) => s.mode === 'preview' || s.mode === 'kept';
+// A new Korean draft typed over the shown translation (not an edit of it): it runs, with its notes.
+const freshDraft = (s, text) => (s.mode === 'kept'
+  ? newHangul(text, s)
+  : hasHangul(text) && s.lang !== 'ko' && norm(text) !== norm(s.shown));
+// A note added to the shown translation itself is held: no refine.
+const noteOnShown = (s, raw, text) => shownMode(s) && addsNote(raw, s.shown) && !freshDraft(s, text);
 
 export function reduce(s, e) {
   switch (e.type) {
     case 'enter': {
       const profile = e.hard ? 'hard' : 'outgoing';
       if (s.mode === 'translating') return { state: s, effect: { type: 'block' } };
-      if (shownMode(s) && addsNote(e.text, s.shown)) return hold(s, NOTE_ON_TRANSLATION);
       // Mode decisions use the text without notes; the raw draft stays the source.
       const { text, notes } = splitNotes(e.text);
+      if (noteOnShown(s, e.text, text)) return hold(s, NOTE_ON_TRANSLATION);
       if (s.mode === 'preview') {
         // New draft: Hangul that is not the shown translation (which may keep ㅋㅋ or a Korean name).
-        if (hasHangul(text) && s.lang !== 'ko' && norm(e.text) !== norm(s.shown)) return translate(s, e.text, profile, null);
+        if (freshDraft(s, text)) return translate(s, e.text, profile, null);
         if (e.hard) return s.kind === 'polish' ? polish(s, s.korean, 'hard', true) : translate(s, s.korean, 'hard', s.lang, true);
         // Anything else is sent as is, an edit included: polish starts only from idle.
         return { state: idle(s), effect: { type: 'sent', korean: s.korean } };
       }
       if (s.mode === 'kept') {
-        if (newHangul(text, s)) return translate(s, e.text, profile, null);
+        if (freshDraft(s, text)) return translate(s, e.text, profile, null);
         return { state: idle(s), effect: { type: 'sent', korean: s.korean } }; // never re-polished on Enter: Alt+T does that
       }
       if (notes.length && !text) return hold(s, NOTES_ONLY);
@@ -70,9 +76,9 @@ export function reduce(s, e) {
     }
     // Alt+T in the composer: translate or polish without sending. Explicit, so polish needs no toggle.
     case 'run': {
-      if (shownMode(s) && addsNote(e.text, s.shown)) return hold(s, NOTE_ON_TRANSLATION);
-      if (s.mode !== 'idle' && s.mode !== 'kept') return { state: s, effect: { type: 'none' } };
       const { text, notes } = splitNotes(e.text);
+      if (noteOnShown(s, e.text, text)) return hold(s, NOTE_ON_TRANSLATION);
+      if (s.mode !== 'idle' && s.mode !== 'kept') return { state: s, effect: { type: 'none' } };
       if (notes.length && !text) return hold(s, NOTES_ONLY);
       if (hasHangul(text)) return translate(s, e.text, 'outgoing', null);
       if (notes.length || /\p{L}/u.test(text)) return polish(s, e.text, 'outgoing');

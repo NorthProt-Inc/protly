@@ -440,11 +440,22 @@ test('notes: a note typed into a preview or a kept translation is held, Alt+Ente
   const k = reduce(p, { type: 'esc' }).state;
   assert.equal(k.mode, 'kept');
   for (const [s, e] of [[p, { type: 'enter', text: 'T [shorter]' }], [p, { type: 'enter', text: 'T [shorter]', hard: true }],
-    [p, { type: 'run', text: 'T [shorter]' }], [k, { type: 'enter', text: 'T [shorter]' }], [k, { type: 'run', text: 'T [shorter]' }],
-    [k, { type: 'enter', text: '[짧게] 새 초안' }]]) {
+    [p, { type: 'run', text: 'T [shorter]' }], [k, { type: 'enter', text: 'T [shorter]' }], [k, { type: 'run', text: 'T [shorter]' }]]) {
     const r = reduce(s, e);
     assert.deepEqual(r.effect, { type: 'hold', message: NOTE_ON_TRANSLATION }, `${s.mode} ${JSON.stringify(e)}`);
     assert.equal(r.state, s);
+  }
+});
+
+test('notes: a new Korean draft typed over a preview or a kept translation runs, with its notes', () => {
+  const p = previewOf('내일 보자');
+  const k = reduce(p, { type: 'esc' }).state;
+  for (const [s, e] of [[p, { type: 'enter', text: '[짧게] 새 초안' }], [k, { type: 'enter', text: '[짧게] 새 초안' }],
+    [k, { type: 'run', text: '[짧게] 새 초안' }]]) {
+    const r = reduce(s, e).effect;
+    assert.equal(r.type, 'translate', `${s.mode} ${e.type}`);
+    assert.equal(r.korean, '새 초안');
+    assert.deepEqual(r.notes, ['짧게']);
   }
 });
 

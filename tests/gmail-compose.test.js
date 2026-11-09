@@ -465,3 +465,25 @@ test('notes: a note on a draft with no letters still polishes; a translation tha
   assert.equal(calls.length, 2);
   assert.match(note().textContent, /역번역/);
 });
+
+test('notes: Deep and the language chip hold a note typed into the preview instead of dropping it', async () => {
+  const { inline, calls, reply, note, buttonIn } = setup();
+  draft(inline, '내일 보자');
+  translate(inline);
+  await reply(ok('See you tomorrow'));
+  draft(inline, 'See you tomorrow [shorter]');
+  buttonIn('Deep').click();
+  assert.equal(calls.length, 1);
+  assert.equal(note().textContent.includes(NOTE_ON_TRANSLATION), true);
+  assert.equal(userText(inline), 'See you tomorrow [shorter]');
+});
+
+test('notes: a new Korean draft with a note typed over the preview is translated with its notes', async () => {
+  const { inline, calls, reply } = setup();
+  draft(inline, '내일 보자');
+  translate(inline);
+  await reply(ok('See you tomorrow'));
+  draft(inline, '새 초안 [formal]');
+  translate(inline);
+  assert.deepEqual([calls[1].type, calls[1].korean, calls[1].notes], ['email', '새 초안', ['formal']]);
+});

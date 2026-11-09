@@ -124,10 +124,12 @@ export function translate(body) {
   if (s.mode === 'translating') return;
   const nodes = userNodes(body);
   const raw = nodesToText(nodes).trim();
-  // No refine: a note typed into the shown translation (preview, or kept after Esc) runs nothing. Undo first.
-  if ((s.mode === 'preview' || s.mode === 'kept') && addsNote(raw, s.shown)) return showError(body, s, NOTE_ON_TRANSLATION);
   // Decisions read the text without notes; the saved nodes keep the raw draft, so Undo brings the notes back.
   const { text, notes } = splitNotes(raw);
+  // No refine: a note typed into the shown translation (preview, or kept after Esc) runs nothing. Undo first.
+  // A new Korean draft typed over it is not an edit of it: it runs, with its notes.
+  const fresh = hasHangul(text) && norm(text) !== norm(s.shown);
+  if ((s.mode === 'preview' || s.mode === 'kept') && addsNote(raw, s.shown) && !fresh) return showError(body, s, NOTE_ON_TRANSLATION);
   if (s.mode === 'preview') {
     if (norm(raw) === norm(s.shown)) return; // nothing new to translate
     // Polish only starts from idle, so Undo always goes back to the original draft.
@@ -159,6 +161,8 @@ export function translate(body) {
 function retranslate(body, { lang, profile, force = false }) {
   const s = stateOf(body);
   if (s.mode !== 'preview') return;
+  // A note typed into the translation is held here too, as on the Alt+T path: it would only be dropped.
+  if (addsNote(nodesToText(userNodes(body)), s.shown)) return showError(body, s, NOTE_ON_TRANSLATION);
   const opts = { kind: s.kind, korean: s.korean, notes: s.notes, profile: profile ?? s.profile, lang: lang ?? s.lang };
   if (!force && edited(body, s)) {
     return say(body, s, 'You edited the translation. Translating again replaces your edit.', {
