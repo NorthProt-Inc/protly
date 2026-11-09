@@ -40,6 +40,8 @@ struct ResultCard: View {
     let replace: () -> Void
     let close: () -> Void
     let retry: (ActionMode) -> Void
+    /// The same mode again at effort high (KeyboardViewController.deep).
+    let deep: () -> Void
 
     @State private var copied = false
 
@@ -81,6 +83,7 @@ struct ResultCard: View {
                 closeButton
                 Spacer(minLength: 0)
                 retryButton
+                deepButton
                 copyButton
                 primaryButton
             }
@@ -89,6 +92,7 @@ struct ResultCard: View {
                     closeButton
                     Spacer(minLength: 0)
                     retryButton
+                    deepButton
                 }
                 HStack(spacing: 8) {
                     Spacer(minLength: 0)
@@ -108,6 +112,15 @@ struct ResultCard: View {
     private var retryButton: some View {
         if let error = feed.failed, error.canRetry {
             button("Retry") { retry(card.action) }
+        }
+    }
+
+    /// On a finished Translate or Polish card and after a cut-off reply (ActionProfile.offersDeep). Never with Retry:
+    /// a cut-off reply is not retried.
+    @ViewBuilder
+    private var deepButton: some View {
+        if ActionProfile.offersDeep(card.action, done: card.phase == .done, error: feed.failed) {
+            button("Deep", action: deep)
         }
     }
 

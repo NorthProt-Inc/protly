@@ -746,8 +746,8 @@ def resolve_card_mid(check, marks=None, samples=None, run_dir=None):
 
 
 def resolve_card_done(check, marks=None, samples=None, run_dir=None):
-    """card-done-<look> (steps 2 and 3): the whole translation with the back translation under it, Cancel, Copy and
-    Replace at least 44 pt tall, the strip gone. Then (dark) Replace puts the result in the field, or (light) Copy
+    """card-done-<look> (steps 2 and 3): the whole translation with the back translation under it, Cancel, Deep (plan
+    2026-11-08 Part B #2), Copy and Replace at least 44 pt tall, the strip gone. Then (dark) Replace puts the result in the field, or (light) Copy
     turns into Copied and Cancel closes the card with the draft untouched."""
     ev = check.evidence
     text, want = quoted_field(ev, "text"), quoted_field(ev, "want")
@@ -759,7 +759,7 @@ def resolve_card_done(check, marks=None, samples=None, run_dir=None):
         problems.append(f"text {text!r}, want {want!r}")
     if not same_text(back, want_back):
         problems.append(f"back translation {back!r}, want {want_back!r}")
-    problems += button_problems(parse_buttons(quoted_field(ev, "buttons")), ("Cancel", "Copy", "Replace"))
+    problems += button_problems(parse_buttons(quoted_field(ev, "buttons")), ("Cancel", "Deep", "Copy", "Replace"))
     if int_field(ev, "strip") != 0:
         problems.append("the strip is still up")
     after, want_after = quoted_field(ev, "after"), quoted_field(ev, "want-after")
@@ -796,7 +796,7 @@ def resolve_card_err0(check, marks=None, samples=None, run_dir=None):
 
 def resolve_card_err1(check, marks=None, samples=None, run_dir=None):
     """card-err1-<look> (step 5, text on screen): the text already shown stays, with one error line under it, only
-    Copy (no Replace) and Retry; Cancel closes the card. The CHECK that the error-after-text shot shows both."""
+    Copy (no Replace) and Retry, no Deep (only a cut-off reply offers it); Cancel closes the card. The CHECK that the error-after-text shot shows both."""
     ev = check.evidence
     kept, want_kept = quoted_field(ev, "kept"), quoted_field(ev, "want-kept")
     error, want_error = quoted_field(ev, "error"), quoted_field(ev, "want-error")
@@ -808,7 +808,7 @@ def resolve_card_err1(check, marks=None, samples=None, run_dir=None):
     if not same_text(error, want_error):
         problems.append(f"error line {error!r}, want {want_error!r}")
     problems += button_problems(parse_buttons(quoted_field(ev, "buttons")), ("Copy", "Retry"),
-                                absent=("Replace", "Insert"))
+                                absent=("Replace", "Insert", "Deep"))
     if int_field(ev, "strip") != 0:
         problems.append("the strip is still up")
     if plain_field(ev, "closed") != "1":

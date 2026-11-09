@@ -128,6 +128,21 @@ final class BarActionTests: XCTestCase {
         XCTAssertNil(BarAction.undo.slowLine)
     }
 
+    /// A Deep re-run (plan 2026-11-08 Part B #2) says so, as the extension does: "Translating deeply", "Polishing
+    /// deeply". Read clipboard is never deep, and a normal call keeps its words.
+    func testDeepProgressWords() {
+        XCTAssertEqual(BarAction.translate(target: "English").progressVerb(deep: true), "Translating deeply")
+        XCTAssertEqual(BarAction.polish(korean: false).progressVerb(deep: true), "Polishing deeply")
+        XCTAssertEqual(BarAction.polish(korean: true).progressVerb(deep: true), "Polishing deeply")
+        XCTAssertEqual(BarAction.read.progressVerb(deep: true), "Reading")
+        XCTAssertNil(BarAction.undo.progressVerb(deep: true))
+        XCTAssertEqual(BarAction.translate(target: "English").progressVerb(deep: false), "Translating")
+        XCTAssertEqual(BarAction.polish(korean: false).progressVerb(deep: false), "Polishing")
+        XCTAssertEqual(BarAction.translate(target: "Русский").slowLine(deep: true), "Still translating deeply…")
+        XCTAssertEqual(BarAction.polish(korean: false).slowLine(deep: true), "Still polishing deeply…")
+        XCTAssertEqual(BarAction.translate(target: "Русский").slowLine(deep: false), "Still translating…")
+    }
+
     /// The call a request makes, as the bar would have labeled it: the strip and the card name the same target.
     func testTheCallsLabelFollowsTheRequest() {
         XCTAssertEqual(BarAction.call(.out, text: "ru: 안녕"), .translate(target: "Русский"))

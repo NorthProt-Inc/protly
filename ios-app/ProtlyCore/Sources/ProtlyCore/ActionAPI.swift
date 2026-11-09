@@ -21,7 +21,7 @@ public struct ActionResult: Sendable, Equatable {
 public struct ActionError: Error, Sendable, Equatable {
     public enum Kind: String, Sendable {
         case auth, spendLimit, rate, overloaded, server, badRequest, network, timeout, refused, truncated, parse
-        case tooLong, noKey, setup
+        case tooLong, noKey, setup, notesOnly
     }
     public let kind: Kind
     /// Trying again can work: the network, a timeout, an overloaded API, a rate limit (P4), a server error or a reply
@@ -44,14 +44,74 @@ public struct ActionError: Error, Sendable, Equatable {
         case .network: return "Network error. Check the connection and try again."
         case .timeout: return "The model took too long. Try again."
         case .refused: return "The model declined this text. Edit it first."
-        case .truncated: return "The reply was cut off. Try a shorter text."
+        case .truncated: return "The reply was cut off. Try Deep or a shorter text."
         case .parse: return "The reply was not readable. Try again."
         case .tooLong: return "The text is too long. Try a shorter text."
         case .noKey: return "protly was built without an API key. Run make-secrets.sh and rebuild."
         case .setup: return "protly could not build the request. Rebuild protly."
+        case .notesOnly: return "Add the message too. [Brackets] are notes for protly."
         }
     }
     public init(_ kind: Kind) { self.kind = kind }
+}
+
+/// How hard one call works and how long and how much it may take. `normal` is every call from the bar and the key;
+/// `deep` re-runs a card on the same model at effort high (plan 2026-11-08 Part B #2). URLSession keeps the total
+/// timeout per session, so a deep call needs a session of its own (sessionConfiguration(profile:)), and its reply is
+/// read with `maxResponseBytes` as the limit (updates(limit:)).
+public struct ActionProfile: Sendable, Equatable {
+    public let effort: String
+    public let maxTokens: Int
+    public let idleTimeout: TimeInterval
+    public let totalTimeout: TimeInterval
+    public let maxResponseBytes: Int
+
+    public static let normal = ActionProfile(
+        effort: "low", maxTokens: 16000, idleTimeout: ActionAPI.idleTimeout, totalTimeout: ActionAPI.totalTimeout,
+        maxResponseBytes: ActionAPI.maxResponseBytes)
+    /// A 32000-token reply with high-effort thinking first: more time in all and twice the bytes. The idle timeout
+    /// stays, since thinking deltas and pings keep the stream busy.
+    public static let deep = ActionProfile(
+        effort: "high", maxTokens: 32000, idleTimeout: ActionAPI.idleTimeout, totalTimeout: 240,
+        maxResponseBytes: 2 * ActionAPI.maxResponseBytes)
+
+    /// Where Deep is offered: on a finished Translate or Polish card, and with a cut-off reply (on the card, or on the
+    /// strip when no text came first), whose line says "Try Deep". Never for Read clipboard, never while the text
+    /// streams, never after any other error.
+    public static func offersDeep(_ mode: ActionMode, done: Bool, error: ActionError?) -> Bool {
+        guard mode != .in else { return false }
+        if let error { return error.kind == .truncated }
+        return done
+    }
+}
+
+/// One call as the keyboard sent it: what Deep and a deep Retry run again.
+public struct ActionCall: Sendable, Equatable {
+    public let mode: ActionMode
+    /// What the request sends.
+    public let text: String
+    /// What the field read returned, for Replace and the field check ("" for Read clipboard).
+    public let original: String
+    public let isSelection: Bool
+    public let profile: ActionProfile
+
+    public init(mode: ActionMode, text: String, original: String, isSelection: Bool, profile: ActionProfile = .normal) {
+        self.mode = mode
+        self.text = text
+        self.original = original
+        self.isSelection = isSelection
+        self.profile = profile
+    }
+
+    /// Deep: the same mode on what the field read returned, at effort high (plan 2026-11-08 Part B #2). The field is
+    /// not read again, so Replace checks the result against the same original. nil for Read clipboard.
+    public var deep: ActionCall? {
+        mode == .in ? nil : ActionCall(mode: mode, text: original, original: original, isSelection: isSelection, profile: .deep)
+    }
+
+    /// Retry of a failed deep call runs it again as sent, deep. nil for a normal call, which Retry starts over (the
+    /// field read again, or Read's own text).
+    public var deepRetry: ActionCall? { profile == .deep ? self : nil }
 }
 
 public enum ActionAPI {
@@ -67,15 +127,24 @@ public enum ActionAPI {
         return try String(contentsOf: url, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// The action for the user's own draft: a Korean draft after "ko:" -> polish, else Korean anywhere ->
-    /// translate out, else polish.
-    public static func mode(forDraft text: String) -> ActionMode {
-        isKoreanPolish(text) ? .fix : hasHangul(text) ? .out : .fix
+    /// The action for the user's own draft, decided on its text without notes (Notes.split): a Korean draft after
+    /// "ko:" -> polish, else Korean anywhere -> translate out, else polish.
+    public static func mode(forDraft draft: String) -> ActionMode {
+        mode(forText: Notes.split(draft).text)
     }
 
     /// "ko: 낼 봐": the writer asks for his Korean draft polished in Korean. Without Korean after the prefix the
-    /// draft is handled as before, prefix and all.
-    public static func isKoreanPolish(_ text: String) -> Bool {
+    /// draft is handled as before, prefix and all. Notes do not count: "[짧게] ko: 낼 봐" is one too.
+    public static func isKoreanPolish(_ draft: String) -> Bool {
+        koreanPolish(Notes.split(draft).text)
+    }
+
+    /// mode(forDraft:) for a text already split: a draft is split once, so what one pass leaves stays text.
+    static func mode(forText text: String) -> ActionMode {
+        koreanPolish(text) ? .fix : hasHangul(text) ? .out : .fix
+    }
+
+    static func koreanPolish(_ text: String) -> Bool {
         let p = Languages.prefix(of: text)
         return p.code == "ko" && hasHangul(p.text)
     }
@@ -112,16 +181,22 @@ public enum ActionAPI {
     public static let totalTimeout: TimeInterval = 90
 
     /// The request for one action, or the error to show without sending anything.
-    public static func request(mode: ActionMode, text: String, system: String, apiKey: String) -> Result<URLRequest, ActionError> {
+    public static func request(mode: ActionMode, text: String, system: String, apiKey: String,
+                               profile: ActionProfile = .normal) -> Result<URLRequest, ActionError> {
         // Printable ASCII, no space: anything else is not a key and could not travel as a header value.
         guard !apiKey.isEmpty, apiKey.unicodeScalars.allSatisfy({ (0x21...0x7E).contains($0.value) }) else {
             return .failure(ActionError(.noKey))
         }
         guard text.utf16.count <= maxInputLength else { return .failure(ActionError(.tooLong)) }
-        guard let url = URL(string: url), let body = try? body(mode: mode, text: text, system: system) else {
+        // A draft of notes only has nothing to translate or polish (Read never splits).
+        if mode != .in {
+            let draft = Notes.split(text)
+            guard draft.notes.isEmpty || !draft.text.isEmpty else { return .failure(ActionError(.notesOnly)) }
+        }
+        guard let url = URL(string: url), let body = try? body(mode: mode, text: text, system: system, profile: profile) else {
             return .failure(ActionError(.setup))
         }
-        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: idleTimeout)
+        var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: profile.idleTimeout)
         req.httpMethod = "POST"
         req.httpShouldHandleCookies = false
         for (name, value) in headers(apiKey: apiKey) { req.setValue(value, forHTTPHeaderField: name) }
@@ -130,15 +205,15 @@ public enum ActionAPI {
     }
 
     /// The session for action requests: the text and the reply stay in memory, never in a cache or cookie store.
-    public static func sessionConfiguration() -> URLSessionConfiguration {
+    public static func sessionConfiguration(profile: ActionProfile = .normal) -> URLSessionConfiguration {
         let c = URLSessionConfiguration.ephemeral
         c.urlCache = nil
         c.httpCookieStorage = nil
         c.httpShouldSetCookies = false
         c.urlCredentialStorage = nil
         c.requestCachePolicy = .reloadIgnoringLocalCacheData
-        c.timeoutIntervalForRequest = idleTimeout
-        c.timeoutIntervalForResource = totalTimeout
+        c.timeoutIntervalForRequest = profile.idleTimeout
+        c.timeoutIntervalForResource = profile.totalTimeout
         return c
     }
 
@@ -159,13 +234,14 @@ public enum ActionAPI {
     ] }
 
     /// Same shape as the extension and the Shortcut: thinking off on Sonnet is "between_tools", Opus is
-    /// "adaptive"; effort low; JSON schema output; no temperature. Streamed (keyboard-ui 003).
-    public static func body(mode: ActionMode, text: String, system: String) throws -> Data {
+    /// "adaptive"; effort and max_tokens from the profile (low and 16000 unless Deep); JSON schema output; no
+    /// temperature. Streamed (keyboard-ui 003).
+    public static func body(mode: ActionMode, text: String, system: String, profile: ActionProfile = .normal) throws -> Data {
         let body: [String: Any] = [
             "model": model(for: mode),
-            "max_tokens": 16000,
+            "max_tokens": profile.maxTokens,
             "thinking": ["type": mode == .in ? "between_tools" : "adaptive"],
-            "output_config": ["effort": "low", "format": ["type": "json_schema", "schema": schema]],
+            "output_config": ["effort": profile.effort, "format": ["type": "json_schema", "schema": schema]],
             "system": system,
             "messages": [["role": "user", "content": userMessage(mode: mode, text: text)]],
             "stream": true,
@@ -174,18 +250,20 @@ public enum ActionAPI {
     }
 
     /// MODE out names its TARGET: the language of the draft's prefix ("ru: 안녕", the prefix dropped), else
-    /// English. MODE fix drops a "ko:" prefix (isKoreanPolish). The system prompt stays the same for every call.
+    /// English, and sends mid-draft spans tagged ("fr:고마워;" -> "<fr>고마워</fr>", Languages.parse). MODE fix drops
+    /// a "ko:" prefix (isKoreanPolish) and tags nothing. Both send the draft without its notes and put the notes in a
+    /// NOTES block right before the DRAFT. Read (MODE in) sends someone else's text as it is. The system prompt stays
+    /// the same for every call.
     static func userMessage(mode: ActionMode, text: String) -> String {
-        let p = Languages.prefix(of: text)
-        switch mode {
-        case .in:
-            return "MODE: in\n\nTEXT:\n\(text)"
-        case .out:
-            let target = p.code == "ko" ? nil : p.code.flatMap(Languages.name(of:))
-            return "MODE: out\nTARGET: \(target ?? "English")\n\nDRAFT:\n\(target == nil ? text : p.text)"
-        case .fix:
-            return "MODE: fix\n\nDRAFT:\n\(isKoreanPolish(text) ? p.text : text)"
+        if mode == .in { return "MODE: in\n\nTEXT:\n\(text)" }
+        let draft = Notes.split(text)
+        let notes = draft.notes.isEmpty ? "" : "NOTES:\n" + draft.notes.map { "- \($0)\n" }.joined() + "\n"
+        if mode == .out {
+            let p = Languages.parse(draft.text)
+            return "MODE: out\nTARGET: \(p.lang.flatMap(Languages.name(of:)) ?? "English")\n\n\(notes)DRAFT:\n\(p.text)"
         }
+        let polish = koreanPolish(draft.text) ? Languages.prefix(of: draft.text).text : draft.text
+        return "MODE: fix\n\n\(notes)DRAFT:\n\(polish)"
     }
 
     /// The reply's bytes, or nil once they pass `limit`: a huge or endless body never takes the keyboard's
