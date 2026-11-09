@@ -31,7 +31,7 @@ struct ProgressStrip: View {
         HStack(spacing: 4) {
             VStack(alignment: .leading, spacing: 0) {
                 if let error = state.error {
-                    Text(error.message)
+                    Text(error.message(deep: state.deep))
                         .font(.subheadline)
                         .lineLimit(2)
                 } else {
@@ -48,7 +48,7 @@ struct ProgressStrip: View {
                 Button { retry(state.action) } label: {
                     Text("Retry").fontWeight(.semibold).frame(minWidth: 44, minHeight: 44).contentShape(.rect)
                 }
-            } else if ActionProfile.offersDeep(state.action, done: false, error: state.error) {
+            } else if ActionProfile.offersDeep(state.action, deep: state.deep, done: false, error: state.error) {
                 // Cut off before any text: the line says "Try Deep".
                 Button(action: deep) {
                     Text("Deep").fontWeight(.semibold).frame(minWidth: 44, minHeight: 44).contentShape(.rect)

@@ -16,6 +16,8 @@ struct CardState: Equatable {
     /// What the read returned, for Replace and the field check.
     let original: String
     let isSelection: Bool
+    /// A Deep call: its cut-off line offers no Deep (ActionProfile.offersDeep).
+    let deep: Bool
     /// systemUptime when the card appeared: its buttons ignore taps for AboutMe.saveDelay, because the keys were live
     /// until now and a typing thumb is right there.
     let shownAt: Double
@@ -50,7 +52,7 @@ struct ResultCard: View {
             header
             ScrollView {
                 // Only this view reads the streamed text: a delta redraws it, not the header or the buttons.
-                CardText(feed: feed, phase: card.phase, copyOnly: card.copyOnly)
+                CardText(feed: feed, phase: card.phase, copyOnly: card.copyOnly, deep: card.deep)
             }
             // Follows new text without a scrollTo per delta.
             .defaultScrollAnchor(.bottom)
@@ -119,7 +121,7 @@ struct ResultCard: View {
     /// a cut-off reply is not retried.
     @ViewBuilder
     private var deepButton: some View {
-        if ActionProfile.offersDeep(card.action, done: card.phase == .done, error: feed.failed) {
+        if ActionProfile.offersDeep(card.action, deep: card.deep, done: card.phase == .done, error: feed.failed) {
             button("Deep", action: deep)
         }
     }
@@ -161,6 +163,7 @@ private struct CardText: View {
     let feed: ResultFeed
     let phase: CardState.Phase
     let copyOnly: Bool
+    let deep: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -175,7 +178,7 @@ private struct CardText: View {
                 Text(feed.back).font(.subheadline).foregroundStyle(.secondary)
             }
             if let error = feed.failed {
-                Text(error.message).font(.footnote).foregroundStyle(.secondary)
+                Text(error.message(deep: deep)).font(.footnote).foregroundStyle(.secondary)
             } else if copyOnly {
                 Text("The text changed while this ran. Copy the result instead.")
                     .font(.footnote).foregroundStyle(.secondary)

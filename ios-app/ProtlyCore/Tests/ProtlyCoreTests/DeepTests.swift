@@ -9,15 +9,31 @@ final class DeepTests: XCTestCase {
     /// while the text streams, never after any other error.
     func testDeepIsOfferedOnAFinishedOrCutOffCardOnly() {
         for mode in [ActionMode.out, .fix] {
-            XCTAssertTrue(ActionProfile.offersDeep(mode, done: true, error: nil), "\(mode) done")
-            XCTAssertTrue(ActionProfile.offersDeep(mode, done: false, error: ActionError(.truncated)), "\(mode) cut off")
-            XCTAssertFalse(ActionProfile.offersDeep(mode, done: false, error: nil), "\(mode) streaming")
-            for kind in [ActionError.Kind.network, .timeout, .overloaded, .refused, .parse, .tooLong, .auth, .notesOnly] {
-                XCTAssertFalse(ActionProfile.offersDeep(mode, done: false, error: ActionError(kind)), "\(mode) \(kind)")
+            for deep in [false, true] {
+                XCTAssertTrue(ActionProfile.offersDeep(mode, deep: deep, done: true, error: nil), "\(mode) \(deep) done")
+                XCTAssertFalse(ActionProfile.offersDeep(mode, deep: deep, done: false, error: nil), "\(mode) streaming")
+                for kind in [ActionError.Kind.network, .timeout, .overloaded, .refused, .parse, .tooLong, .auth, .notesOnly] {
+                    XCTAssertFalse(ActionProfile.offersDeep(mode, deep: deep, done: false, error: ActionError(kind)),
+                                   "\(mode) \(deep) \(kind)")
+                }
             }
+            XCTAssertTrue(ActionProfile.offersDeep(mode, deep: false, done: false, error: ActionError(.truncated)), "\(mode) cut off")
         }
-        XCTAssertFalse(ActionProfile.offersDeep(.in, done: true, error: nil))
-        XCTAssertFalse(ActionProfile.offersDeep(.in, done: false, error: ActionError(.truncated)))
+        XCTAssertFalse(ActionProfile.offersDeep(.in, deep: false, done: true, error: nil))
+        XCTAssertFalse(ActionProfile.offersDeep(.in, deep: false, done: false, error: ActionError(.truncated)))
+    }
+
+    /// A deep call that is cut off offers no Deep: the same 32000-token call would be cut off again. Its line says
+    /// to shorten the text instead. A finished deep card still offers Deep, as the extension does.
+    func testACutOffDeepCallOffersNoDeep() {
+        for mode in [ActionMode.out, .fix] {
+            XCTAssertFalse(ActionProfile.offersDeep(mode, deep: true, done: false, error: ActionError(.truncated)), "\(mode)")
+        }
+        XCTAssertEqual(ActionError(.truncated).message(deep: true), "The reply was cut off. Try a shorter text.")
+        XCTAssertEqual(ActionError(.truncated).message(deep: false), ActionError(.truncated).message)
+        for kind in [ActionError.Kind.network, .timeout, .overloaded, .notesOnly] {
+            XCTAssertEqual(ActionError(kind).message(deep: true), ActionError(kind).message, "\(kind)")
+        }
     }
 
     /// Deep runs the same mode on what the field read returned, at effort high; the selection flag stays, so Replace

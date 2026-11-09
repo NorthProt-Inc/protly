@@ -424,13 +424,13 @@ final class KeyboardViewController: KeyboardInputViewController {
     private func run(_ sent: ActionCall, call: Int? = nil) {
         let call = call ?? nextCall()
         onScreen = sent
-        let action = sent.mode, original = sent.original, isSelection = sent.isSelection
+        let action = sent.mode, original = sent.original, isSelection = sent.isSelection, deep = sent.profile == .deep
         let label = BarAction.call(action, text: sent.text)
         if mode.panel != nil { mode.panel = nil }
         let callFeed = ResultFeed()
         feed = callFeed  // the card of the last call keeps its own while it fades out
         // From act() the strip is already up for this call: one write at most.
-        let strip = StripState(call: call, action: action, label: label, deep: sent.profile == .deep)
+        let strip = StripState(call: call, action: action, label: label, deep: deep)
         if mode.strip != strip { mode.strip = strip }
         actionTask?.cancel()
         actionTask = Task { [weak self] in
@@ -439,7 +439,7 @@ final class KeyboardViewController: KeyboardInputViewController {
             for await update in ActionClient.run(action, text: sent.text, profile: sent.profile) {
                 guard let self, !Task.isCancelled else { return }
                 show(update, feed: callFeed, card: CardState(call: call, action: action, label: label, original: original,
-                                                         isSelection: isSelection, shownAt: now))
+                                                         isSelection: isSelection, deep: deep, shownAt: now))
                 // At most 20 redraws of the card's text a second: meanwhile the stream keeps only the newest partial
                 // and the result, so nothing is lost and the text is never more than 50 ms behind.
                 if case .partial = update { try? await Task.sleep(nanoseconds: 50_000_000) }
@@ -448,7 +448,7 @@ final class KeyboardViewController: KeyboardInputViewController {
             guard let self, !Task.isCancelled, let strip = mode.strip, strip.call == call, strip.error == nil else { return }
             show(.failed(ActionError(.network)), feed: callFeed,
                  card: CardState(call: call, action: action, label: label, original: original, isSelection: isSelection,
-                                 shownAt: now))
+                                 deep: deep, shownAt: now))
         }
     }
 

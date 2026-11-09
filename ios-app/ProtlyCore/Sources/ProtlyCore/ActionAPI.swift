@@ -52,6 +52,10 @@ public struct ActionError: Error, Sendable, Equatable {
         case .notesOnly: return "Add the message too. [Brackets] are notes for protly."
         }
     }
+    /// The line for a call at `deep`: a deep call that is cut off cannot be helped by Deep again.
+    public func message(deep: Bool) -> String {
+        deep && kind == .truncated ? "The reply was cut off. Try a shorter text." : message
+    }
     public init(_ kind: Kind) { self.kind = kind }
 }
 
@@ -77,10 +81,11 @@ public struct ActionProfile: Sendable, Equatable {
 
     /// Where Deep is offered: on a finished Translate or Polish card, and with a cut-off reply (on the card, or on the
     /// strip when no text came first), whose line says "Try Deep". Never for Read clipboard, never while the text
-    /// streams, never after any other error.
-    public static func offersDeep(_ mode: ActionMode, done: Bool, error: ActionError?) -> Bool {
+    /// streams, never after any other error, and never when the cut-off call was already deep (`deep`): the same
+    /// call again would be cut off again.
+    public static func offersDeep(_ mode: ActionMode, deep: Bool, done: Bool, error: ActionError?) -> Bool {
         guard mode != .in else { return false }
-        if let error { return error.kind == .truncated }
+        if let error { return error.kind == .truncated && !deep }
         return done
     }
 }
