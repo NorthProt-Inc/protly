@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE } from '../src/lib/style.js';
+import { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE, READ_TONE } from '../src/lib/style.js';
 import { LANG_NAMES } from '../src/lib/lang.js';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
@@ -21,13 +21,14 @@ test('keyboard prompt carries the shared English style verbatim (src/lib/style.j
   assert.ok(prompt.includes(ENGLISH_STYLE), 'ENGLISH_STYLE');
   assert.ok(prompt.includes(POLISH_VOICE), 'POLISH_VOICE');
   assert.ok(prompt.includes(TRANSLATE_TONE), 'TRANSLATE_TONE');
+  assert.ok(prompt.includes(READ_TONE), 'READ_TONE');
   assert.equal(prompt.includes(EMAIL_SHAPE), false, 'EMAIL_SHAPE: the keyboard has no email mode');
 });
 
 test('keyboard prompt stays inside its size budget (it is sent on every call from the phone)', () => {
   // 5100 since 2026-11-08 (measured 5037): the span tag rule, the notes rules and the email, slang and numbers wording
-  // of the extension polish added about 590 characters.
-  assert.ok(prompt.length <= 5100, `keyboard prompt is ${prompt.length} characters, budget 5100`);
+  // of the extension polish added about 590 characters. 5200 since 2026-11-12: the read tone line.
+  assert.ok(prompt.length <= 5200, `keyboard prompt is ${prompt.length} characters, budget 5200`);
 });
 
 test('the keyboard translates into the extension languages (ProtlyCore Languages.swift equals LANG_NAMES)', () => {

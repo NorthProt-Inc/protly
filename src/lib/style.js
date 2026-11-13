@@ -1,9 +1,10 @@
 // The user's own English style, written by Cyan on 2026-10-29 (tone made calmer, fewer lol, 2026-11-08). The bullets are the user's text verbatim: edit
 // them only with the user. Each block's scope is fixed by the user too, and tests/style.test.js pins it:
 // ENGLISH_STYLE goes into every call whose output is English, POLISH_VOICE into Polish (the rewrite mode, not the
-// language) only, TRANSLATE_TONE into Korean -> English translation only, EMAIL_SHAPE into email only.
-// src/lib/prompts.js imports them. ios/keyboard-prompt.txt carries ENGLISH_STYLE, POLISH_VOICE and TRANSLATE_TONE
-// verbatim (it has no email mode), and tests/ios-app.test.js fails when it does not.
+// language) only, TRANSLATE_TONE into Korean -> English translation only, EMAIL_SHAPE into email only, READ_TONE
+// (2026-11-12: reading someone else's message came out too bubbly) into reading only: incoming, selection and the
+// keyboard's MODE in. src/lib/prompts.js imports them. ios/keyboard-prompt.txt carries ENGLISH_STYLE, POLISH_VOICE,
+// TRANSLATE_TONE and READ_TONE verbatim (it has no email mode), and tests/ios-app.test.js fails when it does not.
 // Keep it short: the keyboard sends it on every call, straight from the phone.
 
 export const ENGLISH_STYLE = `- Meaning: keep every fact, name, number, request and hedge. Add nothing the draft lacks. Meaning wins over style: if a rule below would drop a fact, request or hedge, keep it.
@@ -22,3 +23,5 @@ export const TRANSLATE_TONE = `- Keep the draft's tone, calm and even: warm stay
 - ㅋㅋ is usually dropped. Write "lol" at most once, only when the draft is clearly joking and nothing else carries it.`;
 
 export const EMAIL_SHAPE = `- Email: the ask goes first, context after. Keep "Hi <Name>," when the draft has it. Keep the draft's sign-off.`;
+
+export const READ_TONE = `- Keep the sender's tone, calm and even. Add no ㅋㅋ, ~, ! or intensifiers (완전, 대박, 헐) the original lacks.`;

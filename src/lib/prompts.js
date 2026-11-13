@@ -1,6 +1,6 @@
 import { ApiError } from './api.js';
 import { langName } from './lang.js';
-import { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE } from './style.js';
+import { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE, READ_TONE } from './style.js';
 
 // useFormat: the Task 2 spike confirmed format works with adaptive thinking; false is only a fallback switch.
 export const PROFILES = {
@@ -24,6 +24,7 @@ For every listed message:
 - Any other language: translate into the language given as TARGET_FOR_OTHER.
 Style:
 - Keep the register. Casual stays casual. Korean output uses casual speech (banmal) unless the memo says otherwise.
+${READ_TONE}
 - Render slang and internet speak as natural equivalents, not literal glosses.
 - Keep emoji, names, @handles, URLs and line breaks as they are.
 - Use the recent conversation and the thread memo to resolve pronouns, jokes and references.
