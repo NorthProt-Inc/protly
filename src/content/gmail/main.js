@@ -1,8 +1,8 @@
 import { watchFlags, siteEnabled } from '../../lib/flags.js';
 import { addFonts, fetchFonts } from '../../ui/fonts.js';
 import { GSEL } from './selectors.js';
-import { mountCompose, translate, escape } from './compose.js';
-import { commandListener } from '../../lib/command.js';
+import { mountCompose, translate, keep, undoKey } from './compose.js';
+import { commandListener, isUndoKey } from '../../lib/command.js';
 
 const SCAN_MS = 300;
 
@@ -18,11 +18,12 @@ export async function start() {
     .observe(document.body, { childList: true, subtree: true });
   scan();
 
-  // Esc in a compose body undoes protly's preview. Only swallowed when there was something to undo.
+  // In a compose body, Esc keeps protly's translation and Alt+Z undoes it. Only swallowed when protly acted.
   document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape' || e.isComposing) return;
+    const act = e.key === 'Escape' ? keep : isUndoKey(e) ? undoKey : null;
+    if (!act || e.isComposing) return;
     const body = e.target?.closest?.(GSEL.body);
-    if (!body || !escape(body)) return;
+    if (!body || !act(body)) return;
     e.preventDefault();
     e.stopImmediatePropagation();
   }, true);

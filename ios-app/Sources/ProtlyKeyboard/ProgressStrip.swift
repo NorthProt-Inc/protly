@@ -8,6 +8,8 @@ struct StripState: Equatable {
     let action: ActionMode
     /// What the strip names: the call as the bar would label it.
     let label: BarAction
+    /// A Deep re-run: "Translating deeply".
+    var deep = false
     /// The call failed before any text: the error line replaces the label, the glow stops.
     var error: ActionError?
 }
@@ -21,6 +23,7 @@ struct ProgressStrip: View {
     let scheme: ColorScheme
     let close: () -> Void
     let retry: (ActionMode) -> Void
+    let deep: () -> Void
 
     @State private var slow = false
 
@@ -28,12 +31,12 @@ struct ProgressStrip: View {
         HStack(spacing: 4) {
             VStack(alignment: .leading, spacing: 0) {
                 if let error = state.error {
-                    Text(error.message)
+                    Text(error.message(deep: state.deep))
                         .font(.subheadline)
                         .lineLimit(2)
                 } else {
                     label.font(.subheadline.weight(.medium)).accessibilityElement(children: .combine)
-                    if slow, let line = state.label.slowLine {
+                    if slow, let line = state.label.slowLine(deep: state.deep) {
                         Text(line).font(.footnote).foregroundStyle(.secondary)
                     }
                 }
@@ -44,6 +47,11 @@ struct ProgressStrip: View {
             if let error = state.error, error.canRetry {
                 Button { retry(state.action) } label: {
                     Text("Retry").fontWeight(.semibold).frame(minWidth: 44, minHeight: 44).contentShape(.rect)
+                }
+            } else if ActionProfile.offersDeep(state.action, deep: state.deep, done: false, error: state.error) {
+                // Cut off before any text: the line says "Try Deep".
+                Button(action: deep) {
+                    Text("Deep").fontWeight(.semibold).frame(minWidth: 44, minHeight: 44).contentShape(.rect)
                 }
             }
             // The 44 pt frame is inside the label: with the plain style only the label takes taps.
@@ -77,7 +85,7 @@ struct ProgressStrip: View {
     private var label: some View {
         HStack(spacing: 0) {
             HStack(spacing: 4) {
-                Text(state.label.progressVerb ?? "")
+                Text(state.label.progressVerb(deep: state.deep) ?? "")
                 if state.label.arrow {
                     Text(verbatim: "→")
                     Text(state.label.title)

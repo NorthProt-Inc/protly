@@ -5,7 +5,7 @@ types Korean and English on one QWERTY grid. Both translate or polish what you w
 
 ## Chrome extension
 
-- Built in on `instagram.com` (DMs) and `mail.google.com` (drafts).
+- Built in on `instagram.com` (DMs), `web.whatsapp.com` (chats) and `mail.google.com` (drafts).
 - On any other site, press `Alt+T` in a focused text box, or right-click a box or a selection and pick protly.
 - Calls to the Anthropic API go through a native messaging host (`host/protly_host.py`), so the API key stays
   in that process and never reaches the page or the extension.

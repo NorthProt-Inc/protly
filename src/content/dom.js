@@ -4,13 +4,31 @@ import { trusted } from '../ui/trust.js';
 export const findThreadRoot = (doc) => doc.querySelector(SEL.threadRoot);
 export const findComposer = (doc) => doc.querySelector(SEL.composer);
 
+// Visible text of a bubble. WhatsApp renders emoji as <img alt="😀">, which innerText and textContent drop, so an
+// element holding an <img> is walked: text nodes, <br> as a newline, img alt. Without one, the plain read as before.
+export function textOf(el) {
+  if (!el) return '';
+  if (!el.querySelector('img')) return el.innerText ?? el.textContent ?? '';
+  let out = '';
+  const walk = (n) => {
+    for (const c of n.childNodes) {
+      if (c.nodeType === 3) out += c.data;
+      else if (c.nodeName === 'BR') out += '\n';
+      else if (c.nodeName === 'IMG') out += c.getAttribute('alt') ?? '';
+      else if (c.nodeType === 1) walk(c);
+    }
+  };
+  walk(el);
+  return out;
+}
+
 // Text bubbles only, top to bottom. Rows without a text element (media, stickers) are skipped.
 // viewer defaults to the live page's sidebar username; tests pass it explicitly.
 export function readMessages(root, viewer = findViewerName(root.ownerDocument)) {
   const out = [];
   for (const row of root.querySelectorAll(SEL.messageRow)) {
     const textEl = row.querySelector(SEL.messageText);
-    const text = textEl?.innerText ?? textEl?.textContent ?? '';
+    const text = textOf(textEl);
     if (!text.trim()) continue;
     out.push({ row, textEl, text: text.trim(), from: senderOf(row, viewer) });
   }
@@ -50,7 +68,7 @@ export function clearAllTranslations(root) {
 // True while the row still shows the text it was read with (nodes get reused for other messages).
 export function stillShows(m) {
   const el = m.textEl;
-  return el.isConnected && (el.innerText ?? el.textContent ?? '').trim() === m.text;
+  return el.isConnected && textOf(el).trim() === m.text;
 }
 
 export function renderRetry(m, onClick) {
@@ -78,10 +96,20 @@ export function getComposerText(el) {
 export const SELECT_SETTLE_MS = 60;
 // stillOk() is re-checked after the settle; false aborts the insert (thread switched, write superseded).
 // Returns true when the text was inserted.
+// Focus coming in from elsewhere (WhatsApp's Reply leaves it on the message row) makes Lexical restore its own caret a
+// moment later, which collapses the first select-all; then insertText would append. Select once more if so.
 export async function setComposerText(el, text, stillOk = () => true) {
-  el.focus();
-  el.ownerDocument.getSelection().selectAllChildren(el);
-  await new Promise((r) => setTimeout(r, SELECT_SETTLE_MS));
+  const sel = el.ownerDocument.getSelection();
+  const flat = (t) => t.replace(/\s+/g, '');
+  const selectsAll = () => !flat(el.innerText || el.textContent || '')
+    || (!sel.isCollapsed && el.contains(sel.anchorNode) && flat(sel.toString()) === flat(el.innerText || el.textContent || ''));
+  const select = async () => {
+    el.focus();
+    sel.selectAllChildren(el);
+    await new Promise((r) => setTimeout(r, SELECT_SETTLE_MS));
+  };
+  await select();
+  if (el.isConnected && stillOk() && !selectsAll()) await select();
   if (!el.isConnected || !stillOk()) return false;
   el.focus();
   el.ownerDocument.execCommand('insertText', false, text);

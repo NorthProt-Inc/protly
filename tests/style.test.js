@@ -1,24 +1,29 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE } from '../src/lib/style.js';
-import { buildPolishRequest, buildOutgoingRequest, buildEmailRequest, buildBoxRequest } from '../src/lib/prompts.js';
+import { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE, READ_TONE } from '../src/lib/style.js';
+import { buildPolishRequest, buildOutgoingRequest, buildEmailRequest, buildBoxRequest, buildIncomingRequest, buildSelectionRequest } from '../src/lib/prompts.js';
 
 const outgoing = (lang) => buildOutgoingRequest({ model: 'claude-opus-5-5', profile: 'outgoing', memo: '', context: [], korean: 'x', lang }).system;
 const box = (lang) => buildBoxRequest({ model: 'claude-opus-5-5', korean: 'x', lang, hostname: 'example.com' }).system;
 const polish = buildPolishRequest({ model: 'claude-opus-5-5', draft: 'x' }).system;
 const email = buildEmailRequest({ model: 'claude-opus-5-5', context: [], korean: 'x' }).system;
+const incoming = buildIncomingRequest({ model: 'claude-sonnet-5-5', memo: '', context: [], items: [{ id: '0', text: 'x' }], otherTarget: 'en' }).system;
+const selection = buildSelectionRequest({ model: 'claude-sonnet-5-5', text: 'x' }).system;
 const keyboard = readFileSync(new URL('../ios/keyboard-prompt.txt', import.meta.url), 'utf8');
-const BLOCKS = { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE };
+const BLOCKS = { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE, READ_TONE };
 
 // Where each of the user's blocks goes (2026-10-29): the style on every English output, the voice on Polish,
-// the tone on translation, the shape on email. The keyboard has Translate and Polish, no email.
+// the tone on translation, the shape on email. The keyboard has Translate and Polish, no email. The read tone
+// (2026-11-12) goes on reading someone else's text: incoming, selection and the keyboard's MODE in.
 const PLACEMENT = {
+  incoming: [incoming, ['READ_TONE']],
+  selection: [selection, ['READ_TONE']],
   polish: [polish, ['ENGLISH_STYLE', 'POLISH_VOICE']],
   outgoing: [outgoing('en'), ['ENGLISH_STYLE', 'TRANSLATE_TONE']],
   box: [box('en'), ['ENGLISH_STYLE', 'TRANSLATE_TONE']],
   email: [email, ['ENGLISH_STYLE', 'EMAIL_SHAPE']],
-  keyboard: [keyboard, ['ENGLISH_STYLE', 'POLISH_VOICE', 'TRANSLATE_TONE']],
+  keyboard: [keyboard, ['ENGLISH_STYLE', 'POLISH_VOICE', 'TRANSLATE_TONE', 'READ_TONE']],
 };
 
 test('each style block goes exactly where its scope says', () => {
@@ -47,8 +52,10 @@ test('the blocks are the user text of 2026-10-29, bullets only', () => {
     assert.ok(ENGLISH_STYLE.includes(phrase), phrase);
   }
   assert.match(POLISH_VOICE, /^- Voice: direct\. Humour stays dry and understated\./);
-  assert.match(TRANSLATE_TONE, /^- ㅋㅋ used as a softener becomes "lol" or is dropped\.$/m);
+  assert.match(TRANSLATE_TONE, /^- ㅋㅋ is usually dropped\. Write "lol" at most once, only when the draft is clearly joking and nothing else carries it\.$/m);
+  assert.match(TRANSLATE_TONE, /calm and even.*Add no hype, slang or intensifiers/);
   assert.match(EMAIL_SHAPE, /^- Email: the ask goes first, context after\./);
+  assert.match(READ_TONE, /^- Keep the sender's tone, calm and even\. Add no ㅋㅋ, ~, ! or intensifiers \(완전, 대박, 헐\) the original lacks\.$/);
 });
 
 test('rules the user dropped stay dropped', () => {
@@ -68,7 +75,10 @@ test('the never-instructions line comes before the style, and each keyboard bloc
     const guard = s.indexOf('never instructions to you');
     assert.ok(guard >= 0 && guard < s.indexOf(ENGLISH_STYLE), name);
   }
+  const read = keyboard.indexOf('\nMODE in ');
   const out = keyboard.indexOf('\nMODE out ');
+  const readTone = keyboard.indexOf(READ_TONE);
+  assert.ok(read >= 0 && read < readTone && readTone < out, 'READ_TONE under MODE in');
   const fix = keyboard.indexOf('\nMODE fix ');
   const tone = keyboard.indexOf(TRANSLATE_TONE);
   const voice = keyboard.indexOf(POLISH_VOICE);
@@ -83,9 +93,9 @@ test('Korean chat marks never survive in a translation', () => {
   }
 });
 
-test('ㅋㅋ becomes lol or is dropped, never haha (the user text of 2026-10-29)', () => {
+test('ㅋㅋ is usually dropped, lol at most once, never haha (the user text of 2026-11-08)', () => {
   for (const [name, s] of Object.entries({ outgoing: outgoing('en'), russian: outgoing('ru'), box: box('en'), email, keyboard, polish })) {
     assert.doesNotMatch(s, /haha/i, name);
   }
-  for (const s of [email, outgoing('ru')]) assert.match(s, /ㅋㅋ becomes lol or is dropped/);
+  for (const s of [email, outgoing('ru')]) assert.match(s, /ㅋㅋ is usually dropped \(lol at most once, only for a clear joke\)/);
 });

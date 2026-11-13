@@ -4,6 +4,8 @@ import { bindTheme } from './theme.js';
 import { LANG_NAMES, langName } from '../lib/lang.js';
 
 export const modelLabel = (m) => (m && m.includes('opus') ? 'Opus' : 'Sonnet');
+// deep: the result of a Deep re-run (the hard profile: same model by default, high effort).
+const modelText = (m, deep) => `${modelLabel(m)}${deep ? ' deep' : ''}`;
 
 const GAP = 6; // px between the anchor rect and a floating card
 const shadows = new WeakMap(); // card host -> its closed shadow root
@@ -104,8 +106,8 @@ export function createCard({ doc = document, place }) {
     working(text, { onCancel } = {}) {
       render([el('span', 'msg dots', text.replace(/(\.\.\.|…)$/, '')), ...(onCancel ? [button({ label: 'Cancel', onClick: onCancel })] : [])]);
     },
-    preview({ text, model, lang, onLang, actions = [], hints = '' }) {
-      render([el('span', 'msg', text), ...(model ? [el('span', 'model', modelLabel(model))] : []), ...trailing(lang, onLang, actions, hints)]);
+    preview({ text, model, deep = false, lang, onLang, actions = [], hints = '' }) {
+      render([el('span', 'msg', text), ...(model ? [el('span', 'model', modelText(model, deep))] : []), ...trailing(lang, onLang, actions, hints)]);
     },
     message(text, { actions = [], error = false, lang, onLang } = {}) {
       render([el('span', 'msg', text), ...trailing(lang, onLang, actions, '')], { error });

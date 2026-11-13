@@ -85,6 +85,7 @@ export const senders = {
   popup: { id: EXT_ID, url: `${EXT_ORIGIN}/popup/popup.html`, origin: EXT_ORIGIN },
   options: { id: EXT_ID, url: `${EXT_ORIGIN}/options/options.html`, origin: EXT_ORIGIN, tab: { id: 9 }, frameId: 0 },
   instagram: { id: EXT_ID, url: 'https://www.instagram.com/direct/t/123/', origin: 'https://www.instagram.com', tab: { id: 1 }, frameId: 0 },
+  whatsapp: { id: EXT_ID, url: 'https://web.whatsapp.com/', origin: 'https://web.whatsapp.com', tab: { id: 4 }, frameId: 0 },
   gmail: { id: EXT_ID, url: 'https://mail.google.com/mail/u/0/#inbox', origin: 'https://mail.google.com', tab: { id: 2 }, frameId: 0 },
   page: { id: EXT_ID, url: 'https://evil.example/x', origin: 'https://evil.example', tab: { id: 3 }, frameId: 0 },
   otherExtension: { id: 'ponmlkjihgfedcbaponmlkjihgfedcba', url: 'chrome-extension://ponmlkjihgfedcbaponmlkjihgfedcba/x.html', origin: 'chrome-extension://ponmlkjihgfedcbaponmlkjihgfedcba' },

@@ -37,21 +37,21 @@ test('defaults: polish off, every site on', async () => {
   await watchFlags();
   assert.equal(flags.polish, false);
   assert.deepEqual(flags.sites, DEFAULT_SITES);
-  assert.deepEqual(DEFAULT_SITES, { instagram: true, gmail: true });
+  assert.deepEqual(DEFAULT_SITES, { instagram: true, whatsapp: true, gmail: true });
 });
 
 test('stored values load before watchFlags resolves; a partial sites object keeps the other defaults', async () => {
   stubChrome({ polish: true, sites: { gmail: false } });
   await watchFlags();
   assert.equal(flags.polish, true);
-  assert.deepEqual(flags.sites, { instagram: true, gmail: false });
+  assert.deepEqual(flags.sites, { instagram: true, whatsapp: true, gmail: false });
 });
 
 test('storage changes flow in; other areas and keys are ignored', async () => {
   const c = stubChrome({});
   await watchFlags();
   c.change({ sites: { newValue: { instagram: false, gmail: true } }, polish: { newValue: true } });
-  assert.deepEqual(flags.sites, { instagram: false, gmail: true });
+  assert.deepEqual(flags.sites, { instagram: false, whatsapp: true, gmail: true });
   assert.equal(flags.polish, true);
   c.change({ polish: { newValue: false } }, 'session');
   assert.equal(flags.polish, true);
@@ -101,7 +101,7 @@ test('Gmail start mounts nothing when Gmail is off, and mounts the button when o
 });
 
 test('Instagram start returns before any timer or listener when Instagram is off', async () => {
-  const { start } = await import('../src/content/main.js');
+  const { start } = await import('../src/content/instagram.js');
   stubChrome({ sites: { instagram: false } });
   const realSetInterval = globalThis.setInterval;
   let timers = 0;

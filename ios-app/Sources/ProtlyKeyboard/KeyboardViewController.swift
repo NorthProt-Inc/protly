@@ -61,6 +61,9 @@ final class KeyboardViewController: KeyboardInputViewController {
     private var readInput: String?
     /// Numbers the calls: a new number restarts the strip's 8 s line and makes a new card.
     private var calls = 0
+    /// The call on the strip or the card, as sent: Deep runs it again at effort high, and Retry of a deep call stays
+    /// deep. Cleared when the next call begins (beginCall), so a Retry on a later failure never reaches it.
+    private var onScreen: ActionCall?
     /// What the field reads moved the cursor over, for Cancel (P6).
     private var cursorReturn = CursorReturn()
     /// Text protly inserted and what it replaced, for Undo.
@@ -319,17 +322,29 @@ final class KeyboardViewController: KeyboardInputViewController {
                 mode.panel = .failed("Could not read the whole text. Select all, then tap again.", retry: action)
                 return
             }
-            run(action, text: field.text, original: field.text, isSelection: field.isSelection, call: call)
+            run(ActionCall(mode: action, text: field.text, original: field.text, isSelection: field.isSelection), call: call)
         }
     }
 
     /// Retry on the strip, a panel or the card: the same call again. Read sends the same text again; the field
     /// actions read the field again (a Retry after a cut-short read continues from where it stopped, CursorReturn).
+    /// A failed Deep retries deep, on the same text.
     func retry(_ action: ActionMode) {
+        if let again = onScreen?.deepRetry, again.mode == action {
+            guard beginCall() else { return }
+            return run(again)
+        }
         guard action == .in, let text = readInput else { return act(action) }
         guard beginCall() else { return }
         cursorReturn.clear()
-        run(.in, text: text, original: "", isSelection: false)
+        run(ActionCall(mode: .in, text: text, original: "", isSelection: false))
+    }
+
+    /// Deep on a finished or cut-off card (or the strip's cut-off line): the same mode on what the field read
+    /// returned, at effort high (ActionCall.deep). The field is not read again; Cancel puts the cursor back as before.
+    func deep() {
+        guard let again = onScreen?.deep, beginCall() else { return }
+        run(again)
     }
 
     /// What every call does first. false while a call runs (B10: the strip has no action, and the protly key is still
@@ -337,6 +352,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     private func beginCall() -> Bool {
         if let strip = mode.strip, strip.error == nil { return false }
         if isReadingField { return false }  // a cancelled read still settling its last step
+        onScreen = nil
         commitWord()
         session.forgetLast()  // the field is about to change: the bar's flip must not reach into it
         watch.forget()  // reading the field moves the cursor
@@ -394,7 +410,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         switch AboutMe.parse(clipboard: text) {
         case .notAboutMe:
             readInput = text
-            run(.in, text: text, original: "", isSelection: false)
+            run(ActionCall(mode: .in, text: text, original: "", isSelection: false))
         case .note(let note):
             mode.panel = .confirmNote(note, shownAt: ProcessInfo.processInfo.systemUptime)
         case .tooLong(let count):
@@ -405,23 +421,25 @@ final class KeyboardViewController: KeyboardInputViewController {
     }
 
     /// One call: the strip at once, the card at the first text, the result or the error at the end (design Part 3).
-    private func run(_ action: ActionMode, text: String, original: String, isSelection: Bool, call: Int? = nil) {
+    private func run(_ sent: ActionCall, call: Int? = nil) {
         let call = call ?? nextCall()
-        let label = BarAction.call(action, text: text)
+        onScreen = sent
+        let action = sent.mode, original = sent.original, isSelection = sent.isSelection, deep = sent.profile == .deep
+        let label = BarAction.call(action, text: sent.text)
         if mode.panel != nil { mode.panel = nil }
         let callFeed = ResultFeed()
         feed = callFeed  // the card of the last call keeps its own while it fades out
         // From act() the strip is already up for this call: one write at most.
-        let strip = StripState(call: call, action: action, label: label)
+        let strip = StripState(call: call, action: action, label: label, deep: deep)
         if mode.strip != strip { mode.strip = strip }
         actionTask?.cancel()
         actionTask = Task { [weak self] in
-            // self is bound per update, never before the loop: a torn-down controller is not held for up to 90 s. The
+            // self is bound per update, never before the loop: a torn-down controller is not held for up to 240 s. The
             // cancel check stops a late update from bringing a card back after Cancel or after a Retry replaced this task.
-            for await update in ActionClient.run(action, text: text) {
+            for await update in ActionClient.run(action, text: sent.text, profile: sent.profile) {
                 guard let self, !Task.isCancelled else { return }
                 show(update, feed: callFeed, card: CardState(call: call, action: action, label: label, original: original,
-                                                         isSelection: isSelection, shownAt: now))
+                                                         isSelection: isSelection, deep: deep, shownAt: now))
                 // At most 20 redraws of the card's text a second: meanwhile the stream keeps only the newest partial
                 // and the result, so nothing is lost and the text is never more than 50 ms behind.
                 if case .partial = update { try? await Task.sleep(nanoseconds: 50_000_000) }
@@ -430,7 +448,7 @@ final class KeyboardViewController: KeyboardInputViewController {
             guard let self, !Task.isCancelled, let strip = mode.strip, strip.call == call, strip.error == nil else { return }
             show(.failed(ActionError(.network)), feed: callFeed,
                  card: CardState(call: call, action: action, label: label, original: original, isSelection: isSelection,
-                                 shownAt: now))
+                                 deep: deep, shownAt: now))
         }
     }
 
@@ -804,7 +822,8 @@ struct ProtlyRoot: View {
                         state: strip,
                         scheme: context.colorScheme,
                         close: { [unowned host] in host.closePanel() },
-                        retry: { [unowned host] in host.retry($0) }
+                        retry: { [unowned host] in host.retry($0) },
+                        deep: { [unowned host] in host.deep() }
                     )
                 } else {
                     ProtlyBar(
@@ -832,7 +851,8 @@ struct ProtlyRoot: View {
                         insert: { [unowned host] in host.insertResult() },
                         copy: { [unowned host] in host.copyResult() },
                         close: { [unowned host] in host.closePanel() },
-                        retry: { [unowned host] in host.retry($0) }
+                        retry: { [unowned host] in host.retry($0) },
+                        deep: { [unowned host] in host.deep() }
                     )
                     .frame(height: layoutHeight)
                 }

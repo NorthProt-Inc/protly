@@ -21,10 +21,11 @@ struct PanelView: View {
     let copy: () -> Bool
     let close: () -> Void
     let retry: (ActionMode) -> Void
+    let deep: () -> Void
 
     var body: some View {
         if case .card(let card) = state {
-            ResultCard(card: card, feed: feed, copy: copy, replace: insert, close: close, retry: retry)
+            ResultCard(card: card, feed: feed, copy: copy, replace: insert, close: close, retry: retry, deep: deep)
                 .id(card.call)
         } else {
             message

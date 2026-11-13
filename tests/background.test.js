@@ -35,22 +35,22 @@ test('inherited object names are not commands', async () => {
 
 // What each sender may call. Everything else is refused before a handler runs.
 const PAGE_ONLY = ['tabStatus', 'diag', 'testCall', 'usageSummary'];
-const INSTAGRAM_ONLY = ['getThread', 'setThread', 'incoming', 'outgoing', 'suggestMemo', 'sent', 'lookupSent'];
-const ALL = [...PAGE_ONLY, ...INSTAGRAM_ONLY, 'email', 'polish', 'box', 'selection', 'badge'];
+const THREAD_COMMANDS = ['getThread', 'setThread', 'incoming', 'outgoing', 'suggestMemo', 'sent', 'lookupSent'];
+const ALL = [...PAGE_ONLY, ...THREAD_COMMANDS, 'email', 'polish', 'box', 'selection', 'badge'];
 const refused = (r) => r !== NO_RESPONSE && r.ok === false && r.error.kind === 'forbidden';
 
 test('content scripts cannot call the popup and options commands', async () => {
   native.replyWith = (m) => (m.ping ? { ping: { ok: true } } : apiReply({}));
-  for (const s of ['instagram', 'gmail', 'page']) {
+  for (const s of ['instagram', 'whatsapp', 'gmail', 'page']) {
     for (const type of PAGE_ONLY) assert.ok(refused(await send({ type }, senders[s])), `${type} from ${s}`);
   }
   assert.equal(native.sent.length, 0); // no billed testCall, no ping
 });
 
-test('thread commands come only from the Instagram content script', async () => {
+test('thread commands come only from the Instagram and WhatsApp content scripts', async () => {
   native.replyWith = () => apiReply({ items: [], translation: 'x', back_translation: 'y', memo: 'm' });
   for (const s of ['gmail', 'page', 'popup', 'options']) {
-    for (const type of INSTAGRAM_ONLY) {
+    for (const type of THREAD_COMMANDS) {
       assert.ok(refused(await send({ type, threadId: '1', patch: { memo: 'x' }, context: [], items: [], texts: [], text: 'a', korean: 'a' }, senders[s])), `${type} from ${s}`);
     }
   }
@@ -58,8 +58,33 @@ test('thread commands come only from the Instagram content script', async () => 
   assert.equal(native.sent.length, 0);
 });
 
-test('email comes only from Gmail, badge only from the two site adapters', async () => {
-  for (const s of ['instagram', 'page', 'popup', 'options']) {
+// WhatsApp thread ids are wa-<hash>. An Instagram page can pushState to /direct/t/wa-<hash>/, which the Instagram
+// adapter would read as a thread id, so a wa- id is WhatsApp's alone, and WhatsApp may use nothing else.
+const ARGS = { patch: { memo: 'x' }, context: [], items: [], texts: ['hi'], text: 'hi', korean: '안녕', profile: 'outgoing', updateLang: false };
+test('WhatsApp may call every thread command with a wa- id', async () => {
+  native.replyWith = () => apiReply({ items: [], translation: 'x', back_translation: 'y', memo: 'm' });
+  for (const type of THREAD_COMMANDS) {
+    const r = await send({ type, threadId: 'wa-0123456789abcd', ...ARGS }, senders.whatsapp);
+    assert.equal(r.ok, true, `${type}: ${JSON.stringify(r)}`);
+  }
+  assert.equal((await send({ type: 'badge', text: '!', reason: 'WhatsApp thread not found' }, senders.whatsapp)).ok, true);
+});
+
+test('wa- thread ids are bound to WhatsApp, and WhatsApp to wa- ids', async () => {
+  for (const type of THREAD_COMMANDS) {
+    assert.ok(refused(await send({ type, threadId: 'wa-0123456789abcd', ...ARGS }, senders.instagram)), `${type} wa- from instagram`);
+    assert.ok(refused(await send({ type, threadId: 'wa-untitled', ...ARGS }, senders.instagram)), `${type} wa-untitled from instagram`);
+    assert.ok(refused(await send({ type, threadId: '123', ...ARGS }, senders.whatsapp)), `${type} plain id from whatsapp`);
+  }
+  assert.deepEqual(local.dump(), {}); // nothing written
+  assert.equal(native.sent.length, 0);
+  // A malformed id is still a bad message, not a binding refusal.
+  const r = await send({ type: 'setThread', threadId: 'wa-a/b', patch: { memo: 'x' } }, senders.whatsapp);
+  assert.equal(r.error.kind, 'bad_message');
+});
+
+test('email comes only from Gmail, badge only from the site adapters', async () => {
+  for (const s of ['instagram', 'whatsapp', 'page', 'popup', 'options']) {
     assert.ok(refused(await send({ type: 'email', context: [], korean: '안녕', profile: 'email', lang: 'auto' }, senders[s])), s);
   }
   for (const s of ['page', 'popup', 'options']) {
@@ -244,5 +269,24 @@ test('Alt+T and the context menu call the instance under Symbol.for("protly"), n
     fake.chrome.scripting.executeScript = real;
     delete globalThis[KEY];
     delete globalThis.__protly;
+  }
+});
+
+test('notes reach the outgoing, email, polish and box prompts; without notes no NOTES block', async () => {
+  native.replyWith = (m) => (m.ping ? { ping: { ok: true } } : apiReply({ lang: 'en', translation: 'hi', back_translation: '안녕' }));
+  const cases = [
+    [{ type: 'outgoing', threadId: '1', context: [], korean: '안녕', profile: 'outgoing' }, 'instagram'],
+    [{ type: 'email', context: [], korean: '안녕', profile: 'email', lang: 'auto' }, 'gmail'],
+    [{ type: 'polish', text: 'hi', profile: 'polish' }, 'page'],
+    [{ type: 'box', text: '안녕', lang: 'en', profile: 'outgoing' }, 'page'],
+  ];
+  for (const [msg, s] of cases) {
+    for (const notes of [['formal', 'short'], undefined]) {
+      native.sent.length = 0;
+      const r = await send({ ...msg, notes }, senders[s]);
+      assert.equal(r.ok, true, `${msg.type}: ${JSON.stringify(r)}`);
+      const content = native.sent.find((m) => m.body)?.body.messages[0].content;
+      assert.equal(content.includes('NOTES:\n- formal\n- short\n\n'), !!notes, `${msg.type} ${notes}`);
+    }
   }
 });

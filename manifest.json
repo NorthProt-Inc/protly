@@ -3,7 +3,7 @@
   "name": "protly",
   "version": "0.1.0",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp0mPMqnNtwS40XXVbf/cotvgHFMNLvw/tz9INiBXhPumXxyVCmU67cAUA6u8UZTDrkRIz28gKwO7EbYh7t1bV1Yvnko8OOc5WyTa+tBwYbM+PCBSlMxf32VquMlgzx00gK3P4eVVSEF5K8aM3LaFSdM2lXubbuRBFWc0bgULZQZg0wwp1YThTXI9bZG5xldzM0UPO2UKNzUyeeIX6tYESyMSKGRO4jmcED7+/auN0ysb5zRbd9198hyBdqVkAkKcTxn88yVm9aN4+zLTTXecP5D54dxhKKa0e6eq/dCJlUWhfbLAGapGQzoQAJIm+JmLBYcKWx4ARgx2KtPgczgAMwIDAQAB",
-  "description": "Translate Instagram DMs and Gmail drafts with Claude.",
+  "description": "Translate Instagram DMs, WhatsApp Web chats and Gmail drafts with Claude.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -52,6 +52,18 @@
     },
     {
       "matches": [
+        "https://web.whatsapp.com/*"
+      ],
+      "js": [
+        "src/content/whatsapp/loader.js"
+      ],
+      "css": [
+        "src/content/style.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
         "https://mail.google.com/*"
       ],
       "js": [
@@ -67,6 +79,7 @@
     {
       "resources": [
         "src/content/dom.js",
+        "src/content/instagram.js",
         "src/content/main.js",
         "src/content/outgoing.js",
         "src/content/panel.js",
@@ -94,6 +107,38 @@
       ],
       "matches": [
         "https://www.instagram.com/*"
+      ]
+    },
+    {
+      "resources": [
+        "src/content/dom.js",
+        "src/content/main.js",
+        "src/content/outgoing.js",
+        "src/content/panel.js",
+        "src/content/selectors.js",
+        "src/content/whatsapp/site.js",
+        "src/lib/classify.js",
+        "src/lib/command.js",
+        "src/lib/flags.js",
+        "src/lib/ime.js",
+        "src/lib/lang.js",
+        "src/lib/limits.js",
+        "src/lib/preview.js",
+        "src/ui/card.css.js",
+        "src/ui/card.js",
+        "src/ui/errors.js",
+        "src/ui/fonts.js",
+        "src/ui/panel.css.js",
+        "src/ui/theme.js",
+        "src/ui/toast.css.js",
+        "src/ui/toast.js",
+        "src/ui/tokens.css.js",
+        "src/ui/trust.js",
+        "src/ui/fonts/protly-mono-400.woff2",
+        "src/ui/fonts/protly-mono-500.woff2"
+      ],
+      "matches": [
+        "https://web.whatsapp.com/*"
       ]
     },
     {

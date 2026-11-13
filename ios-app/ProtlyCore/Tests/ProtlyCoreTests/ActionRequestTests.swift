@@ -64,6 +64,37 @@ final class ActionRequestTests: XCTestCase {
         XCTAssertEqual(ActionAPI.parse(status: 200, body: edge + Data(" ".utf8)).failureKind, .parse)
     }
 
+    /// The Deep re-run (plan 2026-11-08 Part B #2): effort high, a 32000-token reply, 240 s in all, twice the bytes.
+    /// Every other call is normal, the values above.
+    func testTheDeepProfileWorksHarderWithinItsOwnBounds() throws {
+        let normal = ActionProfile.normal, deep = ActionProfile.deep
+        XCTAssertEqual([normal.effort, deep.effort], ["low", "high"])
+        XCTAssertEqual([normal.maxTokens, deep.maxTokens], [16000, 32000])
+        XCTAssertEqual([normal.idleTimeout, deep.idleTimeout], [ActionAPI.idleTimeout, ActionAPI.idleTimeout])
+        XCTAssertEqual([normal.totalTimeout, deep.totalTimeout], [ActionAPI.totalTimeout, 240])
+        XCTAssertEqual([normal.maxResponseBytes, deep.maxResponseBytes], [ActionAPI.maxResponseBytes, 2 * ActionAPI.maxResponseBytes])
+
+        for mode in ActionMode.allCases {
+            let req = try ActionAPI.request(mode: mode, text: "hi", system: "S", apiKey: "k", profile: .deep).get()
+            XCTAssertEqual(req.timeoutInterval, 30)
+            let b = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(req.httpBody)) as? [String: Any])
+            XCTAssertEqual(b["max_tokens"] as? Int, 32000)
+            XCTAssertEqual((b["output_config"] as? [String: Any])?["effort"] as? String, "high")
+            XCTAssertEqual(b["model"] as? String, ActionAPI.model(for: mode))  // the same model, working harder
+            let plain = try ActionAPI.request(mode: mode, text: "hi", system: "S", apiKey: "k").get()
+            let p = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(plain.httpBody)) as? [String: Any])
+            XCTAssertEqual(p["max_tokens"] as? Int, 16000)
+            XCTAssertEqual((p["output_config"] as? [String: Any])?["effort"] as? String, "low")
+            XCTAssertEqual(p.count, b.count)
+        }
+        let c = ActionAPI.sessionConfiguration(profile: .deep)
+        XCTAssertEqual(c.timeoutIntervalForRequest, 30)
+        XCTAssertEqual(c.timeoutIntervalForResource, 240)
+        XCTAssertNil(c.urlCache)
+        XCTAssertNil(c.httpCookieStorage)
+        XCTAssertEqual(ActionAPI.sessionConfiguration().timeoutIntervalForResource, 90)
+    }
+
     func testNoKeyMeansNoRequest() {
         // The CI and cloud stand-in key is empty: the user's text must not leave the phone without a key.
         XCTAssertEqual(kind(request("hi", key: "")), .noKey)

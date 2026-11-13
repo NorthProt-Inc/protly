@@ -16,3 +16,7 @@ export function commandListener({ owner, composing, run, settle = settleComposit
     return false;
   };
 }
+
+// Alt+Z (Option+Z on a Mac): put the original draft back. Matched by the physical key, since Option+Z on a Mac
+// reports e.key 'Ω'. Esc keeps the translation instead.
+export const isUndoKey = (e) => e.code === 'KeyZ' && e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey;

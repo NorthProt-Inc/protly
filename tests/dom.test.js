@@ -85,3 +85,21 @@ test('clearAllTranslations removes everything we added, including hover titles',
   a.textContent = 'other message';
   assert.equal(stillShows({ textEl: a, text: 'hello' }), false);
 });
+
+test('setComposerText: selects again when the editor collapses the selection on focus', async () => {
+  // Lexical restores its own caret (at the end) a moment after focus moves in from elsewhere, e.g. from the message
+  // row WhatsApp's Reply leaves focused. One select-all before the settle is then lost and insertText appends
+  // (live check 2026-11-08).
+  const { setComposerText } = await import('../src/content/dom.js');
+  const d = new JSDOM('<body><div id="row" tabindex="0"></div><div id="c" contenteditable="true" tabindex="0">내일 보자</div></body>').window.document;
+  const el = d.getElementById('c');
+  el.addEventListener('focus', () => setTimeout(() => d.getSelection().collapse(el.firstChild, el.firstChild.length), 10));
+  d.execCommand = (cmd, ui, text) => {
+    const all = d.getSelection().toString() === el.textContent;
+    el.textContent = all ? text : el.textContent + text;
+    return true;
+  };
+  d.getElementById('row').focus();
+  assert.equal(await setComposerText(el, 'see you tomorrow'), true);
+  assert.equal(el.textContent, 'see you tomorrow');
+});

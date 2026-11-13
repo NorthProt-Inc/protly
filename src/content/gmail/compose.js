@@ -1,14 +1,14 @@
 import { GSEL, composeOf, findViewerEmail } from './selectors.js';
 import { userNodes, nodesToText, textToNodes, replaceUserNodes, hasMedia } from './body.js';
 import { readThread } from './thread.js';
-import { hasHangul, parseLangPrefix } from '../../lib/lang.js';
+import { hasHangul, parseLangPrefix, splitNotes, addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../../lib/lang.js';
 import { createCard } from '../../ui/card.js';
 import { ERRORS, errorText } from '../../ui/errors.js';
 import { trusted } from '../../ui/trust.js';
 import { LIMITS } from '../../lib/limits.js';
 
 const MOUNT_GRACE_MS = 3000; // Gmail can render a body before its toolbar
-const HINTS = 'Esc undo';
+const HINTS = 'Esc keep · Alt+Z undo';
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 // The user changed the translation in the body since the preview appeared.
 const edited = (body, s) => norm(nodesToText(userNodes(body))) !== norm(s.shown);
@@ -34,9 +34,10 @@ async function ask(msg) {
 function stateOf(body) {
   let s = states.get(body);
   if (!s) {
-    // korean is the source text: the Korean draft, or the English draft being polished (kind 'polish').
+    // korean is the source text: the Korean draft, or the English draft being polished (kind 'polish'), without its
+    // prefix and notes. notes: the draft's bracket notes, kept for the Deep and language re-runs.
     s = {
-      mode: 'idle', reqId: 0, saved: null, kind: 'translate', korean: null, shown: null, lang: 'auto', profile: 'email',
+      mode: 'idle', reqId: 0, saved: null, kind: 'translate', korean: null, notes: [], shown: null, lang: 'auto', profile: 'email',
       last: null, card: null, cardAnchor: null, anchor: null, btn: null, firstMiss: 0, warned: false,
     };
     states.set(body, s);
@@ -91,11 +92,11 @@ function cardOf(body, s) {
 
 const act = (label, onClick) => ({ label, onClick });
 // A polish preview has no target language, so no picker.
-// The chip takes focus and the working card removes it, so give focus back to the body for the next Esc.
+// The chip takes focus and the working card removes it, so give focus back to the body for the next Esc or Alt+Z.
 const pickerOf = (body, s) => (s.kind === 'polish' ? {} : {
   lang: s.lang, onLang: (lang) => { body.focus(); retranslate(body, { lang }); },
 });
-const previewActions = (body) => [act('Opus', () => retranslate(body, { profile: 'hard' })), act('Undo', () => undo(body))];
+const previewActions = (body) => [act('Deep', () => retranslate(body, { profile: 'hard' })), act('Undo', () => undo(body))];
 
 function say(body, s, text, { error = false, actions = [], picker = false } = {}) {
   cardOf(body, s).message(text, { error, actions, ...(picker ? pickerOf(body, s) : {}) });
@@ -107,7 +108,7 @@ function hideNote(s) {
 
 function showPreview(body, s) {
   cardOf(body, s).preview({
-    text: s.last.back_translation, model: s.last.model, ...pickerOf(body, s), actions: previewActions(body), hints: HINTS,
+    text: s.last.back_translation, model: s.last.model, deep: s.profile === 'hard', ...pickerOf(body, s), actions: previewActions(body), hints: HINTS,
   });
 }
 
@@ -122,23 +123,30 @@ export function translate(body) {
   const s = stateOf(body);
   if (s.mode === 'translating') return;
   const nodes = userNodes(body);
-  const text = nodesToText(nodes).trim();
+  const raw = nodesToText(nodes).trim();
+  // Decisions read the text without notes; the saved nodes keep the raw draft, so Undo brings the notes back.
+  const { text, notes } = splitNotes(raw);
+  // No refine: a note typed into the shown translation (preview, or kept after Esc) runs nothing. Undo first.
+  // A new Korean draft typed over it is not an edit of it: it runs, with its notes.
+  const fresh = hasHangul(text) && norm(text) !== norm(s.shown);
+  if ((s.mode === 'preview' || s.mode === 'kept') && addsNote(raw, s.shown) && !fresh) return showError(body, s, NOTE_ON_TRANSLATION);
   if (s.mode === 'preview') {
-    if (norm(text) === norm(s.shown)) return; // nothing new to translate
+    if (norm(raw) === norm(s.shown)) return; // nothing new to translate
     // Polish only starts from idle, so Undo always goes back to the original draft.
     if (!hasHangul(text)) return showError(body, s, 'No Korean text to translate. To polish this English, press Undo first.');
     // A new Korean draft replaced the preview. The body holds it, so the older Korean is not needed for Undo.
     Object.assign(s, { mode: 'idle', saved: null });
   }
-  if (text.length > LIMITS.text) return say(body, s, `Too long for protly (over ${LIMITS.text} characters).`, { error: true });
+  if (raw.length > LIMITS.text) return say(body, s, `Too long for protly (over ${LIMITS.text} characters).`, { error: true });
+  if (notes.length && !text) return say(body, s, NOTES_ONLY, { error: true });
   let opts;
   if (hasHangul(text)) {
     // The prefix ("ru: ...") is a one-off override; the saved nodes keep it, so Undo brings it back.
     const p = parseLangPrefix(text);
-    opts = { kind: 'translate', korean: p.text, profile: 'email', lang: p.lang ?? 'auto' };
-  } else if (/\p{L}/u.test(text)) {
+    opts = { kind: 'translate', korean: p.text, notes, profile: 'email', lang: p.lang ?? 'auto' };
+  } else if (notes.length || /\p{L}/u.test(text)) {
     // Explicit action (button or Alt+T): polish always. The popup toggle only governs Enter on Instagram.
-    opts = { kind: 'polish', korean: text, profile: 'email' };
+    opts = { kind: 'polish', korean: text, notes, profile: 'email' };
   } else {
     return say(body, s, 'Nothing to translate or polish.', { error: true });
   }
@@ -149,11 +157,13 @@ export function translate(body) {
   return request(body, opts);
 }
 
-// Picker and Opus in preview: same source and kind, other language or model.
+// Picker and Deep in preview: same source and kind, other language or profile.
 function retranslate(body, { lang, profile, force = false }) {
   const s = stateOf(body);
   if (s.mode !== 'preview') return;
-  const opts = { kind: s.kind, korean: s.korean, profile: profile ?? s.profile, lang: lang ?? s.lang };
+  // A note typed into the translation is held here too, as on the Alt+T path: it would only be dropped.
+  if (addsNote(nodesToText(userNodes(body)), s.shown)) return showError(body, s, NOTE_ON_TRANSLATION);
+  const opts = { kind: s.kind, korean: s.korean, notes: s.notes, profile: profile ?? s.profile, lang: lang ?? s.lang };
   if (!force && edited(body, s)) {
     return say(body, s, 'You edited the translation. Translating again replaces your edit.', {
       actions: [
@@ -166,22 +176,41 @@ function retranslate(body, { lang, profile, force = false }) {
   return request(body, opts);
 }
 
-export function undo(body) {
-  const s = stateOf(body);
-  if (s.saved) replaceUserNodes(body, s.saved);
-  Object.assign(s, { mode: 'idle', saved: null, kind: 'translate', korean: null, shown: null, lang: 'auto', profile: 'email', last: null });
-  s.reqId++; // drop any result still in flight
+// Back to idle with whatever the body holds now, dropping any result still in flight.
+function settle(s) {
+  Object.assign(s, { mode: 'idle', saved: null, kind: 'translate', korean: null, notes: [], shown: null, lang: 'auto', profile: 'email', last: null });
+  s.reqId++;
   hideNote(s);
 }
 
-// Esc in a compose body: undo a preview or a translation in flight. False when there is nothing to undo.
-// An edited translation is never undone by Esc (the DOM swap is outside Ctrl+Z): retranslate's
-// edited-translation prompt asks instead, with Undo as one of its choices.
-export function escape(body) {
+export function undo(body) {
+  const s = stateOf(body);
+  if (s.saved) replaceUserNodes(body, s.saved);
+  settle(s);
+}
+
+// Keys in a compose body. False when there is nothing to act on, so Gmail keeps the key.
+// Esc keeps the body as it is (the translation, edited or not; the draft while a first request is in flight) and
+// closes the card. With an original to go back to, the compose stays 'kept' so Alt+Z can still restore it.
+export function keep(body) {
   const s = states.get(body);
   if (!s || s.mode === 'idle') return false;
-  if (s.mode === 'preview' && edited(body, s)) {
-    retranslate(body, {});
+  if (s.mode === 'kept') { hideNote(s); return false; } // an Undo prompt closes; Gmail still gets its Esc
+  const saved = s.saved;
+  settle(s);
+  if (saved) Object.assign(s, { mode: 'kept', saved, shown: nodesToText(userNodes(body)) });
+  return true;
+}
+
+// Alt+Z puts the original draft back. The swap is outside Gmail's Ctrl+Z, so text the user changed since the
+// translation (or since Esc) is replaced only after a confirm on the card.
+export function undoKey(body) {
+  const s = states.get(body);
+  if (!s || s.mode === 'idle') return false;
+  if ((s.mode === 'preview' || s.mode === 'kept') && edited(body, s)) {
+    say(body, s, 'You changed the text. Undo puts the original draft back and drops your changes.', {
+      actions: [act('Undo anyway', () => undo(body)), act('Keep my text', () => (s.mode === 'kept' ? hideNote(s) : showPreview(body, s)))],
+    });
     return true;
   }
   undo(body);
@@ -208,7 +237,7 @@ function threadContext(body) {
   return readThread(root, viewer);
 }
 
-async function request(body, { kind = 'translate', korean, profile, lang }) {
+async function request(body, { kind = 'translate', korean, notes = [], profile, lang }) {
   const s = stateOf(body);
   const prevMode = s.mode;
   const expected = nodesToText(userNodes(body)); // what the body must still hold when the result lands
@@ -216,12 +245,13 @@ async function request(body, { kind = 'translate', korean, profile, lang }) {
   s.mode = 'translating';
   const polish = kind === 'polish';
   const verb = polish ? 'Polishing' : 'Translating';
-  cardOf(body, s).working(profile === 'hard' ? `${verb} with Opus` : verb, { onCancel: () => cancel(body, reqId, prevMode) });
+  cardOf(body, s).working(profile === 'hard' ? `${verb} deeply` : verb, { onCancel: () => cancel(body, reqId, prevMode) });
   try {
     // Polish takes no thread context: one draft does not need it.
+    const withNotes = notes.length ? { notes } : {};
     const r = polish
-      ? await ask({ type: 'polish', text: korean, profile })
-      : await ask({ type: 'email', context: threadContext(body), korean, profile, lang });
+      ? await ask({ type: 'polish', text: korean, profile, ...withNotes })
+      : await ask({ type: 'email', context: threadContext(body), korean, profile, lang, ...withNotes });
     if (reqId !== s.reqId || !body.isConnected) return;
     s.mode = prevMode;
     // The draft changed while translating (the user kept typing): never overwrite it.
@@ -235,7 +265,7 @@ async function request(body, { kind = 'translate', korean, profile, lang }) {
     }
     if (prevMode !== 'preview') s.saved = removed; // first result: keep the original draft nodes for Undo
     // The polish result carries no lang, so keep the current one.
-    Object.assign(s, { mode: 'preview', kind, korean, shown: r.translation, lang: r.lang ?? s.lang, profile, last: r });
+    Object.assign(s, { mode: 'preview', kind, korean, notes, shown: r.translation, lang: r.lang ?? s.lang, profile, last: r });
     showPreview(body, s);
   } catch (e) {
     if (reqId !== s.reqId) return;

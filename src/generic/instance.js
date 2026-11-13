@@ -6,6 +6,8 @@ import { commitByRefocus, nextFrame, settleComposition } from '../lib/ime.js';
 import { decideBox, decideSelection } from './decide.js';
 import { deepActive, findTarget, selectionInfo } from './target.js';
 import { boxHolds, readBox, writeBox } from './writer.js';
+import { isUndoKey } from '../lib/command.js';
+import { addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../lib/lang.js';
 
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 const NOTHING = 'Put the cursor in a text box or select text.';
@@ -33,6 +35,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   const host = () => hostname || top.defaultView?.location?.hostname || '';
   // box: { t, d, card, mode: 'idle'|'working'|'preview', original, shown, lang, hard, reqId, last }
   let box = null;
+  let kept = null; // { t, original, shown }: Esc kept a translation; Alt+Z in that box restores the original until focus leaves
   let pop = null; // selection popover card
   let seq = 0;
   let composing = false;
@@ -62,20 +65,38 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     return card && (a === cur.card.host || a.getRootNode?.() === cur.card.shadow);
   }
 
+  const inKept = (e) => !!kept && (e.composedPath?.() ?? [e.target]).includes(kept.t.el);
+
+  // Esc keeps what the box holds now and closes the card (a write in flight is dropped or rolled back).
+  // Alt+Z puts the original back, also after Esc kept a translation; while a request is in flight it cancels it first.
   function onKeyDown(e) {
-    if (e.key !== 'Escape' || e.isComposing) return;
+    const esc = e.key === 'Escape';
+    if (!(esc || isUndoKey(e)) || e.isComposing) return;
     if (box && (box.mode === 'preview' || box.mode === 'working') && inBox(box, e)) {
       e.preventDefault();
       e.stopImmediatePropagation();
-      if (box.mode === 'working') cancel(box); else undo();
+      if (!esc) { if (box.mode === 'working') cancel(box); else undo(); return; }
+      // A translation is on screen (a preview, or the one a re-run would replace): keep the way back to the original.
+      const k = box.mode === 'preview' || box.prev === 'preview' ? { t: box.t, original: box.original, shown: box.shown } : null;
+      close();
+      kept = k;
       return;
     }
-    if (pop) { pop.hide(); pop = null; } // the page still gets its Esc
+    if (!esc && inKept(e)) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const k = kept;
+      kept = null;
+      restore(k.t, k.original);
+      return;
+    }
+    if (esc && pop) { pop.hide(); pop = null; } // the page still gets its Esc
   }
 
-  // Focus moved elsewhere: the preview is accepted as it is and the card closes.
+  // Focus moved elsewhere: the preview is accepted as it is and the card closes, and Alt+Z no longer undoes.
   function onFocusIn(e) {
     if (box?.mode === 'preview' && !inBox(box, e)) close();
+    if (kept && !inKept(e)) kept = null;
   }
 
   // A click on plain text fires no focusin, so blur closes too. Checked a tick later, when focus has landed:
@@ -102,7 +123,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   }
 
   const actionsFor = (cur) => (cur.mode === 'preview'
-    ? [{ label: 'Opus', onClick: () => rerun({ hard: true }) }, { label: 'Undo', onClick: () => undo() }]
+    ? [{ label: 'Deep', onClick: () => rerun({ hard: true }) }, { label: 'Undo', onClick: () => undo() }]
     : [{ label: 'Close', onClick: () => close() }]);
 
   function showPreview(cur) {
@@ -110,9 +131,10 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     cur.card.preview({
       text: cur.last.back_translation,
       model: cur.last.model, // the card turns the id into 'Sonnet' or 'Opus'
+      deep: cur.hard,
       ...(polish ? {} : { lang: cur.lang, onLang: (code) => rerun({ lang: code }) }),
       actions: actionsFor(cur),
-      hints: 'Esc undo',
+      hints: 'Esc keep · Alt+Z undo',
     });
   }
 
@@ -135,15 +157,16 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     cur.prev = cur.mode;
     cur.mode = 'working';
     const polish = cur.d.kind === 'polish';
-    cur.card.working(`${polish ? 'Polishing' : 'Translating'}${cur.hard ? ' with Opus' : ''}`, { onCancel: () => cancel(cur) });
+    const notes = cur.d.notes ? { notes: cur.d.notes } : {}; // decideBox's notes, sent again on every re-run
+    cur.card.working(`${polish ? 'Polishing' : 'Translating'}${cur.hard ? ' deeply' : ''}`, { onCancel: () => cancel(cur) });
     lift(cur);
     const before = readBox(cur.t); // what the box must still hold when the result lands
     const live = () => box === cur && cur.reqId === reqId;
     let r;
     try {
       r = polish
-        ? await ask({ type: 'polish', text: cur.d.text, profile: cur.hard ? 'hard' : 'polish' })
-        : await ask({ type: 'box', text: cur.d.text, lang: cur.lang, profile: cur.hard ? 'hard' : 'outgoing', hostname: host() });
+        ? await ask({ type: 'polish', text: cur.d.text, profile: cur.hard ? 'hard' : 'polish', ...notes })
+        : await ask({ type: 'box', text: cur.d.text, lang: cur.lang, profile: cur.hard ? 'hard' : 'outgoing', hostname: host(), ...notes });
     } catch (e) {
       if (!live()) return;
       cur.mode = cur.prev;
@@ -168,7 +191,7 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     const focusMoved = () => { close(); toast(FOCUS_MOVED); };
     if (!focusOk()) { focusMoved(); return; }
     const w = await writeBox(cur.t, r.translation, { stillOk: () => live() && focusOk() });
-    if (w === null) { if (live()) focusMoved(); return; } // Esc or a focus change during the select settle
+    if (w === null) { if (live()) focusMoved(); return; } // Esc, an Alt+Z cancel or a focus change during the select settle
     if (!w) {
       const back = (await boxHolds(cur.t, before)) || (await writeBox(cur.t, before));
       cur.mode = cur.prev;
@@ -188,6 +211,11 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   async function rerun({ hard = box?.hard, lang = box?.lang, force = false } = {}) {
     const cur = box;
     if (!cur || cur.mode !== 'preview') return;
+    // No refine: a note typed into the translation never runs (Alt+T, Deep, the chip). Undo first.
+    if (addsNote(readBox(cur.t), cur.shown)) {
+      cur.card.message(NOTE_ON_TRANSLATION, { error: true, actions: actionsFor(cur) });
+      return;
+    }
     if (!force && norm(readBox(cur.t)) !== norm(cur.shown)) {
       cur.card.message('You edited the text. Running again replaces your edit.', {
         actions: [
@@ -206,7 +234,11 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     const cur = box;
     if (!cur) return;
     close();
-    if (norm(readBox(cur.t)) !== norm(cur.original) && !(await writeBox(cur.t, cur.original))) {
+    await restore(cur.t, cur.original);
+  }
+
+  async function restore(t, original) {
+    if (norm(readBox(t)) !== norm(original) && !(await writeBox(t, original))) {
       toast('Could not restore the original text. Ctrl+Z may bring it back.', { error: true });
     }
   }
@@ -220,9 +252,13 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       await nextFrame();
       const original = readBox(t);
       if (original.length > MAX_CHARS) { toast(TOO_LONG); return; }
+      // A note typed into a kept translation never runs; kept stays, so Alt+Z still restores the original.
+      if (kept?.t.el === t.el && addsNote(original, kept.shown)) { toast(NOTE_ON_TRANSLATION); return; }
       const d = decideBox(original);
+      if (d.kind === 'notes-only') { toast(NOTES_ONLY); return; }
       if (d.kind === 'none') { toast('Nothing to translate or polish in this box.'); return; }
       close();
+      kept = null;
       const card = createCard({ doc: t.doc, place: { float: () => t.el.getBoundingClientRect() } });
       box = cur = { t, d, card, mode: 'idle', prev: 'idle', original, shown: null, lang: d.lang ?? null, hard: false, reqId: 0, last: null };
       t.el.addEventListener('focusout', onFocusOut);

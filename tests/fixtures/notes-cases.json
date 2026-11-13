@@ -1,0 +1,291 @@
+[
+  {
+    "why": "a trailing note",
+    "draft": "내일 보자 [좀 더 정중하게]",
+    "text": "내일 보자",
+    "notes": [
+      "좀 더 정중하게"
+    ]
+  },
+  {
+    "why": "a leading note",
+    "draft": "[formal] see you",
+    "text": "see you",
+    "notes": [
+      "formal"
+    ]
+  },
+  {
+    "why": "between words: one space",
+    "draft": "a [x] b",
+    "text": "a b",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "no space after it",
+    "draft": "a [x]b",
+    "text": "a b",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "no space before it",
+    "draft": "a[x] b",
+    "text": "a b",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "two notes in a row",
+    "draft": "a [x] [y] b",
+    "text": "a b",
+    "notes": [
+      "x",
+      "y"
+    ]
+  },
+  {
+    "why": "a note alone on its line",
+    "draft": "a\n[x]\nb",
+    "text": "a\n\nb",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "before closing punctuation: no space",
+    "draft": "Hello [x].",
+    "text": "Hello.",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "before a span's closing ;",
+    "draft": "오늘 fr:고마워 [짧게]; 잘가",
+    "text": "오늘 fr:고마워; 잘가",
+    "notes": [
+      "짧게"
+    ]
+  },
+  {
+    "why": "before an emoji: one space",
+    "draft": "Hello [x] 👍",
+    "text": "Hello 👍",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "nothing before it on the line",
+    "draft": "[짧게]안녕",
+    "text": "안녕",
+    "notes": [
+      "짧게"
+    ]
+  },
+  {
+    "why": "notes only",
+    "draft": "[x]",
+    "text": "",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "notes only, two",
+    "draft": "[x] [y]",
+    "text": "",
+    "notes": [
+      "x",
+      "y"
+    ]
+  },
+  {
+    "why": "content is trimmed",
+    "draft": "[ 짧게 ]",
+    "text": "",
+    "notes": [
+      "짧게"
+    ]
+  },
+  {
+    "why": "outer spaces are trimmed",
+    "draft": "  a  [x]  ",
+    "text": "a",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "trailing note with inner spaces",
+    "draft": "a [ x ]",
+    "text": "a",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "notes on two lines",
+    "draft": "A [B] c\nd [e]",
+    "text": "A c\nd",
+    "notes": [
+      "B",
+      "e"
+    ]
+  },
+  {
+    "why": "digits only: text",
+    "draft": "see you [1]",
+    "text": "see you [1]",
+    "notes": []
+  },
+  {
+    "why": "a year: text",
+    "draft": "[2026] plan",
+    "text": "[2026] plan",
+    "notes": []
+  },
+  {
+    "why": "no letter: text",
+    "draft": "price [$5]",
+    "text": "price [$5]",
+    "notes": []
+  },
+  {
+    "why": "empty: text",
+    "draft": "[] hi",
+    "text": "[] hi",
+    "notes": []
+  },
+  {
+    "why": "blank: text",
+    "draft": "[ ] hi",
+    "text": "[ ] hi",
+    "notes": []
+  },
+  {
+    "why": "letters and digits: a note",
+    "draft": "hi [ok 1]",
+    "text": "hi",
+    "notes": [
+      "ok 1"
+    ]
+  },
+  {
+    "why": "an unmatched [ is text",
+    "draft": "a [b",
+    "text": "a [b",
+    "notes": []
+  },
+  {
+    "why": "an unmatched ] is text",
+    "draft": "a ] b",
+    "text": "a ] b",
+    "notes": []
+  },
+  {
+    "why": "only the innermost pair is a note, in one pass",
+    "draft": "a [note with [nested] text] b",
+    "text": "a [note with text] b",
+    "notes": [
+      "nested"
+    ]
+  },
+  {
+    "why": "a leading prefix after a leading note",
+    "draft": "[formal] ru: 안녕",
+    "text": "ru: 안녕",
+    "notes": [
+      "formal"
+    ]
+  },
+  {
+    "why": "a note after a prefixed draft",
+    "draft": "ru: 안녕 [formal]",
+    "text": "ru: 안녕",
+    "notes": [
+      "formal"
+    ]
+  },
+  {
+    "why": "a span opener inside a note is note text",
+    "draft": "안녕 [fr:로 하지 마]",
+    "text": "안녕",
+    "notes": [
+      "fr:로 하지 마"
+    ]
+  },
+  {
+    "why": "no notes",
+    "draft": "그냥 초안",
+    "text": "그냥 초안",
+    "notes": []
+  },
+  {
+    "why": "before CJK closing punctuation: no space",
+    "draft": "좋아 [짧게]。",
+    "text": "좋아。",
+    "notes": [
+      "짧게"
+    ]
+  },
+  {
+    "why": "before a closing paren: no space",
+    "draft": "(see you [x])",
+    "text": "(see you)",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "before ! : no space",
+    "draft": "great [x]!",
+    "text": "great!",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "NBSP counts as a space",
+    "draft": "a [x] b",
+    "text": "a b",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "a tab counts as a space",
+    "draft": "a\t[x]\tb",
+    "text": "a b",
+    "notes": [
+      "x"
+    ]
+  },
+  {
+    "why": "a note may hold a line break",
+    "draft": "hi [a\nb]",
+    "text": "hi",
+    "notes": [
+      "a\nb"
+    ]
+  },
+  {
+    "why": "no notes: returned untrimmed",
+    "draft": "  as typed  ",
+    "text": "  as typed  ",
+    "notes": []
+  },
+  {
+    "why": "CRLF line: a note alone on it",
+    "draft": "a\r\n[x]\r\nb",
+    "text": "a\r\n\r\nb",
+    "notes": [
+      "x"
+    ]
+  }
+]

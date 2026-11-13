@@ -51,3 +51,22 @@ test('checkShape accepts what the adapters send: every picker language, both con
   assert.throws(() => checkShape('nope', {}), (e) => e.kind === 'bad_message');
   assert.throws(() => checkShape('getThread', { threadId: 'a b' }), (e) => e.kind === 'bad_message' && /threadId/.test(e.message));
 });
+
+// Notes (plan rule 11): only a shape bound, no user-facing limit.
+test('checkShape: notes on outgoing, email, polish and box are a list of at most 20 strings of 1 to 500 characters', async () => {
+  const { checkShape } = await import('../src/lib/messages.js');
+  const base = {
+    outgoing: { threadId: 'abc', context: [], korean: '안녕', profile: 'outgoing' },
+    email: { context: [], korean: '안녕', profile: 'email', lang: 'auto' },
+    polish: { text: 'hi', profile: 'polish' },
+    box: { text: '안녕', lang: 'en', profile: 'outgoing' },
+  };
+  for (const [type, msg] of Object.entries(base)) {
+    for (const notes of [undefined, null, [], ['formal'], Array(20).fill('x'), ['x'.repeat(500)]]) {
+      checkShape(type, { ...msg, notes });
+    }
+    for (const notes of ['formal', [''], ['x'.repeat(501)], Array(21).fill('x'), [7], [null], { 0: 'x' }]) {
+      assert.throws(() => checkShape(type, { ...msg, notes }), (e) => e.kind === 'bad_message' && /notes/.test(e.message), `${type} ${JSON.stringify(notes)}`);
+    }
+  }
+});

@@ -99,12 +99,12 @@ async function incoming({ threadId, context, items, updateLang }) {
   }));
 }
 
-async function outgoing({ threadId, context, korean, profile, lang }) {
+async function outgoing({ threadId, context, korean, profile, lang, notes }) {
   const settings = await getSettings();
   const thread = await getThread(threadId, settings);
   const target = lang || resolveOutputLang(thread);
   const model = profile === 'hard' ? settings.models.hard : settings.models.outgoing;
-  const body = buildOutgoingRequest({ model, profile, memo: thread.memo, context, korean, lang: target });
+  const body = buildOutgoingRequest({ model, profile, memo: thread.memo, context, korean, lang: target, notes });
   const r = await api(body, parseOutgoing);
   return { ...r, lang: target, model };
 }
@@ -115,31 +115,31 @@ async function suggestMemo({ context }) {
 }
 
 // Gmail drafts. No storage: nothing is cached or remembered per thread.
-async function email({ context, korean, profile, lang }) {
+async function email({ context, korean, profile, lang, notes }) {
   const settings = await getSettings();
   const hard = profile === 'hard';
   const model = hard ? settings.models.hard : settings.models.outgoing;
-  const body = buildEmailRequest({ model, profile: hard ? 'hard' : 'email', context, korean, lang: lang || 'auto' });
+  const body = buildEmailRequest({ model, profile: hard ? 'hard' : 'email', context, korean, lang: lang || 'auto', notes });
   const r = await api(body, parseEmail);
   return { ...r, model };
 }
 
 // English polish (Instagram and Gmail). No storage, like email.
-async function polish({ text, profile }) {
+async function polish({ text, profile, notes }) {
   const settings = await getSettings();
   const hard = profile === 'hard';
   const model = hard ? settings.models.hard : settings.models.outgoing;
-  const r = await api(buildPolishRequest({ model, profile: hard ? 'hard' : 'polish', draft: text }), parseOutgoing);
+  const r = await api(buildPolishRequest({ model, profile: hard ? 'hard' : 'polish', draft: text, notes }), parseOutgoing);
   return { ...r, model };
 }
 
 // Any-site text box. Stateless like email and polish: nothing cached, nothing remembered.
-async function box({ text, lang, profile, hostname }) {
+async function box({ text, lang, profile, hostname, notes }) {
   const settings = await getSettings();
   const hard = profile === 'hard';
   const model = hard ? settings.models.hard : settings.models.outgoing;
   const target = lang || 'en';
-  const body = buildBoxRequest({ model, profile: hard ? 'hard' : 'outgoing', korean: text, lang: target, hostname });
+  const body = buildBoxRequest({ model, profile: hard ? 'hard' : 'outgoing', korean: text, lang: target, hostname, notes });
   const r = await api(body, parseOutgoing);
   return { ...r, lang: target, model };
 }

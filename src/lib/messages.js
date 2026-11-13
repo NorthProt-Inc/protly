@@ -4,19 +4,22 @@ import { LIMITS } from './limits.js';
 export { LIMITS };
 
 export const INSTAGRAM = 'https://www.instagram.com';
+export const WHATSAPP = 'https://web.whatsapp.com';
 export const GMAIL = 'https://mail.google.com';
 export const PAGE = 'extension page'; // the popup and the options page
 export const ANY_SITE = 'any site'; // any of our content scripts in a tab (the generic Alt+T bundle)
 export const OTHER_ORIGIN = 'other origin'; // our content script in a frame with no http(s) origin (sandboxed, file:)
 
 // Who may send each command. A command missing here is refused. Content scripts run inside hostile pages, so each
-// one gets only what its own adapter calls: thread state is Instagram's, email is Gmail's, the popup and options
-// commands (a billed test call, spend, other tabs' status) are for extension pages only.
+// one gets only what its own adapter calls: thread state is Instagram's and WhatsApp's (each bound to its own thread
+// ids, see threadBound), email is Gmail's, the popup and options commands (a billed test call, spend, other tabs'
+// status) are for extension pages only.
+const CHAT = [INSTAGRAM, WHATSAPP];
 export const SENDERS = {
-  getThread: [INSTAGRAM], setThread: [INSTAGRAM], incoming: [INSTAGRAM], outgoing: [INSTAGRAM],
-  suggestMemo: [INSTAGRAM], sent: [INSTAGRAM], lookupSent: [INSTAGRAM],
+  getThread: CHAT, setThread: CHAT, incoming: CHAT, outgoing: CHAT,
+  suggestMemo: CHAT, sent: CHAT, lookupSent: CHAT,
   email: [GMAIL],
-  badge: [INSTAGRAM, GMAIL],
+  badge: [INSTAGRAM, WHATSAPP, GMAIL],
   polish: [ANY_SITE], box: [ANY_SITE], selection: [ANY_SITE],
   tabStatus: [PAGE], diag: [PAGE], testCall: [PAGE], usageSummary: [PAGE],
 };
@@ -64,6 +67,8 @@ export const isLangCode = lang;
 const autoOrLang = (v) => v === 'auto' || lang(v);
 const threadId = match(THREAD_ID);
 const context = listOf(LIMITS.context, record({ from: oneOf('me', 'partner', 'them'), text }));
+// Bracket notes from the user's own draft (src/lib/lang.js splitNotes). A shape bound only; drafts have no note limit.
+const notes = opt(listOf(20, str(500, 1)));
 
 // setThread: only the fields the thread panel and the language chip change, at least one of them.
 const PATCH = {
@@ -80,13 +85,13 @@ export const SHAPES = {
     threadId, context, updateLang: opt(bool),
     items: listOf(LIMITS.items, record({ id: match(ITEM_ID), text, from: oneOf('me', 'partner') })),
   },
-  outgoing: { threadId, context, korean: someText, profile: oneOf('outgoing', 'hard'), lang: opt(lang) },
+  outgoing: { threadId, context, korean: someText, profile: oneOf('outgoing', 'hard'), lang: opt(lang), notes },
   suggestMemo: { threadId, context },
   sent: { threadId, text: someText, korean: opt(text) },
   lookupSent: { threadId, texts: listOf(LIMITS.texts, text) },
-  email: { context, korean: someText, profile: oneOf('email', 'hard'), lang: opt(autoOrLang) },
-  polish: { text: someText, profile: opt(oneOf('outgoing', 'polish', 'email', 'hard')) },
-  box: { text: someText, lang: opt(lang), profile: opt(oneOf('outgoing', 'hard')), hostname: opt(match(HOSTNAME)) },
+  email: { context, korean: someText, profile: oneOf('email', 'hard'), lang: opt(autoOrLang), notes },
+  polish: { text: someText, profile: opt(oneOf('outgoing', 'polish', 'email', 'hard')), notes },
+  box: { text: someText, lang: opt(lang), profile: opt(oneOf('outgoing', 'hard')), hostname: opt(match(HOSTNAME)), notes },
   selection: { text: someText },
   badge: { text: oneOf('', '!'), reason: opt(str(LIMITS.reason)) },
   tabStatus: { tabId: opt(Number.isInteger), url: opt(str(LIMITS.url)) },
@@ -98,6 +103,15 @@ export function checkShape(type, msg, shapes = SHAPES) {
   if (!Object.hasOwn(shapes, type)) throw new ApiError('bad_message', `${type}: no message shape`);
   for (const [field, ok] of Object.entries(shapes[type])) {
     if (!ok(msg[field])) throw new ApiError('bad_message', `${type}: bad ${field}`);
+  }
+}
+
+// WhatsApp thread ids are 'wa-' plus a title hash. Instagram reads its id from the URL path, which a page script
+// can pushState to /direct/t/wa-<hash>/, so a wa- id is accepted only from WhatsApp, and WhatsApp may use no other.
+export function threadBound(type, msg, from, shapes = SHAPES) {
+  if (!Object.hasOwn(shapes[type], 'threadId')) return;
+  if (msg.threadId.startsWith('wa-') !== (from === WHATSAPP)) {
+    throw new ApiError('forbidden', `${type}: thread id not available to this sender`);
   }
 }
 
@@ -117,7 +131,11 @@ export function createRouter({ handlers, extensionId, senders = SENDERS, shapes 
       return false;
     }
     Promise.resolve()
-      .then(() => { checkShape(type, msg, shapes); return handlers[type](msg, sender); })
+      .then(() => {
+        checkShape(type, msg, shapes);
+        threadBound(type, msg, senderClass(sender, extensionId), shapes);
+        return handlers[type](msg, sender);
+      })
       .then((data) => sendResponse({ ok: true, data }))
       .catch((e) => reply(sendResponse, e));
     return true;

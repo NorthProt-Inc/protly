@@ -173,7 +173,7 @@ test('Instagram: an oversized partner message neither blocks the batch nor the r
   const { checkShape } = await import('../src/lib/messages.js');
   const doc = igThread(['hello', `${'x'.repeat(1999)}${'😀'.repeat(20000)}`, 'привет']);
   const root = doc.querySelector('[role="main"]');
-  const ctx = contextFor(root);
+  const ctx = contextFor(readMessages(root, 'me'));
   checkShape('outgoing', { threadId: '1', context: ctx, korean: '안녕', profile: 'outgoing' });
   checkShape('suggestMemo', { threadId: '1', context: ctx });
   assert.match(ctx[1].text, /\[\.\.\.\]$/);
@@ -285,4 +285,20 @@ test('Instagram: an Enter the user did not press never sends Hangul or an unconf
   const other = win.document.getElementById('o');
   other.textContent = '안녕';
   assert.equal(holdUntrustedEnter(key(other), { composer: null, writing: false, mode: 'idle' }), true);
+  other.textContent = 'see you [formal]'; // a bracket note: the user's own Enter would run it (plan rule 4)
+  assert.equal(holdUntrustedEnter(key(other), { composer: null, writing: false, mode: 'idle' }), true);
+  c.textContent = 'see you [formal]';
+  assert.equal(hold(key(c)), true);
+  c.textContent = 'see you [1]';
+  assert.equal(hold(key(c)), false); // digits only: text, not a note
+  // A target the site says sends the box (WhatsApp: a focused message) reads the box, not the target.
+  const row = win.document.createElement('div');
+  win.document.body.append(row);
+  const sendsComposer = (t) => t === row;
+  c.textContent = '안녕';
+  assert.equal(hold(key(row), { sendsComposer }), true);
+  assert.equal(hold(key(row)), false); // no such site rule: outside the composer
+  c.textContent = 'hello';
+  assert.equal(hold(key(row), { sendsComposer }), false);
+  assert.equal(hold(key(row), { sendsComposer, mode: 'preview' }), true);
 });

@@ -9,16 +9,20 @@ const { polish, sites: stored } = await chrome.storage.local.get(['polish', 'sit
 const sites = { ...DEFAULT_SITES, ...stored };
 $('polish').checked = polish === true;
 $('site-instagram').checked = sites.instagram;
+$('site-whatsapp').checked = sites.whatsapp;
 $('site-gmail').checked = sites.gmail;
 
 $('polish').onchange = () => chrome.storage.local.set({ polish: $('polish').checked });
 const saveSites = async () => {
   await chrome.storage.local.set({
-    sites: { instagram: $('site-instagram').checked, gmail: $('site-gmail').checked },
+    sites: {
+      instagram: $('site-instagram').checked, whatsapp: $('site-whatsapp').checked, gmail: $('site-gmail').checked,
+    },
   });
   showStatus();
 };
 $('site-instagram').onchange = saveSites;
+$('site-whatsapp').onchange = saveSites;
 $('site-gmail').onchange = saveSites;
 
 $('options').onclick = () => chrome.runtime.openOptionsPage();

@@ -336,6 +336,49 @@ final class KeyboardSourceRulesTests: XCTestCase {
         XCTAssertTrue(client.contains("ActionAPI.updates"), "ActionClient.swift must read the reply through ActionAPI.updates")
     }
 
+    /// Plan 2026-11-08 Part B #2: a Deep call has its own session (URLSession fixes the total timeout per session)
+    /// and reads twice the bytes; Deep on the strip and on the card reach deep(); Deep and a deep Retry run the call on
+    /// screen, which is forgotten when the next call begins.
+    func testDeepWiring() throws {
+        let all = try sources()
+        let client = all.first(where: { $0.name == "ActionClient.swift" })?.text ?? ""
+        for needle in ["sessionConfiguration(profile: .deep)", "profile == .deep ? deepSession : session",
+                       "ActionAPI.updates(limit: profile.maxResponseBytes)", "apiKey: Secrets.apiKey, profile: profile)"] {
+            XCTAssertTrue(client.contains(needle), "ActionClient: \(needle)")
+        }
+        // Both sessions refuse redirects: a 3xx must never replay x-api-key to another host, on a Deep call either.
+        XCTAssertEqual(matches(#"URLSession\("#, in: client).count, 2, "ActionClient: one session per profile")
+        XCTAssertEqual(matches(#"URLSession\(\s*configuration: [^\n]+, delegate: ActionSessionDelegate\(\)"#, in: client).count, 2,
+                       "ActionClient: every session has the redirect-refusing delegate")
+        // The buttons reach deep(), and their lines and offers know a deep call.
+        let card = all.first(where: { $0.name == "ResultCard.swift" })?.text ?? ""
+        let strip = all.first(where: { $0.name == "ProgressStrip.swift" })?.text ?? ""
+        let panel = all.first(where: { $0.name == "Panel.swift" })?.text ?? ""
+        XCTAssertTrue(card.contains(#"button("Deep", action: deep)"#), "ResultCard: Deep calls deep")
+        XCTAssertTrue(card.contains("offersDeep(card.action, deep: card.deep,"), "ResultCard: offer knows a deep call")
+        XCTAssertTrue(card.contains("error.message(deep: deep)"), "ResultCard: line knows a deep call")
+        XCTAssertTrue(card.contains("deep: card.deep)"), "ResultCard: CardText gets the card's deep")
+        XCTAssertTrue(strip.contains("Button(action: deep)"), "ProgressStrip: Deep calls deep")
+        XCTAssertTrue(strip.contains("offersDeep(state.action, deep: state.deep,"), "ProgressStrip: offer knows a deep call")
+        XCTAssertTrue(strip.contains("error.message(deep: state.deep)"), "ProgressStrip: line knows a deep call")
+        XCTAssertTrue(panel.contains("retry: retry, deep: deep)"), "Panel forwards deep to the card")
+        let controller = all.first(where: { $0.name == "KeyboardViewController.swift" })?.text ?? ""
+        XCTAssertEqual(matches(#"deep: \{ \[unowned host\] in host\.deep\(\) \}"#, in: controller).count, 2)
+        let cns = controller as NSString
+        func fn(_ declaration: String) -> String { body(of: declaration, in: cns).map { cns.substring(with: $0) } ?? "" }
+        XCTAssertTrue(fn("func deep()").contains("onScreen?.deep, beginCall()"), "deep() runs the call on screen")
+        let retry = fn("func retry(") as NSString
+        let deepAt = retry.range(of: "onScreen?.deepRetry").location, actAt = retry.range(of: "act(action)").location
+        XCTAssertTrue(deepAt != NSNotFound && actAt != NSNotFound && deepAt < actAt, "a failed Deep retries deep, first")
+        XCTAssertTrue(fn("private func beginCall()").contains("onScreen = nil"), "a new call forgets the last one")
+        let run = fn("private func run(")
+        XCTAssertTrue(run.contains("onScreen = sent"), "run() records the call on screen")
+        XCTAssertTrue(run.contains("profile: sent.profile"), "run() sends the call's profile")
+        XCTAssertTrue(run.contains("deep = sent.profile == .deep"), "run() knows a deep call")
+        XCTAssertEqual(matches(#"isSelection: isSelection,\s+deep: deep, shownAt: now"#, in: run).count, 2, "every card knows a deep call")
+        XCTAssertTrue(run.contains("label: label, deep: deep)"), "the strip says deeply")
+    }
+
     /// keyboard-ui 003, Task 3.5: the CI stub compiles only into the simulator's ProtlyCIKeyboard. `PROTLY_CI_STUB`
     /// wraps the whole stub file and its one call site, before the key; only ios-app/CI/project.yml defines it.
     func testTheCIStubIsCompiledOutOfThePhone() throws {

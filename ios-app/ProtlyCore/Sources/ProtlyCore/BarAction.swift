@@ -62,18 +62,21 @@ public enum BarAction: Hashable, Sendable {
     }
 
     /// The center slot: Undo after an Insert, else the action that fits the field text, else Read when the field
-    /// is empty and new text was copied, else nothing.
-    public static func center(text: String, canUndo: Bool, clipboardIsNew: Bool) -> BarAction? {
+    /// is empty and new text was copied, else nothing. Decided on the text without notes (Notes.split): a field of
+    /// notes only shows what an empty one shows.
+    public static func center(text field: String, canUndo: Bool, clipboardIsNew: Bool) -> BarAction? {
         if canUndo { return .undo }
-        if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return clipboardIsNew ? .read : nil }
-        switch ActionAPI.mode(forDraft: text) {
+        let text = Notes.split(field).text
+        // Blank by JavaScript's \s, as Notes.split trims: the bar shows an action exactly when the request sends one.
+        if text.unicodeScalars.allSatisfy(Languages.isSpace) { return clipboardIsNew ? .read : nil }
+        switch ActionAPI.mode(forText: text) {
         case .out:
             // As ActionAPI.userMessage: the prefix's language, "ko" never (that is a polish), else English.
             let code = Languages.prefix(of: text).code
             let target = code == "ko" ? "en" : code ?? "en"
             return .translate(target: Languages.endonym(of: target) ?? Languages.name(of: target) ?? "English")
         case .fix:
-            return .polish(korean: ActionAPI.isKoreanPolish(text))
+            return .polish(korean: ActionAPI.koreanPolish(text))
         case .in:
             return .read  // mode(forDraft:) never answers .in
         }
@@ -87,18 +90,23 @@ public enum BarAction: Hashable, Sendable {
 
     /// The progress strip while the call runs (keyboard-ui 003): "Translating", then the arrow and the title for a
     /// translation. nil for Undo, which makes no call.
-    public var progressVerb: String? {
+    public var progressVerb: String? { progressVerb(deep: false) }
+
+    /// A Deep re-run says so, as the extension does: "Translating deeply", "Polishing deeply". Read is never deep.
+    public func progressVerb(deep: Bool) -> String? {
         switch self {
-        case .translate: return "Translating"
-        case .polish: return "Polishing"
+        case .translate: return deep ? "Translating deeply" : "Translating"
+        case .polish: return deep ? "Polishing deeply" : "Polishing"
         case .read: return "Reading"
         case .undo: return nil
         }
     }
 
     /// The strip's second line after 8 s (P5).
-    public var slowLine: String? {
-        progressVerb.map { "Still \($0.lowercased())…" }
+    public var slowLine: String? { slowLine(deep: false) }
+
+    public func slowLine(deep: Bool) -> String? {
+        progressVerb(deep: deep).map { "Still \($0.lowercased())…" }
     }
 
     /// The label of a call the keyboard makes, from the text it sends, as the bar would show it.
