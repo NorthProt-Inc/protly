@@ -485,3 +485,59 @@ test('notes: Alt+Z restores the raw draft and the sent record keeps it', () => {
   assert.deepEqual(reduce(reduce(p, { type: 'esc' }).state, { type: 'undo' }).effect, { type: 'restore', korean: '내일 보자 [정중하게]' });
   assert.deepEqual(reduce(p, { type: 'enter', text: 'T' }).effect, { type: 'sent', korean: '내일 보자 [정중하게]' });
 });
+
+// A lowercase language prefix translates a draft without Hangul (plan 2026-11-12-prefix-translate).
+test('prefix: Enter and Alt+T translate an English draft with a prefix, Polish on or off', () => {
+  for (const ev of [{ type: 'enter', polish: false }, { type: 'enter', polish: true }, { type: 'run' }]) {
+    const r = reduce(initial(), { ...ev, text: 'ru: see you' });
+    assert.equal(r.state.mode, 'translating', ev.type);
+    assert.equal(r.state.kind, 'translate');
+    assert.equal(r.state.korean, 'ru: see you'); // Undo restores the prefixed draft
+    assert.equal(r.effect.kind, 'translate');
+    assert.equal(r.effect.lang, 'ru');
+    assert.equal(r.effect.korean, 'see you');
+  }
+});
+
+test('prefix: a note before the prefix still translates, with its note', () => {
+  const r = reduce(initial(), { type: 'enter', text: '[formal] ru: see you', polish: false });
+  assert.equal(r.effect.kind, 'translate');
+  assert.equal(r.effect.lang, 'ru');
+  assert.equal(r.effect.korean, 'see you');
+  assert.deepEqual(r.effect.notes, ['formal']);
+});
+
+test('prefix: en:, ko:, uppercase and labels keep today\'s path', () => {
+  for (const text of ['en: hi', 'ko: hi', 'RU: see you', 'ID: A12', 'No: that is wrong']) {
+    assert.deepEqual(reduce(initial(), { type: 'enter', text, polish: false }).effect, { type: 'pass' }, text);
+    assert.equal(reduce(initial(), { type: 'run', text }).effect.kind, 'polish', text);
+  }
+});
+
+test('prefix: a prefixed draft typed over a shown translation runs (preview, Korean-target preview, kept)', () => {
+  for (const p of [toPreview('가자'), toPreview('가자', { lang: 'ko' })]) {
+    const r = reduce(p, { type: 'enter', text: 'ja: thanks' });
+    assert.equal(r.effect.type, 'translate');
+    assert.equal(r.effect.lang, 'ja');
+    assert.equal(r.effect.korean, 'thanks');
+  }
+  const k = reduce(kept("Let's go"), { type: 'enter', text: 'ja: thanks' });
+  assert.equal(k.effect.type, 'translate');
+  assert.equal(k.effect.lang, 'ja');
+  // The shown translation itself, unchanged, is still sent.
+  const same = reduce(toPreview('가자'), { type: 'enter', text: 'T' });
+  assert.equal(same.effect.type, 'sent');
+});
+
+test('prefix: a re-run and a language change keep the English source', () => {
+  const a = reduce(initial(), { type: 'enter', text: 'ru: see you' });
+  const b = reduce(a.state, { type: 'result', reqId: a.effect.reqId, translation: 'Увидимся', back_translation: '또 봐', lang: 'ru', model: 'm' });
+  const deep = reduce(b.state, { type: 'enter', text: 'Увидимся', hard: true });
+  assert.equal(deep.effect.kind, 'translate');
+  assert.equal(deep.effect.lang, 'ru');
+  assert.equal(deep.effect.korean, 'see you');
+  const ja = reduce(b.state, { type: 'lang', lang: 'ja' });
+  assert.equal(ja.effect.lang, 'ja');
+  assert.equal(ja.effect.korean, 'see you');
+  assert.deepEqual(reduce(b.state, { type: 'undo' }).effect, { type: 'restore', korean: 'ru: see you' });
+});

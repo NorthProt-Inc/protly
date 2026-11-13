@@ -237,3 +237,15 @@ test('notes: the rule and the DRAFT guard are in the four draft prompts, never i
     assert.match(b.messages[0].content, /hi \[x\]/); // someone else's text keeps its brackets
   }
 });
+
+test('the draft prompts translate a draft that is not Korean (a language prefix on English)', () => {
+  const systems = {
+    outgoing: buildOutgoingRequest({ model: 'm', profile: 'outgoing', memo: '', context: [], korean: 'x', lang: 'ru' }).system,
+    email: buildEmailRequest({ model: 'm', context: [], korean: 'x' }).system,
+    box: buildBoxRequest({ model: 'm', korean: 'x', lang: 'ru', hostname: 'example.com' }).system,
+  };
+  for (const [name, s] of Object.entries(systems)) {
+    assert.match(s, /Translate the draft \(usually Korean, sometimes English or another language\) into the TARGET language/, name);
+    assert.doesNotMatch(s, /Translate the Korean draft/, name);
+  }
+});

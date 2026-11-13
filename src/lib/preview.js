@@ -1,4 +1,4 @@
-import { hasHangul, hangulRuns, parseLangPrefix, splitNotes, addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from './lang.js';
+import { hasHangul, hangulRuns, parseLangPrefix, prefixTarget, splitNotes, addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from './lang.js';
 
 // korean: the source text. The Korean draft (prefix and notes included, so Alt+Z restores them), or the English draft
 // being polished. Each request splits the notes off it again, so a re-run keeps them.
@@ -42,10 +42,16 @@ const newHangul = (text, s) => s.lang !== 'ko'
 // Undo first, then add the note to the draft).
 const hold = (s, message) => ({ state: s, effect: { type: 'hold', message } });
 const shownMode = (s) => s.mode === 'preview' || s.mode === 'kept';
-// A new Korean draft typed over the shown translation (not an edit of it): it runs, with its notes.
-const freshDraft = (s, text) => (s.mode === 'kept'
-  ? newHangul(text, s)
-  : hasHangul(text) && s.lang !== 'ko' && norm(text) !== norm(s.shown));
+// A draft to translate: Hangul, or a lowercase language prefix on a draft without it ("ru: see you").
+const translatable = (text) => hasHangul(text) || prefixTarget(text) !== null;
+// A new draft typed over the shown translation (not an edit of it): it runs, with its notes. A Korean draft, or a
+// prefixed one; the Korean-target check is for Hangul only, since a Korean translation is all Hangul.
+const freshDraft = (s, text) => {
+  const prefixed = prefixTarget(text) !== null && norm(text) !== norm(s.shown);
+  return s.mode === 'kept'
+    ? newHangul(text, s) || prefixed
+    : (hasHangul(text) && s.lang !== 'ko' && norm(text) !== norm(s.shown)) || prefixed;
+};
 // A note added to the shown translation itself is held: no refine.
 const noteOnShown = (s, raw, text) => shownMode(s) && addsNote(raw, s.shown) && !freshDraft(s, text);
 
@@ -69,7 +75,7 @@ export function reduce(s, e) {
         return { state: idle(s), effect: { type: 'sent', korean: s.korean } }; // never re-polished on Enter: Alt+T does that
       }
       if (notes.length && !text) return hold(s, NOTES_ONLY);
-      if (hasHangul(text)) return translate(s, e.text, profile, null);
+      if (translatable(text)) return translate(s, e.text, profile, null);
       // A draft with a note never goes out as typed: polish it, Polish switch or not.
       if (notes.length || (e.polish && /\p{L}/u.test(text))) return polish(s, e.text, profile);
       return { state: s, effect: { type: 'pass' } };
@@ -80,7 +86,7 @@ export function reduce(s, e) {
       if (noteOnShown(s, e.text, text)) return hold(s, NOTE_ON_TRANSLATION);
       if (s.mode !== 'idle' && s.mode !== 'kept') return { state: s, effect: { type: 'none' } };
       if (notes.length && !text) return hold(s, NOTES_ONLY);
-      if (hasHangul(text)) return translate(s, e.text, 'outgoing', null);
+      if (translatable(text)) return translate(s, e.text, 'outgoing', null);
       if (notes.length || /\p{L}/u.test(text)) return polish(s, e.text, 'outgoing');
       return { state: s, effect: { type: 'none' } };
     }

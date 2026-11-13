@@ -291,6 +291,12 @@ test('Instagram: an Enter the user did not press never sends Hangul or an unconf
   assert.equal(hold(key(c)), true);
   c.textContent = 'see you [1]';
   assert.equal(hold(key(c)), false); // digits only: text, not a note
+  c.textContent = 'ru: see you';
+  assert.equal(hold(key(c)), true); // a language prefix: the user's own Enter would translate it
+  c.textContent = 'ID: A12';
+  assert.equal(hold(key(c)), false); // uppercase: an English label, text
+  other.textContent = 'ru: see you';
+  assert.equal(holdUntrustedEnter(key(other), { composer: null, writing: false, mode: 'idle' }), true);
   // A target the site says sends the box (WhatsApp: a focused message) reads the box, not the target.
   const row = win.document.createElement('div');
   win.document.body.append(row);

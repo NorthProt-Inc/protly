@@ -63,6 +63,14 @@ final class BarActionTests: XCTestCase {
         XCTAssertNil(BarAction.undo.actionMode)
     }
 
+    /// plan 2026-11-12-prefix-translate: a prefixed English draft shows Translate to its language, never Polish.
+    func testAPrefixedEnglishDraftShowsTranslate() {
+        XCTAssertEqual(center("ru: see you"), .translate(target: "Русский"))
+        XCTAssertEqual(center("ja: thanks"), .translate(target: Languages.endonym(of: "ja")!))
+        XCTAssertEqual(center("en: see you"), .polish(korean: false))
+        XCTAssertEqual(center("RU: see you"), .polish(korean: false))
+    }
+
     /// The label names the target the request sends: TARGET is the English name of the same code.
     func testTheLabelAgreesWithTheRequest() {
         for (text, name) in [("오늘 고마워", "English"), ("ru: 누나 고마워", "Russian"), ("ok: 내일 봐", "English")] {

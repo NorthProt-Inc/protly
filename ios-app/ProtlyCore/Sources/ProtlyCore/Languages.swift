@@ -40,6 +40,19 @@ public enum Languages {
         return (code, String(s[i...]))
     }
 
+    /// lang.js prefixTarget (plan 2026-11-12-prefix-translate): a draft without Hangul that opens with a lowercase listed
+    /// code other than "ko" and "en", with a letter after it, is translated into that language instead of polished.
+    /// Lowercase only, so "ID: A12" and "No: ..." stay English; prefix(of:) itself takes any case and lowercases, so the
+    /// code is checked as typed. tests/fixtures/prefix-target-cases.json holds both platforms to the rule.
+    public static func prefixTarget(_ text: String) -> String? {
+        guard !ActionAPI.hasHangul(text) else { return nil }
+        let p = prefix(of: text)
+        guard let code = p.code, code != "ko", code != "en" else { return nil }
+        let typed = text.unicodeScalars.drop(while: isSpace).prefix(code.unicodeScalars.count)
+        guard String(String.UnicodeScalarView(typed)) == code else { return nil }
+        return p.text.unicodeScalars.contains(where: Notes.isLetter) ? code : nil
+    }
+
     /// The extension's parseLangPrefix: a leading prefix of a listed code but "ko" picks the whole draft's language
     /// and is dropped, and every mid-draft span after it is tagged for the model (tagSpans). MODE out sends this text.
     public static func parse(_ text: String) -> (lang: String?, text: String) {

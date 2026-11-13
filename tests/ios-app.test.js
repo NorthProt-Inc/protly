@@ -27,8 +27,9 @@ test('keyboard prompt carries the shared English style verbatim (src/lib/style.j
 
 test('keyboard prompt stays inside its size budget (it is sent on every call from the phone)', () => {
   // 5100 since 2026-11-08 (measured 5037): the span tag rule, the notes rules and the email, slang and numbers wording
-  // of the extension polish added about 590 characters. 5200 since 2026-11-12: the read tone line.
-  assert.ok(prompt.length <= 5200, `keyboard prompt is ${prompt.length} characters, budget 5200`);
+  // of the extension polish added about 590 characters. 5200 since 2026-11-12: the read tone line. 5250 the same day
+  // (measured 5226): MODE out names drafts that are not Korean (a language prefix on English).
+  assert.ok(prompt.length <= 5250, `keyboard prompt is ${prompt.length} characters, budget 5250`);
 });
 
 test('the keyboard translates into the extension languages (ProtlyCore Languages.swift equals LANG_NAMES)', () => {
@@ -46,6 +47,9 @@ test('keyboard MODE out writes the TARGET language, the English-only lines only 
     assert.ok(english >= 0 && english < at && at < other, line);
   }
   assert.match(out, /into the TARGET language/);
+  // A language prefix on English sends it through MODE out too (plan 2026-11-12-prefix-translate).
+  assert.match(prompt, /^MODE out \(DRAFT is the writer's draft, usually Korean, TARGET the output language\):$/m);
+  assert.match(out, /Translate the DRAFT \(usually Korean, sometimes English or another language\) into the TARGET language/);
   assert.match(out, /Russian past tense, Spanish or French adjectives/);
   assert.match(out, /ty spasla, never ty spas/);
   assert.match(other >= 0 ? out.slice(other) : '', /add nothing the DRAFT lacks/);
