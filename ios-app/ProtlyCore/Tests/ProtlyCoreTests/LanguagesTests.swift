@@ -36,6 +36,14 @@ final class LanguagesTests: XCTestCase {
         XCTAssertEqual(parse("ko: 안녕"), ["ko", "안녕"])
     }
 
+    /// plan 2026-11-12-prefix-translate: a lowercase prefix translates a draft without Hangul (lang.js prefixTarget).
+    func testTheSharedPrefixTargetCases() throws {
+        for c in try SharedFixtures.cases("prefix-target-cases.json") {
+            let text = try XCTUnwrap(c["text"] as? String)
+            XCTAssertEqual(Languages.prefixTarget(text), c["want"] as? String, "\(c["why"] ?? ""): \(text)")
+        }
+    }
+
     func testTheSharedSpanCases() throws {
         for c in try SharedFixtures.cases("span-cases.json") {
             let draft = try XCTUnwrap(c["draft"] as? String)

@@ -188,3 +188,9 @@ test('splitNotes: a draft without notes comes back unchanged, untrimmed; with no
   for (const s of ['  hi  ', ' [1] \n', '\n안녕\n', '']) assert.deepEqual(lang.splitNotes(s), { text: s, notes: [] }, JSON.stringify(s));
   assert.deepEqual(lang.splitNotes('\n hi [x] \n'), { text: 'hi', notes: ['x'] });
 });
+
+test('prefixTarget matches the shared prefix cases (a lowercase prefix translates a draft without Hangul)', () => {
+  for (const c of fixture('prefix-target-cases.json')) {
+    assert.equal(lang.prefixTarget(c.text), c.want, `${c.why}: ${JSON.stringify(c.text)}`);
+  }
+});

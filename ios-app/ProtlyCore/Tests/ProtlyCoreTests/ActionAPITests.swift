@@ -133,6 +133,18 @@ final class ActionPromptTests: XCTestCase {
         XCTAssertEqual(ActionAPI.mode(forDraft: "see you tomorrow"), .fix)
     }
 
+    /// plan 2026-11-12-prefix-translate: a lowercase prefix on a draft without Hangul translates it.
+    func testALowercasePrefixTranslatesADraftWithoutHangul() {
+        XCTAssertEqual(ActionAPI.mode(forDraft: "ru: see you"), .out)
+        XCTAssertEqual(ActionAPI.mode(forDraft: "[짧게] ru: see you"), .out)
+        for text in ["en: hi", "ko: hi", "RU: see you", "ID: A12", "No: that's wrong", "ru:", "see you ru: later"] {
+            XCTAssertEqual(ActionAPI.mode(forDraft: text), .fix, text)
+        }
+        XCTAssertEqual(ActionAPI.userMessage(mode: .out, text: "ru: see you"), "MODE: out\nTARGET: Russian\n\nDRAFT:\nsee you")
+        XCTAssertEqual(ActionAPI.userMessage(mode: .out, text: "[짧게] ru: see you"),
+                       "MODE: out\nTARGET: Russian\n\nNOTES:\n- 짧게\n\nDRAFT:\nsee you")
+    }
+
     func testOutNamesItsTargetAndAPrefixPicksIt() {
         XCTAssertEqual(ActionAPI.userMessage(mode: .out, text: "내일 봐"), "MODE: out\nTARGET: English\n\nDRAFT:\n내일 봐")
         XCTAssertEqual(ActionAPI.userMessage(mode: .out, text: "ru: 노트 고마워"), "MODE: out\nTARGET: Russian\n\nDRAFT:\n노트 고마워")

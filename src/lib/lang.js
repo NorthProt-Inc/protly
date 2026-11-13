@@ -91,6 +91,18 @@ export function parseLangPrefix(s) {
   return { lang: code, text: tagSpans(s.slice(m[0].length)) };
 }
 
+// "ru: see you" -> 'ru': a draft without Hangul that opens with a lowercase listed code other than ko and en, with a
+// letter after it, is translated into that language instead of polished (plan docs/plans/2026-11-12-prefix-translate.md).
+// Lowercase only, so "ID: A12" and "No: ..." stay English; parseLangPrefix itself takes any case. The iPhone keyboard's
+// Languages.prefixTarget follows the same rule; tests/fixtures/prefix-target-cases.json holds both to it.
+const LOWER_PREFIX = /^\s*([a-z]{2,3}):\s*/;
+export function prefixTarget(s) {
+  if (hasHangul(s)) return null;
+  const m = s.match(LOWER_PREFIX);
+  if (!m || !isCode(m[1]) || m[1] === 'en') return null;
+  return /\p{L}/u.test(s.slice(m[0].length)) ? m[1] : null;
+}
+
 // Notes (plan docs/plans/2026-11-08-notes-and-iphone-port.md, Part A): `[` + content + `]` in the user's own draft,
 // where the content holds no bracket and at least one letter, is an instruction to the model for this message.
 // Notes leave the text; a run of notes and the spaces around it becomes one space when the line has text on both

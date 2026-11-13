@@ -133,7 +133,8 @@ public enum ActionAPI {
     }
 
     /// The action for the user's own draft, decided on its text without notes (Notes.split): a Korean draft after
-    /// "ko:" -> polish, else Korean anywhere -> translate out, else polish.
+    /// "ko:" -> polish, else Korean anywhere -> translate out, else a lowercase language prefix ("ru: see you",
+    /// Languages.prefixTarget) -> translate out, else polish.
     public static func mode(forDraft draft: String) -> ActionMode {
         mode(forText: Notes.split(draft).text)
     }
@@ -146,7 +147,7 @@ public enum ActionAPI {
 
     /// mode(forDraft:) for a text already split: a draft is split once, so what one pass leaves stays text.
     static func mode(forText text: String) -> ActionMode {
-        koreanPolish(text) ? .fix : hasHangul(text) ? .out : .fix
+        koreanPolish(text) ? .fix : hasHangul(text) || Languages.prefixTarget(text) != nil ? .out : .fix
     }
 
     static func koreanPolish(_ text: String) -> Bool {

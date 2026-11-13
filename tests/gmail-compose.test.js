@@ -161,6 +161,7 @@ test('the button title mentions polish, the label stays Translate', () => {
   const btn = inline.closest('.reply').querySelector('.pl-g-btn');
   assert.equal(btn.textContent, 'Translate');
   assert.match(btn.title, /polish an English one/);
+  assert.match(btn.title, /ru:/);
 });
 
 test('a page script clicking the Translate button sends nothing; the user\'s own click does', async () => {
@@ -251,6 +252,41 @@ test('a ru: prefix sends lang ru without the prefix, Undo brings back the prefix
   assert.equal(userText(dialog), 'Здравствуйте');
   buttonIn('Undo').click();
   assert.equal(userText(dialog), 'ru: 안녕하세요');
+});
+
+test('an English draft with a ru: prefix is translated into Russian, not polished; Undo brings back the draft', async () => {
+  const { dialog, calls, reply, buttonIn } = setup();
+  draft(dialog, 'ru: see you tomorrow');
+  translate(dialog);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].type, 'email');
+  assert.equal(calls[0].lang, 'ru');
+  assert.equal(calls[0].korean, 'see you tomorrow');
+  await reply({ ok: true, data: { lang: 'ru', translation: 'Увидимся завтра', back_translation: '내일 봐', model: 'claude-sonnet-5-5' } });
+  assert.equal(userText(dialog), 'Увидимся завтра');
+  buttonIn('Undo').click();
+  assert.equal(userText(dialog), 'ru: see you tomorrow');
+});
+
+test('uppercase RU: and en: on English still polish', () => {
+  for (const text of ['RU: see you', 'en: see you']) {
+    const { dialog, calls } = setup();
+    draft(dialog, text);
+    translate(dialog);
+    assert.equal(calls[0].type, 'polish', text);
+  }
+});
+
+test('a prefixed English draft typed over a translate preview is translated', async () => {
+  const { inline, calls, reply } = setup();
+  translate(inline);
+  await reply(ok('First'));
+  draft(inline, 'ja: thanks');
+  translate(inline);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1].type, 'email');
+  assert.equal(calls[1].lang, 'ja');
+  assert.equal(calls[1].korean, 'thanks');
 });
 
 test('a mid-draft span sends the tagged text with lang auto', async () => {

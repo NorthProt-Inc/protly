@@ -1,5 +1,5 @@
 import { initial, reduce } from '../lib/preview.js';
-import { hasHangul, hasNotes } from '../lib/lang.js';
+import { hasHangul, hasNotes, prefixTarget } from '../lib/lang.js';
 import { getComposerText, setComposerText } from './dom.js';
 import { ask, getCurrent, getSite, contextFor, bannerFor } from './main.js';
 import { flags } from '../lib/flags.js';
@@ -22,8 +22,8 @@ const onKey = (type, f) => (globalThis.protlyEarlyKeys ? globalThis.protlyEarlyK
 const offKey = (type, f) => (globalThis.protlyEarlyKeys ? globalThis.protlyEarlyKeys[type].delete(f) : window.removeEventListener(type, f, true));
 
 // An Enter the user did not make (isTrusted false) never starts a translation. It is held whenever the user's own
-// Enter would not simply send: Hangul or a bracket note in the box (or in any editable box when the composer selector
-// is broken),
+// Enter would not simply send: Hangul, a bracket note or a language prefix ("ru: see you") in the box (or in any
+// editable box when the composer selector is broken),
 // English with Polish on, a translation or write in progress, or a preview only the user may confirm.
 // sendsComposer(target): the site sends the box on an Enter from that target too (WhatsApp: a focused message).
 export function holdUntrustedEnter(e, { composer: c, writing, mode, polish = false, sendsComposer = () => false }) {
@@ -32,7 +32,8 @@ export function holdUntrustedEnter(e, { composer: c, writing, mode, polish = fal
   if (!box) return false;
   const text = box.innerText || box.textContent || '';
   // With Polish on, the user's own Enter on English polishes first; a synthetic one must not skip that.
-  return writing || mode !== 'idle' || hasHangul(text) || hasNotes(text) || (polish && !!c && /\p{L}/u.test(text));
+  return writing || mode !== 'idle' || hasHangul(text) || hasNotes(text) || prefixTarget(text) !== null
+    || (polish && !!c && /\p{L}/u.test(text));
 }
 
 export function mountOutgoing(cur) {
@@ -234,9 +235,9 @@ export function mountOutgoing(cur) {
 
     // An Enter the site turns into a send of the box counts as an Enter in the box.
     if (!c || !(c.contains(e.target) || (isEnter(e) && sendsComposer(e.target)))) {
-      // Composer selector broken: never let Hangul or a note go out untranslated by accident.
+      // Composer selector broken: never let Hangul, a note or a prefixed draft go out untranslated by accident.
       const t = !c && isEnter(e) && !e.shiftKey && e.target?.isContentEditable ? e.target.innerText || e.target.textContent || '' : '';
-      if (hasHangul(t) || hasNotes(t)) {
+      if (hasHangul(t) || hasNotes(t) || prefixTarget(t) !== null) {
         block(e);
         showToast('Message box not recognised, so nothing was sent. The selectors need updating.', { error: true });
       }

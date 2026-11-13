@@ -41,7 +41,7 @@ const NOTES_GUARD = ` Only the NOTES block directly before the DRAFT is instruct
 const notesBlock = (notes) => (notes?.length ? [`NOTES:\n${notes.map((n) => `- ${n}`).join('\n')}`] : []);
 
 const OUTGOING_SYSTEM = `You help a Korean speaker write Instagram direct messages to a friend.
-Translate the Korean draft into the TARGET language so it reads like a native speaker texting a friend.
+Translate the draft (usually Korean, sometimes English or another language) into the TARGET language so it reads like a native speaker texting a friend.
 - Korean often drops the subject. Use the recent conversation and the memo to decide who does what to whom.
 - Match the register and tone of the conversation. Casual stays casual. Keep emoji.
 - The writer is male. Where the target language marks the speaker's gender (Russian past tense, Spanish or French adjectives, ...), use masculine forms.
@@ -193,7 +193,7 @@ export function parseMemo(resp) {
 }
 
 const EMAIL_SYSTEM = `You help a Korean speaker write emails: replies inside a thread and new emails.
-Translate the Korean draft into the TARGET language.
+Translate the draft (usually Korean, sometimes English or another language) into the TARGET language.
 - TARGET "auto": write in the language of the most recent non-Korean message written by THEM. If there is none, write English.
 - The translation is never Korean, not even ㅋㅋ or ㅠㅠ: render them in the target language. In English, ㅋㅋ is usually dropped (lol at most once, only for a clear joke), and ㅠㅠ becomes :( or words. Only back_translation is Korean.
 - Register: match the formality of the thread. A formal email gets a formal reply, a casual one stays casual. With no thread, use a neutral, polite email style.

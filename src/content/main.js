@@ -1,6 +1,6 @@
 import { LIMITS, chunks } from '../lib/limits.js';
 import { watchFlags, siteEnabled } from '../lib/flags.js';
-import { isKoreanOnly, hasHangul as isHangulText, hasNotes } from '../lib/lang.js';
+import { isKoreanOnly, hasHangul as isHangulText, hasNotes, prefixTarget } from '../lib/lang.js';
 import { classifyAdded } from '../lib/classify.js';
 import { ERRORS, GLOBAL_KINDS, errorText } from '../ui/errors.js';
 import { showToast } from '../ui/toast.js';
@@ -72,7 +72,7 @@ export async function start(s) {
 }
 
 // Between a thread switch and the new thread's outgoing handler (up to ~10 s), a Hangul Enter, or one on a draft with
-// a bracket note, would go out untranslated. Block it unless translation is known to be off for the thread on screen.
+// a bracket note or a language prefix ("ru: see you"), would go out untranslated. Block it unless translation is known to be off for the thread on screen.
 function guardUnownedEnter(e) {
   if (!(e.key === 'Enter' || e.code === 'Enter' || e.code === 'NumpadEnter') || e.shiftKey) return;
   const id = site.threadId();
@@ -80,7 +80,7 @@ function guardUnownedEnter(e) {
   const t = e.target;
   const box = t?.isContentEditable ? t : site.sendsComposer?.(t) ? site.findComposer(document) : null;
   const text = box ? box.innerText || box.textContent || '' : '';
-  if (!isHangulText(text) && !hasNotes(text)) return;
+  if (!isHangulText(text) && !hasNotes(text) && prefixTarget(text) === null) return;
   e.preventDefault();
   e.stopImmediatePropagation();
   showToast('Still loading this thread. Nothing was sent; press Enter again in a moment.', { transient: true });

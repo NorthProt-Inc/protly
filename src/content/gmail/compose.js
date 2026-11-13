@@ -1,7 +1,7 @@
 import { GSEL, composeOf, findViewerEmail } from './selectors.js';
 import { userNodes, nodesToText, textToNodes, replaceUserNodes, hasMedia } from './body.js';
 import { readThread } from './thread.js';
-import { hasHangul, parseLangPrefix, splitNotes, addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../../lib/lang.js';
+import { hasHangul, parseLangPrefix, prefixTarget, splitNotes, addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../../lib/lang.js';
 import { createCard } from '../../ui/card.js';
 import { ERRORS, errorText } from '../../ui/errors.js';
 import { trusted } from '../../ui/trust.js';
@@ -71,7 +71,7 @@ export function mountCompose(body) {
   btn.type = 'button';
   btn.className = 'pl-g-btn';
   btn.textContent = 'Translate';
-  btn.title = 'Translate the Korean draft, or polish an English one (Alt+T)';
+  btn.title = 'Translate the Korean draft, or polish an English one (Alt+T). Start with ru: or another code to translate English';
   btn.addEventListener('click', (e) => { if (trusted(e)) translate(body); }); // a page script's click is not the user's
   td.appendChild(btn);
   sendCell.after(td);
@@ -127,21 +127,23 @@ export function translate(body) {
   // Decisions read the text without notes; the saved nodes keep the raw draft, so Undo brings the notes back.
   const { text, notes } = splitNotes(raw);
   // No refine: a note typed into the shown translation (preview, or kept after Esc) runs nothing. Undo first.
-  // A new Korean draft typed over it is not an edit of it: it runs, with its notes.
-  const fresh = hasHangul(text) && norm(text) !== norm(s.shown);
+  // A new Korean or prefixed draft typed over it is not an edit of it: it runs, with its notes.
+  const translatable = hasHangul(text) || prefixTarget(text) !== null;
+  const fresh = translatable && norm(text) !== norm(s.shown);
   if ((s.mode === 'preview' || s.mode === 'kept') && addsNote(raw, s.shown) && !fresh) return showError(body, s, NOTE_ON_TRANSLATION);
   if (s.mode === 'preview') {
     if (norm(raw) === norm(s.shown)) return; // nothing new to translate
     // Polish only starts from idle, so Undo always goes back to the original draft.
-    if (!hasHangul(text)) return showError(body, s, 'No Korean text to translate. To polish this English, press Undo first.');
+    if (!translatable) return showError(body, s, 'No Korean text to translate. To polish this English, press Undo first.');
     // A new Korean draft replaced the preview. The body holds it, so the older Korean is not needed for Undo.
     Object.assign(s, { mode: 'idle', saved: null });
   }
   if (raw.length > LIMITS.text) return say(body, s, `Too long for protly (over ${LIMITS.text} characters).`, { error: true });
   if (notes.length && !text) return say(body, s, NOTES_ONLY, { error: true });
   let opts;
-  if (hasHangul(text)) {
-    // The prefix ("ru: ...") is a one-off override; the saved nodes keep it, so Undo brings it back.
+  if (translatable) {
+    // The prefix ("ru: ...") is a one-off override; the saved nodes keep it, so Undo brings it back. On a draft
+    // without Hangul it is what makes this a translation (prefixTarget).
     const p = parseLangPrefix(text);
     opts = { kind: 'translate', korean: p.text, notes, profile: 'email', lang: p.lang ?? 'auto' };
   } else if (notes.length || /\p{L}/u.test(text)) {
