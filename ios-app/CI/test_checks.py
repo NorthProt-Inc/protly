@@ -784,5 +784,99 @@ class PrefsDumpTests(unittest.TestCase):
             self.assertIn("~ x: 1 -> 2", f.read())
 
 
+def period(check_id, texts, extra=""):
+    """One dsp-* PENDING line as UITests/PhoneChecksUITests.swift writes it, resolved through assemble()."""
+    kind = check_id.split("-", 2)[2]
+    readings = " ".join(f't{i}="{t}"' for i, t in enumerate(texts))
+    line = f"CHECK {check_id} PENDING kind={kind} tries={len(texts) - 1} {readings}{extra}\n"
+    return {c.id: c for c in checks.assemble(line, "", "")}[check_id]
+
+
+class PeriodTests(unittest.TestCase):
+    """fix/double-space-period (docs/research/2026-11-17-keyboard-diagnosis.md, P4): two space taps after a word give
+    ". ", also with a word right after the cursor (case D: `hello| world`)."""
+
+    WORD = ["world"] + ["hello. " * i + "world" for i in range(1, 7)]
+
+    def test_every_id_is_expected_has_a_method_and_a_rule(self):
+        ids = [f"dsp-{f}-{k}" for f in ("uikit", "composer") for k in ("en", "word", "ko", "fast", "kofast", "pick2")]
+        ids += ["dsp-uikit-hold"]
+        self.assertEqual(checks.METHOD_IDS["test5f_period"], ids)
+        for i in ids:
+            self.assertIn(i, checks.EXPECTED_IDS)
+            self.assertIn(i, checks.RESOLVERS)
+        self.assertTrue(checks.known_entry("PhoneChecksUITests/test5f_period"))
+
+    def test_a_filtered_period_run_marks_the_other_ids_not_run(self):
+        ran = checks.covered_ids(["PhoneChecksUITests/test0_access", "PhoneChecksUITests/test5f_period"])
+        final = {c.id: c for c in checks.assemble("", "", "", ran=ran)}
+        self.assertEqual(final["pad-1"].status, checks.NOT_RUN)
+        self.assertEqual(final["dsp-composer-word"].status, "FAIL")
+        self.assertIn("no CHECK line", final["dsp-composer-word"].evidence)
+
+    def test_word_after_the_cursor_gets_the_period(self):
+        c = period("dsp-uikit-word", self.WORD, ' sel0="0,0"')
+        self.assertEqual(c.status, "PASS", c.evidence)
+        self.assertIn("6/6", c.evidence)
+
+    def test_two_spaces_before_the_word_fail(self):
+        # Protly before the fix (report runs 125 pr-word): KeyboardKit's endSentence left both spaces.
+        c = period("dsp-composer-word", ["world", "hello  world"] + self.WORD[2:])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("try 1", c.evidence)
+
+    def test_a_lost_space_before_the_word_fails(self):
+        c = period("dsp-uikit-word", ["world", "hello.world"] + ["hello.hello. world"] + self.WORD[3:])
+        self.assertEqual(c.status, "FAIL")
+
+    def test_word_needs_six_tries(self):
+        c = period("dsp-uikit-word", self.WORD[:6])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+        self.assertIn("at least 6", c.evidence)
+
+    def test_a_setup_that_did_not_type_the_word_is_unreadable(self):
+        c = period("dsp-uikit-word", ["wrld"] + self.WORD[1:])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+
+    def test_a_missing_reading_is_unreadable(self):
+        line = 'CHECK dsp-uikit-en PENDING kind=en tries=3 t0="" t1="hello. " t3="hello. hello. hello. "\n'
+        c = {c.id: c for c in checks.assemble(line, "", "")}["dsp-uikit-en"]
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+
+    def test_end_of_text_kinds(self):
+        for check_id, unit in [("dsp-uikit-en", "hello. "), ("dsp-composer-fast", "hello. "),
+                               ("dsp-uikit-ko", "안녕. "), ("dsp-composer-kofast", "안녕. "),
+                               ("dsp-uikit-pick2", "the. ")]:
+            c = period(check_id, [unit * i for i in range(4)])
+            self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
+
+    def test_end_of_text_needs_three_tries(self):
+        c = period("dsp-uikit-en", ["", "hello. ", "hello. hello. "])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+
+    def test_nfd_hangul_counts(self):
+        nfd = [unicodedata.normalize("NFD", "안녕. " * i) for i in range(4)]
+        self.assertEqual(period("dsp-composer-ko", nfd).status, "PASS")
+
+    def test_end_of_text_without_the_period_fails(self):
+        c = period("dsp-composer-en", ["", "hello. ", "hello. hello  ", "hello. hello  hello. "])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("try 2", c.evidence)
+
+    def test_hold_types_no_space_and_no_period(self):
+        self.assertEqual(period("dsp-uikit-hold", ["", "hello ", "hello hello ", "hello hello hello "]).status, "PASS")
+        c = period("dsp-uikit-hold", ["", "hello. ", "hello. hello ", "hello. hello hello "])
+        self.assertEqual(c.status, "FAIL")
+
+    def test_a_driver_problem_stays_fail(self):
+        line = 'CHECK dsp-uikit-en FAIL unreadable: problems="no keyboard to type on" kind=en\n'
+        c = {c.id: c for c in checks.assemble(line, "", "")}["dsp-uikit-en"]
+        self.assertEqual(c.status, "FAIL")
+
+
 if __name__ == "__main__":
     unittest.main()

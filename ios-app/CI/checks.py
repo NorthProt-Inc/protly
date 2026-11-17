@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Assembles the phone checks of one CI run (docs/plans/2026-10-30-sim-phone-checks.md, Tasks 1.2-1.6 and 2.3, and
 docs/plans/2026-10-30-typing-fixes.md, Sprint 004: dark-1, ret-*, menu-*, pad-*, and
-docs/plans/2026-10-30-keyboard-ui.md, Task 3.5: card-*, mem-stream, hit-1, bar-*, app-*).
+docs/plans/2026-10-30-keyboard-ui.md, Task 3.5: card-*, mem-stream, hit-1, bar-*, app-*, and
+fix/double-space-period, docs/research/2026-11-17-keyboard-diagnosis.md P4: dsp-*).
 
 Usage: checks.py <dir> [--network-key] [--ran <entry>,<entry>...]
 
@@ -43,7 +44,13 @@ CARD_LOOKS = ("dark", "light")
 CARD_STATES = ("wait", "mid", "done", "err0", "err1")
 CARD_IDS = [f"card-{s}-{look}" for look in CARD_LOOKS for s in CARD_STATES] + ["card-slow", "card-cancel", "mem-stream"]
 BAR_IDS = ["hit-1", "bar-dark", "bar-light", "bar-xxl", "app-dark", "app-light"]
-EXPECTED_IDS = OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
+# fix/double-space-period (report P4): two space taps after a word end the sentence, also with a word right after the
+# cursor (case D). The same list as PhoneRun.periodIDs in UITests/PhoneChecksUITests.swift.
+PERIOD_FIELDS = ("uikit", "composer")
+PERIOD_KINDS = ("en", "word", "ko", "fast", "kofast", "pick2")
+PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS] + ["dsp-uikit-hold"]
+EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
+                + PERIOD_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -58,6 +65,7 @@ METHOD_IDS = {
     "test5c_pad": ["pad-1", "pad-2", "pad-3"],
     "test5d_card": CARD_IDS,
     "test5e_bar": BAR_IDS,
+    "test5f_period": PERIOD_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
 }
@@ -1137,8 +1145,48 @@ CARD_RESOLVERS = {
 }
 
 
+# fix/double-space-period (docs/research/2026-11-17-keyboard-diagnosis.md, P4). UITests/PhoneChecksUITests.swift
+# (checksPeriod) writes dsp-<field>-<kind> PENDING with the field's text before the first try (t0) and after each try
+# (t1...). What each try must add, right before the text after the cursor (`world` for case D, else nothing):
+PERIOD_UNIT = {"word": "hello. ", "en": "hello. ", "fast": "hello. ", "ko": "안녕. ", "kofast": "안녕. ",
+               "pick2": "the. ", "hold": "hello "}
+PERIOD_AFTER = {"word": "world"}
+# The fewest tries that count (the fix's done-when: case D at least 6 tries per field).
+PERIOD_MIN_TRIES = {"word": 6}
+PERIOD_DEFAULT_TRIES = 3
+
+
+def resolve_period(check, marks=None, samples=None, run_dir=None):
+    """dsp-<field>-<kind>: each try adds exactly its unit (`hello. `, `안녕. `, `the. `; `hello ` for hold, where the
+    held space is the trackpad and types nothing) before the text after the cursor, which stays as it was (case D:
+    `hello. world`, one space after the period and none lost before the word). A field that did not start as the
+    case set it up (`world`, or empty) or a missing reading is FAIL unreadable."""
+    kind = check.id.split("-", 2)[2]
+    ev = check.evidence
+    unit, after = PERIOD_UNIT[kind], PERIOD_AFTER.get(kind, "")
+    least = PERIOD_MIN_TRIES.get(kind, PERIOD_DEFAULT_TRIES)
+    n = int_field(ev, "tries")
+    if n is None or n < least:
+        return unreadable(check.id, f"{n} tries, want at least {least}: {ev[:300]!r}")
+    texts = [quoted_field(ev, f"t{i}") for i in range(n + 1)]
+    if any(t is None for t in texts):
+        missing = [f"t{i}" for i, t in enumerate(texts) if t is None]
+        return unreadable(check.id, f"no reading {', '.join(missing)}: {ev[:300]!r}")
+    texts = [unicodedata.normalize("NFC", t) for t in texts]
+    if texts[0] != after:
+        return unreadable(check.id, f"the field started as {texts[0]!r}, not {after!r}: {ev[:300]!r}")
+    problems = []
+    for i in range(1, n + 1):
+        prev, cur = texts[i - 1], texts[i]
+        want = prev[:len(prev) - len(after)] + unit + after if prev.endswith(after) else None
+        if cur != want:
+            problems.append(f"try {i}: {prev!r} became {cur!r}, want {want!r}")
+    where = f" before {after!r}" if after else " at the end"
+    return verdict(check, problems, [f"{n - len(problems)}/{n} tries added {unit!r}{where}"])
+
+
 RESOLVERS = {"6.8-9": resolve_relaunch, "6.8-10": resolve_memory, **{i: resolve_rules for i in RULES},
-             **TYPING_RESOLVERS, **CARD_RESOLVERS}
+             **TYPING_RESOLVERS, **CARD_RESOLVERS, **{i: resolve_period for i in PERIOD_IDS}}
 
 
 NO_KEY = "no network key"
