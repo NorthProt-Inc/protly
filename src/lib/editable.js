@@ -26,15 +26,19 @@ export function editableText(root) {
 // without preventDefault (Quill 1.x) would get the text twice if defaultPrevented picked the path.
 const PASTE_EDITORS = '[data-lexical-editor], .public-DraftEditor-content, [data-slate-editor]';
 
-// A Lexical draft whose last block holds several lines and ends in a line break (<p>a<br>b<br><br></p>: Shift+Enter
-// after the last line, or Enter in plain-text Lexical). After a select-all, Lexical's own selection ends after that
-// block's first line, so a paste replaces only that line (step 0, Lexical 0.12.6 to 0.53.0). The content script cannot
-// see Lexical's selection, so such a draft is never written. One line, or a single-line last paragraph, is written.
+// A Lexical draft whose last block ends in a <br> (a line break: Shift+Enter after the last line, Enter in plain-text
+// Lexical; or the caret <br> after an inline decorator) and holds more than one inline node before it
+// (<p>a<br>b<br><br></p>, <p><span>a </span><strong>b</strong><br><br></p>). After a select-all, Lexical's own selection
+// then ends after that block's first inline node, so a paste replaces only that (step 0, Lexical 0.12.6 to 0.53.0;
+// review of C2 for the inline shapes). The content script cannot see Lexical's selection, so such a draft is never
+// written. A list's last block is its last item. One inline node and a line break (<p><span>a</span><br><br></p>), and
+// an empty last paragraph (<p><br></p>), are written whole.
 export function cutsShort(el) {
   if (!el.matches?.('[data-lexical-editor]')) return false;
-  const kids = [...(el.lastElementChild?.children ?? [])];
-  const brk = kids.findIndex((k) => k.nodeName === 'BR');
-  return kids.at(-1)?.nodeName === 'BR' && brk >= 0 && kids.slice(brk).some((k) => k.nodeName !== 'BR');
+  let block = el.lastElementChild;
+  while (block && (block.nodeName === 'UL' || block.nodeName === 'OL')) block = block.lastElementChild;
+  const kids = [...(block?.children ?? [])];
+  return kids.at(-1)?.nodeName === 'BR' && kids.slice(1).some((k) => k.nodeName !== 'BR');
 }
 
 // Replaces the selection (a select-all) with text: a synthetic paste on the editors above, with no insertText after it

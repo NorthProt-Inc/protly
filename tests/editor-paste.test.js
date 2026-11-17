@@ -68,16 +68,25 @@ test('a marked editor that ignores the paste: no insertText after it, and the ge
   assert.deepEqual(nonblank(el.innerText), KO);
 });
 
-test('a Lexical draft whose lines end in a line break is refused before writing and left as it is', async () => {
-  const { d, el } = page();
-  const log = fakeEditor(el, { kind: 'lexical' });
-  el.innerHTML = TRAILING;
-  el.focus();
-  assert.equal(await writeBox(box(d, el), EN, { settleMs: 0 }), false);
-  assert.equal(await setComposerText(el, EN), false);
-  assert.deepEqual(log.pastes, []);
-  assert.deepEqual(log.inserts, []);
-  assert.equal(el.innerHTML, TRAILING);
+test('a Lexical draft the paste would cut short is refused before writing and left as it is', async () => {
+  // Lexical ends its select-all after the last block's first inline node when that block ends in a <br> (a line
+  // break, or the caret <br> after an inline decorator), so these are written only in part.
+  for (const html of [
+    TRAILING,
+    '<p><span>안녕 </span><strong>친구</strong><br><br></p>', // two inline nodes on one line, then Shift+Enter
+    '<p><span>가나다</span><span data-lexical-decorator="true" contenteditable="false">@민지</span><br></p>', // inline decorator last
+    '<ul><li value="1"><span>가나다</span></li><li value="2"><span>라마바</span><br><span>사아자</span><br><br></li></ul>', // a list
+  ]) {
+    const { d, el } = page();
+    const log = fakeEditor(el, { kind: 'lexical' });
+    el.innerHTML = html;
+    el.focus();
+    assert.equal(await writeBox(box(d, el), EN, { settleMs: 0 }), false, html);
+    assert.equal(await setComposerText(el, EN), false, html);
+    assert.deepEqual(log.pastes, [], html);
+    assert.deepEqual(log.inserts, [], html);
+    assert.equal(el.innerHTML, html);
+  }
 });
 
 test('Lexical drafts ending in a line break that a paste replaces whole are written', async () => {
