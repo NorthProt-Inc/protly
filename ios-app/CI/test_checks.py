@@ -79,9 +79,16 @@ class AssembleTests(unittest.TestCase):
         self.assertIn("unreadable", final["ws-2"].evidence)
 
     def test_missing_file_fails_every_id(self):
+        # Every ID but those of the methods that run only in a filtered run (NOT-RUN in a full run: PeriodTests).
         final = checks.assemble(None, None, None)
         self.assertEqual(len(final), len(checks.EXPECTED_IDS))
-        self.assertTrue(all(c.status == "FAIL" and "unreadable" in c.evidence for c in final))
+        filtered_only = {i for m in checks.FILTERED_ONLY for i in checks.METHOD_IDS[m]}
+        self.assertTrue(filtered_only)
+        for c in final:
+            if c.id in filtered_only:
+                self.assertEqual(c.status, checks.NOT_RUN, c.id)
+            else:
+                self.assertTrue(c.status == "FAIL" and "unreadable" in c.evidence, c.id)
 
     def test_duplicate_id_is_fail(self):
         # A later PASS must not hide an earlier FAIL (or a malformed line for the same ID).
@@ -789,7 +796,10 @@ def period(check_id, texts, extra=""):
     kind = check_id.split("-", 2)[2]
     readings = " ".join(f't{i}="{t}"' for i, t in enumerate(texts))
     line = f"CHECK {check_id} PENDING kind={kind} tries={len(texts) - 1} {readings}{extra}\n"
-    return {c.id: c for c in checks.assemble(line, "", "")}[check_id]
+    return {c.id: c for c in checks.assemble(line, "", "", ran=checks.covered_ids([PERIOD_METHOD]))}[check_id]
+
+
+PERIOD_METHOD = "PhoneChecksUITests/test5f_period"
 
 
 class PeriodTests(unittest.TestCase):
@@ -797,46 +807,88 @@ class PeriodTests(unittest.TestCase):
     ". ", also with a word right after the cursor (case D: `hello| world`)."""
 
     WORD = ["world"] + ["hello. " * i + "world" for i in range(1, 7)]
+    # The caret before the first try: the UITextView's `location,length`, the web composer's offset.
+    UIKIT_SEL = ' sel0="0,0"'
+    WEB_SEL = ' sel0="0"'
 
     def test_every_id_is_expected_has_a_method_and_a_rule(self):
-        ids = [f"dsp-{f}-{k}" for f in ("uikit", "composer") for k in ("en", "word", "ko", "fast", "kofast", "pick2")]
-        ids += ["dsp-uikit-hold"]
+        ids = [f"dsp-{f}-{k}" for f in ("uikit", "composer") for k in ("en", "word", "ko", "pick2")]
         self.assertEqual(checks.METHOD_IDS["test5f_period"], ids)
         for i in ids:
             self.assertIn(i, checks.EXPECTED_IDS)
             self.assertIn(i, checks.RESOLVERS)
-        self.assertTrue(checks.known_entry("PhoneChecksUITests/test5f_period"))
+        self.assertTrue(checks.known_entry(PERIOD_METHOD))
 
     def test_a_filtered_period_run_marks_the_other_ids_not_run(self):
-        ran = checks.covered_ids(["PhoneChecksUITests/test0_access", "PhoneChecksUITests/test5f_period"])
+        ran = checks.covered_ids(["PhoneChecksUITests/test0_access", PERIOD_METHOD])
         final = {c.id: c for c in checks.assemble("", "", "", ran=ran)}
         self.assertEqual(final["pad-1"].status, checks.NOT_RUN)
         self.assertEqual(final["dsp-composer-word"].status, "FAIL")
         self.assertIn("no CHECK line", final["dsp-composer-word"].evidence)
 
+    def test_a_full_run_marks_the_period_ids_not_run(self):
+        # test5f_period skips itself outside a filtered run (MAIN_TEST_DEADLINE): its IDs are NOT-RUN, not FAIL.
+        final = {c.id: c for c in checks.assemble(every_id_but(*checks.PERIOD_IDS), "", "")}
+        for i in checks.PERIOD_IDS:
+            self.assertEqual(final[i].status, checks.NOT_RUN, i)
+            self.assertIn("runs only in a filtered run (deadline)", final[i].evidence)
+        self.assertFalse(any(c.status == "FAIL" for c in final.values()))
+
+    def test_a_full_run_still_fails_the_other_missing_ids(self):
+        final = {c.id: c for c in checks.assemble(every_id_but("ws-2", *checks.PERIOD_IDS), "", "")}
+        self.assertEqual(final["ws-2"].status, "FAIL")
+        self.assertEqual(final["dsp-uikit-en"].status, checks.NOT_RUN)
+
+    def test_a_full_run_still_judges_the_period_lines_it_has(self):
+        line = ('CHECK dsp-uikit-en PENDING kind=en tries=3 t0="" t1="hello  " t2="hello  hello  " '
+                't3="hello  hello  hello  "\n')
+        final ={c.id: c for c in checks.assemble(every_id_but(*checks.PERIOD_IDS) + line, "", "")}
+        self.assertEqual(final["dsp-uikit-en"].status, "FAIL")
+        self.assertEqual(final["dsp-composer-en"].status, checks.NOT_RUN)
+
+    def test_main_without_a_filter_counts_the_period_ids_not_run(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "checks.txt"), "w", encoding="utf-8") as f:
+                f.write(every_id_but(*checks.PERIOD_IDS))
+            out = subprocess.run([sys.executable, os.path.join(HERE, "checks.py"), d], capture_output=True, text=True)
+            self.assertEqual(out.returncode, 0, out.stdout)
+            self.assertTrue(out.stdout.splitlines()[-1].endswith(f" not-run {len(checks.PERIOD_IDS)}"), out.stdout)
+
     def test_word_after_the_cursor_gets_the_period(self):
-        c = period("dsp-uikit-word", self.WORD, ' sel0="0,0"')
-        self.assertEqual(c.status, "PASS", c.evidence)
-        self.assertIn("6/6", c.evidence)
+        for check_id, sel in [("dsp-uikit-word", self.UIKIT_SEL), ("dsp-composer-word", self.WEB_SEL)]:
+            c = period(check_id, self.WORD, sel)
+            self.assertEqual(c.status, "PASS", c.evidence)
+            self.assertIn("6/6", c.evidence)
 
     def test_two_spaces_before_the_word_fail(self):
-        # Protly before the fix (report runs 125 pr-word): KeyboardKit's endSentence left both spaces.
-        c = period("dsp-composer-word", ["world", "hello  world"] + self.WORD[2:])
+        # Protly before the fix (report run 125 pr-word): KeyboardKit's endSentence left both spaces.
+        c = period("dsp-composer-word", ["world", "hello  world"] + self.WORD[2:], self.WEB_SEL)
         self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
         self.assertIn("try 1", c.evidence)
 
     def test_a_lost_space_before_the_word_fails(self):
-        c = period("dsp-uikit-word", ["world", "hello.world"] + ["hello.hello. world"] + self.WORD[3:])
+        c = period("dsp-uikit-word", ["world", "hello.world", "hello.hello. world"] + self.WORD[3:], self.UIKIT_SEL)
         self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+
+    def test_a_caret_that_is_not_at_the_word_start_is_unreadable(self):
+        for check_id, sel in [("dsp-composer-word", ' sel0="5"'), ("dsp-composer-word", ' sel0="-1"'),
+                              ("dsp-composer-word", ""), ("dsp-composer-word", " sel0=<unreadable>"),
+                              ("dsp-uikit-word", ' sel0="5,0"')]:
+            c = period(check_id, self.WORD, sel)
+            self.assertEqual(c.status, "FAIL", f"{check_id}{sel}")
+            self.assertIn("unreadable", c.evidence)
+            self.assertIn("caret not at word start", c.evidence)
 
     def test_word_needs_six_tries(self):
-        c = period("dsp-uikit-word", self.WORD[:6])
+        c = period("dsp-uikit-word", self.WORD[:6], self.UIKIT_SEL)
         self.assertEqual(c.status, "FAIL")
         self.assertIn("unreadable", c.evidence)
         self.assertIn("at least 6", c.evidence)
 
     def test_a_setup_that_did_not_type_the_word_is_unreadable(self):
-        c = period("dsp-uikit-word", ["wrld"] + self.WORD[1:])
+        c = period("dsp-uikit-word", ["wrld"] + self.WORD[1:], self.UIKIT_SEL)
         self.assertEqual(c.status, "FAIL")
         self.assertIn("unreadable", c.evidence)
 
@@ -847,9 +899,9 @@ class PeriodTests(unittest.TestCase):
         self.assertIn("unreadable", c.evidence)
 
     def test_end_of_text_kinds(self):
-        for check_id, unit in [("dsp-uikit-en", "hello. "), ("dsp-composer-fast", "hello. "),
-                               ("dsp-uikit-ko", "안녕. "), ("dsp-composer-kofast", "안녕. "),
-                               ("dsp-uikit-pick2", "the. ")]:
+        for check_id, unit in [("dsp-uikit-en", "hello. "), ("dsp-composer-en", "hello. "),
+                               ("dsp-uikit-ko", "안녕. "), ("dsp-composer-ko", "안녕. "),
+                               ("dsp-uikit-pick2", "the. "), ("dsp-composer-pick2", "the. ")]:
             c = period(check_id, [unit * i for i in range(4)])
             self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
 
@@ -866,11 +918,6 @@ class PeriodTests(unittest.TestCase):
         c = period("dsp-composer-en", ["", "hello. ", "hello. hello  ", "hello. hello  hello. "])
         self.assertEqual(c.status, "FAIL")
         self.assertIn("try 2", c.evidence)
-
-    def test_hold_types_no_space_and_no_period(self):
-        self.assertEqual(period("dsp-uikit-hold", ["", "hello ", "hello hello ", "hello hello hello "]).status, "PASS")
-        c = period("dsp-uikit-hold", ["", "hello. ", "hello. hello ", "hello. hello hello "])
-        self.assertEqual(c.status, "FAIL")
 
     def test_a_driver_problem_stays_fail(self):
         line = 'CHECK dsp-uikit-en FAIL unreadable: problems="no keyboard to type on" kind=en\n'

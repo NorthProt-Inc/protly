@@ -60,6 +60,21 @@ function text(name) {
   return (name === "composer" ? f.textContent : f.value).replace(/ /g, " ");
 }
 
+// The caret's character offset in the focused field, -1 without one (fix/double-space-period: case D's caret before
+// `world`). In the composer it is the selection's anchor (getSelection().anchorOffset) counted from the field's start,
+// so a text split over several nodes still counts from the first character.
+function caret() {
+  const f = document.activeElement;
+  if (!f || !Object.values(fields).includes(f)) return -1;
+  if (typeof f.selectionStart === "number") return f.selectionStart;  // the textarea and the input
+  const s = document.getSelection();
+  if (!s || !s.anchorNode || !f.contains(s.anchorNode)) return -1;
+  const r = document.createRange();
+  r.setStart(f, 0);
+  r.setEnd(s.anchorNode, s.anchorOffset);
+  return r.toString().length;
+}
+
 function rects() {
   const r = {};
   for (const [name, f] of Object.entries(fields)) {
@@ -80,7 +95,7 @@ function state() {
 function postState() {
   const s = {
     textarea: text("textarea"), input: text("input"), composer: text("composer"), sent, submitted, atReturn,
-    focus: (document.activeElement && document.activeElement.id) || "", trace: trace.slice(-16),
+    focus: (document.activeElement && document.activeElement.id) || "", trace: trace.slice(-16), caret: caret(),
   };
   post({ kind: "state", json: JSON.stringify(s), rects: rects() });
 }
@@ -149,6 +164,8 @@ function clearAll() {
 
 window.addEventListener("load", () => { post({ kind: "event", line: `t=${Date.now()} load` }); postState(); });
 window.addEventListener("resize", state);
+// A tap that only moves the caret fires no field event: the state follows the selection too (coalesced like the rest).
+document.addEventListener("selectionchange", state);
 if (window.visualViewport) window.visualViewport.addEventListener("resize", state);
 </script>
 </body>
