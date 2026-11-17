@@ -1,0 +1,23 @@
+surface	trigger	lines	trials	typedOk	sentExact	sentLines	lost	domExact	domLines	model	koLeft	partial	shrunk	ui
+gen:ce	altT	multi	140	140	120	140	0	100	140	140	0	0	0	BT=140
+gen:draft	altT	multi	140	139	119	139	1	0	0	0	0	0	0	BT=140
+gen:draft	altT	single	10	10	10	10	0	10	10	10	0	0	0	BT=10
+gen:lexical-rich	altT	multi	140	140	120	140	0	0	0	0	140	0	140	Could not write=140
+gen:lexical-rich	altT	single	10	10	10	10	0	10	10	10	0	0	0	BT=10
+gen:slate	altT	multi	140	140	100	140	0	140	140	0	0	0	0	BT=140
+gen:slate	altT	single	10	10	10	10	0	10	10	0	0	0	0	BT=10
+gen:textarea	altT	multi	140	140	120	140	0	140	140	140	0	0	0	BT=140
+gm:flat	altT	multi	140	140	20	20	120	0	0	0	120	120	0	BT=140
+gm:flat	altT	single	10	10	10	10	0	0	0	0	0	0	0	BT=10
+gm:none	altT	multi	140	140	140	140	0	100	140	0	0	0	0	BT=140
+gm:quote	altT	multi	140	140	20	20	120	0	0	0	120	120	0	BT=140
+gm:quote	altT	single	10	10	10	10	0	0	0	0	0	0	0	BT=10
+gm:wrapped	altT	multi	140	140	20	20	120	0	0	0	120	120	0	BT=140
+gm:wrapped	altT	single	10	10	10	10	0	0	0	0	0	0	0	BT=10
+ig:lexical-plain	altT	multi	140	140	120	140	0	0	0	0	140	20	120	Could not write=140
+ig:lexical-rich	altT	multi	140	140	100	140	0	0	0	0	140	20	120	Could not write=140
+ig:lexical-rich	altT	single	10	10	10	10	0	10	10	10	0	0	0	BT=10
+ig:lexical-rich	enter	multi	140	140	80	120	0	0	0	0	120	20	100	Could not write=120;other=20
+wa:lexical-plain	altT	multi	140	140	120	140	0	0	0	0	140	20	120	Could not write=140
+wa:lexical-rich	altT	multi	140	140	100	140	0	0	0	0	140	20	120	Could not write=140
+wa:lexical-rich	altT	single	10	10	10	10	0	10	10	10	0	0	0	BT=10

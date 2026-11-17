@@ -1,0 +1,40 @@
+{"ed":"ce","method":"exec","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":null,"errors":0,"pasteHandled":null}
+{"ed":"ce","method":"exec","write":"A1\n\nB2\n\nC3","dom":"A1\n\n\nB2\n\n\nC3","model":null,"errors":0,"pasteHandled":null}
+{"ed":"ce","method":"lines","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":null,"errors":0,"pasteHandled":null}
+{"ed":"ce","method":"lines","write":"A1\n\nB2\n\nC3","dom":"A1\n\nB2\n\nC3","model":null,"errors":0,"pasteHandled":null}
+{"ed":"ce","method":"paras","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":null,"errors":0,"pasteHandled":null}
+{"ed":"ce","method":"paras","write":"A1\n\nB2\n\nC3","dom":"A1\n\n\nB2\n\n\nC3","model":null,"errors":0,"pasteHandled":null}
+{"ed":"ce","method":"paste","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":null,"errors":0,"pasteHandled":false}
+{"ed":"ce","method":"paste","write":"A1\n\nB2\n\nC3","dom":"A1\n\n\nB2\n\n\nC3","model":null,"errors":0,"pasteHandled":false}
+{"ed":"lexical-rich","method":"exec","write":"A1\nB2\nC3","dom":"A1B2C3","model":["A1B2C3"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-rich","method":"exec","write":"A1\n\nB2\n\nC3","dom":"A1B2C3","model":["A1B2C3"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-rich","method":"lines","write":"A1\nB2\nC3","dom":"A1B2C3","model":["A1B2C3"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-rich","method":"lines","write":"A1\n\nB2\n\nC3","dom":"A1B2C3","model":["A1B2C3"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-rich","method":"paras","write":"A1\nB2\nC3","dom":"","model":["가나\n다라\n마바"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-rich","method":"paras","write":"A1\n\nB2\n\nC3","dom":"","model":["가나\n다라\n마바"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-rich","method":"paste","write":"A1\nB2\nC3","dom":"A1\n\nB2\n\nC3","model":["A1","B2","C3"],"errors":0,"pasteHandled":true}
+{"ed":"lexical-rich","method":"paste","write":"A1\n\nB2\n\nC3","dom":"A1\n\n\n\n\nB2\n\n\n\n\nC3","model":["A1","","B2","","C3"],"errors":0,"pasteHandled":true}
+{"ed":"lexical-plain","method":"exec","write":"A1\nB2\nC3","dom":"A1B2C3","model":["A1B2C3"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-plain","method":"exec","write":"A1\n\nB2\n\nC3","dom":"A1B2C3","model":["A1B2C3"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-plain","method":"lines","write":"A1\nB2\nC3","dom":"A1B2C3","model":["A1B2C3"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-plain","method":"lines","write":"A1\n\nB2\n\nC3","dom":"A1B2C3","model":["A1B2C3"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-plain","method":"paras","write":"A1\nB2\nC3","dom":"","model":["가나\n다라\n마바"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-plain","method":"paras","write":"A1\n\nB2\n\nC3","dom":"","model":["가나\n다라\n마바"],"errors":0,"pasteHandled":null}
+{"ed":"lexical-plain","method":"paste","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":["A1\nB2\nC3"],"errors":0,"pasteHandled":true}
+{"ed":"lexical-plain","method":"paste","write":"A1\n\nB2\n\nC3","dom":"A1\n\nB2\n\nC3","model":["A1\n\nB2\n\nC3"],"errors":0,"pasteHandled":true}
+{"ed":"draft","method":"exec","write":"A1\nB2\nC3","dom":"(editable gone)","model":["C3"],"errors":1,"pasteHandled":null}
+{"ed":"draft","method":"exec","write":"A1\n\nB2\n\nC3","dom":"(editable gone)","model":["C3"],"errors":1,"pasteHandled":null}
+{"ed":"draft","method":"lines","write":"A1\nB2\nC3","dom":"(editable gone)","model":["A1"],"errors":5,"pasteHandled":null}
+{"ed":"draft","method":"lines","write":"A1\n\nB2\n\nC3","dom":"(editable gone)","model":["A1"],"errors":7,"pasteHandled":null}
+{"ed":"draft","method":"paras","write":"A1\nB2\nC3","dom":"(editable gone)","model":["A1"],"errors":5,"pasteHandled":null}
+{"ed":"draft","method":"paras","write":"A1\n\nB2\n\nC3","dom":"(editable gone)","model":["A1"],"errors":7,"pasteHandled":null}
+{"ed":"draft","method":"paste","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":["A1","B2","C3"],"errors":0,"pasteHandled":true}
+{"ed":"draft","method":"paste","write":"A1\n\nB2\n\nC3","dom":"A1\n\n\nB2\n\n\nC3","model":["A1","","B2","","C3"],"errors":0,"pasteHandled":true}
+{"ed":"slate","method":"exec","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":["가나","다라","마바"],"errors":0,"pasteHandled":null}
+{"ed":"slate","method":"exec","write":"A1\n\nB2\n\nC3","dom":"A1\n\n\nB2\n\n\nC3","model":["가나","다라","마바"],"errors":0,"pasteHandled":null}
+{"ed":"slate","method":"lines","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":["가나","다라","마바"],"errors":0,"pasteHandled":null}
+{"ed":"slate","method":"lines","write":"A1\n\nB2\n\nC3","dom":"A1\n\nB2\n\nC3","model":["가나","다라","마바"],"errors":0,"pasteHandled":null}
+{"ed":"slate","method":"paras","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":["가나","다라","마바"],"errors":0,"pasteHandled":null}
+{"ed":"slate","method":"paras","write":"A1\n\nB2\n\nC3","dom":"A1\n\n\nB2\n\n\nC3","model":["가나","다라","마바"],"errors":0,"pasteHandled":null}
+{"ed":"slate","method":"paste","write":"A1\nB2\nC3","dom":"A1\nB2\nC3","model":["A1","B2","C3"],"errors":0,"pasteHandled":true}
+{"ed":"slate","method":"paste","write":"A1\n\nB2\n\nC3","dom":"A1\n﻿\n\nB2\n﻿\n\nC3","model":["A1","","B2","","C3"],"errors":0,"pasteHandled":true}
