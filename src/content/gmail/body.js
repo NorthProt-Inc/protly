@@ -101,21 +101,28 @@ export function textToNodes(doc, text) {
 }
 
 const homes = new WeakMap(); // a node swap removed -> the parent it was in
+const closesLine = (n) => BLOCK.test(n.nodeName) || n.nodeName === 'BR' || (n.nodeType === 3 && n.textContent.endsWith('\n'));
 
 // Take out old and put in newNodes, before the first removed node, at the start of its parent. Nodes swap removed
 // earlier (Undo, a failed write check) go back to the start of the parent they came from, so a line taken from the
 // signature's block returns to that block; if any of those parents has left the body (Gmail rendered the block
-// again), none is used and every node goes in before the first removed node, in order. execCommand is not used: next
-// to a block it clones the block's class onto the new lines (spike).
+// again), none is used and every node goes in before the first removed node, in order, with a <br> where a node came
+// from another parent than the one before it and that one does not end a line, so the line it began stays a line.
+// execCommand is not used: next to a block it clones the block's class onto the new lines (spike).
 function swap(body, old, newNodes) {
   const into = old[0]?.parentNode ?? userParent(body);
   old.forEach((n) => { homes.set(n, n.parentNode); n.remove(); });
   const exact = newNodes.every((n) => !homes.has(n) || body.contains(homes.get(n)));
   const runs = new Map(); // parent -> the nodes that go in at its start, in order
+  let prev = null;
   for (const n of newNodes) {
     const p = exact && homes.has(n) ? homes.get(n) : into;
     if (!runs.has(p)) runs.set(p, []);
+    if (!exact && prev && homes.get(prev) !== homes.get(n) && !closesLine(prev)) {
+      runs.get(p).push(body.ownerDocument.createElement('br'));
+    }
     runs.get(p).push(n);
+    prev = n;
   }
   runs.forEach((nodes, p) => p.prepend(...nodes));
   body.dispatchEvent(new body.ownerDocument.defaultView.Event('input', { bubbles: true }));

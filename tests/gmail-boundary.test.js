@@ -102,6 +102,16 @@ test('Undo after Gmail replaced the signature block puts every line back in orde
   assert.equal(whole(body), before);
 });
 
+test('Undo after Gmail replaced the block of the second of two lines keeps them two lines', () => {
+  const { doc, body } = bodyOf(`가나다<div>라마바<br><div><br></div>${SIG}</div>`);
+  const before = whole(body);
+  const removed = replaceUserNodes(body, textToNodes(doc, 'EN1\nEN2'));
+  const block = body.querySelector('.gmail_signature').parentNode; // held 라마바 and its <br>
+  block.replaceWith(block.cloneNode(true));
+  replaceUserNodes(body, removed);
+  assert.equal(whole(body), before);
+});
+
 test('a translation replaced again (Deep, language chip) keeps the signature block and its blank line', () => {
   const [, html, typed] = SHARED[0];
   const { doc, body } = bodyOf(html);
