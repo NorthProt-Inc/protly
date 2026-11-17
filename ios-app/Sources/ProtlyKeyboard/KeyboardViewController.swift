@@ -67,7 +67,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// What the field reads moved the cursor over, for Cancel (P6).
     private var cursorReturn = CursorReturn()
     /// Text protly inserted and what it replaced, for Undo.
-    private var lastInsert: (inserted: String, original: String, isSelection: Bool)?
+    private var lastInsert: (inserted: String, original: String)?
     /// LearnedWords.changes at the last save (Words.swift). Per controller: each one loads its own copy.
     var savedChanges = 0
 
@@ -516,10 +516,10 @@ final class KeyboardViewController: KeyboardInputViewController {
         if card.action == .in {
             // Read: the reply goes in at the cursor (no selection: the check above).
             p.insertText(result)
-            lastInsert = (result, "", false)
+            lastInsert = (result, "")
         } else {
-            FieldText.replace(card.original, isSelection: false, with: result, p)
-            lastInsert = (result, card.original, false)
+            FieldText.replace(card.original, with: result, p)
+            lastInsert = (result, card.original)
         }
         cursorReturn.clear()
         watch.forget()
