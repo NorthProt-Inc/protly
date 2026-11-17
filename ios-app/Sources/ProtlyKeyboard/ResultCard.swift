@@ -2,7 +2,7 @@ import ProtlyCore
 import SwiftUI
 
 /// The result card's state besides the streamed text (ResultFeed). Changes once at the first text and once at the
-/// end of the call, and when Replace finds the field changed.
+/// end of the call, and when Replace or Insert finds it may not write.
 struct CardState: Equatable {
     enum Phase: Equatable {
         case streaming, done, failed
@@ -22,12 +22,13 @@ struct CardState: Equatable {
     /// until now and a typing thumb is right there.
     let shownAt: Double
     var phase: Phase = .streaming
-    /// The field changed during the call (P10): the result stays, only Copy is offered.
-    var copyOnly = false
+    /// Why only Copy is offered (FieldGuard.copyOnly): the text came from a selection (from the start), text is
+    /// selected, or the field changed during the call (P10). nil: Replace or Insert once done.
+    var copyOnly: FieldGuard.CopyOnly?
 
-    /// Replace for Translate and Polish, Insert for Read; only once done and while the field is as read.
+    /// Replace for Translate and Polish, Insert for Read; only once done and while the card may write.
     var primary: String? {
-        guard phase == .done, !copyOnly else { return nil }
+        guard phase == .done, copyOnly == nil else { return nil }
         return action == .in ? "Insert" : "Replace"
     }
 }
@@ -137,8 +138,8 @@ struct ResultCard: View {
     private var primaryButton: some View {
         if let primary = card.primary {
             button(primary, action: replace).fontWeight(.semibold)
-        } else if card.phase == .streaming {
-            // Keeps the row's layout while the text arrives.
+        } else if card.phase == .streaming, card.copyOnly == nil {
+            // Keeps the row's layout while the text arrives. A copy-only card never shows it.
             button(card.action == .in ? "Insert" : "Replace") {}.disabled(true)
         }
     }
@@ -158,11 +159,11 @@ struct ResultCard: View {
 }
 
 /// The card's text: the translation (with a steady caret while it streams, dimmed when kept after an error), the back
-/// translation once done, and the error or field-changed line.
+/// translation once done, and the error or copy-only line.
 private struct CardText: View {
     let feed: ResultFeed
     let phase: CardState.Phase
-    let copyOnly: Bool
+    let copyOnly: FieldGuard.CopyOnly?
     let deep: Bool
 
     var body: some View {
@@ -179,9 +180,8 @@ private struct CardText: View {
             }
             if let error = feed.failed {
                 Text(error.message(deep: deep)).font(.footnote).foregroundStyle(.secondary)
-            } else if copyOnly {
-                Text("The text changed while this ran. Copy the result instead.")
-                    .font(.footnote).foregroundStyle(.secondary)
+            } else if let copyOnly {
+                Text(copyOnly.message).font(.footnote).foregroundStyle(.secondary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

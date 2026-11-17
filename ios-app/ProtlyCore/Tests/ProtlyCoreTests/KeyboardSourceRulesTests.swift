@@ -485,9 +485,34 @@ final class KeyboardSourceRulesTests: XCTestCase {
         // Every Retry goes through retry(_:), which sends Read's own text again instead of reading the clipboard.
         XCTAssertEqual(matches(#"retry: \{ \[unowned host\] in host\.retry\(\$0\) \}"#, in: controller).count, 2)
         XCTAssertEqual(matches(#"retry: \{ \[unowned host\] in host\.act\("#, in: controller).count, 0)
-        // Read's Insert keeps what it typed over, so Undo can put a selection back.
-        let insert = body(of: "func insertResult()", in: cns).map { cns.substring(with: $0) } ?? ""
-        XCTAssertTrue(insert.contains("lastInsert = (result, selected, !selected.isEmpty)"), "Read's Insert drops the selection")
+    }
+
+    private func controllerSource() throws -> String {
+        guard let text = try sources().first(where: { $0.name == "KeyboardViewController.swift" })?.text else {
+            XCTFail("KeyboardViewController.swift not found")
+            return ""
+        }
+        return text
+    }
+
+    /// P1a cause 3 (track K1a): protly never types over a selection, because `selectedText` can hold only the start of
+    /// it. FieldGuard.copyOnly decides: the card opens with it, the finished card checks the field with it, and
+    /// insertResult asks it again before its first write.
+    func testProtlyNeverTypesOverASelection() throws {
+        let controller = try controllerSource()
+        let cns = controller as NSString
+        func fn(_ declaration: String) -> String { body(of: declaration, in: cns).map { cns.substring(with: $0) } ?? "" }
+        let insert = fn("func insertResult()") as NSString
+        let check = insert.range(of: "FieldGuard.copyOnly(").location
+        XCTAssertNotEqual(check, NSNotFound, "insertResult asks FieldGuard.copyOnly")
+        for write in ["insertText(", "FieldText.replace("] {
+            let at = insert.range(of: write).location
+            XCTAssertTrue(at != NSNotFound && check < at, "insertResult asks FieldGuard.copyOnly before \(write)")
+        }
+        let show = fn("private func show(")
+        XCTAssertTrue(show.contains("field: nil)"), "a card opens with the rule applied")
+        XCTAssertTrue(show.contains("field: observed())"), "a finished card checks the field with the rule")
+        XCTAssertFalse(controller.contains("selectedText =="), "selectedText cannot be checked against the real selection")
     }
 
     /// Tower decision D-B: the keys wait during the field read, so the read runs on FieldReadBudget's clock (2 s in all,
