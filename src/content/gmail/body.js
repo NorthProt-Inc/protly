@@ -100,16 +100,14 @@ export function textToNodes(doc, text) {
   });
 }
 
-const homes = new WeakMap(); // a node replaceUserNodes removed -> the parent it was in
+const homes = new WeakMap(); // a node swap removed -> the parent it was in
 
-// Swap the user's part for newNodes; returns the removed nodes (for Undo). Quote and signature stay put: new nodes go
-// in before the first removed node, at the start of its parent. Nodes this function removed earlier (Undo, a failed
-// write check) go back to the start of the parent they came from, so a line taken from the signature's block returns
-// to that block; if any of those parents has left the body (Gmail rendered the block again), none is used and every
-// node goes in before the first removed node, in order. execCommand is not used: next to a block it clones the
-// block's class onto the new lines (spike).
-export function replaceUserNodes(body, newNodes) {
-  const old = userNodes(body);
+// Take out old and put in newNodes, before the first removed node, at the start of its parent. Nodes swap removed
+// earlier (Undo, a failed write check) go back to the start of the parent they came from, so a line taken from the
+// signature's block returns to that block; if any of those parents has left the body (Gmail rendered the block
+// again), none is used and every node goes in before the first removed node, in order. execCommand is not used: next
+// to a block it clones the block's class onto the new lines (spike).
+function swap(body, old, newNodes) {
   const into = old[0]?.parentNode ?? userParent(body);
   old.forEach((n) => { homes.set(n, n.parentNode); n.remove(); });
   const exact = newNodes.every((n) => !homes.has(n) || body.contains(homes.get(n)));
@@ -122,4 +120,13 @@ export function replaceUserNodes(body, newNodes) {
   runs.forEach((nodes, p) => p.prepend(...nodes));
   body.dispatchEvent(new body.ownerDocument.defaultView.Event('input', { bubbles: true }));
   return old;
+}
+
+// Swap the user's part for newNodes; returns the removed nodes (for Undo). Quote and signature stay put.
+export const replaceUserNodes = (body, newNodes) => swap(body, userNodes(body), newNodes);
+
+// After a failed write check: take out exactly the nodes that write put in and put the removed draft back. Unlike
+// replaceUserNodes it does not reread the user's part, so a typed line the check caught stays where it is.
+export function putBack(body, written, removed) {
+  swap(body, written, removed);
 }
