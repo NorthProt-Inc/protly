@@ -1,0 +1,834 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5f_space
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK sp-field-en 1794911534.686
+MARK sp-field-en-try1 1794911536.164
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.98 s
+MARK sp-field-en-try2 1794911544.738
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.91 s
+MARK sp-field-en-try3 1794911553.253
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.87 s
+MARK sp-field-en-try4 1794911561.342
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.85 s
+MARK sp-field-en-try5 1794911569.243
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.85 s
+MARK sp-field-en-try6 1794911577.047
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.88 s
+MARK sp-field-en-try7 1794911584.881
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.88 s
+MARK sp-field-en-try8 1794911592.950
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.89 s
+MARK sp-field-en-try9 1794911601.186
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.90 s
+MARK sp-field-en-try10 1794911609.513
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 0.89 s
+CHECK sp-field-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.98,0.91,0.87,0.85,0.85,0.88,0.88,0.89,0.90,0.89 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-field-ko 1794911621.187
+MARK sp-field-ko-try1 1794911622.502
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.84 s
+MARK sp-field-ko-try2 1794911631.265
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.83 s
+MARK sp-field-ko-try3 1794911639.975
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.87 s
+MARK sp-field-ko-try4 1794911648.704
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.85 s
+MARK sp-field-ko-try5 1794911657.592
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.84 s
+MARK sp-field-ko-try6 1794911666.390
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+MARK sp-field-ko-try7 1794911675.338
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.92 s
+MARK sp-field-ko-try8 1794911684.584
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.94 s
+MARK sp-field-ko-try9 1794911694.122
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.91 s
+MARK sp-field-ko-try10 1794911702.941
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+CHECK sp-field-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.84,0.83,0.87,0.85,0.84,0.89,0.92,0.94,0.91,0.89 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+MARK sp-field-fast 1794911715.359
+MARK sp-field-fast-try1 1794911716.688
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try2 1794911724.001
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try3 1794911731.212
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try4 1794911738.477
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try5 1794911745.729
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try6 1794911753.069
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try7 1794911760.196
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try8 1794911767.372
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try9 1794911774.888
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+MARK sp-field-fast-try10 1794911782.608
+typing: keyboard top 512.00, row 1 564.00
+typed "hello"
+CHECK sp-field-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.53,0.54,0.52,0.53,0.55,0.52,0.51,0.58,0.60,0.60 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-field-kofast 1794911794.045
+MARK sp-field-kofast-try1 1794911795.339
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕"
+MARK sp-field-kofast-try2 1794911803.644
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕"
+MARK sp-field-kofast-try3 1794911811.971
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕"
+MARK sp-field-kofast-try4 1794911820.047
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕"
+MARK sp-field-kofast-try5 1794911827.946
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕"
+MARK sp-field-kofast-try6 1794911835.962
+typing: keyboard top 512.00, row 1 564.00
+typed "안녕"
+CHECK sp-field-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.56,0.57,0.52,0.52,0.54,0.56 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+tapped the field
+MARK sp-uikit-en 1794911854.831
+MARK sp-uikit-en-try1 1794911856.176
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.87 s
+MARK sp-uikit-en-try2 1794911864.321
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.86 s
+MARK sp-uikit-en-try3 1794911872.492
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.86 s
+MARK sp-uikit-en-try4 1794911880.518
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.82 s
+MARK sp-uikit-en-try5 1794911888.324
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.85 s
+MARK sp-uikit-en-try6 1794911896.135
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.85 s
+MARK sp-uikit-en-try7 1794911903.927
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.87 s
+MARK sp-uikit-en-try8 1794911911.836
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.89 s
+MARK sp-uikit-en-try9 1794911920.000
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.91 s
+MARK sp-uikit-en-try10 1794911928.181
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.88 s
+CHECK sp-uikit-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.87,0.86,0.86,0.82,0.85,0.85,0.87,0.89,0.91,0.88 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-uikit-ko 1794911939.954
+MARK sp-uikit-ko-try1 1794911941.306
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.86 s
+MARK sp-uikit-ko-try2 1794911950.127
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.86 s
+MARK sp-uikit-ko-try3 1794911958.925
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+MARK sp-uikit-ko-try4 1794911967.790
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.85 s
+MARK sp-uikit-ko-try5 1794911976.572
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.87 s
+MARK sp-uikit-ko-try6 1794911985.359
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.87 s
+MARK sp-uikit-ko-try7 1794911994.195
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.85 s
+MARK sp-uikit-ko-try8 1794912002.981
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.85 s
+MARK sp-uikit-ko-try9 1794912011.713
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.85 s
+MARK sp-uikit-ko-try10 1794912020.419
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.86 s
+CHECK sp-uikit-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.86,0.86,0.88,0.85,0.87,0.87,0.85,0.85,0.85,0.86 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+MARK sp-uikit-fast 1794912032.805
+MARK sp-uikit-fast-try1 1794912034.104
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try2 1794912041.284
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try3 1794912048.437
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try4 1794912055.526
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try5 1794912062.761
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try6 1794912070.094
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try7 1794912077.235
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try8 1794912084.309
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try9 1794912091.487
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+MARK sp-uikit-fast-try10 1794912098.607
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+CHECK sp-uikit-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.55,0.56,0.53,0.58,0.57,0.53,0.55,0.56,0.56,0.54 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-uikit-kofast 1794912109.245
+MARK sp-uikit-kofast-try1 1794912110.535
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+MARK sp-uikit-kofast-try2 1794912118.679
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+MARK sp-uikit-kofast-try3 1794912126.801
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+MARK sp-uikit-kofast-try4 1794912135.027
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+MARK sp-uikit-kofast-try5 1794912143.153
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+MARK sp-uikit-kofast-try6 1794912151.225
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+CHECK sp-uikit-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.54,0.58,0.57,0.57,0.57,0.58 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+MARK sp-uikit-pick1 1794912163.023
+MARK sp-uikit-pick1-try1 1794912164.345
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+MARK sp-uikit-pick1-try2 1794912171.136
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+MARK sp-uikit-pick1-try3 1794912177.877
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+MARK sp-uikit-pick1-try4 1794912184.652
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+MARK sp-uikit-pick1-try5 1794912191.403
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+MARK sp-uikit-pick1-try6 1794912198.077
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+CHECK sp-uikit-pick1 RECORD kind=pick1 tries=6 period=0 period-other=0 spaces=6 other=0 unreadable=0 seq=SSSSSS gaps=-1.00,-1.00,-1.00,-1.00,-1.00,-1.00 odd=1:"the  ";2:"the  ";3:"the  ";4:"the  ";5:"the  ";6:"the  " final="the  the  the  the  the  the  "
+MARK sp-uikit-pick2 1794912208.374
+MARK sp-uikit-pick2-try1 1794912209.701
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.88 s
+MARK sp-uikit-pick2-try2 1794912217.326
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.89 s
+MARK sp-uikit-pick2-try3 1794912224.921
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.87 s
+MARK sp-uikit-pick2-try4 1794912232.453
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.87 s
+MARK sp-uikit-pick2-try5 1794912240.063
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.88 s
+MARK sp-uikit-pick2-try6 1794912247.658
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.85 s
+CHECK sp-uikit-pick2 RECORD kind=pick2 tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.88,0.89,0.87,0.87,0.88,0.85 final="the. the. the. the. the. the. "
+MARK sp-uikit-hold 1794912258.644
+MARK sp-uikit-hold-try1 1794912259.955
+typing: keyboard top 495.00, row 1 564.00
+typed "hello "
+MARK sp-uikit-hold-try2 1794912268.565
+typing: keyboard top 495.00, row 1 564.00
+typed "hello "
+MARK sp-uikit-hold-try3 1794912277.326
+typing: keyboard top 495.00, row 1 564.00
+typed "hello "
+CHECK sp-uikit-hold RECORD kind=hold tries=3 period=0 period-other=0 spaces=0 other=3 unreadable=0 seq=XXX gaps=1.06,1.12,1.06 odd=1:"hello ";2:"hello ";3:"hello " final="hello hello hello "
+web page: rects {"composer":[8,129,264,40],"input":[8,95,264,30],"plain":[8,173,264,40],"textarea":[8,59,264,32]}
+MARK sp-plain-en 1794912299.890
+MARK sp-plain-en-try1 1794912301.016
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 1.01 s
+MARK sp-plain-en-try2 1794912309.529
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.99 s
+MARK sp-plain-en-try3 1794912317.980
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.91 s
+MARK sp-plain-en-try4 1794912326.486
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.94 s
+MARK sp-plain-en-try5 1794912334.970
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.99 s
+MARK sp-plain-en-try6 1794912343.715
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 1.03 s
+MARK sp-plain-en-try7 1794912352.412
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.97 s
+MARK sp-plain-en-try8 1794912361.065
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.94 s
+MARK sp-plain-en-try9 1794912369.617
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.92 s
+MARK sp-plain-en-try10 1794912377.773
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.90 s
+CHECK sp-plain-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=1.01,0.99,0.91,0.94,0.99,1.03,0.97,0.94,0.92,0.90 nbsp-at-end=1 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-plain-ko 1794912392.326
+MARK sp-plain-ko-try1 1794912393.496
+typing: keyboard top 295.33, row 1 564.00
+typed "안녕  ", last gap 0.92 s
+MARK sp-plain-ko-try2 1794912402.932
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 1.00 s
+MARK sp-plain-ko-try3 1794912412.371
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+MARK sp-plain-ko-try4 1794912421.546
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.87 s
+MARK sp-plain-ko-try5 1794912430.466
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.90 s
+MARK sp-plain-ko-try6 1794912439.707
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.95 s
+MARK sp-plain-ko-try7 1794912448.868
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.95 s
+MARK sp-plain-ko-try8 1794912458.214
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+MARK sp-plain-ko-try9 1794912467.378
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+MARK sp-plain-ko-try10 1794912476.359
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+CHECK sp-plain-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.92,1.00,0.88,0.87,0.90,0.95,0.95,0.89,0.88,0.88 nbsp-at-end=1 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+MARK sp-plain-fast 1794912491.285
+MARK sp-plain-fast-try1 1794912492.443
+typing: keyboard top 295.33, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try2 1794912499.737
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try3 1794912506.717
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try4 1794912513.810
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try5 1794912521.002
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try6 1794912528.412
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try7 1794912535.881
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try8 1794912543.297
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try9 1794912550.516
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+MARK sp-plain-fast-try10 1794912557.723
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+CHECK sp-plain-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.57,0.56,0.59,0.59,0.63,0.61,0.58,0.59,0.63,0.57 nbsp-at-end=1 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-plain-kofast 1794912570.790
+MARK sp-plain-kofast-try1 1794912571.958
+typing: keyboard top 295.33, row 1 564.00
+typed "안녕"
+MARK sp-plain-kofast-try2 1794912580.163
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕"
+MARK sp-plain-kofast-try3 1794912588.194
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕"
+MARK sp-plain-kofast-try4 1794912596.471
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕"
+MARK sp-plain-kofast-try5 1794912604.752
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕"
+MARK sp-plain-kofast-try6 1794912612.967
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕"
+CHECK sp-plain-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.56,0.61,0.59,0.63,0.62,0.56 nbsp-at-end=1 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+MARK sp-plain-pick1 1794912627.011
+MARK sp-plain-pick1-try1 1794912628.157
+typing: keyboard top 295.33, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+MARK sp-plain-pick1-try2 1794912634.916
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+MARK sp-plain-pick1-try3 1794912641.382
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+MARK sp-plain-pick1-try4 1794912647.836
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+MARK sp-plain-pick1-try5 1794912654.286
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+MARK sp-plain-pick1-try6 1794912660.821
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+CHECK sp-plain-pick1 RECORD kind=pick1 tries=6 period=0 period-other=0 spaces=6 other=0 unreadable=0 seq=SSSSSS gaps=-1.00,-1.00,-1.00,-1.00,-1.00,-1.00 odd=1:"the  ";2:"the  ";3:"the  ";4:"the  ";5:"the  ";6:"the  " nbsp-at-end=6 final="the  the  the  the  the  the  "
+MARK sp-plain-pick2 1794912673.335
+MARK sp-plain-pick2-try1 1794912674.478
+typing: keyboard top 295.33, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 0.85 s
+MARK sp-plain-pick2-try2 1794912682.134
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 0.85 s
+MARK sp-plain-pick2-try3 1794912689.563
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 0.92 s
+MARK sp-plain-pick2-try4 1794912697.400
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 0.92 s
+MARK sp-plain-pick2-try5 1794912705.203
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 0.91 s
+MARK sp-plain-pick2-try6 1794912712.948
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 0.92 s
+CHECK sp-plain-pick2 RECORD kind=pick2 tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.85,0.85,0.92,0.92,0.91,0.92 nbsp-at-end=1 final="the. the. the. the. the. the. "
+MARK sp-composer-en 1794912726.650
+MARK sp-composer-en-try1 1794912727.802
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.90 s
+MARK sp-composer-en-try2 1794912735.961
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.91 s
+MARK sp-composer-en-try3 1794912744.120
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.91 s
+MARK sp-composer-en-try4 1794912752.329
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.86 s
+MARK sp-composer-en-try5 1794912760.447
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.91 s
+MARK sp-composer-en-try6 1794912768.556
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.90 s
+MARK sp-composer-en-try7 1794912776.636
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.89 s
+MARK sp-composer-en-try8 1794912784.877
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.88 s
+MARK sp-composer-en-try9 1794912792.929
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.90 s
+MARK sp-composer-en-try10 1794912801.145
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.93 s
+CHECK sp-composer-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.90,0.91,0.91,0.86,0.91,0.90,0.89,0.88,0.90,0.93 nbsp-at-end=0 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-composer-ko 1794912815.418
+MARK sp-composer-ko-try1 1794912816.568
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+MARK sp-composer-ko-try2 1794912825.736
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.91 s
+MARK sp-composer-ko-try3 1794912834.661
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.93 s
+MARK sp-composer-ko-try4 1794912843.753
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+MARK sp-composer-ko-try5 1794912852.852
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.92 s
+MARK sp-composer-ko-try6 1794912861.952
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+MARK sp-composer-ko-try7 1794912870.813
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.90 s
+MARK sp-composer-ko-try8 1794912879.788
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+MARK sp-composer-ko-try9 1794912888.723
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.91 s
+MARK sp-composer-ko-try10 1794912897.767
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.86 s
+CHECK sp-composer-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.88,0.91,0.93,0.89,0.92,0.89,0.90,0.88,0.91,0.86 nbsp-at-end=0 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+MARK sp-composer-fast 1794912912.811
+MARK sp-composer-fast-try1 1794912913.984
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try2 1794912921.331
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try3 1794912928.540
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try4 1794912935.820
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try5 1794912943.334
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try6 1794912950.845
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try7 1794912958.210
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try8 1794912965.642
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try9 1794912973.007
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-composer-fast-try10 1794912980.395
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+CHECK sp-composer-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.55,0.56,0.64,0.61,0.71,0.60,0.61,0.59,0.63,0.58 nbsp-at-end=0 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-composer-kofast 1794912993.671
+MARK sp-composer-kofast-try1 1794912994.852
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-composer-kofast-try2 1794913003.289
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-composer-kofast-try3 1794913011.284
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-composer-kofast-try4 1794913019.397
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-composer-kofast-try5 1794913027.445
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-composer-kofast-try6 1794913035.380
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+CHECK sp-composer-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.58,0.57,0.56,0.57,0.57,0.57 nbsp-at-end=0 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+MARK sp-composer-pick1 1794913049.323
+MARK sp-composer-pick1-try1 1794913050.483
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed " "
+MARK sp-composer-pick1-try2 1794913057.363
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed " "
+MARK sp-composer-pick1-try3 1794913063.845
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed " "
+MARK sp-composer-pick1-try4 1794913070.365
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed " "
+MARK sp-composer-pick1-try5 1794913076.866
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed " "
+MARK sp-composer-pick1-try6 1794913083.331
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed " "
+CHECK sp-composer-pick1 RECORD kind=pick1 tries=6 period=0 period-other=0 spaces=6 other=0 unreadable=0 seq=SSSSSS gaps=-1.00,-1.00,-1.00,-1.00,-1.00,-1.00 odd=1:"the  ";2:"the  ";3:"the  ";4:"the  ";5:"the  ";6:"the  " nbsp-at-end=0 final="the  the  the  the  the  the  "
+MARK sp-composer-pick2 1794913095.832
+MARK sp-composer-pick2-try1 1794913097.001
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed "  ", last gap 0.90 s
+MARK sp-composer-pick2-try2 1794913104.727
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed "  ", last gap 0.88 s
+MARK sp-composer-pick2-try3 1794913112.156
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed "  ", last gap 0.89 s
+MARK sp-composer-pick2-try4 1794913119.666
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed "  ", last gap 0.96 s
+MARK sp-composer-pick2-try5 1794913127.460
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed "  ", last gap 0.98 s
+MARK sp-composer-pick2-try6 1794913135.539
+typing: keyboard top 437.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 437.00, row 1 564.00
+typed "  ", last gap 0.90 s
+CHECK sp-composer-pick2 RECORD kind=pick2 tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.90,0.88,0.89,0.96,0.98,0.90 nbsp-at-end=0 final="the. the. the. the. the. the. "
+MARK sp-textarea-en 1794913150.491
+MARK sp-textarea-en-try1 1794913151.617
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.92 s
+MARK sp-textarea-en-try2 1794913159.863
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.91 s
+MARK sp-textarea-en-try3 1794913167.981
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.92 s
+MARK sp-textarea-en-try4 1794913176.236
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.93 s
+MARK sp-textarea-en-try5 1794913184.485
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.92 s
+MARK sp-textarea-en-try6 1794913192.720
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.91 s
+MARK sp-textarea-en-try7 1794913200.837
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.93 s
+MARK sp-textarea-en-try8 1794913209.066
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.88 s
+MARK sp-textarea-en-try9 1794913217.136
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.89 s
+MARK sp-textarea-en-try10 1794913225.176
+typing: keyboard top 437.00, row 1 564.00
+typed "hello  ", last gap 0.96 s
+CHECK sp-textarea-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.92,0.91,0.92,0.93,0.92,0.91,0.93,0.88,0.89,0.96 nbsp-at-end=0 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-textarea-ko 1794913240.069
+MARK sp-textarea-ko-try1 1794913241.286
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.91 s
+MARK sp-textarea-ko-try2 1794913250.680
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+MARK sp-textarea-ko-try3 1794913259.603
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+MARK sp-textarea-ko-try4 1794913268.614
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+MARK sp-textarea-ko-try5 1794913277.558
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+MARK sp-textarea-ko-try6 1794913286.597
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+MARK sp-textarea-ko-try7 1794913295.607
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+MARK sp-textarea-ko-try8 1794913305.023
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.91 s
+MARK sp-textarea-ko-try9 1794913314.103
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.92 s
+MARK sp-textarea-ko-try10 1794913323.213
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕  ", last gap 0.91 s
+CHECK sp-textarea-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.91,0.88,0.89,0.89,0.88,0.89,0.89,0.91,0.92,0.91 nbsp-at-end=0 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+MARK sp-textarea-fast 1794913338.620
+MARK sp-textarea-fast-try1 1794913339.813
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try2 1794913347.497
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try3 1794913354.897
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try4 1794913362.155
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try5 1794913369.422
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try6 1794913376.767
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try7 1794913383.956
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try8 1794913391.196
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try9 1794913398.422
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+MARK sp-textarea-fast-try10 1794913405.699
+typing: keyboard top 437.00, row 1 564.00
+typed "hello"
+CHECK sp-textarea-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.61,0.61,0.61,0.61,0.60,0.56,0.60,0.57,0.59,0.60 nbsp-at-end=0 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+MARK sp-textarea-kofast 1794913419.302
+MARK sp-textarea-kofast-try1 1794913420.531
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-textarea-kofast-try2 1794913429.147
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-textarea-kofast-try3 1794913437.425
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-textarea-kofast-try4 1794913445.806
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-textarea-kofast-try5 1794913454.138
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+MARK sp-textarea-kofast-try6 1794913462.525
+typing: keyboard top 437.00, row 1 564.00
+typed "안녕"
+CHECK sp-textarea-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.62,0.61,0.61,0.61,0.62,0.62 nbsp-at-end=0 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "

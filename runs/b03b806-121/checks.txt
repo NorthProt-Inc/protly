@@ -1,0 +1,104 @@
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK sp-composer-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.90,0.91,0.91,0.86,0.91,0.90,0.89,0.88,0.90,0.93 nbsp-at-end=0 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-composer-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.55,0.56,0.64,0.61,0.71,0.60,0.61,0.59,0.63,0.58 nbsp-at-end=0 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-composer-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.88,0.91,0.93,0.89,0.92,0.89,0.90,0.88,0.91,0.86 nbsp-at-end=0 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-composer-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.58,0.57,0.56,0.57,0.57,0.57 nbsp-at-end=0 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-composer-pick1 RECORD kind=pick1 tries=6 period=0 period-other=0 spaces=6 other=0 unreadable=0 seq=SSSSSS gaps=-1.00,-1.00,-1.00,-1.00,-1.00,-1.00 odd=1:"the  ";2:"the  ";3:"the  ";4:"the  ";5:"the  ";6:"the  " nbsp-at-end=0 final="the  the  the  the  the  the  "
+CHECK sp-composer-pick2 RECORD kind=pick2 tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.90,0.88,0.89,0.96,0.98,0.90 nbsp-at-end=0 final="the. the. the. the. the. the. "
+CHECK sp-field-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.98,0.91,0.87,0.85,0.85,0.88,0.88,0.89,0.90,0.89 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-field-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.53,0.54,0.52,0.53,0.55,0.52,0.51,0.58,0.60,0.60 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-field-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.84,0.83,0.87,0.85,0.84,0.89,0.92,0.94,0.91,0.89 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-field-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.56,0.57,0.52,0.52,0.54,0.56 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-plain-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=1.01,0.99,0.91,0.94,0.99,1.03,0.97,0.94,0.92,0.90 nbsp-at-end=1 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-plain-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.57,0.56,0.59,0.59,0.63,0.61,0.58,0.59,0.63,0.57 nbsp-at-end=1 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-plain-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.92,1.00,0.88,0.87,0.90,0.95,0.95,0.89,0.88,0.88 nbsp-at-end=1 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-plain-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.56,0.61,0.59,0.63,0.62,0.56 nbsp-at-end=1 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-plain-pick1 RECORD kind=pick1 tries=6 period=0 period-other=0 spaces=6 other=0 unreadable=0 seq=SSSSSS gaps=-1.00,-1.00,-1.00,-1.00,-1.00,-1.00 odd=1:"the  ";2:"the  ";3:"the  ";4:"the  ";5:"the  ";6:"the  " nbsp-at-end=6 final="the  the  the  the  the  the  "
+CHECK sp-plain-pick2 RECORD kind=pick2 tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.85,0.85,0.92,0.92,0.91,0.92 nbsp-at-end=1 final="the. the. the. the. the. the. "
+CHECK sp-textarea-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.92,0.91,0.92,0.93,0.92,0.91,0.93,0.88,0.89,0.96 nbsp-at-end=0 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-textarea-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.61,0.61,0.61,0.61,0.60,0.56,0.60,0.57,0.59,0.60 nbsp-at-end=0 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-textarea-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.91,0.88,0.89,0.89,0.88,0.89,0.89,0.91,0.92,0.91 nbsp-at-end=0 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-textarea-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.62,0.61,0.61,0.61,0.62,0.62 nbsp-at-end=0 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-uikit-en RECORD kind=en tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.87,0.86,0.86,0.82,0.85,0.85,0.87,0.89,0.91,0.88 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-uikit-fast RECORD kind=fast tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.55,0.56,0.53,0.58,0.57,0.53,0.55,0.56,0.56,0.54 final="hello. hello. hello. hello. hello. hello. hello. hello. hello. hello. "
+CHECK sp-uikit-hold RECORD kind=hold tries=3 period=0 period-other=0 spaces=0 other=3 unreadable=0 seq=XXX gaps=1.06,1.12,1.06 odd=1:"hello ";2:"hello ";3:"hello " final="hello hello hello "
+CHECK sp-uikit-ko RECORD kind=ko tries=10 period=10 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPPPPPP gaps=0.86,0.86,0.88,0.85,0.87,0.87,0.85,0.85,0.85,0.86 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-uikit-kofast RECORD kind=kofast tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.54,0.58,0.57,0.57,0.57,0.58 final="안녕. 안녕. 안녕. 안녕. 안녕. 안녕. "
+CHECK sp-uikit-pick1 RECORD kind=pick1 tries=6 period=0 period-other=0 spaces=6 other=0 unreadable=0 seq=SSSSSS gaps=-1.00,-1.00,-1.00,-1.00,-1.00,-1.00 odd=1:"the  ";2:"the  ";3:"the  ";4:"the  ";5:"the  ";6:"the  " final="the  the  the  the  the  the  "
+CHECK sp-uikit-pick2 RECORD kind=pick2 tries=6 period=6 period-other=0 spaces=0 other=0 unreadable=0 seq=PPPPPP gaps=0.88,0.89,0.87,0.87,0.88,0.85 final="the. the. the. the. the. the. "
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
