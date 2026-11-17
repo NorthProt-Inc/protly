@@ -1,6 +1,6 @@
 import { SEL, senderOf, findViewerName } from './selectors.js';
 import { trusted } from '../ui/trust.js';
-import { cutsShort, insertAll } from '../lib/editable.js';
+import { cutsShort, editableText, insertAll } from '../lib/editable.js';
 
 export const findThreadRoot = (doc) => doc.querySelector(SEL.threadRoot);
 export const findComposer = (doc) => doc.querySelector(SEL.composer);
@@ -87,8 +87,10 @@ export function setHoverOriginal(m, korean) {
   m.textEl.setAttribute('data-pl-title', '');
 }
 
+// The draft as the writers write it back: one \n between blocks and per <br>. Not innerText, which puts a blank line
+// between <p>s: a paste into rich Lexical makes one <p> per line, so each Enter and Alt+Z cycle gained a blank line.
 export function getComposerText(el) {
-  return (el.innerText || '').replace(/\n$/, '');
+  return editableText(el);
 }
 
 // Lexical syncs its selection on `selectionchange`, so it needs a moment between selecting and inserting,

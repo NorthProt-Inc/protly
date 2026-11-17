@@ -75,6 +75,28 @@ test('a multi-line translation is pasted, every line lands, and Alt+Z pastes the
   assert.deepEqual(nonblank(composer.innerText), KO);
 });
 
+test('rich Lexical: Enter and Alt+Z, three times over, send and restore the same two lines, no blank line gained', async () => {
+  // A paste makes one <p> per line, and Chrome's innerText puts a blank line between <p>s: a draft read that way grew
+  // by a blank line on every cycle (review of C2). The composer read counts one line break between blocks.
+  const log = freshComposer('<p>가나다<br>라마바</p>');
+  const sent = [];
+  for (let round = 0; round < 3; round++) {
+    assert.equal(enter().defaultPrevented, true);
+    await until(() => pending.length === 1);
+    sent.push(pending[0].msg.korean);
+    answer('A1\nB2');
+    await until(() => cardPart('.hints'));
+    assert.equal(composer.innerHTML, '<p>A1</p><p>B2</p>');
+    assert.equal(altZ().defaultPrevented, true);
+    await until(() => log.pastes.length === 2 * (round + 1));
+    await sleep(SETTLED);
+    assert.equal(composer.innerHTML, '<p>가나다</p><p>라마바</p>', `round ${round + 1}`);
+  }
+  assert.deepEqual(sent, ['가나다\n라마바', '가나다\n라마바', '가나다\n라마바']);
+  assert.deepEqual(log.pastes, ['A1\nB2', '가나다\n라마바', 'A1\nB2', '가나다\n라마바', 'A1\nB2', '가나다\n라마바']);
+  assert.deepEqual(log.inserts, []);
+});
+
 test('a write that fails its check: the Korean is pasted back line for line and the failure is shown', async () => {
   const log = freshComposer(TYPED, { paste: (t) => (t === EN ? 'A1' : t) }); // the translation lands short
   assert.equal(enter().defaultPrevented, true);
