@@ -496,31 +496,37 @@ final class KeyboardSourceRulesTests: XCTestCase {
     }
 
     /// P1a cause 3 (track K1a): protly never types over a selection, because `selectedText` can hold only the start of
-    /// it. FieldGuard.copyOnly decides: the card opens with it, the finished card checks the field with it, and
-    /// insertResult asks it again before its first write.
+    /// it. FieldGuard decides: a card opens with copyOnly applied, a finished card checks the field with it, and
+    /// insertResult acts on its answer before the first write.
     func testProtlyNeverTypesOverASelection() throws {
         let controller = try controllerSource()
         let cns = controller as NSString
         func fn(_ declaration: String) -> String { body(of: declaration, in: cns).map { cns.substring(with: $0) } ?? "" }
-        let insert = fn("func insertResult()") as NSString
-        let check = insert.range(of: "FieldGuard.copyOnly(").location
-        XCTAssertNotEqual(check, NSNotFound, "insertResult asks FieldGuard.copyOnly")
-        for write in ["insertText(", "FieldText.replace("] {
-            let at = insert.range(of: write).location
-            XCTAssertTrue(at != NSNotFound && check < at, "insertResult asks FieldGuard.copyOnly before \(write)")
+        // insertResult binds the answer for the field as it is now: an ignored answer or `field: nil` would let it write.
+        let insert = fn("func insertResult()")
+        let check = matches(#"if let \w+ = FieldGuard\.copyOnly\([^)]*field: observed\(\)\)"#, in: insert).first
+        XCTAssertNotNil(check, "insertResult: if let ... = FieldGuard.copyOnly(..., field: observed())")
+        for write in [#"\binsertText\("#, #"\bFieldText\.replace\("#] {
+            let at = matches(write, in: insert).first
+            XCTAssertTrue(at != nil && check != nil && check!.location < at!.location,
+                          "insertResult asks FieldGuard.copyOnly before \(write)")
         }
-        let show = fn("private func show(")
-        XCTAssertTrue(show.contains("field: nil)"), "a card opens with the rule applied")
-        XCTAssertTrue(show.contains("field: observed())"), "a finished card checks the field with the rule")
+        // The card opens with the rule, and checks the field once done, wherever in the controller that code lives.
+        XCTAssertFalse(matches(#"FieldGuard\.copyOnly\([^)]*field: nil\)"#, in: controller).isEmpty,
+                       "a card opens with the rule applied")
+        XCTAssertGreaterThanOrEqual(matches(#"FieldGuard\.copyOnly\([^)]*field: observed\(\)\)"#, in: controller).count, 2,
+                                    "a finished card checks the field with the rule, as insertResult does")
         XCTAssertFalse(controller.contains("selectedText =="), "selectedText cannot be checked against the real selection")
     }
 
     /// P1a cause 3 (track K1a): a selection is read cut short too, so the cut-short panel no longer sends the user to
-    /// Select all. Retry stays.
+    /// Select all, and no other text does. Retry stays.
     func testTheCutShortPanelDoesNotSendUsersToSelectAll() throws {
         let controller = try controllerSource()
         XCTAssertTrue(controller.contains(#".failed("Could not read the whole text.", retry: action)"#), "the cut-short panel")
-        XCTAssertFalse(controller.lowercased().contains("select all"), "nothing sends the user to Select all")
+        for (name, text) in try sources() {
+            XCTAssertFalse(text.lowercased().contains("select all"), "\(name): sends the user to Select all")
+        }
     }
 
     /// Tower decision D-B: the keys wait during the field read, so the read runs on FieldReadBudget's clock (2 s in all,
