@@ -18,7 +18,7 @@ final class PhoneChecksUITests: XCTestCase {
     static let allowance: [String: TimeInterval] = [
         "test0_access": 300, "test0_probe": 480, "test1_68": 900, "test2_ws": 300, "test3_85offline": 900,
         "test4_memory": 600, "test5_icon": 300, "test5a_web": 900, "test5b_menu": 420, "test5c_pad": 420,
-        "test5d_card": 720, "test5e_bar": 600, "test5f_readnative": 1500, "test5g_readweb": 1800,
+        "test5d_card": 720, "test5e_bar": 600, "test5f_readnative": 1500, "test5g_readweb": 1800, "test5h_readtyped": 1800,
         "test6_85net": 1080, "test7_77": 1080,
     ]
 
@@ -113,6 +113,12 @@ final class PhoneChecksUITests: XCTestCase {
     @MainActor
     func test5g_readweb() throws {
         try PhoneRun(test: self, name: "test5g_readweb").checksReadWeb()
+    }
+
+    /// diag/p1-phone-read: drafts typed key by key on every host, and web fills followed by one typed key.
+    @MainActor
+    func test5h_readtyped() throws {
+        try PhoneRun(test: self, name: "test5h_readtyped", arguments: ["-readfills", "1"]).checksReadTyped()
     }
 
     /// After every offline group, so the requests and the about-me note change nothing they check.

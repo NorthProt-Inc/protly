@@ -16,6 +16,17 @@ enum ReadProbe {
     static let nativeHosts = ["swiftui", "uikit"]
     static let webHosts = ["textarea", "ce", "lexical"]
     static func ids(_ hosts: [String]) -> [String] { hosts.flatMap { h in drafts.map { "read-\(h)-\($0)" } } }
+
+    /// test5h_readtyped: a Latin draft typed key by key (3 paragraphs, 6 sentences, 81 UTF-16 units).
+    static let typed = "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+    static let typedTries = 2
+    static let typedHosts = ["swiftui", "uikit", "textarea", "ce", "lexical"]
+    /// Filled drafts with one typed key after the fill (web hosts): index into `drafts`, tries.
+    static let nudged: [(index: Int, tries: Int)] = [(2, 5), (5, 5), (1, 3), (3, 3)]
+    static var typedIDs: [String] {
+        typedHosts.map { "readt-\($0)-typed" }
+            + webHosts.flatMap { h in nudged.map { "readt-\(h)-\(drafts[$0.index])a" } }
+    }
 }
 
 /// `utf16/lf/tokens`, plus `/read` when the text starts with the stub's reply.
@@ -121,6 +132,59 @@ extension PhoneRun {
         for host in ReadProbe.webHosts { readHost(host, web: web) }
     }
 
+    // MARK: test5h_readtyped
+
+    func checksReadTyped() {
+        let ids = ReadProbe.typedIDs
+        if notReady(ids) { return }
+        guard let row1 = d.rowOne() else {
+            for id in ids { write(id, "FAIL", "unreadable: no row 1 on the host") }
+            return
+        }
+        typedHost("swiftui", web: nil)
+        d.app.terminate()
+        d.launch(arguments: ["-screen", "uikit", "-readfills", "1"])
+        if d.ensureProtly() {
+            typedHost("uikit", web: nil)
+            d.clearField()
+        } else {
+            write("readt-uikit-typed", "FAIL", "unreadable: protly keyboard not up on the uikit screen")
+        }
+        d.app.terminate()
+        d.launch(arguments: ["-screen", "readweb"])
+        d.fixedRow1 = row1
+        defer { d.fixedRow1 = nil }
+        let web = ReadWeb(d: d)
+        let webIDs = ids.filter { id in ReadProbe.webHosts.contains { id.hasPrefix("readt-\($0)-") } }
+        guard web.waitLoaded() else {
+            for id in webIDs { write(id, "FAIL", "unreadable: the read-probe page did not load") }
+            return
+        }
+        for host in ReadProbe.webHosts {
+            typedHost(host, web: web)
+            for n in ReadProbe.nudged {
+                let name = ReadProbe.drafts[n.index]
+                let item = Item("readt-\(host)-\(name)a")
+                for t in 1...n.tries {
+                    let mark = "rdt-" + host + "-" + name + "a-" + String(t)
+                    let evidence = readTry(n.index, host: host, web: web, mark: mark, nudge: true)
+                    item.note("t\(t)={" + evidence + "}")
+                }
+                finish(item, record: true)
+            }
+        }
+    }
+
+    private func typedHost(_ host: String, web: ReadWeb?) {
+        let item = Item("readt-\(host)-typed")
+        for t in 1...ReadProbe.typedTries {
+            let mark = "rdt-" + host + "-typed-" + String(t)
+            let evidence = readTry(0, host: host, web: web, mark: mark, typed: ReadProbe.typed)
+            item.note("t\(t)={" + evidence + "}")
+        }
+        finish(item, record: true)
+    }
+
     // MARK: One host
 
     /// Every draft on one host, each `tries` times; one RECORD line per draft with one `t<n>=` note per try.
@@ -145,7 +209,8 @@ extension PhoneRun {
     }
 
     /// One call: fill, the protly key, the outcome, Replace, the field after. Returns the try's evidence.
-    private func readTry(_ i: Int, host: String, web: ReadWeb?, mark: String) -> String {
+    private func readTry(_ i: Int, host: String, web: ReadWeb?, mark: String, typed: String? = nil,
+                         nudge: Bool = false) -> String {
         if let web {
             web.clear()
             guard web.focus(host) else { return "nofocus" }
@@ -153,10 +218,22 @@ extension PhoneRun {
         } else {
             d.clearField()
         }
-        let button = d.app.buttons["rfill-\(i + 1)"]
-        guard button.waitForExistence(timeout: 3) else { return "nobutton" }
-        button.tap()
-        d.pause(0.8)
+        if let typed {
+            // Typed on Protly key by key, as on the phone: the host builds its context from real edits.
+            guard d.type(typed) else { return "nottyped" }
+            d.pause(0.8)
+        } else {
+            let button = d.app.buttons["rfill-\(i + 1)"]
+            guard button.waitForExistence(timeout: 3) else { return "nobutton" }
+            button.tap()
+            d.pause(0.8)
+            // Run 7e031fc-122: after a JS fill the web view's proxy context stayed nil; one typed key makes the host
+            // send its document state again (the key adds one character where the cursor is).
+            if nudge {
+                d.type("a")
+                d.pause(0.8)
+            }
+        }
         let real = shapeNow(host, web)
         d.mark(mark)
         let t0 = Date()
