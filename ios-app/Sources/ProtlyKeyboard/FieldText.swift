@@ -94,10 +94,49 @@ enum FieldText {
         guard !Task.isCancelled else { return nil }
         let endLine = "read end reason=\(reason) steps=\(steps) t=\(ms()) before=\(shape(proxy.documentContextBeforeInput)) after=\(shape(proxy.documentContextAfterInput))"
         probe.debug("\(endLine, privacy: .public)")
+        // Probe 3: only on the skip drafts (each paragraph ends with a pilcrow), and only when the loop stopped on
+        // an empty after-context. Logs, then puts the cursor back where the loop left it.
+        if reason == "no-after", (proxy.documentContextBeforeInput ?? "").hasSuffix("\u{00B6}") {
+            await skipProbe(proxy, t0: t0)
+        }
         // A whitespace-only field counts as empty, as in the bar: the protly key reads the clipboard.
         guard let before = proxy.documentContextBeforeInput,
               !before.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
         return (before, false)
+    }
+
+    /// diag/p1-phone-read probe 3: does one-unit step past an empty after-context cross a line break (the next
+    /// paragraph then shows after the cursor) or change nothing (the end of the field)? At most 3 steps, each waited
+    /// for up to 0.5 s; then the cursor moves back over the steps that landed. Lengths only.
+    private static func skipProbe(_ proxy: UITextDocumentProxy, t0: TimeInterval) async {
+        func ms() -> Int { Int((ProcessInfo.processInfo.systemUptime - t0) * 1000) }
+        func settle(_ b0: String?, _ a0: String?) async -> (moved: Bool, polls: Int) {
+            let sent = ProcessInfo.processInfo.systemUptime
+            var polls = 0
+            while ProcessInfo.processInfo.systemUptime - sent < 0.5 {
+                await pause()
+                polls += 1
+                if proxy.documentContextBeforeInput != b0 || proxy.documentContextAfterInput != a0 { return (true, polls) }
+            }
+            return (false, polls)
+        }
+        var landed = 0
+        for k in 1...3 {
+            let b0 = proxy.documentContextBeforeInput, a0 = proxy.documentContextAfterInput
+            proxy.adjustTextPosition(byCharacterOffset: 1)
+            let r = await settle(b0, a0)
+            let line = "skip k=\(k) t=\(ms()) moved=\(r.moved ? 1 : 0) polls=\(r.polls) before=\(shape(proxy.documentContextBeforeInput)) after=\(shape(proxy.documentContextAfterInput))"
+            probe.debug("\(line, privacy: .public)")
+            guard r.moved else { break }
+            landed += 1
+            if let a = proxy.documentContextAfterInput, !a.isEmpty { break }  // the next paragraph shows
+        }
+        guard landed > 0 else { return }
+        let b0 = proxy.documentContextBeforeInput, a0 = proxy.documentContextAfterInput
+        proxy.adjustTextPosition(byCharacterOffset: -landed)
+        let r = await settle(b0, a0)
+        let back = "skip back=\(landed) t=\(ms()) moved=\(r.moved ? 1 : 0) polls=\(r.polls) before=\(shape(proxy.documentContextBeforeInput)) after=\(shape(proxy.documentContextAfterInput))"
+        probe.debug("\(back, privacy: .public)")
     }
 
     /// 20 ms that a cancel does not cut short (Task.sleep would end at once).

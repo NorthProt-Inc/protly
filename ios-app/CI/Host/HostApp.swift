@@ -63,6 +63,10 @@ struct HostView: View {
                     }
                 }
                 if ReadDrafts.enabled {
+                    // Probe 3: the keyboard comes back after Dismiss without a tap in the field (the cursor stays).
+                    Button("Focus") { focused = true }
+                        .font(.caption)
+                        .accessibilityIdentifier("rfocus")
                     ReadFillButtons { i in text = ReadDrafts.all[i].text }
                 }
             }
@@ -136,6 +140,27 @@ final class TextViewModel: ObservableObject {
         tv.inputDelegate?.textDidChange(tv)
         tv.inputDelegate?.selectionWillChange(tv)
         tv.selectedRange = NSRange(location: draft.cursor, length: 0)
+        tv.inputDelegate?.selectionDidChange(tv)
+        refresh()
+    }
+
+    /// diag/p1-phone-read probe 3: the whole text selected, as Select All in the edit menu would (the cut-short
+    /// panel's advice), so the read takes its selection path.
+    func selectAll() {
+        guard let tv = textView else { return }
+        tv.inputDelegate?.selectionWillChange(tv)
+        tv.selectedRange = NSRange(location: 0, length: (tv.text ?? "").utf16.count)
+        tv.inputDelegate?.selectionDidChange(tv)
+        refresh()
+    }
+
+    /// diag/p1-phone-read probe 3: the selection set again where it is, with the input delegate told, as the text
+    /// system does when the host moves the caret: does the keyboard's context then come back as a window?
+    func resync() {
+        guard let tv = textView else { return }
+        let r = tv.selectedRange
+        tv.inputDelegate?.selectionWillChange(tv)
+        tv.selectedRange = r
         tv.inputDelegate?.selectionDidChange(tv)
         refresh()
     }
@@ -226,6 +251,17 @@ struct TextViewScreen: View {
                 Probe(id: "first-word", value: model.firstWord)
                 Probe(id: "last-word", value: model.lastWord)
                 if ReadDrafts.enabled {
+                    HStack(spacing: 10) {
+                        Button("SelAll") { model.selectAll() }
+                            .font(.caption)
+                            .accessibilityIdentifier("rselall")
+                        Button("Sync") { model.resync() }
+                            .font(.caption)
+                            .accessibilityIdentifier("rsync")
+                        Button("Focus") { model.focus() }
+                            .font(.caption)
+                            .accessibilityIdentifier("rfocus")
+                    }
                     ReadFillButtons { i in model.fill(i) }
                 }
             }
@@ -413,26 +449,77 @@ enum ReadDrafts {
         make("long", paragraphs(5, sentences: 15), "\n\n", mid: false),
         make("longmid", paragraphs(5, sentences: 15), "\n\n", mid: true),
         make("xlong", paragraphs(8, sentences: 20), "\n\n", mid: false),
+    ] + window
+
+    // MARK: Probe 3 (test5i_readwindow): what bounds the before-window, select all, a step over a line break
+
+    /// The sentence without its period: chat text often has none.
+    static let clause = String(sentence.dropLast())
+    /// One word of 14 syllables, as a sentence (15 units, 1 word).
+    static let longWord = "\u{AC00}\u{B098}\u{B2E4}\u{B77C}\u{B9C8}\u{BC14}\u{C0AC}\u{C544}\u{C790}\u{CC28}\u{CE74}\u{D0C0}\u{D30C}\u{D558}."
+    /// Twelve one-syllable words, as a sentence (24 units, 12 words).
+    static let shortWords = "\u{AC00} \u{B098} \u{B2E4} \u{B77C} \u{B9C8} \u{BC14} \u{C0AC} \u{C544} \u{C790} \u{CC28} \u{CE74} \u{D0C0}."
+    /// Ends every paragraph of the skip drafts: FieldText's probe steps over the line break only after a "¶".
+    static let pilcrow = "\u{00B6}"
+
+    static func atEnd(_ name: String, _ text: String) -> Draft {
+        Draft(name: name, text: text, cursor: text.utf16.count)
+    }
+
+    static func skipParagraphs() -> [String] {
+        paragraphs(3, sentences: 1).map { $0 + pilcrow }
+    }
+
+    /// rfill-9 ... rfill-18, in ReadChecks.swift ReadProbe.window order.
+    static let window: [Draft] = [
+        // One paragraph, no sentence punctuation (382 units).
+        atEnd("run", "\u{00A7}1 " + Array(repeating: clause, count: 20).joined(separator: " ")),
+        // Eight chat lines, single line feeds, no punctuation (175 units).
+        atEnd("lines", (1...8).map { "\u{00A7}\($0) " + clause }.joined(separator: "\n")),
+        // Twelve one-word sentences (191 units): a length bound and a word bound give different windows.
+        atEnd("w1", Array(repeating: longWord, count: 12).joined(separator: " ")),
+        // Six twelve-word sentences (149 units).
+        atEnd("w12", Array(repeating: shortWords, count: 6).joined(separator: " ")),
+        // l5 with the cursor in its second line: does the after-context stop before a single line feed too?
+        make("l5mid", paragraphs(5, sentences: 1), "\n", mid: true),
+        // p3 ending in a line feed, the cursor on the empty last line (71 units).
+        atEnd("trail", paragraphs(3, sentences: 1).joined(separator: "\n\n") + "\n"),
+        // The cursor in the middle of the first paragraph: the read stops at its end, then the probe steps on.
+        Draft(name: "skip", text: skipParagraphs().joined(separator: "\n\n"), cursor: skipParagraphs()[0].utf16.count / 2),
+        // The same with the cursor at the end of the field: a step there must change nothing.
+        atEnd("skipend", skipParagraphs().joined(separator: "\n\n")),
+        // Single line feeds, the cursor in the middle of the first line.
+        Draft(name: "skipl", text: skipParagraphs().joined(separator: "\n"), cursor: skipParagraphs()[0].utf16.count / 2),
+        // ReadChecks.swift ReadProbe.typed (run 3c208a9-124 typed it and the read carried all of it), as a fill.
+        atEnd("en", "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."),
     ]
 }
 
-/// Buttons `rfill-1` ... `rfill-8`, two rows of four, top right.
+/// Buttons `rfill-1` ... `rfill-18`, rows of four, top right. Labels stay short (R1-R8, then W1-W10) so a row
+/// stays right of the read-probe web view.
 struct ReadFillButtons: View {
     let fill: (Int) -> Void
 
     var body: some View {
+        let count = ReadDrafts.all.count
         VStack(alignment: .trailing, spacing: 8) {
-            ForEach(0..<2, id: \.self) { row in
+            ForEach(0..<((count + 3) / 4), id: \.self) { row in
                 HStack(spacing: 10) {
                     ForEach(0..<4, id: \.self) { col in
                         let i = row * 4 + col
-                        Button("R\(i + 1)") { fill(i) }
-                            .font(.caption)
-                            .accessibilityIdentifier("rfill-\(i + 1)")
+                        if i < count {
+                            Button(Self.label(i)) { fill(i) }
+                                .font(.caption)
+                                .accessibilityIdentifier("rfill-\(i + 1)")
+                        }
                     }
                 }
             }
         }
+    }
+
+    static func label(_ i: Int) -> String {
+        i < 8 ? "R\(i + 1)" : "W\(i - 7)"
     }
 }
 

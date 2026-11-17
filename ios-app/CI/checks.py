@@ -49,7 +49,12 @@ READ_NATIVE_IDS = [f"read-{h}-{d}" for h in ("swiftui", "uikit") for d in READ_D
 READ_WEB_IDS = [f"read-{h}-{d}" for h in ("textarea", "ce", "lexical") for d in READ_DRAFTS]
 READ_TYPED_IDS = [f"readt-{h}-typed" for h in ("swiftui", "uikit", "textarea", "ce", "lexical")] + [
     f"readt-{h}-{d}a" for h in ("textarea", "ce", "lexical") for d in ("p5", "long", "p3mid", "p5mid")]
-EXPECTED_IDS = OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS + READ_NATIVE_IDS + READ_WEB_IDS + READ_TYPED_IDS
+# Probe 3 (ReadChecks.swift test5i_readwindow).
+READ_WINDOW_IDS = [f"readw-{h}-{d}" for h in ("swiftui", "uikit") for d in ("run", "lines", "w1", "w12", "l5mid", "trail", "en")] + [
+    f"readw-uikit-{d}" for d in ("skip", "skipend", "skipl", "selp5", "sellong", "selxlong")] + [
+    "readw-swiftui-typedsync", "readw-uikit-typedsync", "readw-uikit-kotypedsync", "readw-textarea-typedsync",
+    "readw-textarea-fillsync", "readw-lexical-fillsync"]
+EXPECTED_IDS = OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS + READ_NATIVE_IDS + READ_WEB_IDS + READ_TYPED_IDS + READ_WINDOW_IDS
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -67,6 +72,7 @@ METHOD_IDS = {
     "test5f_readnative": READ_NATIVE_IDS,
     "test5g_readweb": READ_WEB_IDS,
     "test5h_readtyped": READ_TYPED_IDS,
+    "test5i_readwindow": READ_WINDOW_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
 }

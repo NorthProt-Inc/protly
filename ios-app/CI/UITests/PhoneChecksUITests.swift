@@ -19,6 +19,7 @@ final class PhoneChecksUITests: XCTestCase {
         "test0_access": 300, "test0_probe": 480, "test1_68": 900, "test2_ws": 300, "test3_85offline": 900,
         "test4_memory": 600, "test5_icon": 300, "test5a_web": 900, "test5b_menu": 420, "test5c_pad": 420,
         "test5d_card": 720, "test5e_bar": 600, "test5f_readnative": 1500, "test5g_readweb": 1800, "test5h_readtyped": 1800,
+        "test5i_readwindow": 2700,
         "test6_85net": 1080, "test7_77": 1080,
     ]
 
@@ -119,6 +120,12 @@ final class PhoneChecksUITests: XCTestCase {
     @MainActor
     func test5h_readtyped() throws {
         try PhoneRun(test: self, name: "test5h_readtyped", arguments: ["-readfills", "1"]).checksReadTyped()
+    }
+
+    /// diag/p1-phone-read probe 3: what bounds the native before-window, a step past a line break, select all.
+    @MainActor
+    func test5i_readwindow() throws {
+        try PhoneRun(test: self, name: "test5i_readwindow", arguments: ["-readfills", "1"]).checksReadWindow()
     }
 
     /// After every offline group, so the requests and the about-me note change nothing they check.
