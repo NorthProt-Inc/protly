@@ -33,6 +33,8 @@ const PASTE_EDITORS = '[data-lexical-editor], .public-DraftEditor-content, [data
 // review of C2 for the inline shapes). The content script cannot see Lexical's selection, so such a draft is never
 // written. A list's last block is its last item. One inline node and a line break (<p><span>a</span><br><br></p>), and
 // an empty last paragraph (<p><br></p>), are written whole.
+// What the user is told when cutsShort() refuses a draft before the request.
+export const CUT_SHORT = 'Delete the empty line at the end of the message, then try again.';
 export function cutsShort(el) {
   if (!el.matches?.('[data-lexical-editor]')) return false;
   let block = el.lastElementChild;

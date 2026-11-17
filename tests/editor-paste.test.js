@@ -120,13 +120,17 @@ function generic(fake) {
   const el = doc.getElementById('b');
   const log = fakeEditor(el, fake);
   const pending = [];
-  const inst = createInstance({ doc, ask: () => new Promise((res) => pending.push(res)), fonts: null });
+  const asked = [];
+  const ask = (m) => { asked.push(m); return new Promise((res) => pending.push(res)); };
+  const inst = createInstance({ doc, ask, fonts: null });
   const root = () => { const h = doc.querySelector('.pl-card'); return h ? shadowOf(h) : undefined; };
   const msg = () => root()?.querySelector('.msg')?.textContent ?? null;
   const btn = (label) => [...(root()?.querySelectorAll('button') || [])].find((b) => b.textContent === label);
+  const toasts = () => doc.querySelector('.pl-toasts')?.shadowRoot?.textContent ?? '';
   const reply = (translation) => pending.shift()({ translation, back_translation: '역번역', model: 'claude-sonnet-5-5', lang: 'en' });
-  return { doc, el, log, pending, inst, msg, btn, reply };
+  return { doc, el, log, pending, asked, inst, msg, btn, toasts, reply };
 }
+const SETTLED = 300;
 // A Lexical draft typed with Shift+Enter between the lines.
 const TYPED = '<p><span>가나다</span><br><span>라마바</span><br><span>사아자</span></p>';
 
@@ -161,12 +165,28 @@ test('generic, Lexical: a write that fails its check is restored by the same pas
   assert.deepEqual(nonblank(s.el.innerText), KO);
 });
 
-test('generic, Lexical: a draft whose lines end in a line break is refused with the failure message, untouched', async () => {
+test('generic, Lexical: a draft whose lines end in a line break is refused before any request, with what to do', async () => {
   const s = generic({ kind: 'lexical' });
   s.el.innerHTML = TRAILING;
   s.el.focus();
   s.inst.run({ source: 'command' });
+  await until(() => /empty line/.test(s.toasts()));
+  await sleep(SETTLED);
+  assert.match(s.toasts(), /Delete the empty line at the end of the message, then try again\./);
+  assert.equal(s.asked.length, 0); // nothing billed
+  assert.equal(s.msg(), null);
+  assert.deepEqual(s.log.pastes, []);
+  assert.deepEqual(s.log.inserts, []);
+  assert.equal(s.el.innerHTML, TRAILING);
+});
+
+test('generic, Lexical: a line break added at the end during the request is refused at the write, untouched', async () => {
+  const s = generic({ kind: 'lexical' });
+  s.el.innerHTML = TYPED;
+  s.el.focus();
+  s.inst.run({ source: 'command' });
   await until(() => s.pending.length === 1);
+  s.el.innerHTML = TRAILING; // Shift+Enter while translating: the same text by norm(), so the result is not dropped
   s.reply(EN);
   await until(() => /Could not write/.test(s.msg() || ''));
   assert.equal(s.msg(), 'Could not write into this box. Nothing was changed.');

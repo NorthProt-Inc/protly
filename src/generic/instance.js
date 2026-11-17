@@ -6,6 +6,7 @@ import { commitByRefocus, nextFrame, settleComposition } from '../lib/ime.js';
 import { decideBox, decideSelection } from './decide.js';
 import { deepActive, findTarget, selectionInfo } from './target.js';
 import { boxHolds, readBox, writeBox } from './writer.js';
+import { CUT_SHORT, cutsShort } from '../lib/editable.js';
 import { isUndoKey } from '../lib/command.js';
 import { addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../lib/lang.js';
 
@@ -257,6 +258,8 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       const d = decideBox(original);
       if (d.kind === 'notes-only') { toast(NOTES_ONLY); return; }
       if (d.kind === 'none') { toast('Nothing to translate or polish in this box.'); return; }
+      // A draft the write would cut short is refused before the billed request; writeBox checks again.
+      if (t.kind !== 'text' && cutsShort(t.el)) { toast(CUT_SHORT); return; }
       close();
       kept = null;
       const card = createCard({ doc: t.doc, place: { float: () => t.el.getBoundingClientRect() } });
