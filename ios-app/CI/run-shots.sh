@@ -374,7 +374,7 @@ for test in manifest:
 EOF
 fi
 # The keyboard's own height log (ProtlyHeight.swift), for what iOS did between the screenshots.
-xcrun simctl spawn "$udid" log show --last 30m --debug --info --style compact \
+xcrun simctl spawn "$udid" log show --last 120m --debug --info --style compact \
   --predicate 'subsystem == "com.northprot.protly"' > "$out/keyboard-log.txt" 2>&1
 # The web composer's DOM event log (typing-fixes 004, HostApp.swift `-screen web`): the host appends it in its
 # Documents folder; it goes into the run folder next to the ret-* lines.

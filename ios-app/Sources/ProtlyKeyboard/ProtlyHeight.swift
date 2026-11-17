@@ -45,6 +45,11 @@ final class ProtlyHeight: NSObject {
     private var orientation: AnyCancellable?
     private var bounds: NSKeyValueObservation?
     private var loaded = ProcessInfo.processInfo.systemUptime
+    /// diag/p2-height probe: which controller logs, how old it is, and how many pins are alive.
+    private static var serial = 0
+    private static let alive = NSHashTable<ProtlyHeight>.weakObjects()
+    private let serialID: Int
+    private let created = ProcessInfo.processInfo.systemUptime
 
     /// Call once from viewDidLoad. The pin lives as long as the controller.
     static func pin(_ controller: KeyboardInputViewController) {
@@ -57,6 +62,7 @@ final class ProtlyHeight: NSObject {
     /// left alone, so the path the simulator runs verified does not change.
     static func presented(_ controller: KeyboardInputViewController) {
         guard let pin = objc_getAssociatedObject(controller, &key) as? ProtlyHeight else { return }
+        pin.report("will appear")
         let now = ProcessInfo.processInfo.systemUptime
         guard now - pin.loaded >= freshWindow else { return }
         pin.loaded = now
@@ -70,7 +76,10 @@ final class ProtlyHeight: NSObject {
         // 999, not required: iOS's own constraints win during its transitions instead of breaking ours.
         constraint = view.heightAnchor.constraint(equalToConstant: Self.portrait)
         constraint.priority = UILayoutPriority(999)
+        Self.serial += 1
+        serialID = Self.serial
         super.init()
+        Self.alive.add(self)
 
         orientation = controller.state.keyboardContext.$interfaceOrientation.sink { [weak self] value in
             MainActor.assumeIsolated {
@@ -118,12 +127,39 @@ final class ProtlyHeight: NSObject {
     @objc private func hostDidEnterBackground(_ note: Notification) { report("host did enter background") }
     @objc private func hostWillResignActive(_ note: Notification) { report("host will resign active") }
 
-    private func report(_ reason: String) {
+    private func report(_ what: String) {
         guard let view else { return }
+        let reason = what + " | " + probe(view)
         let height = Double(view.bounds.height)
         let window = Double(view.window?.bounds.height ?? -1)
         let pin = Double(constraint.constant)
         let active = constraint.isActive
-        Self.log.debug("\(reason, privacy: .public): height \(height, privacy: .public) window \(window, privacy: .public) pin \(pin, privacy: .public) active \(active, privacy: .public)")
+        Self.log.debug("PROBE \(reason, privacy: .public): height \(height, privacy: .public) window \(window, privacy: .public) pin \(pin, privacy: .public) active \(active, privacy: .public)")
+    }
+
+    /// Layout numbers only (no text): controller serial, ages, alive pins, the view's frame in its window and on the
+    /// screen, the window's frame, the superview's height, the screen's height and iOS's encapsulated height.
+    private func probe(_ view: UIView) -> String {
+        let now = ProcessInfo.processInfo.systemUptime
+        let sinceActive = Self.lastHostBecameActive.map { now - $0 } ?? -1
+        let inWindow = view.convert(view.bounds, to: nil)
+        let window = view.window
+        let screen = window?.windowScene?.screen
+        let onScreen: CGRect = screen.map { view.convert(view.bounds, to: $0.coordinateSpace) } ?? .zero
+        let windowFrame: CGRect = window?.frame ?? .zero
+        let superHeight: CGFloat = view.superview?.bounds.height ?? -1
+        let encapsulated: CGFloat = view.constraintsAffectingLayout(for: .vertical)
+            .first(where: { $0.identifier == "UIView-Encapsulated-Layout-Height" })?.constant ?? -1
+        func f(_ v: CGFloat) -> String { String(format: "%.2f", Double(v)) }
+        func r(_ v: CGRect) -> String { "\(f(v.minX)),\(f(v.minY)),\(f(v.width)),\(f(v.height))" }
+        func t(_ v: TimeInterval) -> String { String(format: "%.3f", v) }
+        let screenHeight: CGFloat = screen?.bounds.height ?? -1
+        let parts: [String] = [
+            "c\(serialID)", "age \(t(now - created))", "up \(t(now))", "sinceActive \(t(sinceActive))",
+            "alive \(Self.alive.allObjects.count)", "inWindow \(r(inWindow))", "onScreen \(r(onScreen))",
+            "windowFrame \(r(windowFrame))", "super \(f(superHeight))", "screenH \(f(screenHeight))",
+            "encap \(f(encapsulated))", "viewY \(f(view.frame.minY))",
+        ]
+        return parts.joined(separator: " ")
     }
 }
