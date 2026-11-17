@@ -97,6 +97,23 @@ test('rich Lexical: Enter and Alt+Z, three times over, send and restore the same
   assert.deepEqual(log.inserts, []);
 });
 
+test('Alt+Z when the restore is refused: the card says so and the box keeps what it holds', async () => {
+  const log = freshComposer(TYPED);
+  assert.equal(enter().defaultPrevented, true);
+  await until(() => pending.length === 1);
+  answer(EN);
+  await until(() => cardPart('.hints'));
+  // As plain-text Lexical shows the translation, plus a Shift+Enter after it: a write would be cut short.
+  const EDITED = '<p><span>A1</span><br><span>B2</span><br><span>C3</span><br><br></p>';
+  composer.innerHTML = EDITED;
+  assert.equal(altZ().defaultPrevented, true);
+  await until(() => /Could not restore/.test(cardPart('.msg') || ''));
+  await sleep(SETTLED);
+  assert.equal(cardPart('.msg'), 'Could not restore the draft. Ctrl+Z may bring it back.');
+  assert.deepEqual(log.pastes, [EN]);
+  assert.equal(composer.innerHTML, EDITED);
+});
+
 test('a write that fails its check: the Korean is pasted back line for line and the failure is shown', async () => {
   const log = freshComposer(TYPED, { paste: (t) => (t === EN ? 'A1' : t) }); // the translation lands short
   assert.equal(enter().defaultPrevented, true);

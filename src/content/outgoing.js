@@ -172,11 +172,13 @@ export function mountOutgoing(cur) {
         });
         break;
       }
-      case 'restore':
-        if (c) await write(c, effect.korean);
+      case 'restore': {
+        const back = !c || await write(c, effect.korean); // false: refused (cutsShort) or superseded
         hideNote();
         lastText = '';
+        if (!back && live()) say('Could not restore the draft. Ctrl+Z may bring it back.', true);
         break;
+      }
       case 'keep': // the box keeps what it holds; the user edits it and presses Enter or Alt+T again
         hideNote();
         lastText = state.mode === 'kept' ? state.shown : '';
