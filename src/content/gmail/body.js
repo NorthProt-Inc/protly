@@ -105,15 +105,17 @@ const homes = new WeakMap(); // a node replaceUserNodes removed -> the parent it
 // Swap the user's part for newNodes; returns the removed nodes (for Undo). Quote and signature stay put: new nodes go
 // in before the first removed node, at the start of its parent. Nodes this function removed earlier (Undo, a failed
 // write check) go back to the start of the parent they came from, so a line taken from the signature's block returns
-// to that block. execCommand is not used: next to a block it clones the block's class onto the new lines (spike).
+// to that block; if any of those parents has left the body (Gmail rendered the block again), none is used and every
+// node goes in before the first removed node, in order. execCommand is not used: next to a block it clones the
+// block's class onto the new lines (spike).
 export function replaceUserNodes(body, newNodes) {
   const old = userNodes(body);
   const into = old[0]?.parentNode ?? userParent(body);
   old.forEach((n) => { homes.set(n, n.parentNode); n.remove(); });
+  const exact = newNodes.every((n) => !homes.has(n) || body.contains(homes.get(n)));
   const runs = new Map(); // parent -> the nodes that go in at its start, in order
   for (const n of newNodes) {
-    const home = homes.get(n);
-    const p = home && body.contains(home) ? home : into;
+    const p = exact && homes.has(n) ? homes.get(n) : into;
     if (!runs.has(p)) runs.set(p, []);
     runs.get(p).push(n);
   }

@@ -89,6 +89,19 @@ for (const [name, html, typed] of WORKED) {
   test(`layout that worked (${name}): read, replace and undo cover every line, blank lines kept`, () => checkLayout(html, typed));
 }
 
+test('Undo after Gmail replaced the signature block puts every line back in order', () => {
+  // A reopened draft with an empty first line; the last line sits in the signature's block.
+  const { doc, body } = bodyOf(`<div><br></div><div dir="ltr">가나다<div>라마바</div><div>사아자<br><div><br></div>${SIG}</div></div>`);
+  const before = whole(body);
+  assert.equal(before, '\n가나다\n라마바\n사아자\n\n-- \nSig');
+  const removed = replaceUserNodes(body, textToNodes(doc, '\nEN1\nEN2\nEN3'));
+  // Gmail renders the signature's block again: the block the last line came from is gone, its wrapper is not.
+  const block = body.querySelector('.gmail_signature').parentNode;
+  block.replaceWith(block.cloneNode(true));
+  replaceUserNodes(body, removed);
+  assert.equal(whole(body), before);
+});
+
 test('a translation replaced again (Deep, language chip) keeps the signature block and its blank line', () => {
   const [, html, typed] = SHARED[0];
   const { doc, body } = bodyOf(html);
