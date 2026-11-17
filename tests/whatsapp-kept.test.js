@@ -5,6 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { readFileSync } from 'node:fs';
+import { addClipboard } from './fake-editors.js';
 
 const KOREAN = '지민아 또 봐';
 const SHOWN = 'See you, 지민';
@@ -59,10 +60,13 @@ test('WhatsApp: Esc and Alt+Z reach the page only when protly does not act on th
   const composer = doc.querySelector('#main footer [role="textbox"]');
   Object.defineProperty(composer, 'isContentEditable', { value: true });
   Object.defineProperty(composer, 'innerText', { get: () => composer.textContent });
-  doc.execCommand = (cmd, ui, text) => {
+  // Lexical is written with a paste (dom.js insertAll): it handles the paste itself and replaces a select-all.
+  addClipboard(win);
+  composer.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
     composer.textContent = doc.getSelection().toString() === composer.textContent ? text : composer.textContent + text;
-    return true;
-  };
+  });
 
   const key = (type, init) => {
     const e = new win.KeyboardEvent(type, { bubbles: true, cancelable: true, ...init });

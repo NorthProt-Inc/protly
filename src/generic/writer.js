@@ -1,6 +1,9 @@
+import { insertAll } from '../content/dom.js';
+
 // Reads and writes a text box on any site. textarea/input: setRangeText plus an input event, which React-style
-// controlled inputs notice (their value tracker sees the change). contenteditable: select all and
-// execCommand('insertText'), the path the Instagram writer uses, so the editor's own undo and state stay in sync.
+// controlled inputs notice (their value tracker sees the change). contenteditable: select all and insertAll() (a paste
+// on Lexical, Draft.js and Slate, execCommand('insertText') elsewhere), the path the Instagram writer uses, so the
+// editor's own undo and state stay in sync.
 export const SELECT_SETTLE_MS = 60; // editors such as Lexical sync their selection on selectionchange
 export const VERIFY_MS = 300; // Slate and Draft.js cancel beforeinput and render the text a tick later
 const POLL_MS = 20;
@@ -70,7 +73,7 @@ export async function writeBox(t, text, { settleMs = SELECT_SETTLE_MS, verifyMs 
     if (!el.isConnected) return false;
     if (!stillOk()) return null;
     el.focus();
-    el.ownerDocument.execCommand('insertText', false, text);
+    insertAll(el, text);
   }
   return boxHolds(t, text, verifyMs);
 }

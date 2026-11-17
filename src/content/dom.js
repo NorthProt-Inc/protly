@@ -90,6 +90,26 @@ export function getComposerText(el) {
   return (el.innerText || '').replace(/\n$/, '');
 }
 
+// Editors whose own paste handler keeps every line of a text/plain paste, also one dispatched from a content script
+// (fix track C2, step 0): Lexical (Instagram, WhatsApp), Draft.js and Slate. One insertText merges the lines in
+// Lexical, crashes Draft.js and leaves Slate's model behind. Found by DOM marker only: an editor that handles a paste
+// without preventDefault (Quill 1.x) would get the text twice if defaultPrevented picked the path.
+const PASTE_EDITORS = '[data-lexical-editor], .public-DraftEditor-content, [data-slate-editor]';
+
+// Replaces the selection (a select-all) with text: a synthetic paste on the editors above, with no insertText after it
+// (a second write would double the text or land in a crashed editor), execCommand('insertText') everywhere else.
+export function insertAll(el, text) {
+  const doc = el.ownerDocument;
+  if (!el.matches?.(PASTE_EDITORS)) {
+    doc.execCommand('insertText', false, text);
+    return;
+  }
+  const win = doc.defaultView;
+  const data = new win.DataTransfer();
+  data.setData('text/plain', text);
+  el.dispatchEvent(new win.ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }));
+}
+
 // Lexical syncs its selection on `selectionchange`, so it needs a moment between selecting and inserting,
 // otherwise insertText is dropped (spike-notes, Composer write). Clearing to empty is not supported by Lexical
 // via execCommand; callers only write non-empty text.
@@ -112,6 +132,6 @@ export async function setComposerText(el, text, stillOk = () => true) {
   if (el.isConnected && stillOk() && !selectsAll()) await select();
   if (!el.isConnected || !stillOk()) return false;
   el.focus();
-  el.ownerDocument.execCommand('insertText', false, text);
+  insertAll(el, text);
   return true;
 }
