@@ -12,7 +12,8 @@ import WebKit
 ///   first and last word frames are published as accessibility values for XCUITest.
 /// - `web`: a dark web composer (typing-fixes 004: Return in web fields, the word's ink on a dark page) in a WKWebView,
 ///   from the bundled web-composer.html. Its state is published as an accessibility value and every DOM event is
-///   appended to Documents/web-events.txt, which run-shots.sh copies into the run folder.
+///   appended to Documents/web-events.txt, which run-shots.sh copies into the run folder. `-caret 1` loads the page
+///   with `?caret=1`, which also posts the state when the caret moves (fix/double-space-period, test5f_period only).
 /// Every screen has `Clear` (empties the field without keys) and `Dismiss` (the field loses focus, which hides the
 /// keyboard) in the top-right corner, away from the field and the center column measure.py samples.
 @main
@@ -307,7 +308,14 @@ struct WebComposer: UIViewRepresentable {
         web.accessibilityIdentifier = "web"
         model.webView = web
         if let url = Bundle.main.url(forResource: "web-composer", withExtension: "html") {
-            web.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+            // `-caret 1` (the period check only): the page also posts its state when the caret moves.
+            var page = url
+            if UserDefaults.standard.string(forKey: "caret") == "1",
+               var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                parts.queryItems = [URLQueryItem(name: "caret", value: "1")]
+                page = parts.url ?? url
+            }
+            web.loadFileURL(page, allowingReadAccessTo: url.deletingLastPathComponent())
         } else {
             let model = model
             Task { @MainActor in model.fail("web-composer.html is not in the bundle") }

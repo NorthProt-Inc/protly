@@ -61,8 +61,9 @@ function text(name) {
 }
 
 // The caret's character offset in the focused field, -1 without one (fix/double-space-period: case D's caret before
-// `world`). In the composer it is the selection's anchor (getSelection().anchorOffset) counted from the field's start,
-// so a text split over several nodes still counts from the first character.
+// `world`). It rides along in every state post; only `?caret=1` adds posts on a caret move (below). In the composer
+// it is the selection's anchor (getSelection().anchorOffset) counted from the field's start, so a text split over
+// several nodes still counts from the first character.
 function caret() {
   const f = document.activeElement;
   if (!f || !Object.values(fields).includes(f)) return -1;
@@ -164,8 +165,10 @@ function clearAll() {
 
 window.addEventListener("load", () => { post({ kind: "event", line: `t=${Date.now()} load` }); postState(); });
 window.addEventListener("resize", state);
-// A tap that only moves the caret fires no field event: the state follows the selection too (coalesced like the rest).
-document.addEventListener("selectionchange", state);
+// `?caret=1` (HostApp `-caret 1`, test5f_period only): a tap that only moves the caret fires no field event, so the
+// state follows the selection too (coalesced like the rest). Off, the page posts exactly what it did before.
+const caretPosts = new URLSearchParams(location.search).get("caret") === "1";
+if (caretPosts) document.addEventListener("selectionchange", state);
 if (window.visualViewport) window.visualViewport.addEventListener("resize", state);
 </script>
 </body>

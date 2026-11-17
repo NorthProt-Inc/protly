@@ -882,9 +882,9 @@ extension PhoneRun {
             })
         }
 
-        // The web composer.
+        // The web composer; `-caret 1` makes the page post its state when the caret moves (sel0 below).
         d.app.terminate()
-        d.launch(arguments: ["-screen", "web"])
+        d.launch(arguments: ["-screen", "web", "-caret", "1"])
         d.fixedRow1 = row1
         defer { d.fixedRow1 = nil }
         let web = WebPage(d: d)
@@ -908,7 +908,8 @@ extension PhoneRun {
                 // Left of the first letter, inside the padding (1 px border, 8 px padding): the caret goes before it.
                 self.d.point(r.minX + 5, r.midY).tap()
                 self.d.pause(0.8)
-                // The page's caret offset in the focused field (web-composer.html, posted on selectionchange).
+                // The page's caret offset in the focused field (web-composer.html, posted on selectionchange with
+                // `-caret 1`).
                 let caret = (web.state()?["caret"] as? NSNumber).map { String($0.intValue) }
                 return " sel0=\(q(caret))"
             })

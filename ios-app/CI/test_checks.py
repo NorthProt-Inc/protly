@@ -919,6 +919,30 @@ class PeriodTests(unittest.TestCase):
         self.assertEqual(c.status, "FAIL")
         self.assertIn("try 2", c.evidence)
 
+    def test_caret_posts_are_gated_to_the_period_check(self):
+        # The web page posts its state on a caret move only with `?caret=1` (HostApp `-caret 1`), which only
+        # test5f_period asks for: test5a_web's ret-* timings and every other web check see the page as on main.
+        def read(*parts):
+            with open(os.path.join(HERE, *parts), encoding="utf-8") as f:
+                return f.read()
+        page = read("Host", "web-composer.html")
+        code = [ln.strip() for ln in page.splitlines() if not ln.strip().startswith("//")]
+        self.assertIn('const caretPosts = new URLSearchParams(location.search).get("caret") === "1";', code)
+        listeners = [ln for ln in code if "selectionchange" in ln]
+        self.assertEqual(listeners, ['if (caretPosts) document.addEventListener("selectionchange", state);'])
+        self.assertEqual([ln for ln in code if "caretPosts" in ln and "selectionchange" not in ln],
+                         ['const caretPosts = new URLSearchParams(location.search).get("caret") === "1";'])
+        host = read("Host", "HostApp.swift")
+        gate = host.index('UserDefaults.standard.string(forKey: "caret") == "1"')
+        self.assertLess(gate, host.index('URLQueryItem(name: "caret", value: "1")'))
+        self.assertEqual(host.count("URLQueryItem("), 1)
+        users = {name: read("UITests", name).count('"-caret"') for name in os.listdir(os.path.join(HERE, "UITests"))}
+        self.assertEqual({n: c for n, c in users.items() if c}, {"PhoneChecksUITests.swift": 1})
+        swift = read("UITests", "PhoneChecksUITests.swift")
+        period = swift[swift.index("func checksPeriod()"):]
+        self.assertIn('d.launch(arguments: ["-screen", "web", "-caret", "1"])', period[:period.index("\n    }\n")])
+        self.assertIn('d.launch(arguments: ["-screen", "web"])', read("UITests", "TypingChecks.swift"))
+
     def test_a_driver_problem_stays_fail(self):
         line = 'CHECK dsp-uikit-en FAIL unreadable: problems="no keyboard to type on" kind=en\n'
         c = {c.id: c for c in checks.assemble(line, "", "")}["dsp-uikit-en"]

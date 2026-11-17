@@ -250,9 +250,10 @@ logging. Every line is `PENDING` with the field before the first try (`t0`) and 
   contenteditable), kinds:
   - `word` (case D, 6 tries): `world`, the caret tapped in front of it, then `hello` and two spaces. Each try must add
     `hello. ` in front of `world`, so the text grows to `hello. hello. world`. `sel0` is the caret before the first
-    try: the UITextView's `sel` probe, or the composer's offset, which web-composer.html posts as `caret` in
-    `web-state` on `selectionchange`. A caret that is not at 0 makes the line FAIL `unreadable` ("caret not at word
-    start"): the set-up failed, not the fix.
+    try: the UITextView's `sel` probe, or the composer's offset, `caret` in `web-state`. The page posts its state on
+    `selectionchange` only when loaded with `?caret=1` (the host's `-caret 1`, which only this method passes), so
+    `test5a_web` and the other web checks see the page post exactly as before. A caret that is not at 0 makes the
+    line FAIL `unreadable` ("caret not at word start"): the set-up failed, not the fix.
   - `en`, `ko` (3 tries): `hello` / `안녕` and two spaces at the end of the text; each try adds `hello. ` / `안녕. `.
   - `pick2` (3 tries): `teh`, the bar's right slot, then two spaces; each try adds `the. `.
   A field that did not start empty (or as `world`), a missing reading or fewer tries than these is FAIL `unreadable`.
