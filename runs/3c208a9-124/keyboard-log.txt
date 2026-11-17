@@ -1,0 +1,587 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-11-17 20:21:44.116 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:21:44.116 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:21:44.143 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:21:44.994 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-17 20:21:45.019 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-17 20:23:17.170 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:23:17.170 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:23:17.170 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:23:17.180 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:23:17.234 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:23:17.338 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:23:17.491 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:23:17.792 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:23:18.197 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:23:19.716 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:24:54.361 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:24:54.361 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:24:54.361 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:24:54.361 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:24:54.413 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:24:54.517 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:24:54.677 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:24:54.998 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:24:55.422 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:24:56.718 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:25:05.751 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:25:05.751 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:25:05.754 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:25:06.002 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-17 20:25:06.009 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-17 20:26:35.905 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:26:35.905 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:26:35.905 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:26:35.906 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:26:35.959 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:26:36.061 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:26:36.215 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:26:36.522 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:26:36.976 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:26:38.066 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:28:10.133 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:28:10.133 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:28:10.133 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:28:10.134 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:28:10.188 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:28:10.295 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:28:10.452 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:28:10.823 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:28:11.225 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:28:12.516 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:28:32.030 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:28:32.030 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:28:32.031 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:28:32.292 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-17 20:28:32.304 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-17 20:30:02.552 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:30:02.552 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:30:02.552 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:30:02.553 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:30:02.607 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:30:02.710 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:30:02.870 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:30:03.175 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:30:03.600 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:30:05.049 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:31:42.822 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:31:42.822 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:31:42.822 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:31:42.823 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:31:42.876 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:31:42.984 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:31:43.144 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:31:43.465 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:31:43.880 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:31:45.350 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:32:00.240 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:32:00.240 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:32:00.240 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:32:00.241 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:32:00.294 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:32:00.401 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:32:00.566 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:32:00.873 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:32:01.300 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:32:02.567 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:32:17.024 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:32:17.024 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:32:17.024 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:32:17.025 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:32:17.079 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:32:17.182 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:32:17.334 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:32:17.651 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:32:18.070 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:32:19.499 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:32:34.269 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:32:34.269 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:32:34.269 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:32:34.270 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:32:34.329 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:32:34.433 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:32:34.584 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:32:34.899 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:32:35.324 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:32:36.651 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:32:51.400 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:32:51.400 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:32:51.400 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:32:51.401 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:32:51.456 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:32:51.563 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:32:51.719 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:32:52.038 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:32:52.446 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:32:53.849 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:33:08.206 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:33:08.206 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:33:08.206 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:33:08.206 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:33:08.260 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:33:08.363 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:33:08.516 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:33:08.836 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:33:09.255 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:33:10.449 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:33:25.259 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:33:25.259 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:33:25.259 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:33:25.260 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:33:25.313 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:33:25.416 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:33:25.576 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:33:25.895 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:33:26.311 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:33:27.532 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:33:42.000 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:33:42.000 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:33:42.000 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:33:42.000 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:33:42.056 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:33:42.161 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:33:42.312 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:33:42.619 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:33:43.041 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:33:44.501 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:33:59.160 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:33:59.160 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:33:59.160 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:33:59.160 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:33:59.215 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:33:59.322 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:33:59.478 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:33:59.791 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:34:00.200 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:34:01.383 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:34:16.021 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:34:16.021 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:34:16.021 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:34:16.021 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:34:16.075 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:34:16.180 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:34:16.336 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:34:16.651 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:34:17.071 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:34:18.199 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:34:32.514 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:34:32.514 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:34:32.514 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:34:32.514 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:34:32.571 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:34:32.672 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:34:32.833 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:34:33.145 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:34:33.557 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:34:34.816 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:34:49.293 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:34:49.293 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:34:49.293 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:34:49.293 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:34:49.346 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:34:49.449 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:34:49.603 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:34:49.903 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:34:50.326 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:34:51.519 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:35:05.768 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:35:05.768 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:35:05.768 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:35:05.769 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:35:05.822 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:35:05.925 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:35:06.085 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:35:06.402 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:35:06.829 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:35:07.999 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:35:22.367 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:35:22.367 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:35:22.367 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:35:22.368 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:35:22.422 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:35:22.526 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:35:22.686 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:35:23.007 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:35:23.413 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:35:24.566 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:35:38.826 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:35:38.826 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:35:38.826 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:35:38.826 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:35:38.880 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:35:38.984 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:35:39.145 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:35:39.448 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:35:39.863 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:35:41.035 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:35:55.265 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:35:55.265 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:35:55.265 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:35:55.265 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:35:55.320 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:35:55.421 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:35:55.582 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:35:55.882 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:35:56.285 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:35:57.566 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:36:11.894 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:36:11.894 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:36:11.894 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:36:11.894 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:36:11.946 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:36:12.053 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:36:12.204 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:36:12.507 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:36:12.934 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:36:14.216 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:37:48.298 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:37:48.298 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:37:48.298 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:37:48.298 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:37:48.354 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:37:48.454 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:37:48.616 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:37:48.936 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:37:49.350 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:37:50.599 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:39:24.266 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:39:24.266 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:39:24.266 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:39:24.266 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:39:24.321 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:39:24.428 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:39:24.586 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:39:24.894 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:39:25.296 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:39:26.550 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:39:41.283 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:39:41.283 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:39:41.283 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:39:41.283 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:39:41.339 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:39:41.440 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:39:41.598 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:39:41.915 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:39:42.334 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:39:43.683 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:39:58.590 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:39:58.590 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:39:58.590 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:39:58.590 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:39:58.644 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:39:58.750 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:39:58.900 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:39:59.202 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:39:59.614 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:40:00.900 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:40:15.584 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:40:15.584 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:40:15.584 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:40:15.585 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:40:15.639 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:40:15.746 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:40:15.904 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:40:16.221 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:40:16.628 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:40:18.083 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:40:32.814 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:40:32.814 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:40:32.814 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:40:32.814 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:40:32.875 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:40:32.982 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:40:33.136 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:40:33.443 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:40:33.865 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:40:35.116 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:40:50.264 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:40:50.264 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:40:50.264 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:40:50.265 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:40:50.326 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:40:50.433 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:40:50.586 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:40:50.902 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:40:51.305 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:40:52.716 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:41:07.546 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:41:07.546 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:41:07.546 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:41:07.546 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:41:07.605 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:41:07.710 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:41:07.870 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:41:08.173 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:41:08.585 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:41:09.866 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:41:25.300 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:41:25.300 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:41:25.300 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:41:25.301 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:41:25.353 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:41:25.459 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:41:25.610 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:41:25.922 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:41:26.323 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:41:27.668 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:41:42.489 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:41:42.489 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:41:42.489 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:41:42.489 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:41:42.544 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:41:42.644 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:41:42.805 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:41:43.120 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:41:43.522 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:41:44.933 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:41:59.687 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:41:59.687 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:41:59.687 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:41:59.688 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:41:59.738 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:41:59.845 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:41:59.999 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:42:00.317 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:42:00.734 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:42:02.033 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:42:16.708 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:42:16.708 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:42:16.708 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:42:16.709 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:42:16.761 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:42:16.868 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:42:17.030 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:42:17.334 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:42:17.735 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:42:19.017 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:42:33.664 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:42:33.664 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:42:33.664 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:42:33.664 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:42:33.717 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:42:33.824 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:42:33.978 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:42:34.288 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:42:34.707 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:42:35.983 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:42:50.656 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:42:50.656 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:42:50.656 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:42:50.656 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:42:50.709 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:42:50.810 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:42:50.963 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:42:51.267 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:42:51.681 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:42:53.033 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:43:07.841 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:43:07.841 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:43:07.841 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:43:07.841 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:43:07.895 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:43:08.000 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:43:08.160 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:43:08.467 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:43:08.870 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:43:10.333 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:43:25.258 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:43:25.258 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:43:25.258 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:43:25.258 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:43:25.312 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:43:25.419 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:43:25.576 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:43:25.895 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:43:26.321 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:43:27.682 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:43:42.403 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:43:42.403 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:43:42.403 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:43:42.404 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:43:42.457 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:43:42.564 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:43:42.721 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:43:43.033 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:43:43.435 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:43:44.966 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:43:59.666 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:43:59.666 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:43:59.666 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:43:59.666 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:43:59.720 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:43:59.827 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:43:59.988 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:44:00.293 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:44:00.719 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:44:02.018 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:45:39.550 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=90/4 after=nil sel=nil
+2026-11-17 20:45:39.550 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=90/4 after=nil
+2026-11-17 20:45:39.550 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=90/4 selection=0 before=90/4 after=nil
+2026-11-17 20:45:39.551 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=90/4
+2026-11-17 20:45:39.603 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=90/4 after=nil
+2026-11-17 20:45:39.710 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=90/4 after=nil
+2026-11-17 20:45:39.865 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=90/4 after=nil
+2026-11-17 20:45:40.184 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=90/4 after=nil
+2026-11-17 20:45:40.585 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=90/4 after=nil
+2026-11-17 20:45:42.087 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=90/4 result=14/0 before=90/4 after=nil
+2026-11-17 20:47:18.506 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=76/4 after=nil sel=nil
+2026-11-17 20:47:18.506 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=76/4 after=nil
+2026-11-17 20:47:18.506 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=76/4 selection=0 before=76/4 after=nil
+2026-11-17 20:47:18.507 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=76/4
+2026-11-17 20:47:18.560 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=76/4 after=nil
+2026-11-17 20:47:18.663 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=76/4 after=nil
+2026-11-17 20:47:18.814 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=76/4 after=nil
+2026-11-17 20:47:19.125 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=76/4 after=nil
+2026-11-17 20:47:19.550 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=76/4 after=nil
+2026-11-17 20:47:20.967 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=76/4 result=14/0 before=76/4 after=nil
+2026-11-17 20:47:35.473 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:47:35.473 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:47:35.473 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:47:35.473 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:47:35.528 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:47:35.635 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:47:35.797 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:47:36.105 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:47:36.525 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:47:37.716 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:47:52.587 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:47:52.587 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:47:52.587 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:47:52.587 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:47:52.641 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:47:52.745 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:47:52.905 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:47:53.219 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:47:53.631 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:47:54.983 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:48:09.544 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:48:09.544 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:48:09.544 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:48:09.544 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:48:09.594 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:48:09.701 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:48:09.861 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:48:10.168 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:48:10.594 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:48:12.033 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:48:26.504 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:48:26.504 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:48:26.504 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:48:26.504 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:48:26.558 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:48:26.666 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:48:26.818 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:48:27.136 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:48:27.557 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:48:28.882 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:48:43.396 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:48:43.396 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:48:43.396 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:48:43.396 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:48:43.455 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:48:43.563 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:48:43.721 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:48:44.041 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:48:44.466 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:48:45.753 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:49:00.270 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:49:00.270 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:49:00.270 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:49:00.270 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:49:00.324 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:49:00.433 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:49:00.583 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:49:00.901 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:49:01.305 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:49:02.666 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:49:17.124 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:49:17.124 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:49:17.124 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:49:17.125 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:49:17.179 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:49:17.286 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:49:17.438 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:49:17.739 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:49:18.150 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:49:19.469 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:49:34.079 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:49:34.079 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:49:34.079 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:49:34.079 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:49:34.138 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:49:34.245 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:49:34.406 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:49:34.717 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:49:35.127 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:49:36.583 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:49:51.279 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:49:51.279 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:49:51.279 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:49:51.280 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:49:51.340 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:49:51.444 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:49:51.605 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:49:51.913 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:49:52.329 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:49:53.649 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:50:08.181 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:50:08.181 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:50:08.181 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:50:08.181 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:50:08.235 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:50:08.341 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:50:08.503 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:50:08.823 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:50:09.234 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:50:10.551 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:50:25.041 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:50:25.041 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:50:25.041 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:50:25.042 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:50:25.095 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:50:25.202 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:50:25.362 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:50:25.683 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:50:26.093 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:50:27.383 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:50:42.213 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:50:42.213 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:50:42.213 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:50:42.213 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:50:42.267 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:50:42.374 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:50:42.531 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:50:42.844 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:50:43.262 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:50:44.832 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:50:59.656 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:50:59.656 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:50:59.656 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:50:59.656 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:50:59.709 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:50:59.813 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:50:59.968 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:51:00.287 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:51:00.702 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:51:02.033 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:51:16.782 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:51:16.782 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:51:16.782 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:51:16.782 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:51:16.837 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:51:16.946 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:51:17.106 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:51:17.418 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:51:17.842 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:51:19.116 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil
+2026-11-17 20:51:33.768 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read start before=1/0 after=nil sel=nil
+2026-11-17 20:51:33.768 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] read end reason=no-after steps=0 t=0 before=1/0 after=nil
+2026-11-17 20:51:33.768 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] act returned=1/0 selection=0 before=1/0 after=nil
+2026-11-17 20:51:33.768 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] request text=1/0
+2026-11-17 20:51:33.819 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +50ms before=1/0 after=nil
+2026-11-17 20:51:33.926 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +150ms before=1/0 after=nil
+2026-11-17 20:51:34.078 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +300ms before=1/0 after=nil
+2026-11-17 20:51:34.386 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +600ms before=1/0 after=nil
+2026-11-17 20:51:34.794 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] settle +1000ms before=1/0 after=nil
+2026-11-17 20:51:36.116 Db ProtlyCIKeyboard[7771:8039] [com.northprot.protly:read] replace holds=1 original=1/0 result=13/0 before=1/0 after=nil

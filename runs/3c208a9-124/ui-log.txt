@@ -1,0 +1,370 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5h_readtyped
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+typing: keyboard top 512.00, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-swiftui-typed-1 1794946996.596
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+typing: keyboard top 512.00, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-swiftui-typed-2 1794947094.008
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK readt-swiftui-typed RECORD t1={real=76/4/none carried="read 76 4 none" outcome=card s=2.2 after=14/0/none/read card-after="none"} t2={real=76/4/none carried="read 76 4 none" outcome=card s=1.8 after=14/0/none/read card-after="none"}
+typing: keyboard top 495.00, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-uikit-typed-1 1794947195.701
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+typing: keyboard top 495.00, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-uikit-typed-2 1794947290.012
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readt-uikit-typed RECORD t1={real=76/4/none carried="read 76 4 none" outcome=card s=1.6 after=14/0/none/read card-after="none"} t2={real=76/4/none carried="read 76 4 none" outcome=card s=1.7 after=14/0/none/read card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-textarea-typed-1 1794947402.510
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-textarea-typed-2 1794947502.828
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-textarea-typed RECORD t1={real=76/4/none/b0 carried="read 76 4 none" outcome=card s=1.8 after=14/0/none/read/b0 card-after="none"} t2={real=76/4/none/b0 carried="read 76 4 none" outcome=card s=1.8 after=14/0/none/read/b0 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p5a-1 1794947520.315
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p5a-2 1794947537.011
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p5a-3 1794947554.260
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p5a-4 1794947571.403
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p5a-5 1794947588.310
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-textarea-p5a RECORD t1={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b0 card-after="none"} t2={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b0 card-after="none"} t3={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b0 card-after="none"} t4={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b0 card-after="none"} t5={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.5 after=331/8/1.2.3.4.5/b0 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-longa-1 1794947605.319
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-longa-2 1794947622.064
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-longa-3 1794947639.266
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-longa-4 1794947656.125
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-longa-5 1794947672.658
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-textarea-longa RECORD t1={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b0 card-after="none"} t2={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.8 after=1531/8/1.2.3.4.5/b0 card-after="none"} t3={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b0 card-after="none"} t4={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b0 card-after="none"} t5={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b0 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p3mida-1 1794947689.440
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p3mida-2 1794947705.945
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p3mida-3 1794947722.525
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-textarea-p3mida RECORD t1={real=71/4/1.2.3/b0 carried="read 1 0 none" outcome=card s=1.6 after=83/4/1.2.3/b0 card-after="none"} t2={real=71/4/1.2.3/b0 carried="read 1 0 none" outcome=card s=1.6 after=83/4/1.2.3/b0 card-after="none"} t3={real=71/4/1.2.3/b0 carried="read 1 0 none" outcome=card s=1.6 after=83/4/1.2.3/b0 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p5mida-1 1794947739.024
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p5mida-2 1794947755.456
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-textarea-p5mida-3 1794947772.057
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-textarea-p5mida RECORD t1={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.5 after=331/8/1.2.3.4.5/b0 card-after="none"} t2={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b0 card-after="none"} t3={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b0 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-ce-typed-1 1794947868.552
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-ce-typed-2 1794947964.549
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-ce-typed RECORD t1={real=75/3/none/b4 carried="read 76 4 none" outcome=card s=1.6 after=14/0/none/read/b0 card-after="none"} t2={real=75/3/none/b4 carried="read 76 4 none" outcome=card s=1.6 after=14/0/none/read/b0 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p5a-1 1794947981.451
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p5a-2 1794947998.882
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p5a-3 1794948015.823
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p5a-4 1794948033.138
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p5a-5 1794948050.528
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-ce-p5a RECORD t1={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b9 card-after="none"} t2={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b9 card-after="none"} t3={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.9 after=331/8/1.2.3.4.5/b9 card-after="none"} t4={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b9 card-after="none"} t5={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b9 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-longa-1 1794948067.872
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-longa-2 1794948085.652
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-longa-3 1794948102.815
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-longa-4 1794948120.050
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-longa-5 1794948137.090
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-ce-longa RECORD t1={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t2={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t3={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=1531/8/1.2.3.4.5/b9 card-after="none"} t4={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t5={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b9 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p3mida-1 1794948154.029
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p3mida-2 1794948171.011
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p3mida-3 1794948188.186
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-ce-p3mida RECORD t1={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.7 after=83/4/1.2.3/b5 card-after="none"} t2={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.7 after=83/4/1.2.3/b5 card-after="none"} t3={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.8 after=83/4/1.2.3/b5 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p5mida-1 1794948205.636
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p5mida-2 1794948222.735
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-ce-p5mida-3 1794948240.075
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-ce-p5mida RECORD t1={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b9 card-after="none"} t2={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.9 after=331/8/1.2.3.4.5/b9 card-after="none"} t3={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-lexical-typed-1 1794948340.074
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdt-lexical-typed-2 1794948439.017
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-lexical-typed RECORD t1={real=76/4/none/b5 carried="read 90 4 none" outcome=card s=1.8 after=14/0/none/read/b0 card-after="none"} t2={real=76/4/none/b5 carried="read 76 4 none" outcome=card s=1.8 after=14/0/none/read/b1 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p5a-1 1794948455.972
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p5a-2 1794948473.108
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p5a-3 1794948490.116
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p5a-4 1794948507.050
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p5a-5 1794948523.863
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-lexical-p5a RECORD t1={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b9 card-after="none"} t2={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"} t3={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"} t4={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"} t5={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-longa-1 1794948540.812
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-longa-2 1794948557.680
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-longa-3 1794948574.590
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-longa-4 1794948591.816
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-longa-5 1794948608.698
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-lexical-longa RECORD t1={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t2={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b9 card-after="none"} t3={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=1531/8/1.2.3.4.5/b9 card-after="none"} t4={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t5={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p3mida-1 1794948625.594
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p3mida-2 1794948642.654
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p3mida-3 1794948660.133
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+CHECK readt-lexical-p3mida RECORD t1={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.6 after=83/4/1.2.3/b5 card-after="none"} t2={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.9 after=83/4/1.2.3/b5 card-after="none"} t3={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.8 after=83/4/1.2.3/b5 card-after="none"}
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p5mida-1 1794948677.309
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+typing: keyboard top 295.33, row 1 564.00
+typed "a"
+MARK rdt-lexical-p5mida-2 1794948694.316
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00

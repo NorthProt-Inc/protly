@@ -1,0 +1,134 @@
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-long NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-xlong NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-long NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-xlong NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-long NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-xlong NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-long NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-xlong NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-long NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-xlong NOT-RUN filtered run: its test method was not selected
+CHECK readt-ce-longa RECORD t1={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t2={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t3={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=1531/8/1.2.3.4.5/b9 card-after="none"} t4={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t5={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b9 card-after="none"}
+CHECK readt-ce-p3mida RECORD t1={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.7 after=83/4/1.2.3/b5 card-after="none"} t2={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.7 after=83/4/1.2.3/b5 card-after="none"} t3={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.8 after=83/4/1.2.3/b5 card-after="none"}
+CHECK readt-ce-p5a RECORD t1={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b9 card-after="none"} t2={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b9 card-after="none"} t3={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.9 after=331/8/1.2.3.4.5/b9 card-after="none"} t4={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b9 card-after="none"} t5={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b9 card-after="none"}
+CHECK readt-ce-p5mida RECORD t1={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b9 card-after="none"} t2={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.9 after=331/8/1.2.3.4.5/b9 card-after="none"} t3={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"}
+CHECK readt-ce-typed RECORD t1={real=75/3/none/b4 carried="read 76 4 none" outcome=card s=1.6 after=14/0/none/read/b0 card-after="none"} t2={real=75/3/none/b4 carried="read 76 4 none" outcome=card s=1.6 after=14/0/none/read/b0 card-after="none"}
+CHECK readt-lexical-longa RECORD t1={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t2={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b9 card-after="none"} t3={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.8 after=1531/8/1.2.3.4.5/b9 card-after="none"} t4={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"} t5={real=1519/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=1531/8/1.2.3.4.5/b9 card-after="none"}
+CHECK readt-lexical-p3mida RECORD t1={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.6 after=83/4/1.2.3/b5 card-after="none"} t2={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.9 after=83/4/1.2.3/b5 card-after="none"} t3={real=71/4/1.2.3/b5 carried="read 1 0 none" outcome=card s=1.8 after=83/4/1.2.3/b5 card-after="none"}
+CHECK readt-lexical-p5a RECORD t1={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b9 card-after="none"} t2={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"} t3={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"} t4={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"} t5={real=319/8/1.2.3.4.5/b9 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b9 card-after="none"}
+CHECK readt-lexical-p5mida FAIL unreadable: no CHECK line
+CHECK readt-lexical-typed RECORD t1={real=76/4/none/b5 carried="read 90 4 none" outcome=card s=1.8 after=14/0/none/read/b0 card-after="none"} t2={real=76/4/none/b5 carried="read 76 4 none" outcome=card s=1.8 after=14/0/none/read/b1 card-after="none"}
+CHECK readt-swiftui-typed RECORD t1={real=76/4/none carried="read 76 4 none" outcome=card s=2.2 after=14/0/none/read card-after="none"} t2={real=76/4/none carried="read 76 4 none" outcome=card s=1.8 after=14/0/none/read card-after="none"}
+CHECK readt-textarea-longa RECORD t1={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b0 card-after="none"} t2={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.8 after=1531/8/1.2.3.4.5/b0 card-after="none"} t3={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b0 card-after="none"} t4={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b0 card-after="none"} t5={real=1519/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=1531/8/1.2.3.4.5/b0 card-after="none"}
+CHECK readt-textarea-p3mida RECORD t1={real=71/4/1.2.3/b0 carried="read 1 0 none" outcome=card s=1.6 after=83/4/1.2.3/b0 card-after="none"} t2={real=71/4/1.2.3/b0 carried="read 1 0 none" outcome=card s=1.6 after=83/4/1.2.3/b0 card-after="none"} t3={real=71/4/1.2.3/b0 carried="read 1 0 none" outcome=card s=1.6 after=83/4/1.2.3/b0 card-after="none"}
+CHECK readt-textarea-p5a RECORD t1={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b0 card-after="none"} t2={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b0 card-after="none"} t3={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b0 card-after="none"} t4={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.8 after=331/8/1.2.3.4.5/b0 card-after="none"} t5={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.5 after=331/8/1.2.3.4.5/b0 card-after="none"}
+CHECK readt-textarea-p5mida RECORD t1={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.5 after=331/8/1.2.3.4.5/b0 card-after="none"} t2={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.6 after=331/8/1.2.3.4.5/b0 card-after="none"} t3={real=319/8/1.2.3.4.5/b0 carried="read 1 0 none" outcome=card s=1.7 after=331/8/1.2.3.4.5/b0 card-after="none"}
+CHECK readt-textarea-typed RECORD t1={real=76/4/none/b0 carried="read 76 4 none" outcome=card s=1.8 after=14/0/none/read/b0 card-after="none"} t2={real=76/4/none/b0 carried="read 76 4 none" outcome=card s=1.8 after=14/0/none/read/b0 card-after="none"}
+CHECK readt-uikit-typed RECORD t1={real=76/4/none carried="read 76 4 none" outcome=card s=1.6 after=14/0/none/read card-after="none"} t2={real=76/4/none carried="read 76 4 none" outcome=card s=1.7 after=14/0/none/read card-after="none"}
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected

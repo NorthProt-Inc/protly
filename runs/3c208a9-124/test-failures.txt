@@ -1,0 +1,4 @@
+2026-11-17 20:20:47.900863+0000 ProtlyCIUITests-Runner[5624:26664] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-11-17 20:20:47.945452+0000 ProtlyCIUITests-Runner[5624:26670] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+Test Case '-[ProtlyCIUITests.PhoneChecksUITests test5h_readtyped]' exceeded execution time allowance of 30 minutes. The test may have hung; check Xcode's test report for additional diagnostics. If the test requires additional time, use -[XCTestCase executionTimeAllowance] or one of xcodebuild's command-line overrides.
+Restarting after unexpected exit, crash, or test timeout; summary will include totals from previous launches.

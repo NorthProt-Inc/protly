@@ -1,0 +1,1 @@
+Test Case '-[ProtlyCIUITests.PhoneChecksUITests test0_access]' passed (34.081 seconds).
