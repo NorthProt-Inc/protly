@@ -496,8 +496,8 @@ final class KeyboardSourceRulesTests: XCTestCase {
     }
 
     /// P1a cause 3 (track K1a): protly never types over a selection, because `selectedText` can hold only the start of
-    /// it. FieldGuard decides: a card opens with copyOnly applied, a finished card checks the field with it, and
-    /// insertResult acts on its answer before the first write.
+    /// it. FieldGuard decides: a card opens with copyOnly applied, a finished card checks the field with it, insertResult
+    /// acts on its answer before the first write, and Undo is neither offered nor run with text selected.
     func testProtlyNeverTypesOverASelection() throws {
         let controller = try controllerSource()
         let cns = controller as NSString
@@ -517,6 +517,12 @@ final class KeyboardSourceRulesTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(matches(#"FieldGuard\.copyOnly\([^)]*field: observed\(\)\)"#, in: controller).count, 2,
                                     "a finished card checks the field with the rule, as insertResult does")
         XCTAssertFalse(controller.contains("selectedText =="), "selectedText cannot be checked against the real selection")
+        // Undo: refused with text selected, and the bar does not offer it then.
+        let undo = fn("func undoInsert()")
+        XCTAssertFalse(matches(#"FieldGuard\.canUndo\([^)]*selected: "#, in: undo).isEmpty, "undoInsert passes the selection")
+        XCTAssertTrue(undo.contains("observed()"), "undoInsert reads the field as it is now")
+        XCTAssertFalse(matches(#"BarAction\.center\([^)]*canUndo: FieldGuard\.offersUndo\("#, in: controller).isEmpty,
+                       "the bar offers Undo through FieldGuard.offersUndo")
     }
 
     /// P1a cause 3 (track K1a): a selection is read cut short too, so the cut-short panel no longer sends the user to

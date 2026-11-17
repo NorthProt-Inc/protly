@@ -553,8 +553,9 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     func undoInsert() {
         guard let l = lastInsert else { return }
-        guard FieldGuard.canUndo(l.inserted, before: textDocumentProxy.documentContextBeforeInput ?? "") else {
-            endUndo()  // the cursor moved or the text changed since Insert
+        let field = observed()
+        guard FieldGuard.canUndo(l.inserted, before: field.before, selected: field.selected) else {
+            endUndo()  // the cursor moved, the text changed or text is selected since Insert
             refreshField()  // the bar stops offering Undo
             return
         }
@@ -621,8 +622,10 @@ final class KeyboardViewController: KeyboardInputViewController {
             && pb.changeCount != d.integer(forKey: Self.clipboardKey) && pb.hasStrings
         if mode.clipboardIsNew != isNew { mode.clipboardIsNew = isNew }
 
-        // @Published fires on every write; an unchanged write would rebuild the keyboard on each key.
-        let center = BarAction.center(text: text, canUndo: mode.canUndo, clipboardIsNew: isNew)
+        // @Published fires on every write; an unchanged write would rebuild the keyboard on each key. No Undo is offered
+        // while text is selected: the tap would refuse it.
+        let center = BarAction.center(
+            text: text, canUndo: FieldGuard.offersUndo(mode.canUndo, selected: p.selectedText ?? ""), clipboardIsNew: isNew)
         if mode.center != center { mode.center = center }
         let key = center ?? .read  // BarAction.protlyKey, without a second scan of the field
         if mode.protlyKey != key { mode.protlyKey = key }

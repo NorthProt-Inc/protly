@@ -9,9 +9,16 @@ public enum FieldGuard {
         after.isEmpty && !original.isEmpty && before.hasSuffix(original)
     }
 
-    /// Undo: the text before the cursor still ends with all of the inserted text.
-    public static func canUndo(_ inserted: String, before: String) -> Bool {
-        !inserted.isEmpty && before.hasSuffix(inserted)
+    /// Undo: nothing is selected and the text before the cursor still ends with all of the inserted text. With text
+    /// selected, the first delete would take the selection and the next ones the user's text before it.
+    public static func canUndo(_ inserted: String, before: String, selected: String) -> Bool {
+        offersUndo(true, selected: selected) && !inserted.isEmpty && before.hasSuffix(inserted)
+    }
+
+    /// The bar offers a pending Undo only while no text is selected (canUndo would refuse it). The rest of canUndo is
+    /// left to the tap, which ends Undo when it fails: a web view can report the context late just after the write.
+    public static func offersUndo(_ pending: Bool, selected: String) -> Bool {
+        pending && selected.isEmpty
     }
 
     /// Cancel after a read: the cursor goes back only while the text the read moved over is still just before it.
