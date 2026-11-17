@@ -373,3 +373,202 @@ extension PhoneRun {
         return true
     }
 }
+
+/// diag/p4-double-space, third run (test5h_space3). In run e0b1b7d-125 each Apple key tapped by element took about
+/// 1.5 s, so no two Apple spaces came under 3 s and Apple never made a period: these cases tap Apple's space by
+/// coordinate (its frame looked up once), with a positive control.
+/// - `pr-pickfast`: Protly, solid host: `hello i` at a quick pace, the bar's right slot (`I`), one space, so the space
+///   comes within 3 s of the space after `hello` (the keyboard log's sinceLastSpaceTap says how long it was).
+/// - `ap-dbl`: Apple, solid host: `hello`, then XCUICoordinate.doubleTap on its space key (the positive control).
+/// - `ap-co-<n>`: Apple, solid host: `hello`, a space tap, `<n>/10` s of pause, a space tap, both by coordinate.
+/// - `ap-pick2`: Apple, solid host: `hel`, the QuickType `hello`, then two space taps by coordinate (no pause).
+/// - `ap-word2` / `ap-word2d`: Apple, UITextView: `world`, the caret before it, `hello`, then two space taps by
+///   coordinate (no pause) / a coordinate double tap.
+extension PhoneRun {
+    static let space3IDs = ["pr-pickfast", "ap-dbl", "ap-co-0", "ap-co-5", "ap-co-12", "ap-co-20", "ap-pick2",
+                            "ap-word2", "ap-word2d"]
+    static let coAsks: [(id: String, pause: TimeInterval)] = [("0", 0), ("5", 0.5), ("12", 1.2), ("20", 2.0)]
+
+    func checksSpace3() {
+        let ids = Self.space3IDs
+        if notReady(ids) { return }
+        var written = Set<String>()
+
+        // Protly, the solid host: a pick right after a typed space.
+        written.insert("pr-pickfast")
+        pickFastCase("pr-pickfast")
+
+        // Apple's English keyboard, the solid host.
+        d.clearField()
+        d.switchToEnglish()
+        if d.current() == .english, let space = appleSpace() {
+            written.insert("ap-dbl")
+            coordCase("ap-dbl", space: space, pause: nil)
+            for c in Self.coAsks {
+                written.insert("ap-co-\(c.id)")
+                coordCase("ap-co-\(c.id)", space: space, pause: c.pause)
+            }
+            written.insert("ap-pick2")
+            applePick2("ap-pick2", space: space)
+        }
+
+        // The UITextView screen: a word right after the cursor, Apple's spaces by coordinate.
+        d.app.terminate()
+        d.launch(arguments: ["-screen", "uikit"])
+        d.focusField()
+        _ = d.waitForKeyboard()
+        if d.current() != .english { d.switchToEnglish() }
+        if d.current() == .english, let space = appleSpace() {
+            written.insert("ap-word2")
+            appleWordCase("ap-word2", space: space, double: false)
+            written.insert("ap-word2d")
+            appleWordCase("ap-word2d", space: space, double: true)
+        }
+        for id in ids where !written.contains(id) {
+            unreadableLine(id, "keyboard not reached (\(d.current().rawValue))")
+        }
+    }
+
+    /// Apple's space key centre from its accessibility frame (one lookup; the taps then go by coordinate).
+    private func appleSpace() -> (CGFloat, CGFloat)? {
+        let predicate = NSPredicate(format: "identifier == 'space' OR label == ' '")
+        let key = d.app.keyboards.keys.matching(predicate).firstMatch
+        guard key.waitForExistence(timeout: 3) else {
+            d.fail("Apple's keyboard has no space key")
+            return nil
+        }
+        let f = key.frame
+        guard f.width > 0, f.height > 0 else {
+            d.fail("Apple's space key has no frame")
+            return nil
+        }
+        d.log(String(format: "Apple space key at %.1f,%.1f size %.1fx%.1f", f.minX, f.minY, f.width, f.height))
+        return (f.midX, f.midY)
+    }
+
+    /// Two taps on Apple's space by coordinate, `pause` seconds apart, or one XCUICoordinate.doubleTap when nil. Returns
+    /// the seconds from the end of the first tap to the end of the second as the test saw them (-1 for a double tap).
+    private func appleSpaces(_ space: (CGFloat, CGFloat), pause: TimeInterval?) -> Double {
+        let p = d.point(space.0, space.1)
+        guard let pause else {
+            p.doubleTap()
+            return -1
+        }
+        p.tap()
+        let start = Date()
+        if pause > 0 { d.pause(pause) }
+        p.tap()
+        return Date().timeIntervalSince(start)
+    }
+
+    private func coordCase(_ id: String, space: (CGFloat, CGFloat), pause: TimeInterval?) {
+        d.clearField()
+        d.mark(id)
+        var seq = ""
+        var notes: [String] = []
+        for i in 1...3 {
+            let before = Self.plainSpaces(d.fieldText() ?? "")
+            guard appleType("hello") else { break }
+            d.pause(0.4)
+            let gap = appleSpaces(space, pause: pause)
+            d.pause(0.8)
+            let result = Self.classifyAdded(before: before, after: Self.plainSpaces(d.fieldText() ?? ""))
+            seq += result.0
+            notes.append("\(i):gap=" + String(format: "%.2f", gap) + ":" + q(result.1))
+            d.pause(3.5)  // the next try's spaces must not fall in this try's window
+        }
+        let asked = pause.map { String($0) } ?? "doubleTap"
+        record2(id, "pause=\(asked) seq=\(seq) tries=\(notes.joined(separator: ";")) final=\(q(d.fieldText()))")
+    }
+
+    private func applePick2(_ id: String, space: (CGFloat, CGFloat)) {
+        d.clearField()
+        d.mark(id)
+        var seq = ""
+        var notes: [String] = []
+        for i in 1...3 {
+            let before = Self.plainSpaces(d.fieldText() ?? "")
+            guard appleType("hel") else { break }
+            d.pause(1.0)
+            let predicate = NSPredicate(format: "label ==[c] 'hello' OR label ==[c] %@", "\u{201C}hello\u{201D}")
+            let candidates = d.app.descendants(matching: .any).matching(predicate).allElementsBoundByIndex
+                .filter { $0.frame.width > 0 && $0.frame.height > 0 }
+            guard let cell = candidates.first else {
+                notes.append("\(i):no-prediction")
+                d.clearField()
+                continue
+            }
+            cell.tap()
+            d.pause(0.8)
+            let picked = Self.plainSpaces(d.fieldText() ?? "")
+            let gap = appleSpaces(space, pause: 0)
+            d.pause(0.8)
+            let result = Self.classifyAdded(before: before, after: Self.plainSpaces(d.fieldText() ?? ""))
+            seq += result.0
+            let pickAdded = picked.hasPrefix(before) ? String(picked.dropFirst(before.count)) : "not-a-prefix"
+            notes.append("\(i):after-pick=\(q(pickAdded)):gap=" + String(format: "%.2f", gap)
+                         + ":after-spaces=\(q(result.1))")
+            d.pause(3.5)
+        }
+        record2(id, "seq=\(seq) tries=\(notes.joined(separator: ";")) final=\(q(d.fieldText()))")
+    }
+
+    private func appleWordCase(_ id: String, space: (CGFloat, CGFloat), double: Bool) {
+        d.mark(id)
+        var notes: [String] = []
+        for i in 1...3 {
+            d.clearField()
+            appleType("world")
+            d.pause(0.6)
+            guard let r = Self.rect(d.probeValue("first-word")) else {
+                notes.append("\(i):no-word-frame")
+                continue
+            }
+            d.point(r.minX + 1, r.midY).tap()
+            d.pause(0.8)
+            let sel = d.probeValue("sel")
+            appleType("hello")
+            d.pause(0.4)
+            let gap = appleSpaces(space, pause: double ? nil : 0)
+            d.pause(0.8)
+            notes.append("\(i):sel-before=\(q(sel)):gap=" + String(format: "%.2f", gap)
+                         + ":field=\(q(d.fieldText())):sel=\(q(d.probeValue("sel")))")
+            d.pause(3.5)
+        }
+        record2(id, notes.joined(separator: ";"))
+    }
+
+    /// Protly, the solid host: `hello i` with short key pauses, the bar's right slot (`I`), then one space tap, all with
+    /// row 1 measured once (no screenshot between the taps).
+    private func pickFastCase(_ id: String) {
+        d.clearField()
+        guard let row1 = d.rowOne() else {
+            unreadableLine(id, "no row 1 on the host")
+            return
+        }
+        let pace = d.keyPause
+        d.fixedRow1 = row1
+        d.keyPause = 0.1
+        defer {
+            d.keyPause = pace
+            d.fixedRow1 = nil
+        }
+        d.mark(id)
+        var seq = ""
+        var notes: [String] = []
+        for i in 1...4 {
+            let before = Self.plainSpaces(d.fieldText() ?? "")
+            let start = Date()
+            d.type("hello i")
+            d.tapSlot(.right, settle: 0.3)
+            d.tapKey(.space)
+            let took = Date().timeIntervalSince(start)
+            d.pause(0.6)
+            let result = Self.classifyAdded(before: before, after: Self.plainSpaces(d.fieldText() ?? ""))
+            seq += result.0
+            notes.append("\(i):took=" + String(format: "%.2f", took) + ":" + q(result.1))
+            d.pause(3.5)  // the next try's first space must not fall in this try's window
+        }
+        record2(id, "seq=\(seq) tries=\(notes.joined(separator: ";")) final=\(q(d.fieldText()))")
+    }
+}
