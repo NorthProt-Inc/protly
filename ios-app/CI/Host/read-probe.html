@@ -1,0 +1,169 @@
+<!doctype html>
+<!--
+  diag/p1-phone-read probe page (HostApp.swift `-screen readweb`). Offline. Three fields:
+  - textarea: a plain <textarea>.
+  - ce: a contenteditable whose lines are <div> elements, an empty line <div><br></div> (the shape WebKit and Gmail's
+    web composer produce when Return is typed).
+  - lexical: a contenteditable shaped like Lexical's DOM (Instagram/Meta web composers): one
+    <p dir="ltr"><span data-lexical-text="true">...</span></p> per paragraph, an empty paragraph <p><br></p>.
+    It is NOT Lexical: no Lexical script, no beforeinput handling, no reconciliation, no selection management. Only
+    the static DOM shape the keyboard's text proxy reads.
+  fill(text, cursor) puts a draft in the field that last had focus and places the caret at a UTF-16 offset of the
+  draft. The page posts each field's length, line-feed count and paragraph tokens, never its text.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="color-scheme" content="dark">
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; background: #000; color: #f2f2f2; overflow: hidden; }
+  body { font: 15px -apple-system, system-ui, sans-serif; }
+  .f {
+    display: block; box-sizing: border-box; width: 234px; height: 56px; margin: 6px 8px; padding: 4px 6px;
+    background: #000; color: #f2f2f2; border: 1px solid #333; border-radius: 6px; outline: none;
+    font: 15px -apple-system, system-ui, sans-serif; overflow-y: auto;
+  }
+  textarea.f { resize: none; }
+  #ce { white-space: pre-wrap; }
+  #lexical p { margin: 0; }
+</style>
+</head>
+<body>
+<textarea id="textarea" class="f" aria-label="read textarea" autocapitalize="off" autocorrect="off"
+  spellcheck="false"></textarea>
+<div id="ce" class="f" contenteditable="true" role="textbox" aria-label="read ce" autocapitalize="off"
+  autocorrect="off" spellcheck="false"></div>
+<div id="lexical" class="f" contenteditable="true" role="textbox" data-lexical-editor="true" aria-label="read lexical"
+  autocapitalize="off" autocorrect="off" spellcheck="false"><p><br></p></div>
+<script>
+"use strict";
+const fields = {
+  textarea: document.getElementById("textarea"),
+  ce: document.getElementById("ce"),
+  lexical: document.getElementById("lexical"),
+};
+let last = "";
+
+function post(msg) {
+  try { window.webkit.messageHandlers.protly.postMessage(msg); } catch (e) { /* not in the host */ }
+}
+
+// The text a person sees: the textarea's value, or the blocks' text joined by line feeds.
+function text(name) {
+  const f = fields[name];
+  if (name === "textarea") return f.value;
+  const blocks = Array.from(f.childNodes).filter((n) => n.nodeType === 1);
+  if (blocks.length === 0) return f.textContent;
+  // Text typed straight into the editor before any block counts too.
+  const loose = Array.from(f.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent).join("");
+  return loose + blocks.map((b) => b.textContent).join("\n");
+}
+
+function shape(name) {
+  const t = text(name);
+  let lf = 0;
+  for (const ch of t) if (ch === "\n") lf++;
+  const tok = [];
+  for (let k = 1; k <= 12; k++) if (t.includes("§" + k + " ")) tok.push(k);
+  const f = fields[name];
+  return {
+    len: t.length, lf, tok: tok.join(".") || "none", read: t.startsWith("read ") ? 1 : 0,
+    blocks: name === "textarea" ? 0 : f.children.length,
+    inner: name === "textarea" ? t.length : f.innerText.length,
+  };
+}
+
+function rects() {
+  const r = {};
+  for (const [name, f] of Object.entries(fields)) {
+    const b = f.getBoundingClientRect();
+    r[name] = [b.left, b.top, b.width, b.height];
+  }
+  return r;
+}
+
+let pending = false;
+function state() {
+  if (pending) return;
+  pending = true;
+  setTimeout(() => { pending = false; postState(); }, 30);
+}
+
+function postState() {
+  const s = { focus: (document.activeElement && document.activeElement.id) || "", last };
+  for (const name of Object.keys(fields)) s[name] = shape(name);
+  post({ kind: "state", json: JSON.stringify(s), rects: rects() });
+}
+
+for (const [name, f] of Object.entries(fields)) {
+  f.addEventListener("focus", () => { last = name; state(); });
+  f.addEventListener("input", state);
+}
+document.addEventListener("selectionchange", state);
+setInterval(postState, 700);
+
+function block(name, line) {
+  const el = document.createElement(name === "lexical" ? "p" : "div");
+  if (line === "") {
+    el.appendChild(document.createElement("br"));
+    return { el, node: el };
+  }
+  const t = document.createTextNode(line);
+  if (name === "lexical") {
+    el.setAttribute("dir", "ltr");
+    const span = document.createElement("span");
+    span.setAttribute("data-lexical-text", "true");
+    span.appendChild(t);
+    el.appendChild(span);
+  } else {
+    el.appendChild(t);
+  }
+  return { el, node: t };
+}
+
+function fill(draft, cursor) {
+  const name = last || "textarea";
+  const f = fields[name];
+  if (name === "textarea") {
+    f.value = draft;
+    f.focus();
+    f.setSelectionRange(cursor, cursor);
+    state();
+    return name;
+  }
+  f.innerHTML = "";
+  let caret = null;
+  let pos = cursor;
+  for (const line of draft.split("\n")) {
+    const b = block(name, line);
+    f.appendChild(b.el);
+    if (caret === null && pos <= line.length) caret = { node: b.node, offset: line === "" ? 0 : pos };
+    else if (caret === null) pos -= line.length + 1;
+  }
+  f.focus();
+  if (caret) {
+    const range = document.createRange();
+    range.setStart(caret.node, caret.offset);
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  state();
+  return name;
+}
+
+function clearAll() {
+  fields.textarea.value = "";
+  fields.ce.innerHTML = "";
+  fields.lexical.innerHTML = "<p><br></p>";
+  postState();
+  return true;
+}
+
+window.addEventListener("load", postState);
+</script>
+</body>
+</html>

@@ -18,7 +18,7 @@ final class PhoneChecksUITests: XCTestCase {
     static let allowance: [String: TimeInterval] = [
         "test0_access": 300, "test0_probe": 480, "test1_68": 900, "test2_ws": 300, "test3_85offline": 900,
         "test4_memory": 600, "test5_icon": 300, "test5a_web": 900, "test5b_menu": 420, "test5c_pad": 420,
-        "test5d_card": 720, "test5e_bar": 600,
+        "test5d_card": 720, "test5e_bar": 600, "test5f_readnative": 1500, "test5g_readweb": 1800,
         "test6_85net": 1080, "test7_77": 1080,
     ]
 
@@ -101,6 +101,18 @@ final class PhoneChecksUITests: XCTestCase {
     func test5e_bar() throws {
         try PhoneRun(test: self, name: "test5e_bar", arguments: ["-fills", PhoneRun.barFills.joined(separator: "|")])
             .checksBar()
+    }
+
+    /// diag/p1-phone-read (ReadChecks.swift): the whole-field read and Replace on multi-line drafts, native fields.
+    @MainActor
+    func test5f_readnative() throws {
+        try PhoneRun(test: self, name: "test5f_readnative", arguments: ["-readfills", "1"]).checksReadNative()
+    }
+
+    /// diag/p1-phone-read: the same on the read-probe page (textarea, <div> contenteditable, Lexical-shaped).
+    @MainActor
+    func test5g_readweb() throws {
+        try PhoneRun(test: self, name: "test5g_readweb").checksReadWeb()
     }
 
     /// After every offline group, so the requests and the about-me note change nothing they check.

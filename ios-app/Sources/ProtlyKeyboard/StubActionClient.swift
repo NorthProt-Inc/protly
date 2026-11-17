@@ -21,9 +21,23 @@ enum StubActionClient {
 
     /// nil: not a marker draft, so the real client takes it.
     static func run(_ mode: ActionMode, text: String) -> AsyncStream<ActionUpdate>? {
-        guard text.hasPrefix(marker) else { return nil }
+        guard text.hasPrefix(marker) else { return probe(text) }
         let word = String(text.dropFirst(marker.count).prefix { !$0.isWhitespace })
         let script = StubScript.named(word)
+        return ActionAPI.updates {
+            (status: script.status, bytes: StubBytes(chunks: script.chunks), stop: {})
+        }
+    }
+}
+
+extension StubActionClient {
+    /// diag/p1-phone-read: on this probe branch every other draft is answered here too (never the network), with the
+    /// shape of the text the request carried: "read <utf16> <line feeds> <paragraph tokens present>".
+    static func probe(_ text: String) -> AsyncStream<ActionUpdate> {
+        let lf = text.utf16.reduce(0) { $1 == 10 ? $0 + 1 : $0 }
+        let tokens = (1...12).filter { text.contains("\u{00A7}\($0) ") }.map { String($0) }.joined(separator: ".")
+        let reply = "read \(text.utf16.count) \(lf) \(tokens.isEmpty ? "none" : tokens)"
+        let script = StubScript.probe(reply)
         return ActionAPI.updates {
             (status: script.status, bytes: StubBytes(chunks: script.chunks), stop: {})
         }
@@ -58,6 +72,13 @@ struct StubScript: Sendable {
             let body = #"{"type":"error","error":{"type":"invalid_request_error","message":"unknown stub scenario"}}"#
             return StubScript(status: 400, chunks: [Chunk(delay: .milliseconds(500), bytes: Array(body.utf8))])
         }
+    }
+
+    /// diag/p1-phone-read: the probe's reply as one quick translation.
+    static func probe(_ reply: String) -> StubScript {
+        let body = #"{"translation": "# + json(reply) + #", "back_translation": "ok"}"#
+        let c = [chunk(0, start), chunk(200, textStart), chunk(200, textDelta(body)), chunk(100, end("end_turn"))]
+        return StubScript(status: 200, chunks: c)
     }
 
     private static var ok: StubScript {

@@ -43,7 +43,11 @@ CARD_LOOKS = ("dark", "light")
 CARD_STATES = ("wait", "mid", "done", "err0", "err1")
 CARD_IDS = [f"card-{s}-{look}" for look in CARD_LOOKS for s in CARD_STATES] + ["card-slow", "card-cancel", "mem-stream"]
 BAR_IDS = ["hit-1", "bar-dark", "bar-light", "bar-xxl", "app-dark", "app-light"]
-EXPECTED_IDS = OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
+# diag/p1-phone-read (ReadChecks.swift): one RECORD line per host and draft.
+READ_DRAFTS = ("p3", "p3mid", "p5", "p5mid", "l5", "long", "longmid", "xlong")
+READ_NATIVE_IDS = [f"read-{h}-{d}" for h in ("swiftui", "uikit") for d in READ_DRAFTS]
+READ_WEB_IDS = [f"read-{h}-{d}" for h in ("textarea", "ce", "lexical") for d in READ_DRAFTS]
+EXPECTED_IDS = OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS + READ_NATIVE_IDS + READ_WEB_IDS
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -58,6 +62,8 @@ METHOD_IDS = {
     "test5c_pad": ["pad-1", "pad-2", "pad-3"],
     "test5d_card": CARD_IDS,
     "test5e_bar": BAR_IDS,
+    "test5f_readnative": READ_NATIVE_IDS,
+    "test5g_readweb": READ_WEB_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
 }

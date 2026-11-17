@@ -2,6 +2,7 @@ import KeyboardKit
 import ProtlyCore
 import SwiftUI
 import UIKit
+import os
 
 /// State the SwiftUI tree observes besides KeyboardKit's own context.
 @MainActor
@@ -298,6 +299,7 @@ final class KeyboardViewController: KeyboardInputViewController {
             guard !Task.isCancelled else { return }  // Cancel or a hide came first: never move the cursor
             cursorReturn.begin(before: textDocumentProxy.documentContextBeforeInput ?? "")
             let field = await FieldText.read(textDocumentProxy) { [weak self] move in self?.record(move) }
+            probeAfterRead(field.map { FieldText.shape($0.text) } ?? "nil", isSelection: field?.isSelection ?? false)
             guard !Task.isCancelled else {
                 // Cancelled mid-step: the step has settled now, so the cursor can go back over exactly what landed.
                 if restoreWhenReadEnds {
@@ -318,6 +320,7 @@ final class KeyboardViewController: KeyboardInputViewController {
             let action = ActionAPI.mode(forDraft: field.text)
             // Text left after the cursor = only a prefix was read: Replace would glue the result to the rest.
             if !field.isSelection, !(textDocumentProxy.documentContextAfterInput ?? "").isEmpty {
+                FieldText.probe.debug("act outcome=cut-short-panel")
                 mode.strip = nil
                 mode.panel = .failed("Could not read the whole text. Select all, then tap again.", retry: action)
                 return
@@ -368,6 +371,24 @@ final class KeyboardViewController: KeyboardInputViewController {
             return false
         }
         return true
+    }
+
+    /// diag/p1-phone-read probe: what the read returned (lengths only), then the proxy's contexts as the host settles.
+    private func probeAfterRead(_ returned: String, isSelection: Bool) {
+        let now = "before=\(FieldText.shape(textDocumentProxy.documentContextBeforeInput)) after=\(FieldText.shape(textDocumentProxy.documentContextAfterInput))"
+        let line = "act returned=\(returned) selection=\(isSelection ? 1 : 0) \(now)"
+        FieldText.probe.debug("\(line, privacy: .public)")
+        Task { @MainActor [weak self] in
+            var waited = 0
+            for at in [50, 150, 300, 600, 1000] {
+                try? await Task.sleep(nanoseconds: UInt64(at - waited) * 1_000_000)
+                waited = at
+                guard let self else { return }
+                let p = self.textDocumentProxy
+                let line = "settle +\(at)ms before=\(FieldText.shape(p.documentContextBeforeInput)) after=\(FieldText.shape(p.documentContextAfterInput))"
+                FieldText.probe.debug("\(line, privacy: .public)")
+            }
+        }
     }
 
     /// One move of the field read, into the record Cancel uses.
@@ -436,6 +457,8 @@ final class KeyboardViewController: KeyboardInputViewController {
         actionTask = Task { [weak self] in
             // self is bound per update, never before the loop: a torn-down controller is not held for up to 240 s. The
             // cancel check stops a late update from bringing a card back after Cancel or after a Retry replaced this task.
+            let sentShape = FieldText.shape(sent.text)
+            FieldText.probe.debug("request text=\(sentShape, privacy: .public)")
             for await update in ActionClient.run(action, text: sent.text, profile: sent.profile) {
                 guard let self, !Task.isCancelled else { return }
                 show(update, feed: callFeed, card: CardState(call: call, action: action, label: label, original: original,
@@ -516,7 +539,10 @@ final class KeyboardViewController: KeyboardInputViewController {
             lastInsert = (result, selected, !selected.isEmpty)
         } else {
             // The user may have moved the cursor or edited since: never delete the wrong text (P10).
-            guard fieldHolds(card.original, isSelection: card.isSelection) else {
+            let holds = fieldHolds(card.original, isSelection: card.isSelection)
+            let replaceLine = "replace holds=\(holds ? 1 : 0) original=\(FieldText.shape(card.original)) result=\(FieldText.shape(result)) before=\(FieldText.shape(p.documentContextBeforeInput)) after=\(FieldText.shape(p.documentContextAfterInput))"
+            FieldText.probe.debug("\(replaceLine, privacy: .public)")
+            guard holds else {
                 card.copyOnly = true
                 mode.panel = .card(card)
                 return

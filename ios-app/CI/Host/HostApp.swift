@@ -22,6 +22,7 @@ struct HostApp: App {
             switch UserDefaults.standard.string(forKey: "screen") ?? "" {
             case "web": WebComposerScreen()
             case "uikit": TextViewScreen()
+            case "readweb": ReadWebScreen()
             default: HostView()
             }
         }
@@ -60,6 +61,9 @@ struct HostView: View {
                         Button("F\(i + 1)") { text = draft }
                             .accessibilityIdentifier("fill-\(i + 1)")
                     }
+                }
+                if ReadDrafts.enabled {
+                    ReadFillButtons { i in text = ReadDrafts.all[i].text }
                 }
             }
             .tint(.white)
@@ -121,6 +125,19 @@ final class TextViewModel: ObservableObject {
 
     func focus() {
         textView?.becomeFirstResponder()
+    }
+
+    /// diag/p1-phone-read: a read draft in the text view, the cursor at its end or in its second paragraph.
+    func fill(_ i: Int) {
+        guard let tv = textView else { return }
+        let draft = ReadDrafts.all[i]
+        tv.inputDelegate?.textWillChange(tv)
+        tv.text = draft.text
+        tv.inputDelegate?.textDidChange(tv)
+        tv.inputDelegate?.selectionWillChange(tv)
+        tv.selectedRange = NSRange(location: draft.cursor, length: 0)
+        tv.inputDelegate?.selectionDidChange(tv)
+        refresh()
     }
 
     /// Polled (5 times a second): the keyboard moves the caret through the text input system, which does not always
@@ -208,6 +225,9 @@ struct TextViewScreen: View {
                 Probe(id: "marked", value: model.marked)
                 Probe(id: "first-word", value: model.firstWord)
                 Probe(id: "last-word", value: model.lastWord)
+                if ReadDrafts.enabled {
+                    ReadFillButtons { i in model.fill(i) }
+                }
             }
             .tint(.white)
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -261,6 +281,18 @@ final class WebModel: NSObject, ObservableObject, WKScriptMessageHandler {
         webView?.endEditing(true)
     }
 
+    /// diag/p1-phone-read: a read draft in the read-probe page's focused field (read-probe.html fill()).
+    func fill(_ i: Int) {
+        let draft = ReadDrafts.all[i]
+        guard let data = try? JSONEncoder().encode(draft.text), let json = String(data: data, encoding: .utf8) else {
+            append("host: fill \(i) not encoded")
+            return
+        }
+        webView?.evaluateJavaScript("fill(\(json), \(draft.cursor))") { [weak self] _, error in
+            if let error { self?.append("host: fill() failed: \(error)") }
+        }
+    }
+
     func fail(_ why: String) {
         state = "{\"error\":\"\(why)\"}"
     }
@@ -294,6 +326,7 @@ final class WebModel: NSObject, ObservableObject, WKScriptMessageHandler {
 
 struct WebComposer: UIViewRepresentable {
     let model: WebModel
+    var page = "web-composer"
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -306,11 +339,12 @@ struct WebComposer: UIViewRepresentable {
         web.scrollView.contentInsetAdjustmentBehavior = .never
         web.accessibilityIdentifier = "web"
         model.webView = web
-        if let url = Bundle.main.url(forResource: "web-composer", withExtension: "html") {
+        if let url = Bundle.main.url(forResource: page, withExtension: "html") {
             web.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         } else {
             let model = model
-            Task { @MainActor in model.fail("web-composer.html is not in the bundle") }
+            let page = page
+            Task { @MainActor in model.fail("\(page).html is not in the bundle") }
         }
         return web
     }
@@ -339,6 +373,92 @@ struct WebComposerScreen: View {
             .tint(.white)
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.trailing, 16)
+            .padding(.top, 24)
+        }
+    }
+}
+
+// MARK: - diag/p1-phone-read: whole-field read probe
+
+/// The read probe's drafts (`-readfills 1`): synthetic Korean paragraphs, each starting with a token `\u{00A7}<n> ` so
+/// the CI stub can say which paragraphs a read carried. `cursor` is a UTF-16 offset: the end, or the middle of the
+/// second paragraph. ios-app/CI/UITests/ReadChecks.swift names the same drafts in the same order.
+enum ReadDrafts {
+    struct Draft {
+        let name: String
+        let text: String
+        let cursor: Int
+    }
+
+    static var enabled: Bool { UserDefaults.standard.string(forKey: "readfills") == "1" }
+
+    static let sentence = "\u{C624}\u{B298} \u{D68C}\u{C758} \u{B0B4}\u{C6A9} \u{C815}\u{B9AC}\u{D574}\u{C11C} \u{BCF4}\u{B0B4}\u{C904}\u{AC8C}."
+
+    static func paragraphs(_ count: Int, sentences: Int) -> [String] {
+        (1...count).map { k in "\u{00A7}\(k) " + Array(repeating: sentence, count: sentences).joined(separator: " ") }
+    }
+
+    static func make(_ name: String, _ paras: [String], _ separator: String, mid: Bool) -> Draft {
+        let text = paras.joined(separator: separator)
+        let start = (paras[0] + separator).utf16.count
+        return Draft(name: name, text: text, cursor: mid ? start + paras[1].utf16.count / 2 : text.utf16.count)
+    }
+
+    static let all: [Draft] = [
+        make("p3", paragraphs(3, sentences: 1), "\n\n", mid: false),
+        make("p3mid", paragraphs(3, sentences: 1), "\n\n", mid: true),
+        make("p5", paragraphs(5, sentences: 3), "\n\n", mid: false),
+        make("p5mid", paragraphs(5, sentences: 3), "\n\n", mid: true),
+        make("l5", paragraphs(5, sentences: 1), "\n", mid: false),
+        make("long", paragraphs(5, sentences: 15), "\n\n", mid: false),
+        make("longmid", paragraphs(5, sentences: 15), "\n\n", mid: true),
+        make("xlong", paragraphs(8, sentences: 20), "\n\n", mid: false),
+    ]
+}
+
+/// Buttons `rfill-1` ... `rfill-8`, two rows of four, top right.
+struct ReadFillButtons: View {
+    let fill: (Int) -> Void
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 8) {
+            ForEach(0..<2, id: \.self) { row in
+                HStack(spacing: 10) {
+                    ForEach(0..<4, id: \.self) { col in
+                        let i = row * 4 + col
+                        Button("R\(i + 1)") { fill(i) }
+                            .font(.caption)
+                            .accessibilityIdentifier("rfill-\(i + 1)")
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// `-screen readweb`: read-probe.html (a textarea, a contenteditable of <div> lines, a Lexical-like contenteditable of
+/// <p> paragraphs). The page posts lengths, line-feed counts and paragraph tokens only, never text.
+struct ReadWebScreen: View {
+    @StateObject private var model = WebModel()
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            hostBackground.ignoresSafeArea()
+            WebComposer(model: model, page: "read-probe")
+                .frame(width: 250, height: 200)
+                .padding(.top, 8)
+            VStack(alignment: .trailing, spacing: 10) {
+                Button("Clear") { model.clear() }
+                    .accessibilityIdentifier("clear")
+                Button("Dismiss") { model.dismiss() }
+                    .accessibilityIdentifier("dismiss")
+                Probe(id: "web-state", value: model.state)
+                Probe(id: "web-rects", value: model.rects)
+                ReadFillButtons { i in model.fill(i) }
+            }
+            .tint(.white)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .padding(.trailing, 8)
             .padding(.top, 24)
         }
     }
