@@ -3,7 +3,7 @@
 // The layouts are Chromium's own markup: lines typed with Ctrl+Home, Input.insertText and Enter (Shift+Enter where
 // named) into the starting bodies of the diag/p1-chrome harness (probe/p1-chrome/harness.cjs), captured from
 // Chrome for Testing 156.0.8078.4 on 2026-11-17. The starting bodies themselves were made up by the harness, not
-// taken from Gmail; owner check P1b-2 is what ties them to Gmail.
+// taken from Gmail; owner check P1b-2 (the todo at the end) is what ties them to Gmail.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -145,3 +145,10 @@ for (const [name, layout, typed] of SHARED.slice(0, 3)) {
     assert.equal(body.innerHTML, beforeHtml);
   });
 }
+
+// Done-when 5 of Track C1 (owner check P1b-2). The owner runs the structure snippet from the diagnosis report's
+// appendix in a real Gmail compose (tag names only, no text): once with a signature or an expanded quote and no Enter
+// after the last line, once with an Enter. Paste each printed line here, with whether the last line stayed Korean,
+// and add the matching body to SHARED or WORKED above. If it prints `#text DIV DIV[holds-boundary]`, Gmail matches the
+// harness layouts at the top level.
+test.todo('owner fixture P1b-2: the body structure printed in the owner\'s Gmail');
