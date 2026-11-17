@@ -316,10 +316,11 @@ final class KeyboardViewController: KeyboardInputViewController {
             if field.isSelection { cursorReturn.clear() }
             // The action comes from the text read here (the whole field or the selection), not from the bar's view of it.
             let action = ActionAPI.mode(forDraft: field.text)
-            // Text left after the cursor = only a prefix was read: Replace would glue the result to the rest.
+            // Text left after the cursor = only a prefix was read: Replace would glue the result to the rest. No advice
+            // to select: a selection read is cut too, and its card only copies (FieldGuard.copyOnly).
             if !field.isSelection, !(textDocumentProxy.documentContextAfterInput ?? "").isEmpty {
                 mode.strip = nil
-                mode.panel = .failed("Could not read the whole text. Select all, then tap again.", retry: action)
+                mode.panel = .failed("Could not read the whole text.", retry: action)
                 return
             }
             run(ActionCall(mode: action, text: field.text, original: field.text, isSelection: field.isSelection), call: call)

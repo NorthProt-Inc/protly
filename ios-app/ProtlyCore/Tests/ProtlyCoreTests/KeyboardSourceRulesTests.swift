@@ -515,6 +515,14 @@ final class KeyboardSourceRulesTests: XCTestCase {
         XCTAssertFalse(controller.contains("selectedText =="), "selectedText cannot be checked against the real selection")
     }
 
+    /// P1a cause 3 (track K1a): a selection is read cut short too, so the cut-short panel no longer sends the user to
+    /// Select all. Retry stays.
+    func testTheCutShortPanelDoesNotSendUsersToSelectAll() throws {
+        let controller = try controllerSource()
+        XCTAssertTrue(controller.contains(#".failed("Could not read the whole text.", retry: action)"#), "the cut-short panel")
+        XCTAssertFalse(controller.lowercased().contains("select all"), "nothing sends the user to Select all")
+    }
+
     /// Tower decision D-B: the keys wait during the field read, so the read runs on FieldReadBudget's clock (2 s in all,
     /// a started step always settles) instead of a fixed count of polls.
     func testTheFieldReadIsCapped() throws {
