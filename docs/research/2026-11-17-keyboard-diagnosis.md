@@ -47,12 +47,14 @@ selection when there is one (`:23`). Otherwise it moves the cursor over the afte
 holds everything before the cursor, an empty after-context means the end of the field, and `selectedText` is the
 whole selection. On the simulator none of the three held.
 
-**Root causes.** All confirmed on the iOS 26.5 simulator, with the same result on every try of a case.
+**Root causes.** All confirmed on the iOS 26.5 simulator. Every try of a case gave the same result, except one
+Lexical-shaped read (cause 5).
 
 1. **The before-context is a window of the last few sentences.** Once the host has sent its own copy of the field
    (filled by the app, the field focused again, the selection set again), the read carried only the end of the draft.
    - The cut-short check (`KeyboardViewController.swift:320`) looks only at the after-context, so it passed. Replace's
-     guard (`FieldGuard.canReplace`, `:491-495`) checks that the window is just before the cursor, so it passed too.
+     guard (`fieldHolds`, `:491-495`, through `FieldGuard.canReplace`, `FieldGuard.swift:7-9`) checks that the window
+     is just before the cursor, so it passed too.
    - Replace then swapped only the window. The start of the draft stayed Korean, and the card's translation covered
      only the window.
 
@@ -82,52 +84,57 @@ whole selection. On the simulator none of the three held.
      paragraph 2 of 3: paragraphs 1 and 2 were replaced, 3 stayed (3/3). Cursor in line 2 of 5: lines 1 and 2 were
      replaced (2/2).
    - Cursor in paragraph 1 of 3, separated by blank lines or by single line feeds: only paragraph 1 was read (4/4).
-     A probe step of one more unit crossed the line feed and the next paragraph showed in the after-context
-     (`skip k=2 after=22`, `skipl k=1 after=22`). At the true end of the field the same step changed nothing for 0.5 s
-     (`skipend`, 2/2).
+     One-unit probe steps crossed the line break, and the next paragraph showed in the after-context. With single line
+     feeds, one step did it (`skipl k=1 after=22`). With a blank line between, the first step landed on the blank line
+     and the second showed the next paragraph (`skip k=2 after=22`). At the true end of the field a step changed
+     nothing for 0.5 s (`skipend`, 2/2).
    - In the only exception, the cursor sat in a 302-unit paragraph. The after-context ended mid-paragraph twice, and
      the second move never showed within 1 s (`notApplied`). The check caught it and showed "Could not read the whole
      text. Select all, then tap again." (3/3). This was the only case in the three runs where the user is told.
-3. **Select all is cut too, and Replace then deletes the rest of the draft.** In the `UITextView`, after select all,
-   `selectedText` held the first 43 units, the first two sentences, for drafts of 318, 1518 and 3230 units (6/6,
-   `runs/28771e2-127`).
+3. **Select all is cut too, and Replace then deletes the rest of the draft.** In the `UITextView`, the host app
+   selected all of the text in code (`selectedRange`, with the input delegate told). `selectedText` then held the
+   first 43 units, the first two sentences, for drafts of 318, 1518 and 3230 units (6/6, `runs/28771e2-127`).
    - Replace's guard compares `selectedText` with that same 43-unit text, so it passed. Replace typed over the whole
      selection, and the field then held only the reply (6/6).
    - The whole draft was replaced by a translation of its first two sentences.
    - From the code, not run: Undo puts back only the 43 units read (`lastInsert`, `KeyboardViewController.swift:525`;
      `undoInsert`, `:557-569`), so the rest is gone.
    - The cut-short panel itself sends the user here ("Select all, then tap again", `:322`).
-   - Select all was not run in the SwiftUI field or on the web page.
+   - The edit menu's Select All was not run. Neither was select all in the SwiftUI field or on the web page.
 4. **A draft typed key by key in one go was read whole; the same draft after a resync was not.**
-   - Typed with the Protly keyboard, the read carried all of it on every host: 17/17. That was a 76-unit English draft
-     on all five hosts and a 69-unit Korean draft in the `UITextView` (`runs/3c208a9-124`, `runs/28771e2-127`). One
-     of these reads carried 14 extra units (cause 5).
+   - Typed with the Protly keyboard, the read carried all of it on every host: 17/17 (`runs/3c208a9-124`,
+     `runs/28771e2-127`). One of these reads carried 14 extra units (cause 5).
+   - The drafts were English on all five hosts and a 69-unit Korean draft in the `UITextView`. The probe typed 81
+     English units and the fields held 76; the 5 lost units were not traced.
    - Read again after a resync, the same field gave the window: 48 of 76 English, 42 of 69 Korean, 49 of 76 in the
      web textarea (10/10).
-   - A resync here means the app set the selection again and told the input delegate, or Dismiss followed by focus
-     again, or on the web page a tap in the field.
-   - So whether the read is whole depends on what happened to the field since the keyboard came up. This is the
-     likeliest source of "different every time".
+   - A resync here means one of three things: the app set the selection again and told the input delegate; Dismiss,
+     then the app focused the field again; or, on the web page, Dismiss, then a tap at the field's end.
+   - So whether the read is whole depends on what happened to the field since the keyboard came up. That this is the
+     source of "different every time" is a **guess**, the likeliest one.
    - **Guess:** the proxy keeps the text this keyboard typed and replaces it with the host's window when the host
      resyncs. Drafts typed longer than 76 units were not tried, so a long draft typed in one go is open.
 5. **Web fields show the keyboard only what it typed itself.**
    - Text the page put in by script was never in the context. The protly key found an empty field and fell back to
-     the clipboard ("Copy a message first."): 129/129 tries in `runs/7e031fc-122`, and 4/4 in `runs/28771e2-127`.
+     the clipboard ("Copy a message first."): 135/135 tries in `runs/7e031fc-122`, and 4/4 in `runs/28771e2-127`.
    - With one key typed after the fill, the read carried that one key, and Replace replaced only it (45/45,
      `runs/3c208a9-124`).
-   - After a tap in the field, the page sent its state, and the read carried the last 2 sentences (39 of 318 units) in
-     the textarea and the Lexical-shaped field (4/4).
+   - After Dismiss and a tap at the field's end, the page sent its state. The read then carried the last 2 sentences
+     (39 of 318 units) in the textarea and the Lexical-shaped field (4/4).
    - A side observation from 1 try out of 2: in the Lexical-shaped field, the first typed read carried 90 units for a
-     76-unit field. The extra 14 units were left over from the field used just before, which the page had changed by
-     script. Real chat pages clear their box by script after Send, so the next read could carry the tail of the sent
-     message. That this happens on real sites is a **guess**.
+     76-unit field. Its 14 extra units match, by length only, what the keyboard had seen and inserted in the field used
+     just before (1 + 13 units). The logs hold no text, so that origin is a **guess**. Real chat pages clear their
+     box by script after Send, so the next read could carry the tail of the sent message. That this happens on real
+     sites is a **guess**.
 
 **Ruled out.**
-- **Timing.** Every move that landed showed 20 to 33 ms after it was sent (40 moves). The 2 s budget ended no read. The contexts were the
-  same at 50, 150, 300, 600 and 1000 ms after every read: 1735 samples, 0 changes. Waiting longer would not have read
-  more.
-- **The request.** It carried exactly what the read returned, in all 205 calls.
-- **Line-break characters.** Every host used U+000A only, with no CR, U+2028 or U+2029.
+- **Timing.** Every move that landed was seen at the first poll, 20 to 33 ms after it was sent (40 moves). The polls
+  are 20 ms apart, so the host's real delay is shorter. The 2 s budget ended no read. The contexts were the same at 50,
+  150, 300, 600 and 1000 ms after every read: 1735 samples, 0 changes. Waiting longer would not have read more.
+- **The request.** Its length and line-feed count matched what the read returned, in all 205 calls. The logs hold no
+  text, so lengths are all that was compared.
+- **Line-break characters.** No context the keyboard saw held a CR, U+2028 or U+2029. In the contenteditable and the
+  Lexical-shaped field, though, the keyboard never saw a line break the page itself sent, so those two are untested.
 - **The model and prompts.** The tower had already ruled them out, and the stub replaced the model here.
 
 **Not covered.**
@@ -142,8 +149,8 @@ whole selection. On the simulator none of the three held.
 
 **Fix direction.**
 - **The read must find both ends of the field by moving, not by trusting a context.** An empty after-context is the
-  end only when one more step changes nothing. Note that a step over a line feed landed in about 20 ms, while at the
-  end nothing changed for 0.5 s.
+  end only when one more step changes nothing. A step over a line feed was seen at the first poll (21 to 30 ms),
+  while at the end nothing changed for 0.5 s.
 - **The start must be found the same way, by walking back.** Walking back was not probed: prove it in CI first.
 - **Read a selection by walking too, or Replace never over a selection.** `selectedText` cannot be checked against
   the real selection.
