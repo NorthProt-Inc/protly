@@ -33,19 +33,36 @@ function innerTextOf(el) {
 }
 
 // One <p> per line, as rich Lexical renders a paste; an empty line is a <p> holding a <br>.
-export function setLines(el, lines) {
-  const doc = el.ownerDocument;
-  el.replaceChildren(...lines.map((l) => {
+function paragraphs(doc, lines) {
+  return lines.map((l) => {
     const p = doc.createElement('p');
     if (l) p.textContent = l; else p.appendChild(doc.createElement('br'));
     return p;
-  }));
+  });
+}
+export function setLines(el, lines) {
+  el.replaceChildren(...paragraphs(el.ownerDocument, lines));
+}
+
+// Writes nodes where the selection is, as the editors do: in place of the whole box when the selection covers it (the
+// writers' select-all), at the selection otherwise, and nowhere when the selection is outside the box. A dropped or
+// collapsed select-all therefore leaves the old text in the box and fails the write check.
+function writeAtSelection(el, nodes) {
+  const sel = el.ownerDocument.getSelection();
+  if (!sel.rangeCount || !el.contains(sel.anchorNode) || !el.contains(sel.focusNode)) return;
+  if (sel.toString() === el.textContent) { el.replaceChildren(...nodes); return; }
+  const range = sel.getRangeAt(0);
+  range.deleteContents();
+  const frag = el.ownerDocument.createDocumentFragment();
+  frag.append(...nodes);
+  range.insertNode(frag);
 }
 
 // el becomes an editor of kind 'lexical' | 'draft' | 'slate' (its DOM marker), or a plain contenteditable (kind
 // null, like Quill 1.x: it handles a paste on its own without preventDefault, and insertText keeps lines).
-// paste(text): what the editor renders for a paste (default: every line); null: it ignores pastes (no preventDefault,
-// no change). Returns the log of pastes (their text) and insertText calls.
+// paste(text, el): what the editor renders for a paste (a string: one <p> per line; undefined: the callback rendered
+// it itself); null: it ignores pastes (no preventDefault, no change). Returns the log of pastes (their text) and
+// insertText calls.
 export function fakeEditor(el, { kind = 'lexical', paste = (t) => t } = {}) {
   const doc = el.ownerDocument;
   addClipboard(doc.defaultView);
@@ -55,14 +72,16 @@ export function fakeEditor(el, { kind = 'lexical', paste = (t) => t } = {}) {
   el.addEventListener('paste', (e) => {
     const text = e.clipboardData.getData('text/plain');
     log.pastes.push(text);
-    if (!kind) { setLines(el, text.split('\n')); return; } // Quill-like: its own insert, no preventDefault
+    if (!kind) { writeAtSelection(el, paragraphs(doc, text.split('\n'))); return; } // Quill-like: no preventDefault
     if (paste === null) return;
     e.preventDefault();
-    setLines(el, paste(text).split('\n'));
+    const shown = paste(text, el);
+    if (shown !== undefined) writeAtSelection(el, paragraphs(doc, shown.split('\n')));
   });
   doc.execCommand = (cmd, ui, text) => {
     log.inserts.push(text);
-    setLines(el, kind === 'lexical' ? [text.replace(/\n/g, '')] : text.split('\n')); // Lexical drops the breaks
+    // Lexical's selection.insertText drops the line breaks.
+    writeAtSelection(el, paragraphs(doc, kind === 'lexical' ? [text.replace(/\n/g, '')] : text.split('\n')));
     return true;
   };
   return log;
