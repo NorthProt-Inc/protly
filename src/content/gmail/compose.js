@@ -1,5 +1,5 @@
 import { GSEL, composeOf, findViewerEmail } from './selectors.js';
-import { userNodes, nodesToText, textToNodes, replaceUserNodes, hasMedia } from './body.js';
+import { userNodes, nodesToText, textToNodes, replaceUserNodes, hasMedia, textBeforeBoundary } from './body.js';
 import { readThread } from './thread.js';
 import { hasHangul, parseLangPrefix, prefixTarget, splitNotes, addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../../lib/lang.js';
 import { createCard } from '../../ui/card.js';
@@ -261,7 +261,8 @@ async function request(body, { kind = 'translate', korean, notes = [], profile, 
       return showError(body, s, 'The draft changed while translating, so the translation was dropped.');
     }
     const removed = replaceUserNodes(body, textToNodes(document, r.translation));
-    if (norm(nodesToText(userNodes(body))) !== norm(r.translation)) {
+    // Read past userNodes: a typed line it missed is still before the signature or quote and fails the check.
+    if (norm(textBeforeBoundary(body)) !== norm(r.translation)) {
       replaceUserNodes(body, removed);
       return showError(body, s, 'Could not write the translation into the email. Your draft is back as it was.');
     }

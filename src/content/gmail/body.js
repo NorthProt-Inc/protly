@@ -31,6 +31,26 @@ export function userNodes(body) {
   return kids.slice(0, end);
 }
 
+// The body's text before its first quote or signature block, in document order. The write check reads it instead of
+// userNodes, so a typed line the user's part missed still counts. Block starts and ends become line breaks, so only
+// compare it with whitespace collapsed.
+export function textBeforeBoundary(body) {
+  const { NodeFilter } = body.ownerDocument.defaultView;
+  const walker = body.ownerDocument.createTreeWalker(body, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => (n.nodeType === 1 && HIDDEN.test(n.nodeName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  const open = []; // blocks the walk is inside
+  let out = '';
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    while (open.length && !open.at(-1).contains(n)) { open.pop(); out += '\n'; }
+    if (n.nodeType === 3) out += n.textContent;
+    else if (n.matches(GSEL.boundary)) break;
+    else if (n.nodeName === 'BR') out += '\n';
+    else if (BLOCK.test(n.nodeName)) { open.push(n); out += '\n'; }
+  }
+  return out;
+}
+
 export const hasMedia = (nodes) => nodes.some((n) => n.nodeType === 1 && (n.matches(MEDIA) || !!n.querySelector(MEDIA)));
 
 // Plain text with one \n per line, matching how Gmail lays out typed text (bare first line, <div> per line).
