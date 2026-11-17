@@ -1,0 +1,680 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5f_readnative
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK rd-swiftui-p3-1 1794911686.986
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p3-2 1794911700.810
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p3-3 1794911714.722
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK read-swiftui-p3 RECORD t1={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"} t2={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"} t3={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"}
+MARK rd-swiftui-p3mid-1 1794911728.835
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p3mid-2 1794911743.028
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p3mid-3 1794911757.152
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK read-swiftui-p3mid RECORD cursor=end (a SwiftUI TextField fill leaves the cursor at the end) t1={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"} t2={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"} t3={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"}
+MARK rd-swiftui-p5-1 1794911771.180
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-2 1794911785.159
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-3 1794911799.153
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-4 1794911813.658
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-5 1794911827.642
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-6 1794911841.503
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-7 1794911855.304
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-8 1794911869.235
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-9 1794911883.161
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5-10 1794911897.042
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK read-swiftui-p5 RECORD t1={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t2={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t3={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.6 after=267/8/1.2.3.4 card-after="none"} t4={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t5={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t6={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t7={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t8={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t9={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t10={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"}
+MARK rd-swiftui-p5mid-1 1794911911.102
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-2 1794911924.907
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-3 1794911938.702
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-4 1794911952.590
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-5 1794911966.405
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-6 1794911980.285
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-7 1794911994.138
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-8 1794912007.947
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-9 1794912021.814
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-p5mid-10 1794912035.552
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK read-swiftui-p5mid RECORD cursor=end (a SwiftUI TextField fill leaves the cursor at the end) t1={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t2={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t3={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t4={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t5={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t6={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t7={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t8={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t9={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t10={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"}
+MARK rd-swiftui-l5-1 1794912049.438
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-l5-2 1794912063.258
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-l5-3 1794912077.063
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK read-swiftui-l5 RECORD t1={real=114/4/1.2.3.4.5 carried="read 45 1 4.5" outcome=card s=1.4 after=82/3/1.2.3 card-after="none"} t2={real=114/4/1.2.3.4.5 carried="read 45 1 4.5" outcome=card s=1.4 after=82/3/1.2.3 card-after="none"} t3={real=114/4/1.2.3.4.5 carried="read 45 1 4.5" outcome=card s=1.5 after=82/3/1.2.3 card-after="none"}
+MARK rd-swiftui-long-1 1794912090.993
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-2 1794912104.942
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-3 1794912118.688
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-4 1794912132.528
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-5 1794912146.442
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-6 1794912160.342
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-7 1794912174.330
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-8 1794912188.190
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-9 1794912202.051
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-long-10 1794912215.952
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK read-swiftui-long RECORD t1={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t2={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t3={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t4={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t5={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t6={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t7={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t8={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t9={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t10={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"}
+MARK rd-swiftui-longmid-1 1794912229.936
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-longmid-2 1794912243.751
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-longmid-3 1794912257.668
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK read-swiftui-longmid RECORD cursor=end (a SwiftUI TextField fill leaves the cursor at the end) t1={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t2={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t3={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"}
+MARK rd-swiftui-xlong-1 1794912271.626
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-xlong-2 1794912285.463
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rd-swiftui-xlong-3 1794912299.268
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK read-swiftui-xlong RECORD t1={real=3230/14/1.2.3.4.5.6.7.8 carried="read 59 0 none" outcome=card s=1.4 after=3185/14/1.2.3.4.5.6.7.8 card-after="none"} t2={real=3230/14/1.2.3.4.5.6.7.8 carried="read 59 0 none" outcome=card s=1.4 after=3185/14/1.2.3.4.5.6.7.8 card-after="none"} t3={real=3230/14/1.2.3.4.5.6.7.8 carried="read 59 0 none" outcome=card s=1.4 after=3185/14/1.2.3.4.5.6.7.8 card-after="none"}
+MARK rd-uikit-p3-1 1794912318.000
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p3-2 1794912331.894
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p3-3 1794912345.840
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK read-uikit-p3 RECORD t1={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"} t2={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"} t3={real=70/4/1.2.3 carried="read 46 2 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"}
+MARK rd-uikit-p3mid-1 1794912359.823
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p3mid-2 1794912373.870
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p3mid-3 1794912387.791
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK read-uikit-p3mid RECORD t1={real=70/4/1.2.3 carried="read 46 2 1.2" outcome=card s=1.5 after=37/2/3/read card-after="none"} t2={real=70/4/1.2.3 carried="read 46 2 1.2" outcome=card s=1.5 after=37/2/3/read card-after="none"} t3={real=70/4/1.2.3 carried="read 46 2 1.2" outcome=card s=1.5 after=37/2/3/read card-after="none"}
+MARK rd-uikit-p5-1 1794912401.776
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-2 1794912415.733
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-3 1794912429.640
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-4 1794912443.547
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-5 1794912457.440
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-6 1794912471.253
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-7 1794912485.115
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-8 1794912499.005
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-9 1794912512.901
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5-10 1794912526.834
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK read-uikit-p5 RECORD t1={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t2={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t3={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t4={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t5={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t6={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t7={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.4 after=267/8/1.2.3.4 card-after="none"} t8={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t9={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"} t10={real=318/8/1.2.3.4.5 carried="read 62 0 5" outcome=card s=1.5 after=267/8/1.2.3.4 card-after="none"}
+MARK rd-uikit-p5mid-1 1794912540.881
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-2 1794912554.821
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-3 1794912568.806
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-4 1794912582.671
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-5 1794912596.656
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-6 1794912610.616
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-7 1794912624.462
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-8 1794912638.411
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-9 1794912652.283
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-p5mid-10 1794912666.164
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK read-uikit-p5mid RECORD t1={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.5 after=267/8/1.3.4.5 card-after="none"} t2={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.5 after=267/8/1.3.4.5 card-after="none"} t3={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.4 after=267/8/1.3.4.5 card-after="none"} t4={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.4 after=267/8/1.3.4.5 card-after="none"} t5={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.5 after=267/8/1.3.4.5 card-after="none"} t6={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.4 after=267/8/1.3.4.5 card-after="none"} t7={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.5 after=267/8/1.3.4.5 card-after="none"} t8={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.4 after=267/8/1.3.4.5 card-after="none"} t9={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.5 after=267/8/1.3.4.5 card-after="none"} t10={real=318/8/1.2.3.4.5 carried="read 62 0 2" outcome=card s=1.4 after=267/8/1.3.4.5 card-after="none"}
+MARK rd-uikit-l5-1 1794912680.105
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-l5-2 1794912694.003
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-l5-3 1794912707.969
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK read-uikit-l5 RECORD t1={real=114/4/1.2.3.4.5 carried="read 45 1 4.5" outcome=card s=1.5 after=82/3/1.2.3 card-after="none"} t2={real=114/4/1.2.3.4.5 carried="read 45 1 4.5" outcome=card s=1.5 after=82/3/1.2.3 card-after="none"} t3={real=114/4/1.2.3.4.5 carried="read 45 1 4.5" outcome=card s=1.5 after=82/3/1.2.3 card-after="none"}
+MARK rd-uikit-long-1 1794912721.977
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-2 1794912735.958
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-3 1794912749.855
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-4 1794912763.777
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-5 1794912777.614
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-6 1794912791.568
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-7 1794912805.495
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-8 1794912819.392
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-9 1794912833.280
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-long-10 1794912847.248
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK read-uikit-long RECORD t1={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t2={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t3={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t4={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t5={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t6={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t7={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"} t8={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t9={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.4 after=1473/8/1.2.3.4.5 card-after="none"} t10={real=1518/8/1.2.3.4.5 carried="read 59 0 none" outcome=card s=1.5 after=1473/8/1.2.3.4.5 card-after="none"}
+MARK rd-uikit-longmid-1 1794912861.286
+tapped protlyKey
+MARK rd-uikit-longmid-2 1794912871.790
+tapped protlyKey
+MARK rd-uikit-longmid-3 1794912882.256
+tapped protlyKey
+CHECK read-uikit-longmid RECORD t1={real=1518/8/1.2.3.4.5 outcome=panel s=2.2 msg="Could not read the whole text. Select all, then tap again."} t2={real=1518/8/1.2.3.4.5 outcome=panel s=2.2 msg="Could not read the whole text. Select all, then tap again."} t3={real=1518/8/1.2.3.4.5 outcome=panel s=2.2 msg="Could not read the whole text. Select all, then tap again."}
+MARK rd-uikit-xlong-1 1794912892.842
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-xlong-2 1794912906.816
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rd-uikit-xlong-3 1794912920.832
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK read-uikit-xlong RECORD t1={real=3230/14/1.2.3.4.5.6.7.8 carried="read 59 0 none" outcome=card s=1.4 after=3185/14/1.2.3.4.5.6.7.8 card-after="none"} t2={real=3230/14/1.2.3.4.5.6.7.8 carried="read 59 0 none" outcome=card s=1.5 after=3185/14/1.2.3.4.5.6.7.8 card-after="none"} t3={real=3230/14/1.2.3.4.5.6.7.8 carried="read 59 0 none" outcome=card s=1.5 after=3185/14/1.2.3.4.5.6.7.8 card-after="none"}
+== PhoneChecksUITests.test5g_readweb
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK rd-textarea-p3-1 1794912950.607
+tapped protlyKey
+MARK rd-textarea-p3-2 1794912960.702
+tapped protlyKey
+MARK rd-textarea-p3-3 1794912970.735
+tapped protlyKey
+CHECK read-textarea-p3 RECORD t1={real=70/4/1.2.3/b0 outcome=panel s=1.4 msg="Copy a message first."} t2={real=70/4/1.2.3/b0 outcome=panel s=1.4 msg="Copy a message first."} t3={real=70/4/1.2.3/b0 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-textarea-p3mid-1 1794912980.784
+tapped protlyKey
+MARK rd-textarea-p3mid-2 1794912990.818
+tapped protlyKey
+MARK rd-textarea-p3mid-3 1794913000.981
+tapped protlyKey
+CHECK read-textarea-p3mid RECORD t1={real=70/4/1.2.3/b0 outcome=panel s=1.4 msg="Copy a message first."} t2={real=70/4/1.2.3/b0 outcome=panel s=1.4 msg="Copy a message first."} t3={real=70/4/1.2.3/b0 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-textarea-p5-1 1794913011.197
+tapped protlyKey
+MARK rd-textarea-p5-2 1794913021.268
+tapped protlyKey
+MARK rd-textarea-p5-3 1794913031.410
+tapped protlyKey
+MARK rd-textarea-p5-4 1794913041.441
+tapped protlyKey
+MARK rd-textarea-p5-5 1794913051.522
+tapped protlyKey
+MARK rd-textarea-p5-6 1794913061.649
+tapped protlyKey
+MARK rd-textarea-p5-7 1794913071.714
+tapped protlyKey
+MARK rd-textarea-p5-8 1794913081.758
+tapped protlyKey
+MARK rd-textarea-p5-9 1794913091.785
+tapped protlyKey
+MARK rd-textarea-p5-10 1794913101.866
+tapped protlyKey
+CHECK read-textarea-p5 RECORD t1={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t2={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t3={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t4={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t5={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t6={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t7={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t8={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t9={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t10={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-textarea-p5mid-1 1794913112.024
+tapped protlyKey
+MARK rd-textarea-p5mid-2 1794913122.359
+tapped protlyKey
+MARK rd-textarea-p5mid-3 1794913132.847
+tapped protlyKey
+MARK rd-textarea-p5mid-4 1794913143.302
+tapped protlyKey
+MARK rd-textarea-p5mid-5 1794913153.872
+tapped protlyKey
+MARK rd-textarea-p5mid-6 1794913164.359
+tapped protlyKey
+MARK rd-textarea-p5mid-7 1794913174.870
+tapped protlyKey
+MARK rd-textarea-p5mid-8 1794913185.089
+tapped protlyKey
+MARK rd-textarea-p5mid-9 1794913195.432
+tapped protlyKey
+MARK rd-textarea-p5mid-10 1794913205.443
+tapped protlyKey
+CHECK read-textarea-p5mid RECORD t1={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t2={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.6 msg="Copy a message first."} t3={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.6 msg="Copy a message first."} t4={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.6 msg="Copy a message first."} t5={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.5 msg="Copy a message first."} t6={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.5 msg="Copy a message first."} t7={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.5 msg="Copy a message first."} t8={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.5 msg="Copy a message first."} t9={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t10={real=318/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-textarea-l5-1 1794913215.536
+tapped protlyKey
+MARK rd-textarea-l5-2 1794913225.665
+tapped protlyKey
+MARK rd-textarea-l5-3 1794913235.868
+tapped protlyKey
+CHECK read-textarea-l5 RECORD t1={real=114/4/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t2={real=114/4/1.2.3.4.5/b0 outcome=panel s=1.5 msg="Copy a message first."} t3={real=114/4/1.2.3.4.5/b0 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-textarea-long-1 1794913246.274
+tapped protlyKey
+MARK rd-textarea-long-2 1794913256.347
+tapped protlyKey
+MARK rd-textarea-long-3 1794913266.487
+tapped protlyKey
+MARK rd-textarea-long-4 1794913276.653
+tapped protlyKey
+MARK rd-textarea-long-5 1794913286.815
+tapped protlyKey
+MARK rd-textarea-long-6 1794913296.927
+tapped protlyKey
+MARK rd-textarea-long-7 1794913307.101
+tapped protlyKey
+MARK rd-textarea-long-8 1794913317.215
+tapped protlyKey
+MARK rd-textarea-long-9 1794913327.281
+tapped protlyKey
+MARK rd-textarea-long-10 1794913337.405
+tapped protlyKey
+CHECK read-textarea-long RECORD t1={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t2={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t3={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t4={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t5={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t6={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.5 msg="Copy a message first."} t7={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t8={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t9={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t10={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-textarea-longmid-1 1794913347.567
+tapped protlyKey
+MARK rd-textarea-longmid-2 1794913357.644
+tapped protlyKey
+MARK rd-textarea-longmid-3 1794913367.794
+tapped protlyKey
+CHECK read-textarea-longmid RECORD t1={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t2={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.4 msg="Copy a message first."} t3={real=1518/8/1.2.3.4.5/b0 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-textarea-xlong-1 1794913378.005
+tapped protlyKey
+MARK rd-textarea-xlong-2 1794913388.152
+tapped protlyKey
+MARK rd-textarea-xlong-3 1794913398.270
+tapped protlyKey
+CHECK read-textarea-xlong RECORD t1={real=3230/14/1.2.3.4.5.6.7.8/b0 outcome=panel s=1.5 msg="Copy a message first."} t2={real=3230/14/1.2.3.4.5.6.7.8/b0 outcome=panel s=1.4 msg="Copy a message first."} t3={real=3230/14/1.2.3.4.5.6.7.8/b0 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-ce-p3-1 1794913409.224
+tapped protlyKey
+MARK rd-ce-p3-2 1794913419.396
+tapped protlyKey
+MARK rd-ce-p3-3 1794913429.669
+tapped protlyKey
+CHECK read-ce-p3 RECORD t1={real=70/4/1.2.3/b5 outcome=panel s=1.5 msg="Copy a message first."} t2={real=70/4/1.2.3/b5 outcome=panel s=1.5 msg="Copy a message first."} t3={real=70/4/1.2.3/b5 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-ce-p3mid-1 1794913440.054
+tapped protlyKey
+MARK rd-ce-p3mid-2 1794913450.372
+tapped protlyKey
+MARK rd-ce-p3mid-3 1794913460.500
+tapped protlyKey
+CHECK read-ce-p3mid RECORD t1={real=70/4/1.2.3/b5 outcome=panel s=1.5 msg="Copy a message first."} t2={real=70/4/1.2.3/b5 outcome=panel s=1.4 msg="Copy a message first."} t3={real=70/4/1.2.3/b5 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-ce-p5-1 1794913470.753
+tapped protlyKey
+MARK rd-ce-p5-2 1794913480.901
+tapped protlyKey
+MARK rd-ce-p5-3 1794913491.116
+tapped protlyKey
+MARK rd-ce-p5-4 1794913501.336
+tapped protlyKey
+MARK rd-ce-p5-5 1794913511.430
+tapped protlyKey
+MARK rd-ce-p5-6 1794913521.583
+tapped protlyKey
+MARK rd-ce-p5-7 1794913531.739
+tapped protlyKey
+MARK rd-ce-p5-8 1794913541.842
+tapped protlyKey
+MARK rd-ce-p5-9 1794913551.987
+tapped protlyKey
+MARK rd-ce-p5-10 1794913562.172
+tapped protlyKey
+CHECK read-ce-p5 RECORD t1={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t2={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t3={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t4={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t5={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.4 msg="Copy a message first."} t6={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.4 msg="Copy a message first."} t7={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.4 msg="Copy a message first."} t8={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.4 msg="Copy a message first."} t9={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t10={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-ce-p5mid-1 1794913572.461
+tapped protlyKey
+MARK rd-ce-p5mid-2 1794913582.578
+tapped protlyKey
+MARK rd-ce-p5mid-3 1794913592.713
+tapped protlyKey
+MARK rd-ce-p5mid-4 1794913602.812
+tapped protlyKey
+MARK rd-ce-p5mid-5 1794913612.954
+tapped protlyKey
+MARK rd-ce-p5mid-6 1794913623.120
+tapped protlyKey
+MARK rd-ce-p5mid-7 1794913633.335
+tapped protlyKey
+MARK rd-ce-p5mid-8 1794913643.521
+tapped protlyKey
+MARK rd-ce-p5mid-9 1794913653.578
+tapped protlyKey
+MARK rd-ce-p5mid-10 1794913663.770
+tapped protlyKey
+CHECK read-ce-p5mid RECORD t1={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t2={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t3={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t4={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t5={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t6={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t7={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t8={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.4 msg="Copy a message first."} t9={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t10={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-ce-l5-1 1794913674.063
+tapped protlyKey
+MARK rd-ce-l5-2 1794913684.221
+tapped protlyKey
+MARK rd-ce-l5-3 1794913694.350
+tapped protlyKey
+CHECK read-ce-l5 RECORD t1={real=114/4/1.2.3.4.5/b5 outcome=panel s=1.5 msg="Copy a message first."} t2={real=114/4/1.2.3.4.5/b5 outcome=panel s=1.5 msg="Copy a message first."} t3={real=114/4/1.2.3.4.5/b5 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-ce-long-1 1794913704.678
+tapped protlyKey
+MARK rd-ce-long-2 1794913714.850
+tapped protlyKey
+MARK rd-ce-long-3 1794913725.001
+tapped protlyKey
+MARK rd-ce-long-4 1794913735.228
+tapped protlyKey
+MARK rd-ce-long-5 1794913745.444
+tapped protlyKey
+MARK rd-ce-long-6 1794913755.566
+tapped protlyKey
+MARK rd-ce-long-7 1794913765.682
+tapped protlyKey
+MARK rd-ce-long-8 1794913775.832
+tapped protlyKey
+MARK rd-ce-long-9 1794913785.967
+tapped protlyKey
+MARK rd-ce-long-10 1794913796.104
+tapped protlyKey
+CHECK read-ce-long RECORD t1={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t2={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t3={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t4={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t5={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t6={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t7={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t8={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t9={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t10={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-ce-longmid-1 1794913806.409
+tapped protlyKey
+MARK rd-ce-longmid-2 1794913816.518
+tapped protlyKey
+MARK rd-ce-longmid-3 1794913826.641
+tapped protlyKey
+CHECK read-ce-longmid RECORD t1={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t2={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t3={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-ce-xlong-1 1794913836.966
+tapped protlyKey
+MARK rd-ce-xlong-2 1794913847.268
+tapped protlyKey
+MARK rd-ce-xlong-3 1794913857.508
+tapped protlyKey
+CHECK read-ce-xlong RECORD t1={real=3230/14/1.2.3.4.5.6.7.8/b15 outcome=panel s=1.6 msg="Copy a message first."} t2={real=3230/14/1.2.3.4.5.6.7.8/b15 outcome=panel s=1.5 msg="Copy a message first."} t3={real=3230/14/1.2.3.4.5.6.7.8/b15 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-lexical-p3-1 1794913867.405
+tapped protlyKey
+MARK rd-lexical-p3-2 1794913877.572
+tapped protlyKey
+MARK rd-lexical-p3-3 1794913887.664
+tapped protlyKey
+CHECK read-lexical-p3 RECORD t1={real=70/4/1.2.3/b5 outcome=panel s=1.4 msg="Copy a message first."} t2={real=70/4/1.2.3/b5 outcome=panel s=1.4 msg="Copy a message first."} t3={real=70/4/1.2.3/b5 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-lexical-p3mid-1 1794913897.896
+tapped protlyKey
+MARK rd-lexical-p3mid-2 1794913907.990
+tapped protlyKey
+MARK rd-lexical-p3mid-3 1794913918.188
+tapped protlyKey
+CHECK read-lexical-p3mid RECORD t1={real=70/4/1.2.3/b5 outcome=panel s=1.4 msg="Copy a message first."} t2={real=70/4/1.2.3/b5 outcome=panel s=1.5 msg="Copy a message first."} t3={real=70/4/1.2.3/b5 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-lexical-p5-1 1794913928.406
+tapped protlyKey
+MARK rd-lexical-p5-2 1794913938.636
+tapped protlyKey
+MARK rd-lexical-p5-3 1794913948.789
+tapped protlyKey
+MARK rd-lexical-p5-4 1794913958.862
+tapped protlyKey
+MARK rd-lexical-p5-5 1794913968.970
+tapped protlyKey
+MARK rd-lexical-p5-6 1794913979.157
+tapped protlyKey
+MARK rd-lexical-p5-7 1794913989.361
+tapped protlyKey
+MARK rd-lexical-p5-8 1794913999.448
+tapped protlyKey
+MARK rd-lexical-p5-9 1794914009.641
+tapped protlyKey
+MARK rd-lexical-p5-10 1794914019.873
+tapped protlyKey
+CHECK read-lexical-p5 RECORD t1={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t2={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t3={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t4={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t5={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t6={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t7={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.4 msg="Copy a message first."} t8={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t9={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t10={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-lexical-p5mid-1 1794914030.149
+tapped protlyKey
+MARK rd-lexical-p5mid-2 1794914040.281
+tapped protlyKey
+MARK rd-lexical-p5mid-3 1794914050.517
+tapped protlyKey
+MARK rd-lexical-p5mid-4 1794914060.667
+tapped protlyKey
+MARK rd-lexical-p5mid-5 1794914070.821
+tapped protlyKey
+MARK rd-lexical-p5mid-6 1794914080.971
+tapped protlyKey
+MARK rd-lexical-p5mid-7 1794914091.063
+tapped protlyKey
+MARK rd-lexical-p5mid-8 1794914101.219
+tapped protlyKey
+MARK rd-lexical-p5mid-9 1794914111.386
+tapped protlyKey
+MARK rd-lexical-p5mid-10 1794914121.551
+tapped protlyKey
+CHECK read-lexical-p5mid RECORD t1={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t2={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t3={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t4={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.4 msg="Copy a message first."} t5={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t6={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t7={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t8={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t9={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t10={real=318/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-lexical-l5-1 1794914131.788
+tapped protlyKey
+MARK rd-lexical-l5-2 1794914141.925
+tapped protlyKey
+MARK rd-lexical-l5-3 1794914152.097
+tapped protlyKey
+CHECK read-lexical-l5 RECORD t1={real=114/4/1.2.3.4.5/b5 outcome=panel s=1.5 msg="Copy a message first."} t2={real=114/4/1.2.3.4.5/b5 outcome=panel s=1.5 msg="Copy a message first."} t3={real=114/4/1.2.3.4.5/b5 outcome=panel s=1.4 msg="Copy a message first."}
+MARK rd-lexical-long-1 1794914162.292
+tapped protlyKey
+MARK rd-lexical-long-2 1794914172.454
+tapped protlyKey
+MARK rd-lexical-long-3 1794914182.626
+tapped protlyKey
+MARK rd-lexical-long-4 1794914192.865
+tapped protlyKey
+MARK rd-lexical-long-5 1794914203.034
+tapped protlyKey
+MARK rd-lexical-long-6 1794914213.197
+tapped protlyKey
+MARK rd-lexical-long-7 1794914223.342
+tapped protlyKey
+MARK rd-lexical-long-8 1794914233.503
+tapped protlyKey
+MARK rd-lexical-long-9 1794914243.618
+tapped protlyKey
+MARK rd-lexical-long-10 1794914253.849
+tapped protlyKey
+CHECK read-lexical-long RECORD t1={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t2={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t3={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t4={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.4 msg="Copy a message first."} t5={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t6={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t7={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t8={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t9={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t10={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-lexical-longmid-1 1794914264.085
+tapped protlyKey
+MARK rd-lexical-longmid-2 1794914274.196
+tapped protlyKey
+MARK rd-lexical-longmid-3 1794914284.370
+tapped protlyKey
+CHECK read-lexical-longmid RECORD t1={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t2={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."} t3={real=1518/8/1.2.3.4.5/b9 outcome=panel s=1.5 msg="Copy a message first."}
+MARK rd-lexical-xlong-1 1794914294.689
+tapped protlyKey
+MARK rd-lexical-xlong-2 1794914304.837
+tapped protlyKey
+MARK rd-lexical-xlong-3 1794914315.136
+tapped protlyKey
+CHECK read-lexical-xlong RECORD t1={real=3230/14/1.2.3.4.5.6.7.8/b15 outcome=panel s=1.5 msg="Copy a message first."} t2={real=3230/14/1.2.3.4.5.6.7.8/b15 outcome=panel s=1.5 msg="Copy a message first."} t3={real=3230/14/1.2.3.4.5.6.7.8/b15 outcome=panel s=1.6 msg="Copy a message first."}
