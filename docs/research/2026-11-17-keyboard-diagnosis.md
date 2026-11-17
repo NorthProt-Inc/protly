@@ -269,29 +269,91 @@ Checked before the owner answered, using published screenshots only and no CI ru
 
 **Owner:** "sometimes double-tapping space doesn't turn into a period."
 
-*(Being completed. Proven so far, from `runs/b03b806-121`, method `test5f_space` on `diag/p4-double-space`:)*
+**Reproduction.**
+- Three filtered runs on `diag/p4-double-space`: `runs/b03b806-121`, `runs/e0b1b7d-125` and `runs/f1fa850-126`. All
+  three ended STATUS measured with job success, and none hung.
+- A probe log (category `p4`) records what KeyboardKit's double-space check saw at every space release: lengths, the
+  code points of the last two characters, the time since the last space, and the result. It holds no field text.
+- Hosts: a SwiftUI field, a UITextView, a textarea, a pre-wrap contenteditable, and a normal contenteditable (where
+  WebKit stores U+00A0).
+- Cases: English and Hangul words; taps at the driver's pace (0.8-1.05 s apart) and coordinate double taps
+  (46-75 ms); a pick from the bar; a held second tap; pauses of 1.5, 2.2 and 3.5 s; a word right after the cursor.
+- Apple's English keyboard ran as the control. Its coordinate double tap made a period 3/3, so Apple's "." shortcut
+  works in this simulator.
 
-- **Confirmed: a space typed by the bar's suggestion does not start the double-space window (lead E).**
-  - `pickSuggestion` types its space with `insertText(" ")` (`KeyboardViewController.swift:194-207`), outside the
-    action handler. So KeyboardKit's `lastSpaceTap`
-    (`Vendor/KeyboardKit/.../_Keyboard/Keyboard+StandardKeyboardBehavior.swift:141`) still holds the user's
-    previous space tap.
-  - One tap of space after a pick ends in two spaces, but the time since the last space tap is 6.4-14.0 s, over the
-    3.0 s window, so there is no period.
-  - Evidence: 18/18 failures (pick1, in a UITextView and two kinds of web contenteditable). With two taps after the
-    pick, the period comes, 18/18.
-- **Confirmed, by design: a second tap held 0.4 s or longer starts the space trackpad and types nothing (lead C).**
-  3/3 tries.
-- **Ruled out on iOS 26.5.**
-  - A (U+00A0): a contenteditable that stores U+00A0 still reported U+0020 U+0020 to the keyboard.
-  - B (context lag): every second release already saw the first space.
-  - Hangul composition, and fast double taps 46-75 ms apart.
+**A plain double tap at the end of the text never failed on Protly: 204/204.** The runs found these conditions in
+which no period comes:
 
-  0 failures in 236 tries across a SwiftUI field, a UITextView, a textarea and two contenteditables, after English
-  and after Hangul.
+| Case | Protly | Apple's keyboard | Run |
+|---|---|---|---|
+| **D. A word right after the cursor** (`world`, cursor before it, type `hello`, double-tap space) | **3/3 fail**: `hello  world` | 0/6 fail: `hello. world` | 125 `pr-word`, 126 `ap-word2`, `ap-word2d` |
+| **E. One tap after a word picked from the bar** | 18/18 two spaces, no period | 4/4: the tap adds nothing (`hello `) | 121 `pick1`, 125 `ap-pick1` |
+| E. Two taps after a pick | 0/18 fail | 0/3 fail | 121 `pick2`, 126 `ap-pick2` |
+| **C. A second tap held 0.4 s or longer** | 3/3: no space typed, by design (space trackpad) | not run | 121 `hold` |
+| Two spaces 2.0 s / 2.7 s / 4.0 s apart | 0/3, 0/3, 3/3 fail (the 3.0 s window) | fails from 1.63 s on: its window is shorter, 0.95-1.63 s | 125 `pr-gap-*`, 126 `ap-co-*` |
 
-OPEN: run `e0b1b7d` (Apple's keyboard as a control for the pick case, the 3.0 s window, a word after the cursor),
-confidence, the fix direction and owner checks.
+**Root causes.**
+- **D: confirmed, and Apple differs.** The double-space check passes (`end=true`). Then KeyboardKit's
+  `UITextDocumentProxy.endSentence` returns without a change because the cursor is not at the end of a word
+  (`ios-app/Vendor/KeyboardKit/Sources/KeyboardKit/Proxy/UITextDocumentProxy+Words.swift:47-48`; the log reads
+  `atEndOfWord=false`). Protly's override (`ios-app/Sources/ProtlyKeyboard/KeyboardViewController.swift:736-742`)
+  calls it as it is. This is the only measured case where Apple makes the period and Protly does not. It is the
+  likeliest match for "sometimes" (a **guess**: it needs the owner to be typing in front of existing text).
+- **E: confirmed as a mechanism, but it does not make a double tap fail.** `pickSuggestion` types its space with
+  `insertText(" ")` (`KeyboardViewController.swift:204`), outside the action handler. So KeyboardKit's `lastSpaceTap`
+  (`Keyboard+StandardKeyboardBehavior.swift:141`) is not updated.
+  - One tap after a pick leaves two spaces where Apple leaves one.
+  - From the code only: when the previous typed space was under 3 s before, that single tap gives a period instead.
+    The run-126 probe for this case failed to make the pick (4/4; cause unknown).
+- **C: confirmed, by design.** The 0.4 s long press (`SpaceTrackpad.longPressDelay`) turns the space drag on. A
+  release while the drag is on has no action (`Vendor/.../KeyboardAction+StandardActionHandler.swift:222-225`,
+  `:351-358`), so nothing is typed and the period check never runs. How often a real thumb holds that long is open.
+- **G, two thumbs: a guess, untested.** A second finger that lands on space while the first is still down. Each key is
+  a single `DragGesture` (`GestureButton.swift:156-170`). XCUITest cannot make overlapping touches.
+
+**Ruled out (iOS 26.5 simulator).**
+- **A (U+00A0).** The contenteditable stored U+00A0, but the keyboard read U+0020 U+0020 at every second tap
+  (36/36 periods).
+- **B (context lag).** The first space was always in the context, at 46 ms as at 1 s.
+- **Hangul composition.** 80/80 ko tries passed.
+- **Autocorrect.** It is disabled, and no length change was seen.
+- **Fast double taps.** 80/80 passed.
+- **A stale long-press timer.** Ruled out by the code.
+- **Field reads dropping a tap.** A read was never active during a space gesture.
+- **The 3.0 s window.** It is longer than Apple's, so it never refuses a period Apple would make.
+
+A and B remain open on iOS 27.2 and in real apps.
+
+**Confidence:**
+- D: **confirmed**, and it is a difference from Apple.
+- E: **confirmed** as a mechanism, but its link to the owner's words is a **guess**.
+- C: **confirmed** by design, but its share of the owner's failures is open.
+- Which case is the owner's "sometimes": **open**.
+
+**Fix direction.**
+- **D first:** end the sentence when a word follows the cursor, as Apple does (`hello. world`). Do it in Protly's own
+  `endSentence` override. If KeyboardKit must change, that goes into `protly.patch` and `VENDORED.md`.
+- **Then E:** treat the pick's space like Apple's QuickType space. A tap right after the pick takes its place, and the
+  double-space window starts at the pick, so a double tap after a pick gives exactly `the. `. One tap must never end
+  the sentence.
+- **Leave as they are:** the 3.0 s window and the 0.4 s hold, unless the owner checks show otherwise.
+
+**Owner checks (iPhone, Protly, in Messages; do each 5 times and report how many gave a period).**
+1. Type `hello`, then double-tap space with one thumb.
+2. Type `hello`, then tap space with the left thumb and right away with the right thumb. This tests G.
+3. Type `teh`, tap `the` in the bar's right slot, then tap space once. Report one space, two spaces, or a period.
+   Then try a double tap after the pick.
+4. Type `hello`, tap space, then press space for about half a second and lift without moving. Report whether a second
+   space appears.
+5. Type `world`, then tap just before it so the cursor sits before `w`. Type `hello` and double-tap space. Report what
+   is between `hello` and `world` (expected: two spaces, which is D).
+6. Switch to Apple's keyboard (globe key, English (US)) and repeat checks 3 and 5. Also report whether Settings >
+   General > Keyboard > "“.” Shortcut" is on.
+7. When it fails in daily use, report:
+   - the app;
+   - whether there was text after the cursor;
+   - whether the word before it was picked from the bar;
+   - whether that word was Korean or English.
 
 ---
 
