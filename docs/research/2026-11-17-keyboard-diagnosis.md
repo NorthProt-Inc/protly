@@ -1,7 +1,7 @@
 # Keyboard diagnosis (campaign 2026-11-17-keyboard-diagnosis, flight 001)
 
-> **STATUS: DRAFT, IN PROGRESS.** P2, P3 and the Chrome half of P1 are complete. The phone half of P1 and P4 are
-> still being analysed: their sections hold what is proven so far and mark the rest as open.
+> **STATUS: COMPLETE, FOR THE OWNER TO READ.** Every problem has its causes, confidence, fix direction and owner
+> checks. Each section marks what the simulator and Chromium could not reach.
 
 Diagnosis only: nothing here is a fix, and nothing in this flight lands on main. Base: main `ab7ce91` (PR #26), the
 build on the owner's phone. Every claim is proven, with a run, a test or a measurement named next to it, or it is
@@ -28,22 +28,144 @@ flight found causes in the read and write paths on both platforms. None of them 
 
 ### P1a. iPhone keyboard
 
-*(Being completed. Proven so far, from `runs/7e031fc-122`:)*
+**How it was reproduced.** Three filtered runs on `diag/p1-phone-read`: `runs/7e031fc-122` (STATUS measured),
+`runs/3c208a9-124` (STATUS test-failed: the test hit its 30-minute limit on its last case, every earlier case
+recorded) and `runs/28771e2-127` (STATUS measured).
+- The keyboard logged every read step, what the read returned, the request, Replace, and the proxy's contexts 50 to
+  1000 ms after the read: lengths and line-feed counts only, never text (category `read`).
+- On this branch the stub answered every draft with the shape of what the request carried, so each card and each
+  Replace shows what the read sent.
+- Hosts: a SwiftUI field and a UIKit `UITextView`; in a `WKWebView`, a textarea, a contenteditable and a
+  Lexical-shaped contenteditable.
+- Drafts: Korean paragraphs (each starts with a `§<n>` token) separated by blank lines or single line feeds, from 70
+  to 3230 UTF-16 units; chat lines without punctuation; English; the cursor at the end or in an earlier paragraph;
+  select all; filled by the host app, or typed key by key with the Protly keyboard.
 
-- **Native text views (UIKit `UITextView`, SwiftUI field).** The read carried only the end of the draft, and Replace
-  replaced only that end. The start of the draft stayed in the field, untranslated. Same result on every try.
+**What the read assumes.** `FieldText.read` (`ios-app/Sources/ProtlyKeyboard/FieldText.swift:22-57`) returns the
+selection when there is one (`:23`). Otherwise it moves the cursor over the after-context until that is empty
+(`:30`), then returns the before-context as the whole field (`:54`). It assumes three things: the before-context
+holds everything before the cursor, an empty after-context means the end of the field, and `selectedText` is the
+whole selection. On the simulator none of the three held.
 
-  | Draft (field length / line breaks) | Carried by the read | Field after Replace |
-  |---|---|---|
-  | 3 paragraphs (70 / 4) | 46 chars, 2 line breaks | 37 chars |
-  | 5 paragraphs (318 / 8) | 62 chars, 0 line breaks | 267 chars |
-  | long (1518 / 8) | 59 chars, 0 line breaks | 1473 chars |
+**Root causes.** All confirmed on the iOS 26.5 simulator, with the same result on every try of a case.
 
-- **Web fields.** That run could not test them: after a JavaScript fill, the keyboard's proxy context stayed empty.
-  This is a limit of the probe, not a finding. A follow-up run types the draft key by key instead.
+1. **The before-context is a window of the last few sentences.** Once the host has sent its own copy of the field
+   (filled by the app, the field focused again, the selection set again), the read carried only the end of the draft.
+   - The cut-short check (`KeyboardViewController.swift:320`) looks only at the after-context, so it passed. Replace's
+     guard (`FieldGuard.canReplace`, `:491-495`) checks that the window is just before the cursor, so it passed too.
+   - Replace then swapped only the window. The start of the draft stayed Korean, and the card's translation covered
+     only the window.
 
-OPEN: the read-step mechanism, the web hosts, cursor in the middle, the timing lead, tries per host, confidence, the
-fix direction and owner checks.
+   | Draft (cursor at the end) | Field (units / line feeds) | Carried by the read | Tries |
+   |---|---|---|---|
+   | 3 one-sentence paragraphs, blank lines between | 70 / 4 | 46: the last 2 paragraphs | 9 |
+   | the same, ending in a line feed | 71 / 5 | 47: the last 2 paragraphs and the line feed | 4 |
+   | 5 paragraphs of 3 sentences | 318 / 8 | 62: the last 3 sentences | 30 |
+   | 5 one-sentence lines | 114 / 4 | 45: the last 2 lines | 8 |
+   | 5 paragraphs of 15 sentences / 8 paragraphs of 20 | 1518 / 8, 3230 / 14 | 59: the last 3 sentences | 29 |
+   | 8 chat lines, no punctuation | 175 / 7 | 43: the last 2 lines | 4 |
+   | 12 one-word sentences | 191 / 0 | 175: the last 11 sentences | 4 |
+   | 6 twelve-word sentences | 149 / 0 | 24: the last sentence | 4 |
+   | one paragraph, no punctuation | 382 / 0 | 300 | 4 |
+   | English, 3 paragraphs of 2 sentences | 81 / 4 | 53: the last 2 paragraphs and a line feed | 4 |
+
+   Sources: `runs/7e031fc-122` and `runs/28771e2-127`, SwiftUI field and `UITextView` alike. The tries include the
+   SwiftUI cases filled with a mid-text cursor, because the SwiftUI fill leaves the cursor at the end. The
+   window ran back to a sentence or line start and held about the last 10 to 16 words. With no sentence end or line
+   feed in reach it stopped at 300 units. This rule is read off these drafts; Apple does not document it.
+2. **The after-context stops at every line feed, so a cursor in an earlier paragraph ends the read there.** This was
+   seen in the `UITextView`. The SwiftUI fill leaves the cursor at the end, so the SwiftUI field was not tested this
+   way.
+   - The read stopped at the end of the cursor's paragraph or line. Then the window rule above applied. Everything
+     after that paragraph was never read or replaced, and the check passed, because the after-context was empty.
+   - Cursor in paragraph 2 of 5: only paragraph 2 was replaced; 1, 3, 4 and 5 stayed Korean (10/10). Cursor in
+     paragraph 2 of 3: paragraphs 1 and 2 were replaced, 3 stayed (3/3). Cursor in line 2 of 5: lines 1 and 2 were
+     replaced (2/2).
+   - Cursor in paragraph 1 of 3, separated by blank lines or by single line feeds: only paragraph 1 was read (4/4).
+     A probe step of one more unit crossed the line feed and the next paragraph showed in the after-context
+     (`skip k=2 after=22`, `skipl k=1 after=22`). At the true end of the field the same step changed nothing for 0.5 s
+     (`skipend`, 2/2).
+   - In the only exception, the cursor sat in a 302-unit paragraph. The after-context ended mid-paragraph twice, and
+     the second move never showed within 1 s (`notApplied`). The check caught it and showed "Could not read the whole
+     text. Select all, then tap again." (3/3). This was the only case in the three runs where the user is told.
+3. **Select all is cut too, and Replace then deletes the rest of the draft.** In the `UITextView`, after select all,
+   `selectedText` held the first 43 units, the first two sentences, for drafts of 318, 1518 and 3230 units (6/6,
+   `runs/28771e2-127`).
+   - Replace's guard compares `selectedText` with that same 43-unit text, so it passed. Replace typed over the whole
+     selection, and the field then held only the reply (6/6).
+   - The whole draft was replaced by a translation of its first two sentences.
+   - From the code, not run: Undo puts back only the 43 units read (`lastInsert`, `KeyboardViewController.swift:525`;
+     `undoInsert`, `:557-569`), so the rest is gone.
+   - The cut-short panel itself sends the user here ("Select all, then tap again", `:322`).
+   - Select all was not run in the SwiftUI field or on the web page.
+4. **A draft typed key by key in one go was read whole; the same draft after a resync was not.**
+   - Typed with the Protly keyboard, the read carried all of it on every host: 17/17. That was a 76-unit English draft
+     on all five hosts and a 69-unit Korean draft in the `UITextView` (`runs/3c208a9-124`, `runs/28771e2-127`). One
+     of these reads carried 14 extra units (cause 5).
+   - Read again after a resync, the same field gave the window: 48 of 76 English, 42 of 69 Korean, 49 of 76 in the
+     web textarea (10/10).
+   - A resync here means the app set the selection again and told the input delegate, or Dismiss followed by focus
+     again, or on the web page a tap in the field.
+   - So whether the read is whole depends on what happened to the field since the keyboard came up. This is the
+     likeliest source of "different every time".
+   - **Guess:** the proxy keeps the text this keyboard typed and replaces it with the host's window when the host
+     resyncs. Drafts typed longer than 76 units were not tried, so a long draft typed in one go is open.
+5. **Web fields show the keyboard only what it typed itself.**
+   - Text the page put in by script was never in the context. The protly key found an empty field and fell back to
+     the clipboard ("Copy a message first."): 129/129 tries in `runs/7e031fc-122`, and 4/4 in `runs/28771e2-127`.
+   - With one key typed after the fill, the read carried that one key, and Replace replaced only it (45/45,
+     `runs/3c208a9-124`).
+   - After a tap in the field, the page sent its state, and the read carried the last 2 sentences (39 of 318 units) in
+     the textarea and the Lexical-shaped field (4/4).
+   - A side observation from 1 try out of 2: in the Lexical-shaped field, the first typed read carried 90 units for a
+     76-unit field. The extra 14 units were left over from the field used just before, which the page had changed by
+     script. Real chat pages clear their box by script after Send, so the next read could carry the tail of the sent
+     message. That this happens on real sites is a **guess**.
+
+**Ruled out.**
+- **Timing.** Every move that landed showed 20 to 33 ms after it was sent (40 moves). The 2 s budget ended no read. The contexts were the
+  same at 50, 150, 300, 600 and 1000 ms after every read: 1735 samples, 0 changes. Waiting longer would not have read
+  more.
+- **The request.** It carried exactly what the read returned, in all 205 calls.
+- **Line-break characters.** Every host used U+000A only, with no CR, U+2028 or U+2029.
+- **The model and prompts.** The tower had already ruled them out, and the stub replaced the model here.
+
+**Not covered.**
+- iOS 27.2 (no CI runtime).
+- Real apps: Messages, KakaoTalk and Instagram.
+- Paste, dictation, an app switch as the resync, and long drafts typed in one go.
+
+**Confidence:**
+- Causes 1 to 3 and 5: **confirmed** on the iOS 26.5 simulator, and **likely** on the owner's phone. Most chat apps'
+  native fields are `UITextView`s, but that is a **guess**.
+- Cause 4: **confirmed** as a mechanism. Its share of the owner's cases is **open**.
+
+**Fix direction.**
+- **The read must find both ends of the field by moving, not by trusting a context.** An empty after-context is the
+  end only when one more step changes nothing. Note that a step over a line feed landed in about 20 ms, while at the
+  end nothing changed for 0.5 s.
+- **The start must be found the same way, by walking back.** Walking back was not probed: prove it in CI first.
+- **Read a selection by walking too, or Replace never over a selection.** `selectedText` cannot be checked against
+  the real selection.
+- **Change the cut-short panel's advice.** It must not send users to Select all until a selection read is proven
+  whole.
+- **Replace and Undo must work on exactly what was read**, with a check after the write that the field holds the
+  result. A length limit with a message keeps a long read bounded (the extension refuses over 8000 characters).
+- **Where it goes:** all of this is in `FieldText` and its callers, and it lands before or with Option A.
+
+**Owner checks (iPhone, Protly, in the app where it happened, or Messages).**
+1. Type 3 short Korean paragraphs, with Return twice between them, in one go. Tap the protly key and Replace. Report
+   whether all 3 paragraphs became English.
+2. Type the same 3 paragraphs. Swipe to the Home Screen and back, or tap outside the field and back into it at the
+   end. Tap the protly key and Replace. Report how many paragraphs became English (cause 1 predicts the last 2
+   sentences only).
+3. Type the 3 paragraphs, tap in the first paragraph, tap the protly key and Replace. Report which paragraphs changed
+   (cause 2 predicts the first only).
+4. Type 6 or more sentences, select all and tap the protly key. **Do not tap Replace: tap Cancel.** Report whether the
+   card's English covers the whole draft or only its first 2 sentences (cause 3).
+5. Type 8 or more Korean sentences in one go, then tap the protly key. Report whether the card covers all of them
+   (cause 4, long drafts).
+6. Report the app or apps where the partial translation happened, and whether the draft had been typed in one go.
 
 ### P1b. Chrome extension
 
@@ -360,10 +482,13 @@ A and B remain open on iOS 27.2 and in real apps.
 ## Option A (P5: decided, not built)
 
 The protly key becomes the action key and the bar's center pill is emptied.
-- **P1:** the key starts the same read and Replace (`FieldText.read`), so the native cut-off in P1a goes with it.
-  (Being completed.)
+- **P1:** the bar's pill and the protly key already share one path (`act`, `KeyboardViewController.swift:283`;
+  `runProtlyKey`, `:548`). So Option A keeps the same read and Replace (`FieldText.read`), and every P1a cause carries
+  over unchanged: Option A neither causes nor fixes them. The P1a fix belongs in `FieldText` and lands before or with
+  Option A. Its cut-short panel ("Select all, then tap again") must change first (P1a, cause 3).
 - **P2, P3:** no effect.
-- **P4:** see P4.
+- **P4:** no effect. Option A changes only the center pill and the protly key. The right slot's pick (cause E,
+  `pickSuggestion`, `KeyboardViewController.swift:194-205`) and the space key stay as they are.
 
 ## Probe branches (never merged, never deleted)
 
@@ -378,12 +503,14 @@ The protly key becomes the action key and the bar's center pill is emptied.
 
 ## CI runs used
 
-So far, all filtered:
-- `runs/b03b806-121` (P4)
-- `runs/7e031fc-122` (P1 phone)
-- `runs/2b636fe-120` and `runs/13fbf8f-123` (P2)
+Eight runs, all filtered:
+- **P1 phone:** `runs/7e031fc-122`, `runs/3c208a9-124` and `runs/28771e2-127`.
+  - `runs/3c208a9-124` ended test-failed: `test5h_readtyped` hit its 30-minute limit on its last case, the second
+    try of the filled Lexical draft with a mid-text cursor. Every earlier case recorded.
+- **P2:** `runs/2b636fe-120` and `runs/13fbf8f-123`.
+- **P4:** `runs/b03b806-121`, `runs/e0b1b7d-125` and `runs/f1fa850-126`.
 
-In progress: `3c208a9` (P1 phone, typed drafts) and `e0b1b7d` (P4, second probe). None hung.
+The other seven ended STATUS measured.
 
 ## Appendix: owner console snippets (Chrome)
 
