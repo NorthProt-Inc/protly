@@ -1,0 +1,80 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test9_height
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK h2-fresh-1 1794912498.617
+HEIGHT h2-fresh 1 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-fresh-2 1794912507.245
+HEIGHT h2-fresh 2 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-fresh-3 1794912515.670
+HEIGHT h2-fresh 3 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-fresh-4 1794912523.366
+HEIGHT h2-fresh 4 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-fresh-5 1794912535.020
+HEIGHT h2-fresh 5 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-fresh-6 1794912546.617
+HEIGHT h2-fresh 6 board protly reached true top 512.00 row1 564.00
+CHECK h2-fresh RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
+MARK h2-emoji-1 1794912553.962
+HEIGHT h2-emoji 1 board protly reached true top 512.00 row1 564.00
+globe tapped
+emoji after a globe tap
+picked Protly, English from the globe list: protly
+MARK h2-emoji-2 1794912564.740
+HEIGHT h2-emoji 2 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-emoji-3 1794912572.917
+HEIGHT h2-emoji 3 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-emoji-4 1794912581.149
+HEIGHT h2-emoji 4 board protly reached true top 512.00 row1 564.00
+CHECK h2-emoji RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
+MARK h2-english-1 1794912588.553
+HEIGHT h2-english 1 board protly reached true top 512.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h2-english-2 1794912601.246
+HEIGHT h2-english 2 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h2-english-3 1794912608.995
+HEIGHT h2-english 3 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h2-english-4 1794912616.676
+HEIGHT h2-english 4 board protly reached true top 495.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h2-english-5 1794912633.685
+HEIGHT h2-english 5 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-english-6 1794912641.610
+HEIGHT h2-english 6 board protly reached true top 495.00 row1 564.00
+CHECK h2-english RECORD shots="512.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,512.00/564.00/protly,495.00/564.00/protly"
+MARK h2-switch-1 1794912648.793
+HEIGHT h2-switch 1 board protly reached true top 512.00 row1 564.00
+MARK h2-switch-2 1794912655.569
+HEIGHT h2-switch 2 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-switch-3 1794912663.140
+HEIGHT h2-switch 3 board protly reached true top 495.00 row1 564.00
+MARK h2-switch-4 1794912669.240
+HEIGHT h2-switch 4 board protly reached true top 512.00 row1 564.00
+tapped the field
+MARK h2-switch-5 1794912681.020
+HEIGHT h2-switch 5 board protly reached true top 495.00 row1 564.00
+CHECK h2-switch RECORD shots="512.00/564.00/protly,512.00/564.00/protly,495.00/564.00/protly,512.00/564.00/protly,495.00/564.00/protly"

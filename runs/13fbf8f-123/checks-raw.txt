@@ -1,0 +1,4 @@
+CHECK h2-fresh RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
+CHECK h2-emoji RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
+CHECK h2-english RECORD shots="512.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,512.00/564.00/protly,495.00/564.00/protly"
+CHECK h2-switch RECORD shots="512.00/564.00/protly,512.00/564.00/protly,495.00/564.00/protly,512.00/564.00/protly,495.00/564.00/protly"
