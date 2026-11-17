@@ -1,4 +1,4 @@
-import { cutsShort, insertAll } from '../content/dom.js';
+import { cutsShort, editableText, insertAll } from '../lib/editable.js';
 
 // Reads and writes a text box on any site. textarea/input: setRangeText plus an input event, which React-style
 // controlled inputs notice (their value tracker sees the change). contenteditable: select all and insertAll() (a paste
@@ -10,24 +10,6 @@ const POLL_MS = 20;
 
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const BLOCK = /^(ADDRESS|ARTICLE|ASIDE|BLOCKQUOTE|DD|DIV|DL|DT|FIGCAPTION|FIGURE|FOOTER|H[1-6]|HEADER|HR|LI|MAIN|OL|P|PRE|SECTION|TABLE|TR|UL)$/;
-const SKIP = /^(SCRIPT|STYLE|TEMPLATE)$/;
-
-// One \n between blocks and per <br>. innerText puts a blank line between <p>s (ProseMirror, Quill, Lexical).
-function editableText(root) {
-  let out = '';
-  const walk = (n) => {
-    if (n.nodeType === 3) { out += n.textContent; return; }
-    if (n.nodeType !== 1 || SKIP.test(n.nodeName)) return;
-    if (n.nodeName === 'BR') { out += '\n'; return; }
-    const block = BLOCK.test(n.nodeName);
-    if (block && out && !out.endsWith('\n')) out += '\n';
-    n.childNodes.forEach(walk);
-    if (block && !out.endsWith('\n')) out += '\n';
-  };
-  root.childNodes.forEach(walk);
-  return out.replace(/\n$/, '');
-}
 
 export function readBox(t) {
   if (t.kind === 'text') return t.el.value;

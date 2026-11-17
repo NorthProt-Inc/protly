@@ -1,5 +1,6 @@
 import { SEL, senderOf, findViewerName } from './selectors.js';
 import { trusted } from '../ui/trust.js';
+import { cutsShort, insertAll } from '../lib/editable.js';
 
 export const findThreadRoot = (doc) => doc.querySelector(SEL.threadRoot);
 export const findComposer = (doc) => doc.querySelector(SEL.composer);
@@ -88,37 +89,6 @@ export function setHoverOriginal(m, korean) {
 
 export function getComposerText(el) {
   return (el.innerText || '').replace(/\n$/, '');
-}
-
-// Editors whose own paste handler keeps every line of a text/plain paste, also one dispatched from a content script
-// (fix track C2, step 0): Lexical (Instagram, WhatsApp), Draft.js and Slate. One insertText merges the lines in
-// Lexical, crashes Draft.js and leaves Slate's model behind. Found by DOM marker only: an editor that handles a paste
-// without preventDefault (Quill 1.x) would get the text twice if defaultPrevented picked the path.
-const PASTE_EDITORS = '[data-lexical-editor], .public-DraftEditor-content, [data-slate-editor]';
-
-// A Lexical draft whose last block holds several lines and ends in a line break (<p>a<br>b<br><br></p>: Shift+Enter
-// after the last line, or Enter in plain-text Lexical). After a select-all, Lexical's own selection ends after that
-// block's first line, so a paste replaces only that line (step 0, Lexical 0.12.6 to 0.53.0). The content script cannot
-// see Lexical's selection, so such a draft is never written. One line, or a single-line last paragraph, is written.
-export function cutsShort(el) {
-  if (!el.matches?.('[data-lexical-editor]')) return false;
-  const kids = [...(el.lastElementChild?.children ?? [])];
-  const brk = kids.findIndex((k) => k.nodeName === 'BR');
-  return kids.at(-1)?.nodeName === 'BR' && brk >= 0 && kids.slice(brk).some((k) => k.nodeName !== 'BR');
-}
-
-// Replaces the selection (a select-all) with text: a synthetic paste on the editors above, with no insertText after it
-// (a second write would double the text or land in a crashed editor), execCommand('insertText') everywhere else.
-export function insertAll(el, text) {
-  const doc = el.ownerDocument;
-  if (!el.matches?.(PASTE_EDITORS)) {
-    doc.execCommand('insertText', false, text);
-    return;
-  }
-  const win = doc.defaultView;
-  const data = new win.DataTransfer();
-  data.setData('text/plain', text);
-  el.dispatchEvent(new win.ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }));
 }
 
 // Lexical syncs its selection on `selectionchange`, so it needs a moment between selecting and inserting,
