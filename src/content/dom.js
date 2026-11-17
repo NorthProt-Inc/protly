@@ -96,6 +96,17 @@ export function getComposerText(el) {
 // without preventDefault (Quill 1.x) would get the text twice if defaultPrevented picked the path.
 const PASTE_EDITORS = '[data-lexical-editor], .public-DraftEditor-content, [data-slate-editor]';
 
+// A Lexical draft whose last block holds several lines and ends in a line break (<p>a<br>b<br><br></p>: Shift+Enter
+// after the last line, or Enter in plain-text Lexical). After a select-all, Lexical's own selection ends after that
+// block's first line, so a paste replaces only that line (step 0, Lexical 0.12.6 to 0.53.0). The content script cannot
+// see Lexical's selection, so such a draft is never written. One line, or a single-line last paragraph, is written.
+export function cutsShort(el) {
+  if (!el.matches?.('[data-lexical-editor]')) return false;
+  const kids = [...(el.lastElementChild?.children ?? [])];
+  const brk = kids.findIndex((k) => k.nodeName === 'BR');
+  return kids.at(-1)?.nodeName === 'BR' && brk >= 0 && kids.slice(brk).some((k) => k.nodeName !== 'BR');
+}
+
 // Replaces the selection (a select-all) with text: a synthetic paste on the editors above, with no insertText after it
 // (a second write would double the text or land in a crashed editor), execCommand('insertText') everywhere else.
 export function insertAll(el, text) {
@@ -115,10 +126,11 @@ export function insertAll(el, text) {
 // via execCommand; callers only write non-empty text.
 export const SELECT_SETTLE_MS = 60;
 // stillOk() is re-checked after the settle; false aborts the insert (thread switched, write superseded).
-// Returns true when the text was inserted.
+// Returns true when the text was inserted; false, with the box untouched, for a draft cutsShort() refuses.
 // Focus coming in from elsewhere (WhatsApp's Reply leaves it on the message row) makes Lexical restore its own caret a
 // moment later, which collapses the first select-all; then insertText would append. Select once more if so.
 export async function setComposerText(el, text, stillOk = () => true) {
+  if (cutsShort(el)) return false;
   const sel = el.ownerDocument.getSelection();
   const flat = (t) => t.replace(/\s+/g, '');
   const selectsAll = () => !flat(el.innerText || el.textContent || '')

@@ -1,4 +1,4 @@
-import { insertAll } from '../content/dom.js';
+import { cutsShort, insertAll } from '../content/dom.js';
 
 // Reads and writes a text box on any site. textarea/input: setRangeText plus an input event, which React-style
 // controlled inputs notice (their value tracker sees the change). contenteditable: select all and insertAll() (a paste
@@ -58,8 +58,9 @@ function setValue(el, text) {
   el.dispatchEvent(new Ev('input', { bubbles: true, inputType: 'insertReplacementText', data: text }));
 }
 
-// true when the box ends up holding text, false when the write failed (the caller restores), null when
-// stillOk() said no right before writing (nothing was written). textarea/input are written without focusing.
+// true when the box ends up holding text, false when the write failed (the caller restores) or was refused with the
+// box untouched (a Lexical draft cutsShort() turns down), null when stillOk() said no right before writing (nothing
+// was written). textarea/input are written without focusing.
 export async function writeBox(t, text, { settleMs = SELECT_SETTLE_MS, verifyMs = VERIFY_MS, stillOk = () => true } = {}) {
   const { el } = t;
   if (!el.isConnected) return false;
@@ -67,6 +68,7 @@ export async function writeBox(t, text, { settleMs = SELECT_SETTLE_MS, verifyMs 
     if (!stillOk()) return null;
     setValue(el, text);
   } else {
+    if (cutsShort(el)) return false;
     el.focus();
     el.ownerDocument.getSelection().selectAllChildren(el);
     await sleep(settleMs);

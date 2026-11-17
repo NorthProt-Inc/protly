@@ -13,6 +13,8 @@ import { fakeEditor, nonblank, setLines } from './fake-editors.js';
 
 const KO = ['가나다', '라마바', '사아자'];
 const EN = 'A1\nB2\nC3';
+// Lexical after Shift+Enter between the lines and after the last one: the line break plus Lexical's caret <br>.
+const TRAILING = '<p><span>가나다</span><br><span>라마바</span><br><span>사아자</span><br><br></p>';
 
 function page() {
   const d = new JSDOM('<body><div id="b" contenteditable="true" tabindex="0"></div><input id="o"></body>').window.document;
@@ -64,6 +66,34 @@ test('a marked editor that ignores the paste: no insertText after it, and the ge
   assert.deepEqual(log.pastes, [EN, EN]);
   assert.deepEqual(log.inserts, []);
   assert.deepEqual(nonblank(el.innerText), KO);
+});
+
+test('a Lexical draft whose lines end in a line break is refused before writing and left as it is', async () => {
+  const { d, el } = page();
+  const log = fakeEditor(el, { kind: 'lexical' });
+  el.innerHTML = TRAILING;
+  el.focus();
+  assert.equal(await writeBox(box(d, el), EN, { settleMs: 0 }), false);
+  assert.equal(await setComposerText(el, EN), false);
+  assert.deepEqual(log.pastes, []);
+  assert.deepEqual(log.inserts, []);
+  assert.equal(el.innerHTML, TRAILING);
+});
+
+test('Lexical drafts ending in a line break that a paste replaces whole are written', async () => {
+  for (const html of [
+    '<p><span>가나다</span><br><br></p>', // one line, then Shift+Enter
+    '<p><span>가나다</span></p><p><span>라마바</span></p><p><span>사아자</span><br><br></p>', // the last paragraph is one line
+    '<p><span>가나다</span></p><p><span>라마바</span></p><p><br></p>', // rich text, Enter onto an empty last line
+  ]) {
+    const { d, el } = page();
+    const log = fakeEditor(el, { kind: 'lexical' });
+    el.innerHTML = html;
+    el.focus();
+    assert.equal(await writeBox(box(d, el), EN, { settleMs: 0 }), true, html);
+    assert.deepEqual(log.pastes, [EN], html);
+    assert.deepEqual(log.inserts, [], html);
+  }
 });
 
 // ---- the generic instance (Alt+T on any site): write, check, restore ----
@@ -120,4 +150,18 @@ test('generic, Lexical: a write that fails its check is restored by the same pas
   assert.deepEqual(s.log.pastes, [EN, KO.join('\n')]);
   assert.deepEqual(s.log.inserts, []);
   assert.deepEqual(nonblank(s.el.innerText), KO);
+});
+
+test('generic, Lexical: a draft whose lines end in a line break is refused with the failure message, untouched', async () => {
+  const s = generic({ kind: 'lexical' });
+  s.el.innerHTML = TRAILING;
+  s.el.focus();
+  s.inst.run({ source: 'command' });
+  await until(() => s.pending.length === 1);
+  s.reply(EN);
+  await until(() => /Could not write/.test(s.msg() || ''));
+  assert.equal(s.msg(), 'Could not write into this box. Nothing was changed.');
+  assert.deepEqual(s.log.pastes, []);
+  assert.deepEqual(s.log.inserts, []);
+  assert.equal(s.el.innerHTML, TRAILING);
 });

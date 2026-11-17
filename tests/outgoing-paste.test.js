@@ -11,6 +11,7 @@ import { fakeEditor, nonblank } from './fake-editors.js';
 const KO = ['가나다', '라마바', '사아자'];
 const EN = 'A1\nB2\nC3';
 const TYPED = '<p><span>가나다</span><br><span>라마바</span><br><span>사아자</span></p>'; // Shift+Enter between lines
+const TRAILING = '<p><span>가나다</span><br><span>라마바</span><br><span>사아자</span><br><br></p>'; // and after the last
 
 const pending = [];
 const { win, composer: first } = await mountInstagram({
@@ -84,4 +85,16 @@ test('a write that fails its check: the Korean is pasted back line for line and 
   assert.deepEqual(log.pastes, [EN, KO.join('\n')]);
   assert.deepEqual(log.inserts, []);
   assert.deepEqual(nonblank(composer.innerText), KO);
+});
+
+test('a draft whose lines end in a line break is refused: nothing written, the draft as it was, the failure shown', async () => {
+  const log = freshComposer(TRAILING);
+  assert.equal(enter().defaultPrevented, true);
+  await until(() => pending.length === 1);
+  answer(EN);
+  await until(() => cardPart('.msg') === FAILED);
+  await sleep(SETTLED);
+  assert.deepEqual(log.pastes, []);
+  assert.deepEqual(log.inserts, []);
+  assert.equal(composer.innerHTML, TRAILING);
 });
