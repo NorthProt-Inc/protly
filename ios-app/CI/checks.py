@@ -44,7 +44,7 @@ CARD_STATES = ("wait", "mid", "done", "err0", "err1")
 CARD_IDS = [f"card-{s}-{look}" for look in CARD_LOOKS for s in CARD_STATES] + ["card-slow", "card-cancel", "mem-stream"]
 BAR_IDS = ["hit-1", "bar-dark", "bar-light", "bar-xxl", "app-dark", "app-light"]
 # diag/p2-height probe (UITests/HeightProbe.swift, never merged): RECORD lines of measured presentations.
-HEIGHT_IDS = ["h-card", "h-globe", "h-emoji", "h-switch", "h-refocus", "h-relaunch"]
+HEIGHT_IDS = ["h2-fresh", "h2-emoji", "h2-english", "h2-switch"]
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
                 + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of

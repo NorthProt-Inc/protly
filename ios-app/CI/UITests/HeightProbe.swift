@@ -6,56 +6,75 @@ import XCTest
 /// Each shot logs `HEIGHT <id> <n> ...` and a `MARK <id>-<n> <epoch>` in ui-log.txt, so the keyboard's own height log
 /// (ProtlyHeight's PROBE lines in keyboard-log.txt) lines up by time. Records only lengths, counts and timings.
 extension PhoneRun {
-    static let heightIDs = ["h-card", "h-globe", "h-emoji", "h-switch", "h-refocus", "h-relaunch"]
+    static let heightIDs = ["h2-fresh", "h2-emoji", "h2-english", "h2-switch"]
     static let heightArguments = ["-fills", Stub.draft("ok")]
 
+    /// Probe 2 (run 1, runs/2b636fe-120: English->Protly and hide/show after app switches gave +17 every time; Emoji,
+    /// app switch and relaunch did not). Each section starts in a fresh host process, so earlier history cannot carry
+    /// over: does hide/show alone add the band, and does a band survive hide/show?
     func heightProbe() {
         if notReady(PhoneRun.heightIDs) { return }
-        heightCard()
-        heightRepeat("h-globe", 10) {
-            // Apple's English keyboard, then Protly from the globe's list (02's "picked" path).
-            self.d.switchToEnglish()
-            self.d.pause(1)
-            return self.d.pick(.protly) || self.d.cycle(to: .protly, taps: 3)
-        }
-        heightRepeat("h-emoji", 10) {
-            self.d.emojiRoundTrip()
-            return self.d.wait(for: .protly, timeout: 2)
-        }
-        heightRepeat("h-switch", 10) {
-            // 04's path: the host to the background and back with the keyboard up.
-            XCUIDevice.shared.press(.home)
-            self.d.pause(2)
-            self.d.app.activate()
-            if !self.d.waitForKeyboard() { self.d.focusField() }
-            self.d.waitOutStandIn()
-            return self.d.wait(for: .protly, timeout: 3)
-        }
-        heightRepeat("h-refocus", 10) {
-            // Hide and show in the same host (sending a message, then tapping the field again).
-            self.d.dismissKeyboard()
-            self.d.pause(1)
-            self.d.focusField()
-            self.d.waitOutStandIn()
-            return self.d.wait(for: .protly, timeout: 3)
-        }
-        heightRepeat("h-relaunch", 5) {
-            // 02's direct path: a fresh host process opens the keyboard at once.
-            self.d.app.terminate()
-            self.d.launch(arguments: PhoneRun.heightArguments)
-            if !self.d.waitForKeyboard() { self.d.focusField() }
-            self.d.waitOutStandIn()
-            return self.d.wait(for: .protly, timeout: 3)
-        }
+        heightSection("h2-fresh", [
+            // A fresh host, then hide/show: 3 with 1 s hidden, 2 with 5 s hidden.
+            { self.heightRelaunch() },
+            { self.heightRefocus(1) }, { self.heightRefocus(1) }, { self.heightRefocus(1) },
+            { self.heightRefocus(5) }, { self.heightRefocus(5) },
+        ])
+        heightSection("h2-emoji", [
+            { self.heightRelaunch() },
+            { self.d.emojiRoundTrip(); return self.d.wait(for: .protly, timeout: 2) },
+            { self.heightRefocus(1) }, { self.heightRefocus(1) },
+        ])
+        heightSection("h2-english", [
+            { self.heightRelaunch() },
+            { self.d.switchToEnglish(); self.d.pause(1); return self.d.pick(.protly) || self.d.cycle(to: .protly, taps: 3) },
+            { self.heightRefocus(1) }, { self.heightRefocus(1) },
+            // Does an Emoji round trip clear a band that came from English?
+            { self.d.emojiRoundTrip(); return self.d.wait(for: .protly, timeout: 2) },
+            { self.heightRefocus(1) },
+        ])
+        heightSection("h2-switch", [
+            { self.heightRelaunch() },
+            { self.heightAppSwitch() },
+            { self.heightRefocus(1) },
+            { self.heightAppSwitch() },
+            { self.heightRefocus(5) },
+        ])
     }
 
-    /// `n` repeats of `step` (true when Protly was reached), one measured shot after each.
-    private func heightRepeat(_ id: String, _ n: Int, _ step: () -> Bool) {
+    private func heightRelaunch() -> Bool {
+        d.app.terminate()
+        d.launch(arguments: PhoneRun.heightArguments)
+        if !d.waitForKeyboard() { d.focusField() }
+        d.waitOutStandIn()
+        return d.wait(for: .protly, timeout: 3) || d.pick(.protly)
+    }
+
+    /// Hides the keyboard with the host's Dismiss button, waits `hidden` seconds and taps the field again.
+    private func heightRefocus(_ hidden: TimeInterval) -> Bool {
+        d.dismissKeyboard()
+        d.pause(hidden)
+        d.focusField()
+        d.waitOutStandIn()
+        return d.wait(for: .protly, timeout: 3)
+    }
+
+    private func heightAppSwitch() -> Bool {
+        XCUIDevice.shared.press(.home)
+        d.pause(2)
+        d.app.activate()
+        if !d.waitForKeyboard() { d.focusField() }
+        d.waitOutStandIn()
+        return d.wait(for: .protly, timeout: 3)
+    }
+
+    /// Runs the steps in order, one measured shot after each.
+    private func heightSection(_ id: String, _ steps: [@MainActor () -> Bool]) {
         let item = Item(id)
         var shots: [String] = []
-        for i in 1...n {
+        for (i, step) in steps.enumerated() {
             let reached = step()
-            shots.append(heightShot(id, i, reached: reached))
+            shots.append(heightShot(id, i + 1, reached: reached))
         }
         item.note("shots=\(q(shots.joined(separator: ",")))")
         let problems = d.takeProblems()
@@ -79,38 +98,9 @@ extension PhoneRun {
                 row1 = String(format: "%.2f", Double(r))
             }
         }
-        let name = "h-\(id.dropFirst(2))-\(i < 10 ? "0" : "")\(i)"
+        let name = "\(id)-\(i < 10 ? "0" : "")\(i)"
         if i == 1 || top != "512.00" { d.savePNG(name, screen) }
         d.log("HEIGHT \(id) \(i) board \(board.rawValue) reached \(reached) top \(top) row1 \(row1)")
         return "\(top)/\(row1)/\(board.rawValue)"
-    }
-
-    /// One stub Translate call: keys, strip, finished card, keys again after Cancel. The keyboard's band must not move.
-    private func heightCard() {
-        let id = "h-card"
-        guard accessReady([id]) else { return }
-        let item = Item(id)
-        d.clearField()
-        var shots: [String] = []
-        shots.append("keys:" + heightShot(id, 1, reached: true))
-        guard fill(1, Stub.draft("ok"), item), tapCenter(want: "English", item) != nil else {
-            item.note("shots=\(q(shots.joined(separator: ",")))")
-            finish(item, record: true)
-            return
-        }
-        shots.append("strip:" + heightShot(id, 2, reached: true, settle: 1.0))
-        let done = poll(14) { $0.finished("Replace") }
-        item.note("finished=\(done.met ? 1 : 0)")
-        shots.append("card:" + heightShot(id, 3, reached: done.met, settle: 0.7))
-        if let v = done.view, let cancel = v.button("Cancel", in: v.card) {
-            d.pause(0.6)  // the card's buttons ignore taps for 0.5 s after it appears
-            d.point(cancel.frame.midX, cancel.frame.midY).tap()
-        } else {
-            item.note("cancel=none")
-        }
-        shots.append("after:" + heightShot(id, 4, reached: true))
-        item.note("shots=\(q(shots.joined(separator: ",")))")
-        finish(item, record: true)
-        d.clearField()
     }
 }
