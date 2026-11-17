@@ -1,0 +1,263 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5i_readwindow
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK rdw-swiftui-run-1 1794949819.044
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rdw-swiftui-run-2 1794949834.357
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK readw-swiftui-run RECORD t1={real=382/0/1 carried="read 300 0 none" outcome=card s=2.1 after=97/0/1 card-after="none"} t2={real=382/0/1 carried="read 300 0 none" outcome=card s=1.8 after=97/0/1 card-after="none"}
+MARK rdw-swiftui-lines-1 1794949849.518
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rdw-swiftui-lines-2 1794949864.410
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK readw-swiftui-lines RECORD t1={real=175/7/1.2.3.4.5.6.7.8 carried="read 43 1 7.8" outcome=card s=1.7 after=145/6/1.2.3.4.5.6 card-after="none"} t2={real=175/7/1.2.3.4.5.6.7.8 carried="read 43 1 7.8" outcome=card s=1.7 after=145/6/1.2.3.4.5.6 card-after="none"}
+MARK rdw-swiftui-w1-1 1794949879.379
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rdw-swiftui-w1-2 1794949894.485
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK readw-swiftui-w1 RECORD t1={real=191/0/none carried="read 175 0 none" outcome=card s=1.8 after=31/0/none card-after="none"} t2={real=191/0/none carried="read 175 0 none" outcome=card s=1.8 after=31/0/none card-after="none"}
+MARK rdw-swiftui-w12-1 1794949909.488
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rdw-swiftui-w12-2 1794949924.226
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK readw-swiftui-w12 RECORD t1={real=149/0/none carried="read 24 0 none" outcome=card s=1.7 after=139/0/none card-after="none"} t2={real=149/0/none carried="read 24 0 none" outcome=card s=1.7 after=139/0/none card-after="none"}
+MARK rdw-swiftui-l5mid-1 1794949939.143
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rdw-swiftui-l5mid-2 1794949953.910
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK readw-swiftui-l5mid RECORD cursor=end (a SwiftUI TextField fill leaves the cursor at the end) t1={real=114/4/1.2.3.4.5 carried="read 45 1 4.5" outcome=card s=1.7 after=82/3/1.2.3 card-after="none"} t2={real=114/4/1.2.3.4.5 carried="read 45 1 4.5" outcome=card s=1.7 after=82/3/1.2.3 card-after="none"}
+MARK rdw-swiftui-trail-1 1794949968.584
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rdw-swiftui-trail-2 1794949983.591
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK readw-swiftui-trail RECORD t1={real=71/5/1.2.3 carried="read 47 3 2.3" outcome=card s=1.8 after=37/2/1 card-after="none"} t2={real=71/5/1.2.3 carried="read 47 3 2.3" outcome=card s=1.9 after=37/2/1 card-after="none"}
+MARK rdw-swiftui-en-1 1794949998.535
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+MARK rdw-swiftui-en-2 1794950012.941
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "a"
+CHECK readw-swiftui-en RECORD t1={real=81/4/none carried="read 53 3 none" outcome=card s=1.6 after=42/1/none card-after="none"} t2={real=81/4/none carried="read 53 3 none" outcome=card s=1.9 after=42/1/none card-after="none"}
+typing: keyboard top 512.00, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdw-swiftui-typedsync-none-1 1794950106.305
+tapped protlyKey
+MARK rdw-swiftui-typedsync-refocus-1 1794950118.899
+tapped protlyKey
+typing: keyboard top 512.00, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdw-swiftui-typedsync-none-2 1794950208.196
+tapped protlyKey
+MARK rdw-swiftui-typedsync-refocus-2 1794950220.776
+tapped protlyKey
+CHECK readw-swiftui-typedsync RECORD t1={none:real=76/4/none carried="read 76 4 none" outcome=card s=1.6 left=76/4/none refocus:real=76/4/none carried="read 48 3 none" outcome=card s=1.5 left=76/4/none} t2={none:real=76/4/none carried="read 76 4 none" outcome=card s=1.6 left=76/4/none refocus:real=76/4/none carried="read 48 3 none" outcome=card s=1.6 left=76/4/none}
+MARK rdw-uikit-run-1 1794950237.862
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-run-2 1794950252.795
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-run RECORD t1={real=382/0/1 carried="read 300 0 none" outcome=card s=1.7 after=97/0/1 card-after="none"} t2={real=382/0/1 carried="read 300 0 none" outcome=card s=1.8 after=97/0/1 card-after="none"}
+MARK rdw-uikit-lines-1 1794950267.694
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-lines-2 1794950282.295
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-lines RECORD t1={real=175/7/1.2.3.4.5.6.7.8 carried="read 43 1 7.8" outcome=card s=1.6 after=145/6/1.2.3.4.5.6 card-after="none"} t2={real=175/7/1.2.3.4.5.6.7.8 carried="read 43 1 7.8" outcome=card s=1.6 after=145/6/1.2.3.4.5.6 card-after="none"}
+MARK rdw-uikit-w1-1 1794950296.693
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-w1-2 1794950310.908
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-w1 RECORD t1={real=191/0/none carried="read 175 0 none" outcome=card s=1.6 after=31/0/none card-after="none"} t2={real=191/0/none carried="read 175 0 none" outcome=card s=1.6 after=31/0/none card-after="none"}
+MARK rdw-uikit-w12-1 1794950325.397
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-w12-2 1794950339.965
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-w12 RECORD t1={real=149/0/none carried="read 24 0 none" outcome=card s=1.7 after=139/0/none card-after="none"} t2={real=149/0/none carried="read 24 0 none" outcome=card s=1.6 after=139/0/none card-after="none"}
+MARK rdw-uikit-l5mid-1 1794950354.527
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-l5mid-2 1794950369.412
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-l5mid RECORD t1={real=114/4/1.2.3.4.5 carried="read 45 1 1.2" outcome=card s=1.7 after=82/3/3.4.5/read card-after="none"} t2={real=114/4/1.2.3.4.5 carried="read 45 1 1.2" outcome=card s=1.6 after=82/3/3.4.5/read card-after="none"}
+MARK rdw-uikit-trail-1 1794950384.006
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-trail-2 1794950398.356
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-trail RECORD t1={real=71/5/1.2.3 carried="read 47 3 2.3" outcome=card s=1.7 after=37/2/1 card-after="none"} t2={real=71/5/1.2.3 carried="read 47 3 2.3" outcome=card s=1.5 after=37/2/1 card-after="none"}
+MARK rdw-uikit-en-1 1794950412.836
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-en-2 1794950427.225
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-en RECORD t1={real=81/4/none carried="read 53 3 none" outcome=card s=1.5 after=42/1/none card-after="none"} t2={real=81/4/none carried="read 53 3 none" outcome=card s=1.7 after=42/1/none card-after="none"}
+MARK rdw-uikit-skip-1 1794950441.975
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-skip-2 1794950456.444
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-skip RECORD t1={real=73/4/1.2.3 carried="read 23 0 1" outcome=card s=1.8 after=61/4/2.3/read card-after="none"} t2={real=73/4/1.2.3 carried="read 23 0 1" outcome=card s=1.6 after=61/4/2.3/read card-after="none"}
+MARK rdw-uikit-skipend-1 1794950470.948
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-skipend-2 1794950486.717
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-skipend RECORD t1={real=73/4/1.2.3 carried="read 48 2 2.3" outcome=card s=2.7 after=38/2/1 card-after="none"} t2={real=73/4/1.2.3 carried="read 48 2 2.3" outcome=card s=2.4 after=38/2/1 card-after="none"}
+MARK rdw-uikit-skipl-1 1794950502.111
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-skipl-2 1794950517.099
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-skipl RECORD t1={real=71/2/1.2.3 carried="read 23 0 1" outcome=card s=1.7 after=59/2/2.3/read card-after="none"} t2={real=71/2/1.2.3 carried="read 23 0 1" outcome=card s=1.8 after=59/2/2.3/read card-after="none"}
+MARK rdw-uikit-selp5-1 1794950534.587
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-selp5-2 1794950551.784
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-selp5 RECORD t1={real=318/8/1.2.3.4.5 carried="read 43 0 1" outcome=card s=1.8 after=11/0/none/read card-after="none"} t2={real=318/8/1.2.3.4.5 carried="read 43 0 1" outcome=card s=1.7 after=11/0/none/read card-after="none"}
+MARK rdw-uikit-sellong-1 1794950569.098
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-sellong-2 1794950586.537
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-sellong RECORD t1={real=1518/8/1.2.3.4.5 carried="read 43 0 1" outcome=card s=1.8 after=11/0/none/read card-after="none"} t2={real=1518/8/1.2.3.4.5 carried="read 43 0 1" outcome=card s=1.8 after=11/0/none/read card-after="none"}
+MARK rdw-uikit-selxlong-1 1794950603.890
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+MARK rdw-uikit-selxlong-2 1794950620.965
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "a"
+CHECK readw-uikit-selxlong RECORD t1={real=3230/14/1.2.3.4.5.6.7.8 carried="read 43 0 1" outcome=card s=1.7 after=11/0/none/read card-after="none"} t2={real=3230/14/1.2.3.4.5.6.7.8 carried="read 43 0 1" outcome=card s=1.7 after=11/0/none/read card-after="none"}
+typing: keyboard top 495.00, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdw-uikit-typedsync-none-1 1794950715.620
+tapped protlyKey
+MARK rdw-uikit-typedsync-sync-1 1794950724.256
+tapped protlyKey
+MARK rdw-uikit-typedsync-refocus-1 1794950737.024
+tapped protlyKey
+typing: keyboard top 495.00, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdw-uikit-typedsync-none-2 1794950829.094
+tapped protlyKey
+MARK rdw-uikit-typedsync-sync-2 1794950837.818
+tapped protlyKey
+MARK rdw-uikit-typedsync-refocus-2 1794950850.657
+tapped protlyKey
+CHECK readw-uikit-typedsync RECORD t1={none:real=76/4/none carried="read 76 4 none" outcome=card s=1.7 left=76/4/none sync:real=76/4/none carried="read 48 3 none" outcome=card s=1.7 left=76/4/none refocus:real=76/4/none carried="read 48 3 none" outcome=card s=1.7 left=76/4/none} t2={none:real=76/4/none carried="read 76 4 none" outcome=card s=1.7 left=76/4/none sync:real=76/4/none carried="read 48 3 none" outcome=card s=1.7 left=76/4/none refocus:real=76/4/none carried="read 48 3 none" outcome=card s=1.7 left=76/4/none}
+typing: keyboard top 495.00, row 1 564.00
+typed "오늘 회의 끝났어. 자료는 내일 보낼게.\n\n질문 있으면 말해줘. 저녁은 일곱 시에 먹자.\n\n장소는 내가 정할게. 늦지 마."
+MARK rdw-uikit-kotypedsync-none-1 1794950995.517
+tapped protlyKey
+MARK rdw-uikit-kotypedsync-sync-1 1794951004.345
+tapped protlyKey
+MARK rdw-uikit-kotypedsync-refocus-1 1794951017.332
+tapped protlyKey
+CHECK readw-uikit-kotypedsync RECORD t1={none:real=69/4/none carried="read 69 4 none" outcome=card s=1.8 left=69/4/none sync:real=69/4/none carried="read 42 2 none" outcome=card s=1.8 left=69/4/none refocus:real=69/4/none carried="read 42 2 none" outcome=card s=1.8 left=69/4/none}
+typing: keyboard top 295.33, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdw-textarea-typedsync-none-1 1794951124.134
+tapped protlyKey
+MARK rdw-textarea-typedsync-refocus-1 1794951135.675
+tapped protlyKey
+typing: keyboard top 295.33, row 1 564.00
+typed "we met today. it went well.\n\nsee you soon. call me later.\n\nthanks again. bye now."
+MARK rdw-textarea-typedsync-none-2 1794951230.712
+tapped protlyKey
+MARK rdw-textarea-typedsync-refocus-2 1794951242.272
+tapped protlyKey
+CHECK readw-textarea-typedsync RECORD t1={none:real=76/4/none/b0 carried="read 76 4 none" outcome=card s=1.8 left=76/4/none/b0 refocus:real=76/4/none/b0 carried="read 49 3 none" outcome=card s=1.8 left=76/4/none/b0} t2={none:real=76/4/none/b0 carried="read 76 4 none" outcome=card s=1.7 left=76/4/none/b0 refocus:real=76/4/none/b0 carried="read 49 3 none" outcome=card s=1.8 left=76/4/none/b0}
+MARK rdw-textarea-fillsync-none-1 1794951255.089
+tapped protlyKey
+MARK rdw-textarea-fillsync-refocus-1 1794951266.553
+tapped protlyKey
+MARK rdw-textarea-fillsync-none-2 1794951279.391
+tapped protlyKey
+MARK rdw-textarea-fillsync-refocus-2 1794951290.780
+tapped protlyKey
+CHECK readw-textarea-fillsync RECORD t1={none:real=318/8/1.2.3.4.5/b0 carried="Copy a message first." outcome=panel s=1.7 left=318/8/1.2.3.4.5/b0 refocus:real=318/8/1.2.3.4.5/b0 carried="read 39 0 none" outcome=card s=1.8 left=318/8/1.2.3.4.5/b0} t2={none:real=318/8/1.2.3.4.5/b0 carried="Copy a message first." outcome=panel s=1.7 left=318/8/1.2.3.4.5/b0 refocus:real=318/8/1.2.3.4.5/b0 carried="read 39 0 none" outcome=card s=1.7 left=318/8/1.2.3.4.5/b0}
+MARK rdw-lexical-fillsync-none-1 1794951302.832
+tapped protlyKey
+MARK rdw-lexical-fillsync-refocus-1 1794951313.839
+tapped protlyKey
+MARK rdw-lexical-fillsync-none-2 1794951326.158
+tapped protlyKey
+MARK rdw-lexical-fillsync-refocus-2 1794951337.384
+tapped protlyKey
+CHECK readw-lexical-fillsync RECORD t1={none:real=318/8/1.2.3.4.5/b9 carried="Copy a message first." outcome=panel s=1.6 left=318/8/1.2.3.4.5/b9 refocus:real=318/8/1.2.3.4.5/b9 carried="read 39 0 none" outcome=card s=1.7 left=318/8/1.2.3.4.5/b9} t2={none:real=318/8/1.2.3.4.5/b9 carried="Copy a message first." outcome=panel s=1.7 left=318/8/1.2.3.4.5/b9 refocus:real=318/8/1.2.3.4.5/b9 carried="read 39 0 none" outcome=card s=1.7 left=318/8/1.2.3.4.5/b9}
