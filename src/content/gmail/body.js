@@ -21,15 +21,26 @@ function userParent(body) {
   }
 }
 
-// The user's own part: children before the first quote/signature block, minus trailing blank lines
-// (those separate the draft from the signature and stay untouched).
-export function userNodes(body) {
-  const kids = [...userParent(body).childNodes];
+// A <br> right after text ends that text's line (Chrome types "line<br>" before a block); it is not a blank line.
+const endsLine = (kids, i) =>
+  kids[i].nodeName === 'BR' && i > 0 && !isBlank(kids[i - 1]) && !BLOCK.test(kids[i - 1].nodeName);
+
+// The user's part of parent: its children before the first quote/signature block, minus trailing blank lines (those
+// separate the draft from the signature and stay untouched). With no Enter after the last line, Chrome leaves that
+// line in the block that holds the signature or quote (line1<div>line2</div><div>line3<br>...<div
+// class="gmail_signature">), so when the first child with a boundary is not one itself, its children before the
+// boundary are taken too. The user's part of each parent is a run at its start.
+function partOf(parent) {
+  const kids = [...parent.childNodes];
   let end = kids.findIndex(isBoundary);
   if (end === -1) end = kids.length;
-  while (end > 0 && isBlank(kids[end - 1])) end--;
+  const inner = end < kids.length && !kids[end].matches(GSEL.boundary) ? partOf(kids[end]) : [];
+  if (inner.length) return [...kids.slice(0, end), ...inner];
+  while (end > 0 && isBlank(kids[end - 1]) && !endsLine(kids, end - 1)) end--;
   return kids.slice(0, end);
 }
+
+export const userNodes = (body) => partOf(userParent(body));
 
 // The body's text before its first quote or signature block, in document order. The write check reads it instead of
 // userNodes, so a typed line the user's part missed still counts. Block starts and ends become line breaks, so only
@@ -53,6 +64,12 @@ export function textBeforeBoundary(body) {
 
 export const hasMedia = (nodes) => nodes.some((n) => n.nodeType === 1 && (n.matches(MEDIA) || !!n.querySelector(MEDIA)));
 
+// True when n sits inside a block that prev is outside of, as the line taken from a signature's block does.
+const opensBlock = (prev, n) => {
+  for (let p = n.parentNode; p && !p.contains(prev); p = p.parentNode) if (BLOCK.test(p.nodeName)) return true;
+  return false;
+};
+
 // Plain text with one \n per line, matching how Gmail lays out typed text (bare first line, <div> per line).
 // Inline formatting is dropped.
 export function nodesToText(nodes) {
@@ -66,7 +83,10 @@ export function nodesToText(nodes) {
     n.childNodes.forEach(walk);
     if (block && !out.endsWith('\n')) out += '\n';
   };
-  nodes.forEach(walk);
+  nodes.forEach((n, i) => {
+    if (i && out && !out.endsWith('\n') && opensBlock(nodes[i - 1], n)) out += '\n';
+    walk(n);
+  });
   return out.replace(/\n$/, '');
 }
 
@@ -80,16 +100,24 @@ export function textToNodes(doc, text) {
   });
 }
 
-// Swap the user's part for newNodes; returns the removed nodes (for Undo). Quote and signature stay put.
-// execCommand is not used: next to a block it clones the block's class onto the new lines (spike).
+const homes = new WeakMap(); // a node replaceUserNodes removed -> the parent it was in
+
+// Swap the user's part for newNodes; returns the removed nodes (for Undo). Quote and signature stay put: new nodes go
+// in before the first removed node, at the start of its parent. Nodes this function removed earlier (Undo, a failed
+// write check) go back to the start of the parent they came from, so a line taken from the signature's block returns
+// to that block. execCommand is not used: next to a block it clones the block's class onto the new lines (spike).
 export function replaceUserNodes(body, newNodes) {
-  const parent = userParent(body);
   const old = userNodes(body);
-  const next = old.length ? old[old.length - 1].nextSibling : parent.firstChild;
-  old.forEach((n) => n.remove());
-  const frag = body.ownerDocument.createDocumentFragment();
-  newNodes.forEach((n) => frag.appendChild(n));
-  parent.insertBefore(frag, next);
+  const into = old[0]?.parentNode ?? userParent(body);
+  old.forEach((n) => { homes.set(n, n.parentNode); n.remove(); });
+  const runs = new Map(); // parent -> the nodes that go in at its start, in order
+  for (const n of newNodes) {
+    const home = homes.get(n);
+    const p = home && body.contains(home) ? home : into;
+    if (!runs.has(p)) runs.set(p, []);
+    runs.get(p).push(n);
+  }
+  runs.forEach((nodes, p) => p.prepend(...nodes));
   body.dispatchEvent(new body.ownerDocument.defaultView.Event('input', { bubbles: true }));
   return old;
 }
