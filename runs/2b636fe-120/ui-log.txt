@@ -1,0 +1,188 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test9_height
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK h-card-1 1794911456.969
+HEIGHT h-card 1 board protly reached true top 512.00 row1 564.00
+tapped the center slot
+MARK h-card-2 1794911463.566
+HEIGHT h-card 2 board protly reached true top 512.00 row1 564.00
+MARK h-card-3 1794911474.120
+HEIGHT h-card 3 board protly reached true top 512.00 row1 734.00
+MARK h-card-4 1794911477.386
+HEIGHT h-card 4 board protly reached true top 512.00 row1 564.00
+CHECK h-card RECORD center="→, English" finished=1 shots="keys:512.00/564.00/protly,strip:512.00/564.00/protly,card:512.00/734.00/protly,after:512.00/564.00/protly"
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-1 1794911493.835
+HEIGHT h-globe 1 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-2 1794911505.970
+HEIGHT h-globe 2 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-3 1794911517.984
+HEIGHT h-globe 3 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-4 1794911529.976
+HEIGHT h-globe 4 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-5 1794911541.964
+HEIGHT h-globe 5 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-6 1794911553.999
+HEIGHT h-globe 6 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-7 1794911566.066
+HEIGHT h-globe 7 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-8 1794911578.520
+HEIGHT h-globe 8 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-9 1794911590.880
+HEIGHT h-globe 9 board protly reached true top 495.00 row1 564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK h-globe-10 1794911603.270
+HEIGHT h-globe 10 board protly reached true top 495.00 row1 564.00
+CHECK h-globe RECORD shots="495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly"
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-1 1794911620.935
+HEIGHT h-emoji 1 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-2 1794911637.526
+HEIGHT h-emoji 2 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-3 1794911654.734
+HEIGHT h-emoji 3 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-4 1794911672.171
+HEIGHT h-emoji 4 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-5 1794911689.202
+HEIGHT h-emoji 5 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-6 1794911705.600
+HEIGHT h-emoji 6 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-7 1794911722.771
+HEIGHT h-emoji 7 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-8 1794911739.679
+HEIGHT h-emoji 8 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-9 1794911756.829
+HEIGHT h-emoji 9 board protly reached true top 512.00 row1 564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK h-emoji-10 1794911773.800
+HEIGHT h-emoji 10 board protly reached true top 512.00 row1 564.00
+CHECK h-emoji RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
+MARK h-switch-1 1794911779.965
+HEIGHT h-switch 1 board protly reached true top 512.00 row1 564.00
+MARK h-switch-2 1794911786.605
+HEIGHT h-switch 2 board protly reached true top 512.00 row1 564.00
+MARK h-switch-3 1794911792.561
+HEIGHT h-switch 3 board protly reached true top 512.00 row1 564.00
+MARK h-switch-4 1794911798.761
+HEIGHT h-switch 4 board protly reached true top 512.00 row1 564.00
+MARK h-switch-5 1794911804.704
+HEIGHT h-switch 5 board protly reached true top 512.00 row1 564.00
+MARK h-switch-6 1794911810.847
+HEIGHT h-switch 6 board protly reached true top 512.00 row1 564.00
+MARK h-switch-7 1794911817.200
+HEIGHT h-switch 7 board protly reached true top 512.00 row1 564.00
+MARK h-switch-8 1794911823.592
+HEIGHT h-switch 8 board protly reached true top 512.00 row1 564.00
+MARK h-switch-9 1794911829.457
+HEIGHT h-switch 9 board protly reached true top 512.00 row1 564.00
+MARK h-switch-10 1794911835.389
+HEIGHT h-switch 10 board protly reached true top 512.00 row1 564.00
+CHECK h-switch RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
+tapped the field
+MARK h-refocus-1 1794911842.946
+HEIGHT h-refocus 1 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-2 1794911850.651
+HEIGHT h-refocus 2 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-3 1794911858.599
+HEIGHT h-refocus 3 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-4 1794911866.895
+HEIGHT h-refocus 4 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-5 1794911874.645
+HEIGHT h-refocus 5 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-6 1794911882.430
+HEIGHT h-refocus 6 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-7 1794911889.978
+HEIGHT h-refocus 7 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-8 1794911897.366
+HEIGHT h-refocus 8 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-9 1794911904.828
+HEIGHT h-refocus 9 board protly reached true top 495.00 row1 564.00
+tapped the field
+MARK h-refocus-10 1794911912.410
+HEIGHT h-refocus 10 board protly reached true top 495.00 row1 564.00
+CHECK h-refocus RECORD shots="495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly"
+MARK h-relaunch-1 1794911919.755
+HEIGHT h-relaunch 1 board protly reached true top 512.00 row1 564.00
+MARK h-relaunch-2 1794911926.754
+HEIGHT h-relaunch 2 board protly reached true top 512.00 row1 564.00
+MARK h-relaunch-3 1794911933.778
+HEIGHT h-relaunch 3 board protly reached true top 512.00 row1 564.00
+MARK h-relaunch-4 1794911940.792
+HEIGHT h-relaunch 4 board protly reached true top 512.00 row1 564.00
+MARK h-relaunch-5 1794911947.500
+HEIGHT h-relaunch 5 board protly reached true top 512.00 row1 564.00
+CHECK h-relaunch RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"

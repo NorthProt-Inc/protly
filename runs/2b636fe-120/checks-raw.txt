@@ -1,0 +1,6 @@
+CHECK h-card RECORD center="→, English" finished=1 shots="keys:512.00/564.00/protly,strip:512.00/564.00/protly,card:512.00/734.00/protly,after:512.00/564.00/protly"
+CHECK h-globe RECORD shots="495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly"
+CHECK h-emoji RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
+CHECK h-switch RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
+CHECK h-refocus RECORD shots="495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly,495.00/564.00/protly"
+CHECK h-relaunch RECORD shots="512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly,512.00/564.00/protly"
