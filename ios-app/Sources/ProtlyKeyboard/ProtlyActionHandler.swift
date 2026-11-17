@@ -1,4 +1,5 @@
 import KeyboardKit
+import os
 import ProtlyCore
 import UIKit
 
@@ -12,6 +13,10 @@ final class ProtlyActionHandler: KeyboardAction.StandardActionHandler {
     override func handle(_ gesture: Keyboard.Gesture, on action: KeyboardAction, replaced: Bool) {
         // KeyboardKit calls this from button gestures, always on the main thread.
         MainActor.assumeIsolated {
+            if action == .space {
+                P4Probe.gesture(gesture.rawValue, reading: host?.isReadingField == true,
+                                drag: keyboardContext.isSpaceDragGestureActive)
+            }
             // The field read is walking the cursor through the text (a few steps, usually well under a second): a key
             // now would land mid-text and join the text sent, so the keys wait. A gesture's end still goes through,
             // so KeyboardKit's drag state and the shift tracking below never keep a press that began before the read.
@@ -74,6 +79,28 @@ final class ProtlyActionHandler: KeyboardAction.StandardActionHandler {
         }
     }
 
+    /// diag/p4-double-space: what KeyboardKit's double-space check saw at each space release (lengths, the code
+    /// points of the last two characters, timings; never the field's text).
+    override func shouldEndCurrentSentence(after gesture: Keyboard.Gesture, on action: KeyboardAction) -> Bool {
+        guard gesture == .release, action == .space else {
+            return super.shouldEndCurrentSentence(after: gesture, on: action)
+        }
+        let proxy = keyboardContext.textDocumentProxy
+        let before = proxy.documentContextBeforeInput
+        let afterCount = proxy.documentContextAfterInput?.count ?? -1
+        let newWord = proxy.isCursorAtNewWord
+        let newSentence = proxy.isCursorAtNewSentence
+        let closable = (before ?? "").hasSuffix("  ")
+        var since = -1.0
+        if let standard = behavior as? Keyboard.StandardKeyboardBehavior {
+            since = Date().timeIntervalSince(standard.lastSpaceTap)
+        }
+        let result = super.shouldEndCurrentSentence(after: gesture, on: action)
+        P4Probe.release(tail: P4Probe.tail(before), afterCount: afterCount, newWord: newWord,
+                        newSentence: newSentence, closable: closable, sinceLastSpaceTap: since, result: result)
+        return result
+    }
+
     /// true when protly handled the gesture itself.
     @MainActor
     private func handleInWord(_ gesture: Keyboard.Gesture, on action: KeyboardAction) -> Bool {
@@ -91,5 +118,47 @@ final class ProtlyActionHandler: KeyboardAction.StandardActionHandler {
         default:
             return false
         }
+    }
+}
+
+/// diag/p4-double-space probe log (subsystem com.northprot.protly, category p4; run-shots.sh copies it into
+/// keyboard-log.txt). Numbers only: lengths, code points of the last two characters, timings.
+enum P4Probe {
+    static let log = Logger(subsystem: "com.northprot.protly", category: "p4")
+    private static var lastRelease: Double?
+    private static var seq = 0
+
+    static var uptime: Double { ProcessInfo.processInfo.systemUptime }
+
+    static var epoch: String { String(format: "%.3f", Date().timeIntervalSince1970) }
+
+    /// The length (Characters and UTF-16) and the code points of the last two characters; never the text.
+    static func tail(_ s: String?) -> String {
+        guard let s else { return "nil" }
+        let last = String(s.suffix(2)).unicodeScalars.map { String(format: "%04X", $0.value) }.joined(separator: ",")
+        return "len=\(s.count) u16=\(s.utf16.count) last=[\(last)]"
+    }
+
+    static func line(_ text: String) {
+        log.notice("\(text, privacy: .public)")
+    }
+
+    static func gesture(_ name: String, reading: Bool, drag: Bool) {
+        let up = String(format: "%.3f", uptime)
+        line("p4 gesture \(name) epoch=\(epoch) up=\(up) reading=\(reading) drag=\(drag)")
+    }
+
+    static func release(tail: String, afterCount: Int, newWord: Bool, newSentence: Bool, closable: Bool,
+                        sinceLastSpaceTap: Double, result: Bool) {
+        let now = uptime
+        let gap: Double = lastRelease.map { now - $0 } ?? -1
+        lastRelease = now
+        seq += 1
+        let gapText = String(format: "%.3f", gap)
+        let sinceText = String(format: "%.3f", sinceLastSpaceTap)
+        var text = "p4 release seq=\(seq) epoch=\(epoch) gap=\(gapText) sinceLastSpaceTap=\(sinceText)"
+        text += " before{\(tail)} afterLen=\(afterCount) newWord=\(newWord) newSentence=\(newSentence)"
+        text += " closable=\(closable) end=\(result)"
+        line(text)
     }
 }

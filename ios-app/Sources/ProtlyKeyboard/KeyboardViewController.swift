@@ -201,6 +201,9 @@ final class KeyboardViewController: KeyboardInputViewController {
             return
         }
         savePrevious()
+        // diag/p4-double-space: this space does not go through the action handler (no lastSpaceTap update).
+        let up = String(format: "%.3f", P4Probe.uptime)
+        P4Probe.line("p4 pick-space epoch=\(P4Probe.epoch) up=\(up)")
         insertText(" ")
     }
 
@@ -734,9 +737,18 @@ final class KeyboardViewController: KeyboardInputViewController {
     }
 
     override func endSentence(withText text: String) {
+        let p = textDocumentProxy
+        // diag/p4-double-space: KeyboardKit's endSentence returns early unless the cursor is at the end of a word.
+        let afterLen: Int = p.documentContextAfterInput?.count ?? -1
+        let postWordLen: Int = p.currentWordPostCursorPart?.count ?? -1
+        let atEnd: Bool = p.isCursorAtTheEndOfTheCurrentWord
+        var probe = "p4 endSentence-in epoch=\(P4Probe.epoch) before{\(P4Probe.tail(p.documentContextBeforeInput))}"
+        probe += " afterLen=\(afterLen) postWordLen=\(postWordLen) atEndOfWord=\(atEnd)"
+        P4Probe.line(probe)
         commitWord()
         session.forgetLast()
         super.endSentence(withText: text)
+        P4Probe.line("p4 endSentence-out epoch=\(P4Probe.epoch) before{\(P4Probe.tail(textDocumentProxy.documentContextBeforeInput))}")
         watch.forget()  // KeyboardKit may delete a space first
         refreshMode()
     }

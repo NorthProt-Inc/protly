@@ -17,15 +17,18 @@
   html, body { margin: 0; padding: 0; background: #000; color: #f2f2f2; overflow: hidden; }
   body { font: 17px -apple-system, system-ui, sans-serif; }
   .f {
-    display: block; box-sizing: border-box; width: 264px; margin: 6px 8px; padding: 6px 8px;
+    display: block; box-sizing: border-box; width: 264px; margin: 4px 8px; padding: 4px 8px;
     background: #000; color: #f2f2f2; border: 1px solid #1a1a1a; border-radius: 8px; outline: none;
     font: 17px -apple-system, system-ui, sans-serif;
   }
-  textarea.f { height: 44px; resize: none; }
-  input.f { height: 36px; }
+  textarea.f { height: 32px; resize: none; }
+  input.f { height: 30px; }
   #composer { height: 40px; white-space: pre-wrap; caret-color: transparent; overflow: hidden; }
+  /* diag/p4-double-space: a contenteditable with the default white-space (normal), where WebKit stores a
+     trailing space as U+00A0. */
+  #plain { height: 40px; overflow: hidden; }
   form { margin: 0; }
-  #sent { margin: 2px 8px; height: 16px; overflow: hidden; font-size: 11px; color: #8a8a8a; white-space: nowrap; }
+  #sent { display: none; margin: 2px 8px; height: 16px; overflow: hidden; font-size: 11px; color: #8a8a8a; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -35,6 +38,8 @@
   autocorrect="off" spellcheck="false"></form>
 <div id="composer" class="f" contenteditable="true" role="textbox" aria-label="web composer" autocapitalize="off"
   autocorrect="off" spellcheck="false"></div>
+<div id="plain" class="f" contenteditable="true" role="textbox" aria-label="web plain" autocapitalize="off"
+  autocorrect="off" spellcheck="false"></div>
 <div id="sent" aria-label="sent"></div>
 <script>
 "use strict";
@@ -42,6 +47,7 @@ const fields = {
   textarea: document.getElementById("textarea"),
   input: document.getElementById("input"),
   composer: document.getElementById("composer"),
+  plain: document.getElementById("plain"),
 };
 const form = document.getElementById("form");
 let sent = [];
@@ -57,9 +63,18 @@ function post(msg) {
 
 function text(name) {
   const f = fields[name];
-  return (name === "composer" ? f.textContent : f.value).replace(/ /g, " ");
+  return (f.isContentEditable ? f.textContent : f.value).replace(/ /g, " ");
 }
 
+// diag/p4-double-space: how many U+00A0 each field holds (text() turns them into spaces).
+function nbspCounts() {
+  const n = {};
+  for (const [name, f] of Object.entries(fields)) {
+    const raw = f.isContentEditable ? f.textContent : f.value;
+    n[name] = (raw.match(/\u00a0/g) || []).length;
+  }
+  return n;
+}
 function rects() {
   const r = {};
   for (const [name, f] of Object.entries(fields)) {
@@ -79,8 +94,8 @@ function state() {
 
 function postState() {
   const s = {
-    textarea: text("textarea"), input: text("input"), composer: text("composer"), sent, submitted, atReturn,
-    focus: (document.activeElement && document.activeElement.id) || "", trace: trace.slice(-16),
+    textarea: text("textarea"), input: text("input"), composer: text("composer"), plain: text("plain"), sent, submitted, atReturn,
+    focus: (document.activeElement && document.activeElement.id) || "", trace: trace.slice(-16), nbsp: nbspCounts(),
   };
   post({ kind: "state", json: JSON.stringify(s), rects: rects() });
 }
@@ -137,6 +152,7 @@ fields.composer.addEventListener("keydown", (e) => {
 function clearAll() {
   for (const name of ["textarea", "input"]) fields[name].value = "";
   fields.composer.textContent = "";
+  fields.plain.textContent = "";
   document.getElementById("sent").textContent = "";
   sent = [];
   submitted = [];
