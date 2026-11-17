@@ -50,8 +50,11 @@ SPACE_KINDS = ("en", "ko", "fast", "kofast")
 SPACE_PICK_FIELDS = ("uikit", "composer", "plain")
 SPACE_IDS = ([f"sp-{f}-{k}" for f in SPACE_FIELDS for k in SPACE_KINDS]
              + [f"sp-{f}-{k}" for f in SPACE_PICK_FIELDS for k in ("pick1", "pick2")] + ["sp-uikit-hold"])
+# The second probe run (test5g_space2): Apple's keyboard as the control, the time window, a word after the cursor.
+SPACE2_IDS = ["pr-gap-15", "pr-gap-22", "pr-gap-35", "ap-pick1", "ap-gap-15", "ap-gap-22", "ap-gap-35", "ap-word",
+              "pr-word"]
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
-                + SPACE_IDS)
+                + SPACE_IDS + SPACE2_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -67,6 +70,7 @@ METHOD_IDS = {
     "test5d_card": CARD_IDS,
     "test5e_bar": BAR_IDS,
     "test5f_space": SPACE_IDS,
+    "test5g_space2": SPACE2_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
 }
