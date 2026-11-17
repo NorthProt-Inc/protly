@@ -733,11 +733,19 @@ final class KeyboardViewController: KeyboardInputViewController {
             before: SpaceTrackpad.textBefore(context: context, written: word, committed: committed), after: after)
     }
 
+    /// The double-space period. KeyboardKit's own endSentence (not called) does nothing when a word follows the cursor
+    /// (`hello  |world`: isCursorAtTheEndOfTheCurrentWord is false), where Apple's keyboard gives `hello. world`
+    /// (docs/research/2026-11-17-keyboard-diagnosis.md, P4 case D). So the spaces before the cursor are deleted and the
+    /// text inserted here, through the proxy as KeyboardKit did, whatever follows the cursor. The spaces are counted
+    /// once, so a context that lags behind the deletes can neither loop nor delete past them.
     override func endSentence(withText text: String) {
         commitWord()
         session.forgetLast()
-        super.endSentence(withText: text)
-        watch.forget()  // KeyboardKit may delete a space first
+        let proxy = textDocumentProxy
+        let spaces = (proxy.documentContextBeforeInput ?? "").reversed().prefix { $0 == " " }.count
+        for _ in 0..<spaces { proxy.deleteBackward() }
+        proxy.insertText(text)
+        watch.forget()  // spaces deleted and text inserted outside FieldWatch's model
         refreshMode()
     }
 
