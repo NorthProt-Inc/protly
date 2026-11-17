@@ -1,0 +1,138 @@
+STATUS measured
+source f1fa85017f7a4328ce7fda549c2183044c4d5be3
+xcode Xcode 26.6 Build version 17F113 
+network key: present (CI key); DerivedData cache: restore only, not saved in this run
+FILTER PhoneChecksUITests/test0_access PhoneChecksUITests/test5h_space3 (a debug run, outside the run budget; other IDs are NOT-RUN)
+runtime iOS 26.5 (com.apple.CoreSimulator.SimRuntime.iOS-26-5)
+device iPhone-13-Pro (179322A5-9D88-4AC0-A53A-EE6DFB880BF2), 390 pt wide
+build ok
+AppleKeyboards ("com.northprot.protly.cihost.keyboard","emoji@sw=Emoji","en_US@sw=QWERTY;hw=Automatic")
+appearance dark
+memory sampler pid 5070, probe 0, network 1
+web-events.txt: none (the web screen did not run)
+RESULT NOT-RUN (filtered run: KeyboardShotsUITests not selected)
+CHECKS
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK ap-co-0 RECORD pause=0.0 seq=PPP tries=1:gap=0.45:"Hello. ";2:gap=0.45:"Hello. ";3:gap=0.43:"Hello. " final="Hello. Hello. Hello. "
+CHECK ap-co-5 RECORD pause=0.5 seq=PPP tries=1:gap=0.92:"Hello. ";2:gap=0.95:"Hello. ";3:gap=0.93:"Hello. " final="Hello. Hello. Hello. "
+CHECK ap-co-12 RECORD pause=1.2 seq=SSS tries=1:gap=1.65:"Hello  ";2:gap=1.77:"hello  ";3:gap=1.63:"hello  " final="Hello  hello  hello  "
+CHECK ap-co-20 RECORD pause=2.0 seq=SSS tries=1:gap=2.44:"Hello  ";2:gap=2.42:"hello  ";3:gap=2.42:"hello  " final="Hello  hello  hello  "
+CHECK ap-dbl RECORD pause=doubleTap seq=PPP tries=1:gap=-1.00:"hello. ";2:gap=-1.00:"Hello. ";3:gap=-1.00:"Hello. " final="hello. Hello. Hello. "
+CHECK ap-gap-15 NOT-RUN filtered run: its test method was not selected
+CHECK ap-gap-22 NOT-RUN filtered run: its test method was not selected
+CHECK ap-gap-35 NOT-RUN filtered run: its test method was not selected
+CHECK ap-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK ap-pick2 RECORD seq=PPP tries=1:after-pick="Hello ":gap=0.41:after-spaces="Hello. ";2:after-pick="Hello ":gap=0.42:after-spaces="Hello. ";3:after-pick="Hello ":gap=0.41:after-spaces="Hello. " final="Hello. Hello. Hello. "
+CHECK ap-word NOT-RUN filtered run: its test method was not selected
+CHECK ap-word2 RECORD 1:sel-before="0,0":gap=0.40:field="hello. world":sel="7,0";2:sel-before="0,0":gap=0.43:field="hello. world":sel="7,0";3:sel-before="0,0":gap=0.43:field="hello. world":sel="7,0"
+CHECK ap-word2d RECORD 1:sel-before="0,0":gap=-1.00:field="hello. world":sel="7,0";2:sel-before="0,0":gap=-1.00:field="hello. world":sel="7,0";3:sel-before="0,0":gap=-1.00:field="hello. world":sel="7,0"
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK pr-gap-15 NOT-RUN filtered run: its test method was not selected
+CHECK pr-gap-22 NOT-RUN filtered run: its test method was not selected
+CHECK pr-gap-35 NOT-RUN filtered run: its test method was not selected
+CHECK pr-pickfast RECORD seq=XXXX tries=1:took=5.90:"hello i ";2:took=5.89:"hello i ";3:took=5.78:"hello i ";4:took=5.72:"hello i " final="hello i hello i hello i hello i "
+CHECK pr-word NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK sp-composer-en NOT-RUN filtered run: its test method was not selected
+CHECK sp-composer-fast NOT-RUN filtered run: its test method was not selected
+CHECK sp-composer-ko NOT-RUN filtered run: its test method was not selected
+CHECK sp-composer-kofast NOT-RUN filtered run: its test method was not selected
+CHECK sp-composer-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK sp-composer-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK sp-field-en NOT-RUN filtered run: its test method was not selected
+CHECK sp-field-fast NOT-RUN filtered run: its test method was not selected
+CHECK sp-field-ko NOT-RUN filtered run: its test method was not selected
+CHECK sp-field-kofast NOT-RUN filtered run: its test method was not selected
+CHECK sp-plain-en NOT-RUN filtered run: its test method was not selected
+CHECK sp-plain-fast NOT-RUN filtered run: its test method was not selected
+CHECK sp-plain-ko NOT-RUN filtered run: its test method was not selected
+CHECK sp-plain-kofast NOT-RUN filtered run: its test method was not selected
+CHECK sp-plain-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK sp-plain-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK sp-textarea-en NOT-RUN filtered run: its test method was not selected
+CHECK sp-textarea-fast NOT-RUN filtered run: its test method was not selected
+CHECK sp-textarea-ko NOT-RUN filtered run: its test method was not selected
+CHECK sp-textarea-kofast NOT-RUN filtered run: its test method was not selected
+CHECK sp-uikit-en NOT-RUN filtered run: its test method was not selected
+CHECK sp-uikit-fast NOT-RUN filtered run: its test method was not selected
+CHECK sp-uikit-hold NOT-RUN filtered run: its test method was not selected
+CHECK sp-uikit-ko NOT-RUN filtered run: its test method was not selected
+CHECK sp-uikit-kofast NOT-RUN filtered run: its test method was not selected
+CHECK sp-uikit-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK sp-uikit-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
+CHECKS pass 0 fail 0 record 9 skip 0 not-run 113
+LEAK-GUARD pass: no key prefix in 24 files

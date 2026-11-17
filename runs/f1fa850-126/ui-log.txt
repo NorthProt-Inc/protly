@@ -1,0 +1,51 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5h_space3
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK pr-pickfast 1794948774.994
+typing: keyboard top 512.00, row 1 564.00
+typed "hello i"
+tapped the right slot
+tapped space
+typing: keyboard top 512.00, row 1 564.00
+typed "hello i"
+tapped the right slot
+tapped space
+typing: keyboard top 512.00, row 1 564.00
+typed "hello i"
+tapped the right slot
+tapped space
+typing: keyboard top 512.00, row 1 564.00
+typed "hello i"
+tapped the right slot
+tapped space
+CHECK pr-pickfast RECORD seq=XXXX tries=1:took=5.90:"hello i ";2:took=5.89:"hello i ";3:took=5.78:"hello i ";4:took=5.72:"hello i " final="hello i hello i hello i hello i "
+picked English (US) from the globe list: english
+Apple space key at 100.3,722.0 size 191.3x54.0
+MARK ap-dbl 1794948839.719
+CHECK ap-dbl RECORD pause=doubleTap seq=PPP tries=1:gap=-1.00:"hello. ";2:gap=-1.00:"Hello. ";3:gap=-1.00:"Hello. " final="hello. Hello. Hello. "
+MARK ap-co-0 1794948891.043
+CHECK ap-co-0 RECORD pause=0.0 seq=PPP tries=1:gap=0.45:"Hello. ";2:gap=0.45:"Hello. ";3:gap=0.43:"Hello. " final="Hello. Hello. Hello. "
+MARK ap-co-5 1794948943.871
+CHECK ap-co-5 RECORD pause=0.5 seq=PPP tries=1:gap=0.92:"Hello. ";2:gap=0.95:"Hello. ";3:gap=0.93:"Hello. " final="Hello. Hello. Hello. "
+MARK ap-co-12 1794948998.208
+CHECK ap-co-12 RECORD pause=1.2 seq=SSS tries=1:gap=1.65:"Hello  ";2:gap=1.77:"hello  ";3:gap=1.63:"hello  " final="Hello  hello  hello  "
+MARK ap-co-20 1794949056.962
+CHECK ap-co-20 RECORD pause=2.0 seq=SSS tries=1:gap=2.44:"Hello  ";2:gap=2.42:"hello  ";3:gap=2.42:"hello  " final="Hello  hello  hello  "
+MARK ap-pick2 1794949115.450
+CHECK ap-pick2 RECORD seq=PPP tries=1:after-pick="Hello ":gap=0.41:after-spaces="Hello. ";2:after-pick="Hello ":gap=0.42:after-spaces="Hello. ";3:after-pick="Hello ":gap=0.41:after-spaces="Hello. " final="Hello. Hello. Hello. "
+tapped the field
+Apple space key at 100.3,722.0 size 191.3x54.0
+MARK ap-word2 1794949170.849
+CHECK ap-word2 RECORD 1:sel-before="0,0":gap=0.40:field="hello. world":sel="7,0";2:sel-before="0,0":gap=0.43:field="hello. world":sel="7,0";3:sel-before="0,0":gap=0.43:field="hello. world":sel="7,0"
+MARK ap-word2d 1794949264.978
+CHECK ap-word2d RECORD 1:sel-before="0,0":gap=-1.00:field="hello. world":sel="7,0";2:sel-before="0,0":gap=-1.00:field="hello. world":sel="7,0";3:sel-before="0,0":gap=-1.00:field="hello. world":sel="7,0"
