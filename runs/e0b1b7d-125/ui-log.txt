@@ -1,0 +1,67 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5g_space2
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK pr-gap-15 1794946927.904
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 1.99 s
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 2.00 s
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 1.98 s
+CHECK pr-gap-15 RECORD pause=1.5 seq=PPP tries=1:gap=1.99:"hello. ";2:gap=2.00:"hello. ";3:gap=1.98:"hello. " final="hello. hello. hello. "
+MARK pr-gap-22 1794946967.964
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 2.75 s
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 2.72 s
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 2.71 s
+CHECK pr-gap-22 RECORD pause=2.2 seq=PPP tries=1:gap=2.75:"hello. ";2:gap=2.72:"hello. ";3:gap=2.71:"hello. " final="hello. hello. hello. "
+MARK pr-gap-35 1794947010.436
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 4.05 s
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 4.01 s
+typing: keyboard top 512.00, row 1 564.00
+typed "hello  ", last gap 4.03 s
+CHECK pr-gap-35 RECORD pause=3.5 seq=SSS tries=1:gap=4.05:"hello  ";2:gap=4.01:"hello  ";3:gap=4.03:"hello  " final="hello  hello  hello  "
+picked English (US) from the globe list: english
+MARK ap-pick1 1794947064.515
+CHECK ap-pick1 RECORD seq=XXXX tries=1:cell="hello":after-pick="hello ":after-space="hello ";2:cell="hello":after-pick="hello ":after-space="hello ";3:cell="hello":after-pick="hello ":after-space="hello ";4:cell="hello":after-pick="hello ":after-space="hello " final="hello hello hello hello "
+field not empty after Clear (attempt 1): "hello hello hello hello "
+field not empty after Clear (attempt 2): "hello hello hello hello "
+problem: Clear left text in the field
+MARK ap-gap-15 1794947137.803
+CHECK ap-gap-15 RECORD pause=1.5 seq=SSS tries=1:gap=3.06:"hello  ";2:gap=3.07:"hello  ";3:gap=3.06:"hello  " final="hello hello hello hello hello  hello  hello  " problems="Clear left text in the field"
+MARK ap-gap-22 1794947192.432
+CHECK ap-gap-22 RECORD pause=2.2 seq=SSS tries=1:gap=3.77:"Hello  ";2:gap=3.77:"hello  ";3:gap=3.74:"hello  " final="Hello  hello  hello  "
+MARK ap-gap-35 1794947249.544
+CHECK ap-gap-35 RECORD pause=3.5 seq=SSS tries=1:gap=5.06:"Hello  ";2:gap=4.99:"hello  ";3:gap=5.13:"hello  " final="Hello  hello  hello  "
+tapped the field
+MARK ap-word 1794947312.991
+CHECK ap-word RECORD 1:sel-before="0,0":field="hello  world":sel="7,0";2:sel-before="0,0":field="hello  world":sel="7,0";3:sel-before="0,0":field="hello  world":sel="7,0"
+picked Protly, English from the globe list: protly
+MARK pr-word 1794947421.482
+typing: keyboard top 495.00, row 1 564.00
+typed "world"
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  "
+typing: keyboard top 495.00, row 1 564.00
+typed "world"
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  "
+typing: keyboard top 495.00, row 1 564.00
+typed "world"
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  "
+CHECK pr-word RECORD 1:sel-before="0,0":field="hello  world":sel="7,0";2:sel-before="0,0":field="hello  world":sel="7,0";3:sel-before="0,0":field="hello  world":sel="7,0"

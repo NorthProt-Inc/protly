@@ -1,0 +1,126 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-11-17 20:22:01.317 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:22:01.317 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:22:01.346 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:22:01.806 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-17 20:22:02.541 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-17 20:22:14.835 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946934.886 up=273.199 reading=false drag=false
+2026-11-17 20:22:14.903 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946934.954 up=273.268 reading=false drag=false
+2026-11-17 20:22:14.906 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=1 epoch=1794946934.958 gap=-1.000 sinceLastSpaceTap=13.591 before{len=6 u16=6 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:22:14.921 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946934.973 up=273.286 reading=false drag=false
+2026-11-17 20:22:16.821 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946936.874 up=275.186 reading=false drag=false
+2026-11-17 20:22:16.903 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946936.955 up=275.268 reading=false drag=false
+2026-11-17 20:22:16.904 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=2 epoch=1794946936.957 gap=1.998 sinceLastSpaceTap=1.999 before{len=7 u16=7 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:22:16.904 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794946936.957 before{len=7 u16=7 last=[0020,0020]} afterLen=-1 postWordLen=-1 atEndOfWord=true
+2026-11-17 20:22:16.904 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794946936.957 before{len=7 u16=7 last=[002E,0020]}
+2026-11-17 20:22:16.916 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946936.968 up=275.281 reading=false drag=false
+2026-11-17 20:22:26.226 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946946.283 up=284.591 reading=false drag=false
+2026-11-17 20:22:26.303 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946946.360 up=284.668 reading=false drag=false
+2026-11-17 20:22:26.305 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=3 epoch=1794946946.362 gap=9.401 sinceLastSpaceTap=9.405 before{len=13 u16=13 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:22:26.320 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946946.378 up=284.685 reading=false drag=false
+2026-11-17 20:22:28.225 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946948.283 up=286.590 reading=false drag=false
+2026-11-17 20:22:28.303 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946948.361 up=286.668 reading=false drag=false
+2026-11-17 20:22:28.305 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=4 epoch=1794946948.363 gap=2.000 sinceLastSpaceTap=2.001 before{len=14 u16=14 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:22:28.305 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794946948.363 before{len=14 u16=14 last=[0020,0020]} afterLen=-1 postWordLen=-1 atEndOfWord=true
+2026-11-17 20:22:28.305 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794946948.363 before{len=14 u16=14 last=[002E,0020]}
+2026-11-17 20:22:28.316 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946948.374 up=286.681 reading=false drag=false
+2026-11-17 20:22:37.601 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946957.663 up=295.966 reading=false drag=false
+2026-11-17 20:22:37.671 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946957.733 up=296.036 reading=false drag=false
+2026-11-17 20:22:37.672 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=5 epoch=1794946957.735 gap=9.368 sinceLastSpaceTap=9.372 before{len=20 u16=20 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:22:37.683 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946957.746 up=296.048 reading=false drag=false
+2026-11-17 20:22:39.587 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946959.651 up=297.952 reading=false drag=false
+2026-11-17 20:22:39.653 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946959.717 up=298.018 reading=false drag=false
+2026-11-17 20:22:39.655 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=6 epoch=1794946959.719 gap=1.982 sinceLastSpaceTap=1.983 before{len=21 u16=21 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:22:39.655 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794946959.719 before{len=21 u16=21 last=[0020,0020]} afterLen=-1 postWordLen=-1 atEndOfWord=true
+2026-11-17 20:22:39.655 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794946959.719 before{len=21 u16=21 last=[002E,0020]}
+2026-11-17 20:22:39.669 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946959.733 up=298.034 reading=false drag=false
+2026-11-17 20:22:54.110 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946974.181 up=312.475 reading=false drag=false
+2026-11-17 20:22:54.186 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946974.257 up=312.551 reading=false drag=false
+2026-11-17 20:22:54.188 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=7 epoch=1794946974.260 gap=14.534 sinceLastSpaceTap=14.541 before{len=6 u16=6 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:22:54.203 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946974.274 up=312.568 reading=false drag=false
+2026-11-17 20:22:56.857 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946976.929 up=315.222 reading=false drag=false
+2026-11-17 20:22:56.936 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946977.009 up=315.301 reading=false drag=false
+2026-11-17 20:22:56.939 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=8 epoch=1794946977.011 gap=2.750 sinceLastSpaceTap=2.752 before{len=7 u16=7 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:22:56.939 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794946977.011 before{len=7 u16=7 last=[0020,0020]} afterLen=-1 postWordLen=-1 atEndOfWord=true
+2026-11-17 20:22:56.939 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794946977.011 before{len=7 u16=7 last=[002E,0020]}
+2026-11-17 20:22:56.955 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946977.027 up=315.320 reading=false drag=false
+2026-11-17 20:23:06.638 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946986.715 up=325.003 reading=false drag=false
+2026-11-17 20:23:06.720 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946986.797 up=325.085 reading=false drag=false
+2026-11-17 20:23:06.722 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=9 epoch=1794946986.799 gap=9.783 sinceLastSpaceTap=9.788 before{len=13 u16=13 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:23:06.735 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946986.812 up=325.100 reading=false drag=false
+2026-11-17 20:23:09.360 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946989.439 up=327.725 reading=false drag=false
+2026-11-17 20:23:09.436 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946989.515 up=327.801 reading=false drag=false
+2026-11-17 20:23:09.438 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=10 epoch=1794946989.517 gap=2.717 sinceLastSpaceTap=2.718 before{len=14 u16=14 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:23:09.438 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794946989.517 before{len=14 u16=14 last=[0020,0020]} afterLen=-1 postWordLen=-1 atEndOfWord=true
+2026-11-17 20:23:09.438 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794946989.517 before{len=14 u16=14 last=[002E,0020]}
+2026-11-17 20:23:09.451 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946989.530 up=327.816 reading=false drag=false
+2026-11-17 20:23:19.099 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794946999.182 up=337.464 reading=false drag=false
+2026-11-17 20:23:19.169 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794946999.253 up=337.534 reading=false drag=false
+2026-11-17 20:23:19.172 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=11 epoch=1794946999.255 gap=9.733 sinceLastSpaceTap=9.738 before{len=20 u16=20 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:23:19.183 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794946999.267 up=337.548 reading=false drag=false
+2026-11-17 20:23:21.809 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947001.894 up=340.174 reading=false drag=false
+2026-11-17 20:23:21.886 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947001.971 up=340.251 reading=false drag=false
+2026-11-17 20:23:21.888 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=12 epoch=1794947001.973 gap=2.717 sinceLastSpaceTap=2.718 before{len=21 u16=21 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:23:21.888 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794947001.973 before{len=21 u16=21 last=[0020,0020]} afterLen=-1 postWordLen=-1 atEndOfWord=true
+2026-11-17 20:23:21.888 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794947001.973 before{len=21 u16=21 last=[002E,0020]}
+2026-11-17 20:23:21.905 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947001.990 up=340.270 reading=false drag=false
+2026-11-17 20:23:36.397 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947016.489 up=354.762 reading=false drag=false
+2026-11-17 20:23:36.470 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947016.562 up=354.835 reading=false drag=false
+2026-11-17 20:23:36.473 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=13 epoch=1794947016.565 gap=14.585 sinceLastSpaceTap=14.592 before{len=6 u16=6 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:23:36.487 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947016.579 up=354.852 reading=false drag=false
+2026-11-17 20:23:40.442 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947020.536 up=358.806 reading=false drag=false
+2026-11-17 20:23:40.519 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947020.614 up=358.884 reading=false drag=false
+2026-11-17 20:23:40.521 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=14 epoch=1794947020.616 gap=4.049 sinceLastSpaceTap=4.051 before{len=7 u16=7 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=false
+2026-11-17 20:23:40.536 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947020.631 up=358.901 reading=false drag=false
+2026-11-17 20:23:49.957 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947030.056 up=368.322 reading=false drag=false
+2026-11-17 20:23:50.036 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947030.135 up=368.401 reading=false drag=false
+2026-11-17 20:23:50.038 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=15 epoch=1794947030.137 gap=9.517 sinceLastSpaceTap=9.521 before{len=13 u16=13 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:23:50.050 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947030.149 up=368.415 reading=false drag=false
+2026-11-17 20:23:53.959 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947034.060 up=372.324 reading=false drag=false
+2026-11-17 20:23:54.036 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947034.137 up=372.401 reading=false drag=false
+2026-11-17 20:23:54.038 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=16 epoch=1794947034.139 gap=4.000 sinceLastSpaceTap=4.002 before{len=14 u16=14 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=false
+2026-11-17 20:23:54.051 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947034.152 up=372.416 reading=false drag=false
+2026-11-17 20:24:03.444 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947043.550 up=381.809 reading=false drag=false
+2026-11-17 20:24:03.520 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947043.625 up=381.884 reading=false drag=false
+2026-11-17 20:24:03.522 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=17 epoch=1794947043.628 gap=9.484 sinceLastSpaceTap=9.489 before{len=20 u16=20 last=[006F,0020]} afterLen=-1 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:24:03.537 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947043.642 up=381.902 reading=false drag=false
+2026-11-17 20:24:07.474 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947047.581 up=385.839 reading=false drag=false
+2026-11-17 20:24:07.553 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947047.661 up=385.918 reading=false drag=false
+2026-11-17 20:24:07.555 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=18 epoch=1794947047.663 gap=4.033 sinceLastSpaceTap=4.035 before{len=21 u16=21 last=[0020,0020]} afterLen=-1 newWord=true newSentence=false closable=true end=false
+2026-11-17 20:24:07.571 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947047.679 up=385.936 reading=false drag=false
+2026-11-17 20:30:20.804 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:30:20.804 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:30:20.805 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-17 20:30:21.036 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] bounds: height 461.000000 window 461.000000 pin 257.000000 active true
+2026-11-17 20:30:21.042 Db ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-17 20:30:38.327 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947438.630 up=776.692 reading=false drag=false
+2026-11-17 20:30:38.405 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947438.709 up=776.770 reading=false drag=false
+2026-11-17 20:30:38.408 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=19 epoch=1794947438.711 gap=390.852 sinceLastSpaceTap=17.613 before{len=6 u16=6 last=[006F,0020]} afterLen=5 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:30:38.419 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947438.722 up=776.784 reading=false drag=false
+2026-11-17 20:30:39.221 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947439.525 up=777.586 reading=false drag=false
+2026-11-17 20:30:39.303 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947439.606 up=777.668 reading=false drag=false
+2026-11-17 20:30:39.305 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=20 epoch=1794947439.609 gap=0.897 sinceLastSpaceTap=0.898 before{len=7 u16=7 last=[0020,0020]} afterLen=5 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:30:39.305 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794947439.609 before{len=7 u16=7 last=[0020,0020]} afterLen=5 postWordLen=5 atEndOfWord=false
+2026-11-17 20:30:39.305 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794947439.609 before{len=7 u16=7 last=[0020,0020]}
+2026-11-17 20:30:39.318 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947439.622 up=777.683 reading=false drag=false
+2026-11-17 20:31:03.655 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947463.971 up=802.020 reading=false drag=false
+2026-11-17 20:31:03.736 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947464.052 up=802.101 reading=false drag=false
+2026-11-17 20:31:03.738 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=21 epoch=1794947464.054 gap=24.433 sinceLastSpaceTap=24.446 before{len=6 u16=6 last=[006F,0020]} afterLen=5 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:31:03.749 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947464.065 up=802.114 reading=false drag=false
+2026-11-17 20:31:04.522 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947464.838 up=802.887 reading=false drag=false
+2026-11-17 20:31:04.603 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947464.919 up=802.968 reading=false drag=false
+2026-11-17 20:31:04.605 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=22 epoch=1794947464.922 gap=0.867 sinceLastSpaceTap=0.867 before{len=7 u16=7 last=[0020,0020]} afterLen=5 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:31:04.605 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794947464.922 before{len=7 u16=7 last=[0020,0020]} afterLen=5 postWordLen=5 atEndOfWord=false
+2026-11-17 20:31:04.606 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794947464.922 before{len=7 u16=7 last=[0020,0020]}
+2026-11-17 20:31:04.618 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947464.934 up=802.983 reading=false drag=false
+2026-11-17 20:31:28.684 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947489.013 up=827.049 reading=false drag=false
+2026-11-17 20:31:28.770 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947489.098 up=827.135 reading=false drag=false
+2026-11-17 20:31:28.771 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=23 epoch=1794947489.100 gap=24.166 sinceLastSpaceTap=24.178 before{len=6 u16=6 last=[006F,0020]} afterLen=5 newWord=true newSentence=false closable=false end=false
+2026-11-17 20:31:28.782 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947489.111 up=827.147 reading=false drag=false
+2026-11-17 20:31:29.531 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture press epoch=1794947489.860 up=827.896 reading=false drag=false
+2026-11-17 20:31:29.603 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture release epoch=1794947489.932 up=827.968 reading=false drag=false
+2026-11-17 20:31:29.605 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 release seq=24 epoch=1794947489.934 gap=0.834 sinceLastSpaceTap=0.834 before{len=7 u16=7 last=[0020,0020]} afterLen=5 newWord=true newSentence=false closable=true end=true
+2026-11-17 20:31:29.605 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-in epoch=1794947489.934 before{len=7 u16=7 last=[0020,0020]} afterLen=5 postWordLen=5 atEndOfWord=false
+2026-11-17 20:31:29.605 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 endSentence-out epoch=1794947489.934 before{len=7 u16=7 last=[0020,0020]}
+2026-11-17 20:31:29.616 Df ProtlyCIKeyboard[7653:7b39] [com.northprot.protly:p4] p4 gesture end epoch=1794947489.945 up=827.981 reading=false drag=false
