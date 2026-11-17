@@ -121,10 +121,11 @@ final class FieldGuardTests: XCTestCase {
                                            field: field("help", selected: "x")), .fieldChanged)
     }
 
-    /// The card's line says why in a few words, in the card's own style.
+    /// The card's line says why in a few words, in the card's own style. The selection line fits Replace and Read's
+    /// Insert alike.
     func testCopyOnlyLines() {
         XCTAssertEqual(FieldGuard.CopyOnly.fieldChanged.message, "The text changed while this ran. Copy the result instead.")
-        XCTAssertEqual(FieldGuard.CopyOnly.selection.message, "Selected text cannot be replaced. Copy the result instead.")
+        XCTAssertEqual(FieldGuard.CopyOnly.selection.message, "Protly does not type over selected text. Copy the result instead.")
     }
 
     /// keyboard-ui 003 (P6): Cancel moves the cursor back only while the text the read moved over is still just

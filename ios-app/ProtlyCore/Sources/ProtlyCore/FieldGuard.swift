@@ -38,7 +38,7 @@ public enum FieldGuard {
         /// The card's line under the result.
         public var message: String {
             switch self {
-            case .selection: "Selected text cannot be replaced. Copy the result instead."
+            case .selection: "Protly does not type over selected text. Copy the result instead."
             case .fieldChanged: "The text changed while this ran. Copy the result instead."
             }
         }
