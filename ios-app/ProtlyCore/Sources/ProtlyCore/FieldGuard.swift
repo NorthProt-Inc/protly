@@ -1,6 +1,7 @@
 // Whether the field still holds what protly read or inserted, so Insert and Undo delete only that text.
 // The keyboard deletes one character per call, `count` times: a field edited since the read (a paste or a
-// cut anywhere, the cursor moved) must stop the edit, not shift it onto the user's own text.
+// cut anywhere, the cursor moved) must stop the edit, not shift it onto the user's own text. Nothing is ever typed
+// over a selection (copyOnly).
 
 public enum FieldGuard {
     /// Insert over a whole-field read: the cursor is at the end and the text before it ends with all of it.
@@ -16,5 +17,35 @@ public enum FieldGuard {
     /// Cancel after a read: the cursor goes back only while the text the read moved over is still just before it.
     public static func canRestore(_ read: String, before: String) -> Bool {
         !read.isEmpty && before.hasSuffix(read)
+    }
+
+    /// Why a result card offers only Copy, never Replace (Translate, Polish) or Insert (Read).
+    public enum CopyOnly: Sendable, Equatable {
+        /// The text came from a selection, or text is selected now. Protly never types over a selection:
+        /// `selectedText` can hold only its start (the first 43 UTF-16 units after a select all of a long draft,
+        /// diagnosis P1a cause 3), so no check before the write and no Undo after it can cover the rest.
+        case selection
+        /// The field no longer holds what the read returned: typed or moved during the call (P10).
+        case fieldChanged
+
+        /// The card's line under the result.
+        public var message: String {
+            switch self {
+            case .selection: "Selected text cannot be replaced. Copy the result instead."
+            case .fieldChanged: "The text changed while this ran. Copy the result instead."
+            }
+        }
+    }
+
+    /// nil when the card may write its result: Replace over the whole-field read, or Insert (Read, `.in`) at the
+    /// cursor. `field` is what the proxy reports now; nil when the card opens, while the call still runs, so only where
+    /// the text came from decides then (a selection card is copy-only from the start; the field is checked once done).
+    public static func copyOnly(_ action: ActionMode, original: String, isSelection: Bool,
+                                field: FieldWatch.Observed?) -> CopyOnly? {
+        if isSelection { return .selection }
+        guard let field else { return nil }
+        if action != .in, !canReplace(original, before: field.before, after: field.after) { return .fieldChanged }
+        // Selected since the read: the first delete or the insert would take the selection.
+        return field.selected.isEmpty ? nil : .selection
     }
 }

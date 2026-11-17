@@ -51,6 +51,71 @@ final class FieldGuardTests: XCTestCase {
         XCTAssertTrue(FieldGuard.canUndo("\u{00C5}", before: "x\u{212B}"))
     }
 
+    // MARK: Copy-only cards (P10, P1a cause 3)
+
+    private func field(_ before: String, after: String = "", selected: String = "") -> FieldWatch.Observed {
+        FieldWatch.Observed(before: before, after: after, selected: selected)
+    }
+
+    /// P1a cause 3: after a select all of a long draft, `selectedText` held only its first 43 units, and the old guard
+    /// compared it with that same text. A card read from a selection never writes, however the field looks.
+    func testASelectionCardIsCopyOnlyFromTheStart() {
+        let cut = "First line of a long draft. Second line."  // what selectedText returned
+        for action in [ActionMode.out, .fix] {
+            XCTAssertEqual(FieldGuard.copyOnly(action, original: cut, isSelection: true, field: nil), .selection,
+                           "\(action): the card opens copy-only")
+            XCTAssertEqual(FieldGuard.copyOnly(action, original: cut, isSelection: true, field: field("", selected: cut)),
+                           .selection, "\(action): the selection still reads as read")
+            XCTAssertEqual(FieldGuard.copyOnly(action, original: cut, isSelection: true, field: field(cut)), .selection,
+                           "\(action): the selection is gone")
+        }
+    }
+
+    /// Read inserts at the cursor; over a selection it would type over text it never saw, and Undo would put back
+    /// only what `selectedText` showed.
+    func testReadNeverInsertsOverASelection() {
+        XCTAssertEqual(FieldGuard.copyOnly(.in, original: "", isSelection: false, field: field("Hi ", selected: "there")),
+                       .selection)
+        XCTAssertEqual(FieldGuard.copyOnly(.in, original: "", isSelection: false, field: field("", selected: draft)),
+                       .selection)
+        // No selection: the reply goes in at the cursor, wherever it is, as before.
+        XCTAssertNil(FieldGuard.copyOnly(.in, original: "", isSelection: false, field: nil))
+        XCTAssertNil(FieldGuard.copyOnly(.in, original: "", isSelection: false, field: field("")))
+        XCTAssertNil(FieldGuard.copyOnly(.in, original: "", isSelection: false, field: field("Hi ", after: " tail")))
+    }
+
+    /// A read without a selection keeps its rule: the card opens with Replace to come, and once done it writes only
+    /// while the field holds what was read (canReplace).
+    func testAWholeFieldReadWritesWhileTheFieldHoldsIt() {
+        for action in [ActionMode.out, .fix] {
+            XCTAssertNil(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: nil))
+            XCTAssertNil(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field(draft)))
+            XCTAssertNil(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field("Earlier. " + draft)))
+            XCTAssertEqual(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field(draft + "x")),
+                           .fieldChanged)
+            XCTAssertEqual(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field(draft, after: " tail")),
+                           .fieldChanged)
+            XCTAssertEqual(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field("")), .fieldChanged)
+        }
+    }
+
+    /// Text selected after a whole-field read: the field before the selection still ends with the read text, but a
+    /// delete would take the selection first and then the end of the draft.
+    func testNoReplaceOverASelectionMadeAfterTheRead() {
+        XCTAssertTrue(FieldGuard.canReplace("hello", before: "hello", after: ""))
+        XCTAssertEqual(FieldGuard.copyOnly(.out, original: "hello", isSelection: false,
+                                           field: field("hello", selected: " world")), .selection)
+        // A field that changed says so, selection or not.
+        XCTAssertEqual(FieldGuard.copyOnly(.out, original: "hello", isSelection: false,
+                                           field: field("help", selected: "x")), .fieldChanged)
+    }
+
+    /// The card's line says why in a few words, in the card's own style.
+    func testCopyOnlyLines() {
+        XCTAssertEqual(FieldGuard.CopyOnly.fieldChanged.message, "The text changed while this ran. Copy the result instead.")
+        XCTAssertEqual(FieldGuard.CopyOnly.selection.message, "Selected text cannot be replaced. Copy the result instead.")
+    }
+
     /// keyboard-ui 003 (P6): Cancel moves the cursor back only while the text the read moved over is still just
     /// before it.
     func testRestoreOnlyWhileTheReadTextIsBeforeTheCursor() {
