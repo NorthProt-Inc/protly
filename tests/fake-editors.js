@@ -60,7 +60,7 @@ function writeAtSelection(el, nodes) {
 
 // el becomes an editor of kind 'lexical' | 'draft' | 'slate' (its DOM marker), or a plain contenteditable (kind
 // null, like Quill 1.x: it handles a paste on its own without preventDefault, and insertText keeps lines).
-// paste(text, el): what the editor renders for a paste (a string: one <p> per line; undefined: the callback rendered
+// paste(text): what the editor renders for a paste (a string: one <p> per line; undefined: the callback rendered
 // it itself); null: it ignores pastes (no preventDefault, no change). Returns the log of pastes (their text) and
 // insertText calls.
 export function fakeEditor(el, { kind = 'lexical', paste = (t) => t } = {}) {
@@ -75,10 +75,11 @@ export function fakeEditor(el, { kind = 'lexical', paste = (t) => t } = {}) {
     if (!kind) { writeAtSelection(el, paragraphs(doc, text.split('\n'))); return; } // Quill-like: no preventDefault
     if (paste === null) return;
     e.preventDefault();
-    const shown = paste(text, el);
+    const shown = paste(text);
     if (shown !== undefined) writeAtSelection(el, paragraphs(doc, shown.split('\n')));
   });
-  doc.execCommand = (cmd, ui, text) => {
+  doc.execCommand = (...args) => {
+    const text = args[2]; // execCommand('insertText', false, text)
     log.inserts.push(text);
     // Lexical's selection.insertText drops the line breaks.
     writeAtSelection(el, paragraphs(doc, kind === 'lexical' ? [text.replace(/\n/g, '')] : text.split('\n')));

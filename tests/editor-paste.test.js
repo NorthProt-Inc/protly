@@ -205,7 +205,7 @@ test('generic, Lexical: a line break added at the end during the request is refu
 test('generic, Lexical: Esc during the check, then a refused roll-back: a toast says so, nothing more is written', async () => {
   // The translation renders late, as plain-text Lexical with a line break after it: the roll-back is refused.
   const LATE = '<p><span>A1</span><br><span>B2</span><br><span>C3</span><br><br></p>';
-  const s = generic({ kind: 'lexical', paste: (t, el) => { setTimeout(() => { el.innerHTML = LATE; }, 80); } });
+  const s = generic({ kind: 'lexical', paste: () => { setTimeout(() => { s.el.innerHTML = LATE; }, 80); } });
   s.el.innerHTML = TYPED;
   s.el.focus();
   s.inst.run({ source: 'command' });
