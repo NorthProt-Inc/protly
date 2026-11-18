@@ -6,6 +6,7 @@ import { commitByRefocus, nextFrame, settleComposition } from '../lib/ime.js';
 import { decideBox, decideSelection } from './decide.js';
 import { deepActive, findTarget, selectionInfo } from './target.js';
 import { boxHolds, readBox, writeBox } from './writer.js';
+import { cutShortMessage, cutsShort } from '../lib/editable.js';
 import { isUndoKey } from '../lib/command.js';
 import { addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../lib/lang.js';
 
@@ -152,6 +153,12 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   }
 
   async function request(cur) {
+    // A box the write would cut short is refused before the billed call: a re-run (Deep, the language chip, Alt+T,
+    // Replace anyway) can find the shown translation in that shape. doBox refuses a first call with a toast instead.
+    if (cur.t.kind !== 'text' && cutsShort(cur.t.el)) {
+      cur.card.message(cutShortMessage(cur.t.el), { error: true, actions: actionsFor(cur) });
+      return;
+    }
     const reqId = ++seq;
     cur.reqId = reqId;
     cur.prev = cur.mode;
@@ -200,8 +207,8 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
         : 'Could not write into this box. Check the text: Ctrl+Z may bring it back.', { error: true, actions: actionsFor(cur) });
       return;
     }
-    if (!live()) { // Esc landed while the write was verified: put the text back
-      if (holdsFocus(cur)) await writeBox(cur.t, before);
+    if (!live()) { // Esc landed while the write was verified: put the text back (a toast if that fails)
+      if (holdsFocus(cur)) await restore(cur.t, before);
       return;
     }
     Object.assign(cur, { mode: 'preview', shown: r.translation, last: r, lang: polish ? null : (r.lang ?? cur.lang) });
@@ -257,6 +264,8 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       const d = decideBox(original);
       if (d.kind === 'notes-only') { toast(NOTES_ONLY); return; }
       if (d.kind === 'none') { toast('Nothing to translate or polish in this box.'); return; }
+      // A draft the write would cut short is refused before the billed request; writeBox checks again.
+      if (t.kind !== 'text' && cutsShort(t.el)) { toast(cutShortMessage(t.el)); return; }
       close();
       kept = null;
       const card = createCard({ doc: t.doc, place: { float: () => t.el.getBoundingClientRect() } });
