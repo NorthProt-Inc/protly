@@ -15,6 +15,8 @@ const KO = ['가나다', '라마바', '사아자'];
 const EN = 'A1\nB2\nC3';
 // Lexical after Shift+Enter between the lines and after the last one: the line break plus Lexical's caret <br>.
 const TRAILING = '<p><span>가나다</span><br><span>라마바</span><br><span>사아자</span><br><br></p>';
+// A line ending in an inline decorator: Lexical adds its caret <br> after it.
+const DECORATOR = '<p><span>가나다</span><span data-lexical-decorator="true" contenteditable="false">@민지</span><br></p>';
 
 function page() {
   const d = new JSDOM('<body><div id="b" contenteditable="true" tabindex="0"></div><input id="o"></body>').window.document;
@@ -165,19 +167,24 @@ test('generic, Lexical: a write that fails its check is restored by the same pas
   assert.deepEqual(nonblank(s.el.innerText), KO);
 });
 
-test('generic, Lexical: a draft whose lines end in a line break is refused before any request, with what to do', async () => {
-  const s = generic({ kind: 'lexical' });
-  s.el.innerHTML = TRAILING;
-  s.el.focus();
-  s.inst.run({ source: 'command' });
-  await until(() => /empty line/.test(s.toasts()));
-  await sleep(SETTLED);
-  assert.match(s.toasts(), /Delete the empty line at the end of the message, then try again\./);
-  assert.equal(s.asked.length, 0); // nothing billed
-  assert.equal(s.msg(), null);
-  assert.deepEqual(s.log.pastes, []);
-  assert.deepEqual(s.log.inserts, []);
-  assert.equal(s.el.innerHTML, TRAILING);
+test('generic, Lexical: a draft the write would cut short is refused before any request, saying what to do', async () => {
+  for (const [html, what, not] of [
+    [TRAILING, 'Delete the empty line at the end of the message, then try again.', /Type a space/],
+    [DECORATOR, 'Type a space at the end of the message, then try again.', /empty line/], // Lexical's caret <br>
+  ]) {
+    const s = generic({ kind: 'lexical' });
+    s.el.innerHTML = html;
+    s.el.focus();
+    s.inst.run({ source: 'command' });
+    await until(() => s.toasts().includes(what));
+    await sleep(SETTLED);
+    assert.doesNotMatch(s.toasts(), not);
+    assert.equal(s.asked.length, 0); // nothing billed
+    assert.equal(s.msg(), null);
+    assert.deepEqual(s.log.pastes, []);
+    assert.deepEqual(s.log.inserts, []);
+    assert.equal(s.el.innerHTML, html);
+  }
 });
 
 test('generic, Lexical: a line break added at the end during the request is refused at the write, untouched', async () => {

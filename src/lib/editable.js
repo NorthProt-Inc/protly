@@ -26,8 +26,12 @@ export function editableText(root) {
 // without preventDefault (Quill 1.x) would get the text twice if defaultPrevented picked the path.
 const PASTE_EDITORS = '[data-lexical-editor], .public-DraftEditor-content, [data-slate-editor]';
 
-// What the user is told when cutsShort() refuses a draft before the request.
-export const CUT_SHORT = 'Delete the empty line at the end of the message, then try again.';
+// The child elements of a Lexical editor's last block; a trailing list's block is its last item.
+function lastBlockKids(el) {
+  let block = el.lastElementChild;
+  while (block && (block.nodeName === 'UL' || block.nodeName === 'OL')) block = block.lastElementChild;
+  return [...(block?.children ?? [])];
+}
 
 // A Lexical draft whose last block ends in a <br> (a line break: Shift+Enter after the last line, Enter in plain-text
 // Lexical; or the caret <br> after an inline decorator) and holds more than one inline node before it
@@ -38,10 +42,18 @@ export const CUT_SHORT = 'Delete the empty line at the end of the message, then 
 // an empty last paragraph (<p><br></p>), are written whole.
 export function cutsShort(el) {
   if (!el.matches?.('[data-lexical-editor]')) return false;
-  let block = el.lastElementChild;
-  while (block && (block.nodeName === 'UL' || block.nodeName === 'OL')) block = block.lastElementChild;
-  const kids = [...(block?.children ?? [])];
+  const kids = lastBlockKids(el);
   return kids.at(-1)?.nodeName === 'BR' && kids.slice(1).some((k) => k.nodeName !== 'BR');
+}
+
+// What to do about a draft cutsShort() refuses, as the user sees it. A <br> before the last one is a real empty line.
+// A lone last <br> is Lexical's caret <br> after an inline decorator, which the user cannot see: Lexical adds it only
+// while the block's last child is a line break or an inline decorator (0.53 LexicalReconciler.ts,
+// $isLastChildLineBreakOrDecorator), so a typed space, a text node after the decorator, removes it.
+export function cutShortMessage(el) {
+  return lastBlockKids(el).at(-2)?.nodeName === 'BR'
+    ? 'Delete the empty line at the end of the message, then try again.'
+    : 'Type a space at the end of the message, then try again.';
 }
 
 // Replaces the selection (a select-all) with text: a synthetic paste on the editors above, with no insertText after it

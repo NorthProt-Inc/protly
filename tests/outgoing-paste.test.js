@@ -12,6 +12,8 @@ const KO = ['가나다', '라마바', '사아자'];
 const EN = 'A1\nB2\nC3';
 const TYPED = '<p><span>가나다</span><br><span>라마바</span><br><span>사아자</span></p>'; // Shift+Enter between lines
 const TRAILING = '<p><span>가나다</span><br><span>라마바</span><br><span>사아자</span><br><br></p>'; // and after the last
+// A line ending in an inline decorator: Lexical adds its caret <br> after it.
+const DECORATOR = '<p><span>가나다</span><span data-lexical-decorator="true" contenteditable="false">@민지</span><br></p>';
 
 const pending = [];
 const { win, composer: first } = await mountInstagram({
@@ -126,16 +128,20 @@ test('a write that fails its check: the Korean is pasted back line for line and 
   assert.deepEqual(nonblank(composer.innerText), KO);
 });
 
-test('a draft whose lines end in a line break is refused before any request, with what to do', async () => {
-  const log = freshComposer(TRAILING);
-  assert.equal(enter().defaultPrevented, true);
-  await until(() => /empty line/.test(cardPart('.msg') || ''));
-  await sleep(SETTLED);
-  assert.equal(cardPart('.msg'), 'Translation failed: Delete the empty line at the end of the message, then try again.');
-  assert.equal(pending.length, 0); // nothing billed
-  assert.deepEqual(log.pastes, []);
-  assert.deepEqual(log.inserts, []);
-  assert.equal(composer.innerHTML, TRAILING);
+test('a draft the write would cut short is refused before any request, saying what to do about what the user sees', async () => {
+  for (const [html, what] of [
+    [TRAILING, 'Delete the empty line at the end of the message, then try again.'],
+    [DECORATOR, 'Type a space at the end of the message, then try again.'], // Lexical's caret <br>, no empty line
+  ]) {
+    const log = freshComposer(html);
+    assert.equal(enter().defaultPrevented, true);
+    await until(() => cardPart('.msg') === `Translation failed: ${what}`);
+    await sleep(SETTLED);
+    assert.equal(pending.length, 0); // nothing billed
+    assert.deepEqual(log.pastes, []);
+    assert.deepEqual(log.inserts, []);
+    assert.equal(composer.innerHTML, html);
+  }
 });
 
 test('a line break added at the end during the request is refused at the write: the draft as it was, the failure shown', async () => {

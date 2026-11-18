@@ -1,7 +1,7 @@
 import { initial, reduce } from '../lib/preview.js';
 import { hasHangul, hasNotes, prefixTarget } from '../lib/lang.js';
 import { getComposerText, setComposerText } from './dom.js';
-import { CUT_SHORT, cutsShort } from '../lib/editable.js';
+import { cutShortMessage, cutsShort } from '../lib/editable.js';
 import { ask, getCurrent, getSite, contextFor, bannerFor } from './main.js';
 import { flags } from '../lib/flags.js';
 import { createCard } from '../ui/card.js';
@@ -117,7 +117,7 @@ export function mountOutgoing(cur) {
       case 'translate': {
         // A draft the write would cut short is refused before the billed request; the write checks again (a line
         // break typed during the request keeps the same text by norm()).
-        if (c && cutsShort(c)) { dispatch({ type: 'fail', reqId: effect.reqId, message: CUT_SHORT }); break; }
+        if (c && cutsShort(c)) { dispatch({ type: 'fail', reqId: effect.reqId, message: cutShortMessage(c) }); break; }
         if (c) srcText = getComposerText(c);
         const verb = effect.kind === 'polish' ? 'Polishing' : 'Translating';
         cardFor()?.working(effect.profile === 'hard' ? `${verb} deeply` : verb);
