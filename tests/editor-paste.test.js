@@ -202,6 +202,26 @@ test('generic, Lexical: a line break added at the end during the request is refu
   assert.equal(s.el.innerHTML, TRAILING);
 });
 
+test('generic, Lexical: a re-run on a shown translation the write would cut short is refused on the card, no call', async () => {
+  // Plain-text Lexical, one line and a Shift+Enter: written whole, but the paste keeps the line break, so the shown
+  // translation is the cut-short shape. Deep, the language chip, Alt+T and Replace anyway all re-run through request().
+  const SHOWN = '<p><span>A1</span><br><span>B2</span><br><span>C3</span><br><br></p>';
+  const s = generic({ kind: 'lexical', paste: (t) => { if (t !== EN) return t; s.el.innerHTML = SHOWN; return undefined; } });
+  s.el.innerHTML = '<p><span>가나다</span><br><br></p>';
+  s.el.focus();
+  s.inst.run({ source: 'command' });
+  await until(() => s.pending.length === 1);
+  s.reply(EN);
+  await until(() => s.btn('Deep'));
+  s.btn('Deep').click();
+  await until(() => /empty line/.test(s.msg() || ''));
+  await sleep(SETTLED);
+  assert.equal(s.msg(), 'Delete the empty line at the end of the message, then try again.');
+  assert.equal(s.asked.length, 1); // no second billed call
+  assert.ok(s.btn('Undo')); // still the preview's way back
+  assert.equal(s.el.innerHTML, SHOWN);
+});
+
 test('generic, Lexical: Esc during the check, then a refused roll-back: a toast says so, nothing more is written', async () => {
   // The translation renders late, as plain-text Lexical with a line break after it: the roll-back is refused.
   const LATE = '<p><span>A1</span><br><span>B2</span><br><span>C3</span><br><br></p>';

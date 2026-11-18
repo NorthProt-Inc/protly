@@ -153,6 +153,12 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   }
 
   async function request(cur) {
+    // A box the write would cut short is refused before the billed call: a re-run (Deep, the language chip, Alt+T,
+    // Replace anyway) can find the shown translation in that shape. doBox refuses a first call with a toast instead.
+    if (cur.t.kind !== 'text' && cutsShort(cur.t.el)) {
+      cur.card.message(cutShortMessage(cur.t.el), { error: true, actions: actionsFor(cur) });
+      return;
+    }
     const reqId = ++seq;
     cur.reqId = reqId;
     cur.prev = cur.mode;
