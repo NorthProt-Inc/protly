@@ -550,9 +550,14 @@ enum FieldText {
         let lb = c.before.count, la = c.after.count, ends = new.utf16.reversed().starts(with: c.before.reversed()) ? 1 : 0
         // The check moves the cursor: only in the field Replace wrote to (silent-failure review: the user may have
         // tapped another field while the strip said "Replacing the text…").
-        let here = { FieldGuard.focus(before: doc0, now: document()) != .other }
-        let check = shown && !Task.isCancelled && here() ? await holds(new, p, here: here)
-            : (ok: false, tries: 0, why: here() ? "gate" : "focus")
+        // A local function, not a closure value: it captures the non-escaping `document` (Xcode refused the closure).
+        func here() -> Bool { FieldGuard.focus(before: doc0, now: document()) != .other }
+        var check = (ok: false, tries: 0, why: "gate")
+        if !here() {
+            check.why = "focus"
+        } else if shown, !Task.isCancelled {
+            check = await holds(new, p, here: here)
+        }
         let held = check.ok, tries = check.tries, why = check.why
         let inserted = size, heldMS = ms(since: t0), ok = held ? 1 : 0, gate = shown ? 1 : 0
         let empty = emptied ? 1 : 0, seen = hostEvents - events0, cancelled = Task.isCancelled ? 1 : 0
