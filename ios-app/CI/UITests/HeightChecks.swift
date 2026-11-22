@@ -10,11 +10,15 @@ import XCTest
 /// (`hb-apple`). Each `hb-<path>` item collects the shots of one path across the sections and PASSes only when every
 /// shot is on Protly, its band is within `bandTolerance` of Apple's and row 1 is within `bandTolerance` of `row1`.
 /// Each shot also logs `HEIGHT <id> <n> ...` and `MARK <id>-<n> <epoch>` in ui-log.txt, so the keyboard's own height
-/// log (keyboard-log.txt) lines up by time. Records only lengths, counts and timings.
+/// log (keyboard-log.txt) lines up by time. A shot also records iOS's own placeholder for the keyboard on the host's
+/// side (`/ph<top>+<height>`, the element `inputView`): 17 pt shorter than Protly's view (plus the dock) when iOS
+/// draws no margin above the keyboard, Protly's full height when it does. The keyboard cannot see it; the test can.
+/// A relaunch that came up on another keyboard and picked Protly from the globe list is marked `/picked`. Records
+/// only lengths, counts and timings.
 extension PhoneRun {
     /// The same order as checks.py's HEIGHT_IDS.
-    static let heightIDs = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-hide-used", "hb-globe", "hb-emoji",
-                            "hb-switch", "hb-card", "hb-cancel"]
+    static let heightIDs = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji",
+                            "hb-hide-emoji", "hb-switch", "hb-hide-switch", "hb-switch-hidden", "hb-card", "hb-cancel"]
     static let heightArguments = ["-fills", Stub.draft("ok")]
     /// measure.py's BAND_TOLERANCE.
     static let bandTolerance: CGFloat = 1.0
@@ -28,58 +32,84 @@ extension PhoneRun {
         let board: Board
         let reached: Bool
         let screen: XCUIScreenshot
+        let placeholder: CGRect?
+        var picked = false
 
         var band: CGFloat? { top.flatMap { t in row1.map { $0 - t } } }
 
         var text: String {
             func f(_ v: CGFloat?) -> String { v.map { String(format: "%.2f", Double($0)) } ?? "none" }
             return "\(f(band))@\(f(top))/\(f(row1))" + (board == .protly ? "" : "/\(board.rawValue)")
-                + (reached ? "" : "/unreached")
+                + (reached ? "" : "/unreached") + (picked ? "/picked" : "")
+                + (placeholder.map { "/ph\(f($0.minY))+\(f($0.height))" } ?? "/ph-none")
         }
     }
 
     func heightChecks() {
         if notReady(PhoneRun.heightIDs) { return }
         var shots: [String: [HeightShot]] = [:]
-        func take(_ id: String, _ reached: Bool, settle: TimeInterval = 1.5) {
+        func take(_ id: String, _ reached: Bool, settle: TimeInterval = 1.5, picked: Bool = false) {
             shots[id, default: []].append(heightShot(id, (shots[id]?.count ?? 0) + 1, reached: reached,
-                                                     settle: settle))
+                                                     settle: settle, picked: picked))
         }
+        func launch() {
+            let (reached, picked) = heightRelaunch()
+            take("hb-launch", reached, picked: picked)
+        }
+        // Hide/show in a used host is one ID per what used it (`hb-hide-globe`, `-emoji`, `-switch`): iOS's look
+        // after a hide/show is the look of the presentation before (HostLook, rule 3).
         // 1. A fresh host, then hide/show in it: 3 with 1 s hidden, 2 with 5 s hidden. Ends with an Emoji round trip
         // from the fresh host.
-        take("hb-launch", heightRelaunch())
+        launch()
         for hidden in [1.0, 1, 1, 5, 5] { take("hb-hide-fresh", heightRefocus(hidden)) }
         take("hb-emoji", heightEmoji())
         // 2. Apple's English keyboard (the reference band), then Protly picked with the globe right after it, and
         // hide/show in the host that has now shown Apple's keyboard.
-        take("hb-launch", heightRelaunch())
+        launch()
         for _ in 0..<5 {
             d.switchToEnglish()
             take("hb-apple", d.current() == .english)
             take("hb-globe", d.pick(.protly) || d.cycle(to: .protly, taps: 3))
-            take("hb-hide-used", heightRefocus(1))
+            take("hb-hide-globe", heightRefocus(1))
         }
-        // 3. The Emoji round trip in a used host, each followed by hide/show.
-        take("hb-launch", heightRelaunch())
+        // 3. The Emoji round trip in a used host (after the globe pick), each followed by hide/show.
+        launch()
         d.switchToEnglish()
         take("hb-globe", d.pick(.protly) || d.cycle(to: .protly, taps: 3))
         for _ in 0..<5 {
             take("hb-emoji", heightEmoji())
-            take("hb-hide-used", heightRefocus(1))
+            take("hb-hide-emoji", heightRefocus(1))
         }
         // 4. An app switch back with the keyboard up, each followed by hide/show (a host that has been in the
-        // background).
-        take("hb-launch", heightRelaunch())
+        // background), then the Emoji round trip after it (the full run's 05-after-second-emoji path).
+        launch()
         for hidden in [1.0, 1, 1, 5, 5] {
             take("hb-switch", heightAppSwitch())
-            take("hb-hide-used", heightRefocus(hidden))
+            take("hb-hide-switch", heightRefocus(hidden))
         }
-        // 5. The result card from a stub Translate call and the keys after Cancel, in a used host.
-        take("hb-launch", heightRelaunch())
+        for _ in 0..<3 {
+            take("hb-emoji", heightEmoji())
+            take("hb-hide-emoji", heightRefocus(1))
+        }
+        // 5. An app switch with the keyboard hidden, then the field tapped: no keyboard is up while the host is away.
+        launch()
+        for _ in 0..<5 {
+            d.dismissKeyboard()
+            d.pause(1)
+            XCUIDevice.shared.press(.home)
+            d.pause(2)
+            d.app.activate()
+            d.pause(1)
+            d.focusField()
+            d.waitOutStandIn()
+            take("hb-switch-hidden", d.wait(for: .protly, timeout: 3))
+        }
+        // 6. The result card from a stub Translate call and the keys after Cancel, after an app switch with the keyboard
+        // up (the keyboard's shortest pin).
+        launch()
         if accessReadyQuiet() {
-            d.switchToEnglish()
-            _ = d.pick(.protly) || d.cycle(to: .protly, taps: 3)
-            for _ in 0..<5 { heightCard(take) }
+            take("hb-switch", heightAppSwitch())
+            for _ in 0..<5 { heightCard { take($0, $1, settle: $2) } }
         }
         let apple = shots["hb-apple"] ?? []
         let appleBands = apple.compactMap { $0.board == .english ? $0.band : nil }
@@ -142,12 +172,16 @@ extension PhoneRun {
         finish(item, screen: list.first?.screen)
     }
 
-    private func heightRelaunch() -> Bool {
+    /// Reached: Protly is up. Picked: it came up on another keyboard and Protly was picked from the globe list, so
+    /// the shot shows the globe path, not a fresh presentation (run 161's hb-launch-2).
+    private func heightRelaunch() -> (reached: Bool, picked: Bool) {
         d.app.terminate()
         d.launch(arguments: PhoneRun.heightArguments)
         if !d.waitForKeyboard() { d.focusField() }
         d.waitOutStandIn()
-        return d.wait(for: .protly, timeout: 3) || d.pick(.protly)
+        if d.wait(for: .protly, timeout: 3) { return (true, false) }
+        d.log("hb-launch: came up on \(d.current().rawValue), picking Protly")
+        return (d.pick(.protly), true)
     }
 
     /// Hides the keyboard with the host's Dismiss button, waits `hidden` seconds and taps the field again.
@@ -192,8 +226,17 @@ extension PhoneRun {
         }
     }
 
+    /// iOS's placeholder for the keyboard on the host's side, in points: nil when there is none.
+    private func placeholder() -> CGRect? {
+        let element = d.app.otherElements.matching(identifier: "inputView").firstMatch
+        guard element.exists else { return nil }
+        let frame = element.frame
+        return frame.isEmpty ? nil : frame
+    }
+
     /// Measures the screen after `settle`. Saves h-<path>-<n>.png for every shot.
-    private func heightShot(_ id: String, _ i: Int, reached: Bool, settle: TimeInterval) -> HeightShot {
+    private func heightShot(_ id: String, _ i: Int, reached: Bool, settle: TimeInterval, picked: Bool = false)
+        -> HeightShot {
         d.pause(settle)
         let board = d.current()
         let screen = XCUIScreen.main.screenshot()
@@ -204,7 +247,9 @@ extension PhoneRun {
             top = CGFloat(t) / shot.scale
             row1 = shot.row1Top(below: t, column: d.keyX(row: 0, index: 1))
         }
-        let result = HeightShot(top: top, row1: row1, board: board, reached: reached, screen: screen)
+        var result = HeightShot(top: top, row1: row1, board: board, reached: reached, screen: screen,
+                                placeholder: placeholder())
+        result.picked = picked
         d.savePNG("h-\(id.dropFirst(3))-\(i < 10 ? "0" : "")\(i)", screen)
         d.log("HEIGHT \(id) \(i) \(result.text)")
         return result

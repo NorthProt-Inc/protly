@@ -69,8 +69,9 @@ After the layout scenarios, `UITests/PhoneChecksUITests.swift` runs the phone ch
 `test0_access`, `test0_probe` (only with `[probe]` in the commit message; Sprint 002's probe since then), `test1_68`,
 `test2_ws`, `test3_85offline`, `test4_memory`, `test5_icon`, the typing-fixes methods `test5a_web`, `test5b_menu` and
 `test5c_pad`, the keyboard-ui methods `test5d_card` and `test5e_bar` (below), `test5f_period` (the double-space
-period, below; only in a filtered run), then the network groups `test6_85net` and `test7_77` (below); learned words
-carry over between them.
+period, below; only in a filtered run), then the network groups `test6_85net` and `test7_77` (below), and
+`test9_height` (the keyboard's height on every presentation path, below; only in a filtered run); learned words carry
+over between them.
 
 - `UITests/Driver.swift`: the shared helpers. Text is typed by coordinate: Hangul as its Dubeolsik keys
   (ProtlyCore `KeyEncoder`, linked into the UI tests), capitals and shifted jamo with a shift tap, symbols on the
@@ -279,6 +280,30 @@ logging. Every line is `PENDING` with the field before the first try (`t0`) and 
   `test_checks.py` also checks that `PhoneRun.periodCases` lists the same kinds as checks.py, with enough tries.
 - The probe's held space (the trackpad, which types nothing by design) stays out: K4E leaves the 0.4 s hold and the
   3.0 s window as they are.
+
+## Height checks (fix/keyboard-height, K2)
+
+Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis branch until it lands). Code:
+`UITests/HeightChecks.swift`, method `PhoneChecksUITests/test9_height`, ported from the probe on `diag/p2-height`.
+
+- **Filtered runs only**, like `test5f_period` (about 15 minutes): run it with
+  `[shots:PhoneChecksUITests/test9_height]`. A full run marks its IDs `NOT-RUN` (`FILTERED_ONLY` in checks.py).
+- **Every shot** is measured the way measure.py measures the layout scenarios: the glass top and row 1's top along
+  the second key's column, band = row 1 - top. ui-log.txt has `HEIGHT <id> <n> <band>@<top>/<row1>[/<board>]
+  [/unreached][/picked]/ph<top>+<height>` and `MARK <id>-<n> <epoch>` (for keyboard-log.txt). `ph` is iOS's own
+  placeholder for the keyboard on the host's side (the element `inputView`): its top is 17 pt below the glass top in
+  both of iOS's looks, and its height is Protly's view plus the dock, 17 pt less when iOS draws no margin above the
+  keyboard. `picked`: the relaunch came up on another keyboard and Protly was picked from the globe list.
+- **IDs.** `hb-apple` (RECORD): Apple's English keyboard, 5 shots, the reference band (the median). Each other ID
+  collects one path's shots across six sections that each start with a relaunch, and PASSes only when every shot is
+  on Protly with its band within 1 pt of Apple's and row 1 within 1 pt of 564 (iPhone 13 Pro):
+  `hb-launch` (the relaunch at each section's start), `hb-hide-fresh` (hide and show in a fresh host, 1 s and 5 s
+  hidden), `hb-globe` (Protly picked right after Apple's English keyboard), `hb-hide-globe` (hide and show after it),
+  `hb-emoji` (the Emoji round trip in a fresh host, after the globe pick and after an app switch), `hb-hide-emoji` (hide
+  and show after it), `hb-switch` (an app switch back with the keyboard up), `hb-hide-switch` (hide and show after
+  it), `hb-switch-hidden` (an app switch with the keyboard hidden, then the field tapped), `hb-card` (a stub
+  Translate's finished card after an app switch, judged by the glass top only: it covers row 1) and `hb-cancel` (the
+  keys after the card's Cancel). Fewer than 5 shots, or no Apple band, is FAIL `unreadable`.
 
 ## Reading a run without GitHub access
 
