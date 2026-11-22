@@ -3,22 +3,17 @@ import Foundation
 import KeyboardKit
 import ObjectiveC
 import os
+import ProtlyCore
 import UIKit
 
-/// Pins the keyboard's height in portrait so every presentation (first open, Emoji round-trip, app switch) shows
-/// the same band above row 1 (Sprint 5; docs/ios-keyboard-notes.md, "Simulator verification"). Landscape keeps
-/// iOS's own height: its rows are KeyboardKit's, not ProtlyGeometry's.
+/// Pins the keyboard's height in portrait so the band above row 1 is Apple's in every presentation (K2,
+/// docs/research/2026-11-17-keyboard-diagnosis.md, P2). Landscape keeps iOS's own height: its rows are KeyboardKit's,
+/// not ProtlyGeometry's.
 ///
-/// iOS draws its glass `hostTopMargin` above the height it gives a third-party keyboard. On a fresh presentation it
-/// takes that margin out of the keyboard's own height, so the glass starts at the view's top. When the host app
-/// comes back from the background with the keyboard up, it keeps the full height and draws the margin above the
-/// view: an empty band 17 pt too tall (simulator runs 1-4). That path attaches a new controller to the kept
-/// presentation and sends it NSExtensionHostDidBecomeActive about 0.23 s after it loads, sometimes after its first
-/// layout (runs 5 and 6). Then the pin drops by the margin, and ProtlyRoot keeps the content at the bottom, so only
-/// the empty top of the bar's band goes under iOS's margin. A controller older than `freshWindow` ignores the
-/// notification (Control Center, an alert, Face ID over a live keyboard): iOS kept the fresh-presentation geometry.
-/// The notification can also come just before the new controller pins (run 59: 32 ms before, received only by the
-/// old controller): every pin records it, and a pin made within `earlyWindow` of it takes the drop at once.
+/// iOS 26 draws its glass flush with the keyboard's view or `HostLook.hostTopMargin` above it, by the host's history
+/// (ProtlyCore `HostLook`). The keyboard cannot see which, so one `HostLook` per process keeps what it knows across
+/// presentations, and every live controller pins its view to `portrait` or `HostLook.hostTopMargin` less. ProtlyRoot
+/// keeps the content at the bottom, so only the empty top of the bar's band goes under iOS's margin.
 ///
 /// Logs the view's height at debug level (subsystem com.northprot.protly, category height): Console on a Mac
 /// shows it for the phone, `log show --debug` for the simulator.
@@ -27,16 +22,11 @@ final class ProtlyHeight: NSObject {
     /// The bar's band and four rows, the last one trimmed: 257 pt.
     static let portrait = ProtlyGeometry.topBand + ProtlyGeometry.toolbarHeight
         + 4 * ProtlyGeometry.rowPitch - ProtlyGeometry.lastRowTrim
-    /// Glass above the keyboard's height that iOS 26 adds for a third-party keyboard. Measured in the iOS 26.5
-    /// simulator; confirm on the phone with this log (the view settles this far below the glass after an app switch).
-    static let hostTopMargin: CGFloat = 17
-    /// How soon after loading a controller still counts as attached by the host's return (seen: 0.22-0.24 s).
-    static let freshWindow: TimeInterval = 2
-    /// How soon before a controller pins the host's return still counts as meant for it (seen: 32 ms).
-    static let earlyWindow: TimeInterval = 0.5
-    /// systemUptime of the host's last NSExtensionHostDidBecomeActive, as any pin saw it.
-    private static var lastHostBecameActive: TimeInterval?
 
+    /// What the keyboard knows about iOS's look in this host: one per keyboard process.
+    private static var look = HostLook()
+    private static let pins = NSHashTable<ProtlyHeight>.weakObjects()
+    private static var observers: [NSObjectProtocol] = []
     private static let log = Logger(subsystem: "com.northprot.protly", category: "height")
     private static var key: UInt8 = 0
 
@@ -44,31 +34,66 @@ final class ProtlyHeight: NSObject {
     private let constraint: NSLayoutConstraint
     private var orientation: AnyCancellable?
     private var bounds: NSKeyValueObservation?
-    private var loaded = ProcessInfo.processInfo.systemUptime
+
+    private static var now: Double { ProcessInfo.processInfo.systemUptime }
 
     /// Call once from viewDidLoad. The pin lives as long as the controller.
     static func pin(_ controller: KeyboardInputViewController) {
+        observeHost()
+        look.loaded(at: now)
         let pin = ProtlyHeight(controller)
+        pins.add(pin)
         objc_setAssociatedObject(controller, &key, pin, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        pin.report("pinned")
     }
 
-    /// Call from viewWillAppear. A controller that iOS shows again later (older than `freshWindow`) starts over:
-    /// the full portrait pin, and a new window for the host's return. The first appearance after loading is
-    /// left alone, so the path the simulator runs verified does not change.
+    /// Call from viewWillAppear.
     static func presented(_ controller: KeyboardInputViewController) {
-        guard let pin = objc_getAssociatedObject(controller, &key) as? ProtlyHeight else { return }
-        let now = ProcessInfo.processInfo.systemUptime
-        guard now - pin.loaded >= freshWindow else { return }
-        pin.loaded = now
-        pin.constraint.constant = portrait
-        pin.report("presented again, reset")
+        look.appeared(document: document(controller), at: now)
+        follow("will appear")
+    }
+
+    /// Call from viewDidDisappear.
+    static func disappeared(_ controller: KeyboardInputViewController) {
+        look.disappeared(document: document(controller))
+    }
+
+    /// The field's document, nil while iOS gives none. Swift imports `documentIdentifier` as a non-optional UUID, and
+    /// reading it before iOS has a document traps (probe runs 170 and 173: the keyboard never logged a line).
+    private static func document(_ controller: KeyboardInputViewController) -> UUID? {
+        guard let proxy = controller.textDocumentProxy as? NSObject else { return nil }
+        let getter = NSSelectorFromString("documentIdentifier")
+        guard proxy.responds(to: getter) else { return nil }
+        return proxy.perform(getter)?.takeUnretainedValue() as? UUID
+    }
+
+    /// Every live pin takes the height `look` asks for.
+    private static func follow(_ reason: String) {
+        let height = CGFloat(look.pin(content: Double(portrait)))
+        for pin in pins.allObjects where pin.constraint.constant != height {
+            pin.constraint.constant = height
+            pin.report(reason)
+        }
+    }
+
+    /// The host's notices, for the whole process. Selector-free blocks: they live as long as the process.
+    private static func observeHost() {
+        guard observers.isEmpty else { return }
+        observers.append(NotificationCenter.default.addObserver(
+            forName: .NSExtensionHostDidBecomeActive, object: nil, queue: .main
+        ) { _ in
+            MainActor.assumeIsolated {
+                ProtlyHeight.look.hostBecameActive(at: ProtlyHeight.now)
+                ProtlyHeight.follow("host became active")
+            }
+        })
     }
 
     private init(_ controller: KeyboardInputViewController) {
         let view: UIView = controller.view
         self.view = view
         // 999, not required: iOS's own constraints win during its transitions instead of breaking ours.
-        constraint = view.heightAnchor.constraint(equalToConstant: Self.portrait)
+        constraint = view.heightAnchor.constraint(equalToConstant: CGFloat(Self.look.pin(content: Double(Self.portrait))))
         constraint.priority = UILayoutPriority(999)
         super.init()
 
@@ -82,41 +107,7 @@ final class ProtlyHeight: NSObject {
             guard change.oldValue?.height != change.newValue?.height else { return }
             MainActor.assumeIsolated { self?.report("bounds") }
         }
-        // Selector observers go away with this object.
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(hostBecameActive), name: .NSExtensionHostDidBecomeActive, object: nil
-        )
-        // Log only, for the phone check: whether WillEnterForeground is a tighter signal for the app-switch path.
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(hostWillEnterForeground), name: .NSExtensionHostWillEnterForeground, object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(hostDidEnterBackground), name: .NSExtensionHostDidEnterBackground, object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(hostWillResignActive), name: .NSExtensionHostWillResignActive, object: nil
-        )
-        report("pinned")
-        // The host came back just before this controller loaded: the notification went to the old one only.
-        if let last = Self.lastHostBecameActive, loaded - last < Self.earlyWindow, constraint.isActive {
-            constraint.constant = Self.portrait - Self.hostTopMargin
-            report("host became active \(loaded - last) s before pinning")
-        }
     }
-
-    @objc private func hostBecameActive(_ note: Notification) {
-        Self.lastHostBecameActive = ProcessInfo.processInfo.systemUptime
-        let age = ProcessInfo.processInfo.systemUptime - loaded
-        guard age < Self.freshWindow, constraint.isActive else {
-            return report("host became active after \(age) s, kept")
-        }
-        constraint.constant = Self.portrait - Self.hostTopMargin
-        report("host became active")
-    }
-
-    @objc private func hostWillEnterForeground(_ note: Notification) { report("host will enter foreground") }
-    @objc private func hostDidEnterBackground(_ note: Notification) { report("host did enter background") }
-    @objc private func hostWillResignActive(_ note: Notification) { report("host will resign active") }
 
     private func report(_ reason: String) {
         guard let view else { return }
