@@ -1,0 +1,123 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5h_wholeweb
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wr-textarea-win-t1 1795382447.961
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-win-t2 1795382510.165
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=17.0 reply=335/9/h49b6f226 caret-read=335,0 replace=3.70 kb=12.44 undo=2.43 kbundo=6.74} t2={real=335/9/h49b6f226 caret=335,0 s=9.8 reply=335/9/h49b6f226 caret-read=335,0 replace=2.58 kb=6.84 undo=2.55 kbundo=6.58}
+MARK wr-textarea-mid-t1 1795382561.252
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=13.9 reply=335/9/h49b6f226 caret-read=335,0 replace=2.62 kb=7.35 undo=2.60 kbundo=6.81}
+MARK wr-textarea-sel-t1 1795382612.723
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=13.2 reply=335/9/h49b6f226 caret-read=335,0 replace=2.94 kb=7.09 undo=2.34 kbundo=6.88}
+MARK wr-textarea-long-t1 1795382662.487
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-long-t2 1795382744.748
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-long PASS t1={real=3247/15/h3ca63fec caret=3247,0 s=19.6 reply=3247/15/h3ca63fec caret-read=3247,0 replace=11.46 kb=19.22 undo=3.31 kbundo=19.19} t2={real=3247/15/h3ca63fec caret=3247,0 s=20.3 reply=3247/15/h3ca63fec caret-read=3247,0 replace=10.83 kb=18.31 undo=2.96 kbundo=18.82}
+MARK wr-textarea-x14k-t1 1795382825.506
+tapped protlyKey
+CHECK wr-textarea-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=5.0 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0}
+MARK wr-textarea-emoji-t1 1795382855.915
+tapped protlyKey
+CHECK wr-textarea-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=5.5 panel="Could not read the whole text. Copy it, then use Read clipboard." left=460/9/h0755cc33 caret-left=460,0 want 460,0}
+MARK wr-textarea-swin-t1 1795382888.545
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-swin-t2 1795382927.417
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-swin-t3 1795382969.122
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=5.0 reply=39/0/h84d73b78 caret-read=39,0 replace=2.26 kb=6.60 undo=2.47 kbundo=5.13} t2={real=39/0/h84d73b78 caret=39,0 s=4.7 reply=39/0/h84d73b78 caret-read=39,0 replace=2.36 kb=5.17 undo=2.78 kbundo=8.35} t3={real=39/0/h84d73b78 caret=39,0 s=4.9 reply=39/0/h84d73b78 caret-read=39,0 replace=2.45 kb=6.54 undo=2.63 kbundo=8.43}
+MARK wr-textarea-smid-t1 1795383014.601
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-smid-t2 1795383061.203
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-smid PASS t1={real=39/0/h84d73b78 caret=26,0 s=7.9 reply=39/0/h84d73b78 caret-read=39,0 replace=2.11 kb=6.49 undo=2.98 kbundo=8.27} t2={real=39/0/h84d73b78 caret=26,0 s=7.3 reply=39/0/h84d73b78 caret-read=39,0 replace=2.33 kb=6.18 undo=2.48 kbundo=8.51}
+MARK wr-textarea-ssel-t1 1795383106.493
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-ssel-t2 1795383148.146
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-ssel PASS t1={real=39/0/h84d73b78 caret=0,39 s=7.1 reply=39/0/h84d73b78 caret-read=39,0 replace=1.91 kb=5.67 undo=2.31 kbundo=5.91} t2={real=39/0/h84d73b78 caret=0,39 s=10.3 reply=39/0/h84d73b78 caret-read=39,0 replace=2.08 kb=5.93 undo=2.73 kbundo=8.36}
+MARK wr-textarea-s3-t1 1795383196.269
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-s3 PASS t1={real=93/0/h063bc933 caret=93,0 s=7.8 reply=93/0/h063bc933 caret-read=93,0 replace=2.24 kb=6.33 undo=2.40 kbundo=6.27}
+MARK wr-lexical-win-t1 1795383237.043
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-win-t2 1795383288.681
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=10.9 reply=335/9/h49b6f226 caret-read=335,0 replace=2.42 kb=8.64 undo=2.67 kbundo=8.64} t2={real=335/9/h49b6f226 caret=335,0 s=15.6 reply=335/9/h49b6f226 caret-read=335,0 replace=2.60 kb=8.63 undo=2.37 kbundo=7.12}
+MARK wr-lexical-mid-t1 1795383347.045
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=11.8 reply=335/9/h49b6f226 caret-read=335,0 replace=2.90 kb=7.69 undo=2.76 kbundo=8.48}
+MARK wr-lexical-sel-t1 1795383399.371
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=11.0 reply=335/9/h49b6f226 caret-read=335,0 replace=2.85 kb=7.55 undo=2.74 kbundo=7.55}
+MARK wr-lexical-long-t1 1795383447.070
+tapped protlyKey
+MARK wr-lexical-long-t2 1795383492.892
+tapped protlyKey
+CHECK wr-lexical-long FAIL t1={real=3247/15/h3ca63fec caret=3247,0 s=21.5 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected) t2={real=3247/15/h3ca63fec caret=3247,0 s=22.5 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-lexical-x14k-t1 1795383537.830
+tapped protlyKey
+CHECK wr-lexical-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=6.9 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0}
+MARK wr-lexical-emoji-t1 1795383570.149
+tapped protlyKey
+CHECK wr-lexical-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=5.9 panel="Could not read the whole text. Copy it, then use Read clipboard." left=460/9/h0755cc33 caret-left=460,0 want 460,0}
+MARK wr-lexical-swin-t1 1795383603.007
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-swin-t2 1795383650.893
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-swin-t3 1795383694.489
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=11.3 reply=39/0/h84d73b78 caret-read=39,0 replace=2.14 kb=6.84 undo=2.59 kbundo=8.27} t2={real=39/0/h84d73b78 caret=39,0 s=10.5 reply=39/0/h84d73b78 caret-read=39,0 replace=1.97 kb=5.36 undo=2.31 kbundo=6.05} t3={real=39/0/h84d73b78 caret=39,0 s=10.8 reply=39/0/h84d73b78 caret-read=39,0 replace=1.96 kb=5.56 undo=2.24 kbundo=5.75}
+MARK wr-lexical-smid-t1 1795383740.478
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-smid-t2 1795383788.475
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-smid PASS t1={real=39/0/h84d73b78 caret=26,0 s=9.8 reply=39/0/h84d73b78 caret-read=39,0 replace=2.28 kb=6.42 undo=2.36 kbundo=7.81} t2={real=39/0/h84d73b78 caret=26,0 s=9.4 reply=39/0/h84d73b78 caret-read=39,0 replace=1.94 kb=5.47 undo=2.33 kbundo=6.44}
+MARK wr-lexical-ssel-t1 1795383831.874
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-ssel-t2 1795383875.886
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-ssel PASS t1={real=39/0/h84d73b78 caret=0,39 s=9.4 reply=39/0/h84d73b78 caret-read=39,0 replace=2.03 kb=5.78 undo=2.21 kbundo=7.07} t2={real=39/0/h84d73b78 caret=0,39 s=9.6 reply=39/0/h84d73b78 caret-read=39,0 replace=1.98 kb=5.88 undo=2.49 kbundo=8.08}
+MARK wr-lexical-s3-t1 1795383921.228
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-s3 PASS t1={real=93/0/h063bc933 caret=93,0 s=9.5 reply=93/0/h063bc933 caret-read=93,0 replace=2.05 kb=5.89 undo=2.26 kbundo=6.24}
