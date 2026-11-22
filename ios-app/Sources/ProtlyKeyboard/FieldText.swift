@@ -408,6 +408,13 @@ enum FieldText {
                     let s = await step(p, by: move, wait: WholeRead.moveWait)
                     track.landed(nil, s.c.b)
                 }
+                // A native window stops at a line feed: right after the one the collapse crossed it shows nothing (run
+                // 8be8a93-218). One unit back, at the selection's end, it shows the selection's line.
+                if ctx(p).before.isEmpty, !Task.isCancelled {
+                    track.sending()
+                    let s = await step(p, by: -1, wait: WholeRead.moveWait)
+                    track.landed(nil, s.c.b)
+                }
                 before = ctx(p).before
             }
             switch WholeRead.collapsed(crossed: first, resynced: fResynced, selected: Array(c0.s.utf16), before: before) {
@@ -555,7 +562,11 @@ enum FieldText {
                 last = c
                 quietFrom = uptime()
             }
-            if uptime() >= settle, uptime() - quietFrom >= WholeRead.quiet, shows(new, c) {
+            // An empty field in the contexts after the bound, quiet: the proxy may have stopped following the host (run
+            // 8be8a93-218 etail: b=0 a=0 for 4.7 s while the field held the result). The check walk moves the cursor,
+            // which refreshes the contexts, and decides; an empty field fails it as before.
+            let blank = c.b.isEmpty && c.a.isEmpty && !new.isEmpty
+            if uptime() >= settle, uptime() - quietFrom >= WholeRead.quiet, shows(new, c) || blank {
                 shown = true
                 break
             }
