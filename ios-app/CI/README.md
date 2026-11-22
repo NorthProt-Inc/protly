@@ -283,34 +283,46 @@ logging. Every line is `PENDING` with the field before the first try (`t0`) and 
 
 ## Height checks (fix/keyboard-height, K2)
 
-Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis branch until it lands). Code:
-`UITests/HeightChecks.swift`, method `PhoneChecksUITests/test9_height`, ported from the probe on `diag/p2-height`.
+Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis branch until it lands). Fix: ProtlyCore
+`HostLook` (its header lists the rules and their runs). Code: `UITests/HeightChecks.swift`, method
+`PhoneChecksUITests/test9_height`, ported from the probe on `diag/p2-height`.
 
-- **Filtered runs only**, like `test5f_period` (about 15 minutes): run it with
+- **Filtered runs only**, like `test5f_period` (about 25 minutes): run it with
   `[shots:PhoneChecksUITests/test9_height]`. A full run marks its IDs `NOT-RUN` (`FILTERED_ONLY` in checks.py).
 - **Every shot** is measured the way measure.py measures the layout scenarios: the glass top and row 1's top along
   the second key's column, band = row 1 - top. ui-log.txt has `HEIGHT <id> <n> <band>@<top>/<row1>[/<board>]
-  [/unreached][/picked]/ph<top>+<height>` and `MARK <id>-<n> <epoch>` (for keyboard-log.txt). `ph` is iOS's own
-  placeholder for the keyboard on the host's side (the element `inputView`): its top is 17 pt below the glass top in
-  both of iOS's looks, and its height is Protly's view plus the dock, 17 pt less when iOS draws no margin above the
-  keyboard. `picked`: the relaunch came up on another keyboard and Protly was picked from the globe list.
+  [/unreached][/picked][/problems<n>]/ph<top>+<height>` and `MARK <id>-<n> <epoch>` (for keyboard-log.txt). `ph` is
+  iOS's own placeholder for the keyboard on the host's side (the element `inputView`): its top is 17 pt below the
+  glass top in both of iOS's looks, and its height is Protly's view plus the dock, 17 pt less when iOS draws no
+  margin above the keyboard.
 - **IDs.** `hb-apple` (RECORD): Apple's English keyboard, 5 shots, the reference band (the median). Each other ID
-  collects one path's shots across the sections (each starts with a relaunch), and PASSes only when every shot is
-  on Protly with its band within 1 pt of Apple's and row 1 within 1 pt of 564 (iPhone 13 Pro):
-  `hb-launch` (the relaunch at each section's start), `hb-hide-fresh` (hide and show in a fresh host, 1 s and 5 s
-  hidden), `hb-globe` (Protly picked right after Apple's English keyboard), `hb-hide-globe` (hide and show after it),
-  `hb-emoji` (the Emoji round trip in a fresh host, after the globe pick and after an app switch), `hb-hide-emoji` (hide
-  and show after it), `hb-switch` (an app switch back with the keyboard up), `hb-hide-switch` (hide and show after
-  it), `hb-switch-hidden` (after an app switch with the keyboard up and a hide/show, an app switch with the keyboard
-  hidden, 13 s away, then the field tapped), `hb-kill-up` and `hb-kill-hidden` (after an app switch with the keyboard
-  up, the host left with the keyboard up, or hidden and 13 s away, terminated in the background and launched again), `hb-card` (a stub Translate's finished card in a fresh host, judged by the
-  glass top only: it covers row 1; a card that did not finish FAILs) and `hb-cancel` (the keys after the card's
-  Cancel). A shot that came up on another keyboard (a system stand-in, or English) is listed as `skipped`, not judged;
-  fewer than 5 shots on Protly, or no Apple band, is FAIL `unreadable`. One more card after an app switch is not judged:
-  runs 159 and 178 could not read the bar's center at the 240 pt pin, and its tree goes to
-  `tree-hb-card-after-switch.txt` when that happens.
-- A relaunch that comes up on another keyboard picks Protly and launches again (iOS brings back the keyboard last
-  used), up to three launches; only then is the shot marked `picked`.
+  collects one path's shots across the sections (each starts with a relaunch), and PASSes only when every judged shot
+  has its band within 1 pt of Apple's and row 1 within 1 pt of 564 (iPhone 13 Pro):
+  - `hb-launch`: the relaunch at each section's start. `hb-hide-fresh`: hide and show in a fresh host, 1 s and 5 s
+    hidden.
+  - `hb-globe`: Protly picked right after Apple's English keyboard. `hb-hide-globe`: hide and show after it.
+  - `hb-emoji`: the Emoji round trip in a fresh host, after the globe pick and after an app switch. `hb-hide-emoji`:
+    hide and show after it.
+  - `hb-switch`: an app switch back with the keyboard up. `hb-hide-switch`: hide and show after it.
+    `hb-hide-long` (RECORD): after an app switch, a 12 s hide without leaving the host, the other side of HostLook's
+    10 s guess (iOS keeps its margin there, so 69 is what the guess costs).
+  - `hb-switch-hidden`: after an app switch and a hide and show, an app switch with the keyboard hidden, 13 s away,
+    then the field tapped. `hb-kill-up`, `hb-kill-hidden`: after an app switch, the host left with the keyboard up,
+    or hidden and 13 s away, terminated in the background and launched again.
+  - `hb-card`: a stub Translate's finished card in a fresh host, judged by the glass top (it covers row 1); a card
+    that did not finish FAILs. `hb-cancel`: the keys after the card's Cancel. One more card after an app switch is
+    not judged: the test cannot read the bar at the 240 pt pin (iOS reports the center button's frame at y -8.7,
+    run de8574c-184), and its tree goes to `tree-hb-card-after-switch.txt`.
+- **Skipped shots** are listed, not judged: a shot that came up on another keyboard (a system stand-in, or English),
+  one after a failed step (Emoji or English not reached: `problems<n>=`), one whose step did not reach Protly, and a
+  relaunch that still needed a globe pick after three launches (iOS brings back the keyboard last used, so a relaunch
+  that came up elsewhere picks Protly and launches again). Fewer than 5 judged shots, or no Apple band, is FAIL
+  `unreadable`.
+- **Expected FAILs.** `hb-globe` and `hb-hide-globe` FAIL on every run at 69: Protly picked right after Apple's
+  keyboard looks to the keyboard like a return from Emoji, and it assumes Emoji. Single shots at 69 elsewhere happen
+  when iOS changes its look with nothing the keyboard can see (a hide and show after an Emoji round trip, about 1 in
+  16; a fresh launch, about 1 in 45) or sends no became-active on a return (about 1 in 64). Any other FAIL, or a band
+  of 35, is a regression.
 
 ## Reading a run without GitHub access
 
