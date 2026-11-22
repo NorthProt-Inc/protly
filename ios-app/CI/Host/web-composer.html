@@ -98,6 +98,7 @@ function postState() {
     textarea: text("textarea"), input: text("input"), composer: text("composer"), sent, submitted, atReturn,
     focus: (document.activeElement && document.activeElement.id) || "", trace: trace.slice(-16), caret: caret(),
   };
+  if (caretPosts) s.edits = { n: editCount, t: editTimes.slice() };
   post({ kind: "state", json: JSON.stringify(s), rects: rects() });
 }
 
@@ -125,10 +126,21 @@ function log(name, e) {
   trace.push(t);
 }
 
+// `?caret=1` (test5f_period only): how many `input` events the composer had and when the last 16 came (ms,
+// performance.now()), for the spacing of a double tap's two spaces. Counts and times only, never the text.
+let editCount = 0;
+let editTimes = [];
+function noteEdit(name, e) {
+  if (!caretPosts || name !== "composer" || e.type !== "input") return;
+  editCount += 1;
+  editTimes.push(Math.round(performance.now()));
+  if (editTimes.length > 16) editTimes.shift();
+}
+
 const types = ["keydown", "keypress", "keyup", "beforeinput", "input", "compositionstart", "compositionupdate",
   "compositionend", "change", "focus", "blur"];
 for (const [name, f] of Object.entries(fields)) {
-  for (const type of types) f.addEventListener(type, (e) => { log(name, e); state(); }, true);
+  for (const type of types) f.addEventListener(type, (e) => { noteEdit(name, e); log(name, e); state(); }, true);
 }
 
 form.addEventListener("submit", (e) => {

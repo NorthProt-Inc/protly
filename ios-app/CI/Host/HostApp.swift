@@ -109,7 +109,21 @@ final class TextViewModel: ObservableObject {
     /// `x,y,w,h` in screen points: where a double-tap selects that word.
     @Published var firstWord = ""
     @Published var lastWord = ""
+    /// `<count>:<t>,<t>,...`: how many times the text changed (UITextView.textDidChangeNotification, the keyboard's
+    /// edits) and when the last 16 changes came, in ms of the host's uptime clock. test5f_period reads the spacing of a
+    /// double tap's two spaces from it. Counts and times only, never the text.
+    @Published var edits = "0:"
+    private var editCount = 0
+    private var editTimes: [Int] = []
+    var editObserver: NSObjectProtocol?
     weak var textView: UITextView?
+
+    func noteEdit() {
+        editCount += 1
+        editTimes.append(Int((ProcessInfo.processInfo.systemUptime * 1000).rounded()))
+        if editTimes.count > 16 { editTimes.removeFirst(editTimes.count - 16) }
+        edits = "\(editCount):" + editTimes.map(String.init).joined(separator: ",")
+    }
 
     func clear() {
         textView?.text = ""
@@ -183,6 +197,11 @@ struct TextViewField: UIViewRepresentable {
         tv.autocapitalizationType = .none
         tv.accessibilityIdentifier = "field"
         model.textView = tv
+        model.editObserver = NotificationCenter.default.addObserver(
+            forName: UITextView.textDidChangeNotification, object: tv, queue: .main
+        ) { [weak model] _ in
+            MainActor.assumeIsolated { model?.noteEdit() }
+        }
         return tv
     }
 
@@ -209,6 +228,7 @@ struct TextViewScreen: View {
                 Probe(id: "marked", value: model.marked)
                 Probe(id: "first-word", value: model.firstWord)
                 Probe(id: "last-word", value: model.lastWord)
+                Probe(id: "edits", value: model.edits)
             }
             .tint(.white)
             .frame(maxWidth: .infinity, alignment: .trailing)

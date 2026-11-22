@@ -113,6 +113,16 @@ final class PickSpaceTests: XCTestCase {
         XCTAssertFalse(r.isWaiting)
     }
 
+    func testThePickedWordEarlierInTheTextIsNotThePick() {
+        // The word and its space must be right before the cursor (rule 4), not anywhere before it: here the cursor
+        // moved past the next word, or the user typed one, so `the ` is in the text but not at its end.
+        var p = picked()
+        p.noticed(O(before: "hello the world"), now: later)
+        XCTAssertFalse(p.isWaiting)
+        var q = picked()
+        XCTAssertFalse(tap(&q, O(before: "hello the world ")))
+    }
+
     func testAnEditOfThePickedWordEndsIt() {
         var p = picked()
         p.noticed(O(before: "hello then "), now: later)

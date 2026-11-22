@@ -335,6 +335,10 @@ final class KeyboardSourceRulesTests: XCTestCase {
                       "the space release is decided before KeyboardKit's flow and cleared after it")
         XCTAssertTrue(handle.contains("} else if action != .space, gesture == .press {\n                host?.endPickSpace()"),
                       "any other key ends the pick")
+        // Only the release takes the pick: the press would spend it, and the release would then type a second space.
+        XCTAssertEqual(matches(#"if action == \.space, gesture == \.release, let host \{\s*takenByPick = host\.takePickSpace\("#,
+                               in: handle).count, 1, "only a space release takes the pick")
+        XCTAssertEqual(matches(#"takePickSpace\("#, in: handler).count, 1)
         XCTAssertEqual(matches(#"takenByPick = true"#, in: handler).count, 0)
         XCTAssertFalse(handler.contains("lastSpaceTap"), "KeyboardKit's double-space clock stays KeyboardKit's")
 
@@ -343,8 +347,16 @@ final class KeyboardSourceRulesTests: XCTestCase {
         let waits = (pick as NSString).range(of: "pickSpace.picked(")
         XCTAssertTrue(typed.location != NSNotFound && waits.location != NSNotFound && typed.location < waits.location,
                       "the pick waits only once its space is typed")
-        XCTAssertTrue(code("private func noticeFieldMoved()", cns).contains("pickSpace.noticed("),
-                      "a host change ends the pick")
+        // A pick in front of a word waits with that word: without it the tap is never taken there (`the  world`).
+        XCTAssertTrue(pick.contains("pickSpace.picked(shown, after: textDocumentProxy.documentContextAfterInput ?? \"\", at: now)"),
+                      "the pick keeps the text after the cursor")
+        // Before FieldWatch's decision: between words it is always `.keep`, which returns early, so a host change
+        // checked after it would never end the pick.
+        let notice = code("private func noticeFieldMoved()", cns) as NSString
+        let noticed = notice.range(of: "pickSpace.noticed(o, now: now)")
+        let decide = notice.range(of: "switch watch.decide(")
+        XCTAssertTrue(noticed.location != NSNotFound && decide.location != NSNotFound && noticed.location < decide.location,
+                      "every host callback reaches the pick before FieldWatch decides")
         for declaration in ["override func adjustTextPosition(by offset: Int)", "override func viewWillDisappear(",
                             "private func beginCall()", "func endPickSpace()"] {
             XCTAssertTrue(code(declaration, cns).contains("pickSpace.end()"), "\(declaration) does not end the pick")
