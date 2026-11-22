@@ -198,19 +198,22 @@ final class FieldDecisionTests: XCTestCase {
     /// the contexts were stale) is neither: refused (code review: it sent select all's first 43 units as a selection).
     func testACollapsedSelectionWithTextAfterItWasPartial() {
         let head = Array("Title".utf16)
-        XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: false, selected: head, before: head), .selectAll)
-        XCTAssertEqual(WholeRead.collapsed(crossed: Array("\nprivate notes".utf16), resynced: false, selected: head,
-                                           before: head), .partial)
-        // The +1 collapse of a partial selection lands one past its end, over the line feed (run 1b402b4-204: the caret
-        // at 17 after a 16-unit selection): the before-context there is the selection and that line feed.
-        XCTAssertEqual(WholeRead.collapsed(crossed: Array("private notes".utf16), resynced: false, selected: head,
-                                           before: head + [10]), .partial)
-        XCTAssertEqual(WholeRead.collapsed(crossed: Array("private notes".utf16), resynced: false, selected: head,
-                                           before: head + Array(" x".utf16)), .unknown)
-        // The selection longer than selectedText showed: not proven, refused.
-        XCTAssertEqual(WholeRead.collapsed(crossed: Array("\nmore".utf16), resynced: false, selected: Array("Titl".utf16),
-                                           before: head), .unknown)
+        let rest = Array("private notes".utf16)
+        XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: false, selected: head, whole: head), .selectAll)
+        // The collapse landed past the line feed (run 1b402b4-204: caret 17 after a 16-unit selection): the walk to the
+        // end crossed the rest; the walk back from the end read the selection, the line feed and the rest.
+        XCTAssertEqual(WholeRead.collapsed(crossed: rest, resynced: false, selected: head, whole: head + [10] + rest),
+                       .partial)
+        // The collapse landed at the selection's end: the walk to the end crossed the line feed first.
+        XCTAssertEqual(WholeRead.collapsed(crossed: [10] + rest, resynced: false, selected: head,
+                                           whole: head + [10] + rest), .partial)
+        // selectedText held only the selection's first units: the field read whole is longer. Refused.
+        XCTAssertEqual(WholeRead.collapsed(crossed: rest, resynced: false, selected: Array("Titl".utf16),
+                                           whole: head + [10] + rest), .unknown)
+        // Text before the selection (its before-context only looked empty): refused.
+        XCTAssertEqual(WholeRead.collapsed(crossed: rest, resynced: false, selected: head,
+                                           whole: Array("x".utf16) + head + [10] + rest), .unknown)
         // Stale contexts: the first step resynced and crossed nothing it could name.
-        XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: true, selected: head, before: head), .unknown)
+        XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: true, selected: head, whole: head), .unknown)
     }
 }
