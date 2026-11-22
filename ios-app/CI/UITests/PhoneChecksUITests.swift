@@ -131,14 +131,14 @@ final class PhoneChecksUITests: XCTestCase {
     /// diag/p1-walk-back (WalkChecks.swift): the walk read (both ends found by moving) on the UITextView.
     @MainActor
     func test5j_walkuikit() throws {
-        try PhoneRun(test: self, name: "test5j_walkuikit", arguments: ["-screen", "uikit", "-readfills", "1"])
+        try PhoneRun(test: self, name: "test5j_walkuikit", arguments: ["-screen", "uikit", "-readfills", "1", "-uniquedrafts", "1"])
             .checksWalkNative("uikit", WalkProbe.uikit)
     }
 
     /// diag/p1-walk-back: the same on the SwiftUI field (its fill leaves the cursor at the end; no select all).
     @MainActor
     func test5k_walkswiftui() throws {
-        try PhoneRun(test: self, name: "test5k_walkswiftui", arguments: ["-readfills", "1"])
+        try PhoneRun(test: self, name: "test5k_walkswiftui", arguments: ["-readfills", "1", "-uniquedrafts", "1"])
             .checksWalkNative("swiftui", WalkProbe.swiftui)
     }
 
