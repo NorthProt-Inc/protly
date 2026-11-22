@@ -257,6 +257,22 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(w.plan(before: u("ab")), 1)
     }
 
+    /// Tower review of f0533ae: a context that is exactly one emoji gave a forward step of one unit, inside the pair
+    /// (the after-context stops at a line feed, so a line that ends with one emoji). Both ways it is two.
+    func testALoneEmojiIsOneStepOfTwoUnitsBothWays() {
+        let e = Array("\u{1F600}".utf16)
+        XCTAssertEqual(WholeRead.safeJump(e, back: false), 2)
+        XCTAssertEqual(WholeRead.safeJump(e, back: true), 2)
+        XCTAssertEqual(WholeRead.safeJump(u("ab"), back: false), 1)
+        XCTAssertEqual(WholeRead.safeJump(u("a"), back: false), 1)
+        // A forward walk over a line that ends with one emoji reads it whole.
+        let t = u("ab\n\u{1F600}\ncd")
+        var f = Field(text: t, pos: 3)
+        let fw = walkForward(&f)
+        XCTAssertEqual(fw.step, .done)
+        XCTAssertEqual(fw.units, Array(t[3...]))
+    }
+
     func testRepeatedTextNeverStopsTheWalk() {
         let t = u(String(repeating: "Thanks for the help ", count: 60))  // period 20, the probe's stuck case
         var f = Field(text: t, pos: t.count)
@@ -307,6 +323,24 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(WholeRead.charUnits(u("ab\u{1F602}"), 2), 3)
         XCTAssertEqual(WholeRead.charUnits(u("ab"), 2), 2)
         XCTAssertNil(WholeRead.charUnits(u("a"), 2))
+    }
+
+    /// Tower review of f0533ae (a model by Codex): a web view that counts characters and stops at the start. Walking
+    /// back over emoji at the field's start must not read a shortened text as whole. Windows of a few units are not
+    /// covered: inside one, a run of one emoji fits a wrong move whatever the check (no host showed windows that
+    /// small: 2-3 sentences after a resync, P1a).
+    func testAWebHostThatClampsAtTheStartIsNotReadShort() {
+        for text in ["\u{1F600}\u{1F600}\u{1F600}\nA", "\u{1F600}\nA", "x\u{1F600}\u{1F600}\nAB",
+                     "\u{1F600}\u{1F600}\u{1F600}\u{1F600} ok\nA"] {
+            let t = u(text)
+            for window in [30, 12] {
+                var f = Field(text: t, pos: t.count, window: window, byCharacters: true)
+                let bw = walkBack(&f)
+                if case .done = bw.step {
+                    XCTAssertEqual(bw.units, t, "\(text) window \(window): a read that ends must be whole")
+                }
+            }
+        }
     }
 
     func testNativeTextWithEmojiIsReadExactly() {
@@ -553,6 +587,11 @@ final class WholeReadTests: XCTestCase {
         var q = ForwardWalk(cap: 100)
         _ = q.plan(before: u("ha ㅋㅋㅋ"), after: [])
         XCTAssertEqual(q.landed(changed: true, before: u("ha ㅋㅋㅋㅋ"), after: []), .retry(-1))
+        // Tower review of f0533ae: a window that grew while text appeared after the cursor (the host appended during the
+        // probe) is no end.
+        var g = ForwardWalk(cap: 100)
+        _ = g.plan(before: u("the end."), after: [])
+        XCTAssertEqual(g.landed(changed: true, before: u("Then the end."), after: u(" More")), .failed("badStep", moved: nil))
         // Nothing to compare with: nothing named.
         var z = ForwardWalk(cap: 100)
         _ = z.plan(after: [])

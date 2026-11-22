@@ -75,7 +75,9 @@ public enum WholeRead {
     /// 3182f20-145 lost units on emoji). 1, or 2 when 1 would split a pair, below that.
     public static func safeJump(_ u: [UInt16], back: Bool) -> Int {
         let n = u.count
-        guard n > 2 else { return n == 2 && back && isLow(u[1]) ? 2 : 1 }
+        // One unit lands at index 1 either way: never there when it is a pair's low half (tower review of f0533ae: a
+        // forward step over a lone emoji split it).
+        guard n > 2 else { return n == 2 && isLow(u[1]) ? 2 : 1 }
         var k = n - 1
         while k > 1 {
             if !isLow(u[back ? n - k : k]) {
@@ -220,12 +222,19 @@ public struct BackWalk: Sendable {
             fit = (false, a1.isEmpty)
             return .failed("badStep", moved: -k)
         }
-        func fits(_ c: Int) -> Bool {
-            WholeRead.agree(b1, Array(b0.prefix(b0.count - c)), atEnd: true)
-                && WholeRead.agree(a1, Array(b0.suffix(c).prefix { $0 != 10 }), atEnd: false)
+        // The after-context stops at a line feed: when the piece crossed holds one, the after-context must be exactly
+        // the piece up to it, not only agree where both have units (tower review of f0533ae: a web view that counts
+        // characters overshot to the start of "😀😀😀\nA", and the after-context agreed with the piece only because the
+        // emoji repeat).
+        func afterFits(_ c: Int) -> Bool {
+            let piece = b0.suffix(c)
+            let shown = Array(piece.prefix { $0 != 10 })
+            return shown.count < piece.count ? a1 == shown : WholeRead.agree(a1, shown, atEnd: false)
         }
-        fit = (WholeRead.agree(b1, Array(b0.prefix(b0.count - k)), atEnd: true),
-               WholeRead.agree(a1, Array(b0.suffix(k).prefix { $0 != 10 }), atEnd: false))
+        func fits(_ c: Int) -> Bool {
+            WholeRead.agree(b1, Array(b0.prefix(b0.count - c)), atEnd: true) && afterFits(c)
+        }
+        fit = (WholeRead.agree(b1, Array(b0.prefix(b0.count - k)), atEnd: true), afterFits(k))
         // A web view moves by characters (run 4a2110a-150): the contexts fit the units k characters take. Refused,
         // never corrected (owner decision), also when both readings fit (text that repeats, such as one emoji over and
         // over: the walk cannot tell which host it is, code review). Either way the requested move is what the host
@@ -307,7 +316,8 @@ public struct ForwardWalk: Sendable {
                 // after-context did not show (a false end). Both or neither: nothing this walk can name.
                 let still = !b0.isEmpty && !b1.isEmpty && WholeRead.agree(b1, b0, atEnd: true)
                 let over = !b0.isEmpty && !b1.isEmpty && WholeRead.agree(Array(b1.dropLast()), b0, atEnd: true)
-                if still, !over { return .done }
+                // Text after the cursor now (the host appended during the probe): no end (tower review of f0533ae).
+                if still, !over, a1.isEmpty { return .done }
                 guard over, !still, let x = b1.last else { return .failed("badStep", moved: nil) }
                 guard retries < Self.maxRetries else { return .failed("falseEnd", moved: 1) }
                 retries += 1

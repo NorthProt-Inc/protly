@@ -373,8 +373,8 @@ extension PhoneRun {
         }
         let texts = v.texts(v.card).map(\.label)
         guard let reply = texts.first(where: { $0.hasPrefix("read ") }), let parsed = WholeChecks.parseReply(reply) else {
-            // Never the card's text (a stub reply that does not parse could carry field text): counts and lengths only.
-            r.check(false, "reply=unparsed card=\(texts.count) texts, lengths \(texts.map { $0.utf16.count })")
+            // Counts only: the card's labels can hold the field's text (tower review of f0533ae).
+            r.check(false, "reply=unparsed card-labels=\(texts.count) units=\(texts.map { $0.utf16.count }.reduce(0, +))")
             closeCall(v)
             return r
         }
