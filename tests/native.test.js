@@ -83,7 +83,7 @@ test('an old host that answers a ping like an API call is a host_bug', async () 
 });
 
 test('ping times out on its own short timer', async () => {
-  const t = createNativeTransport(() => fakePort(), undefined, 270000, 20);
+  const t = createNativeTransport(() => fakePort(), undefined, 630000, 20);
   await assert.rejects(t.ping(), (e) => e.kind === 'timeout');
 });
 

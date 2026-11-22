@@ -1,6 +1,7 @@
 // kind: auth | host | host_bug | timeout | spend_limit | rate | overloaded | server | bad_request | network | refused | parse | truncated
 // | forbidden (a sender may not call that command) | bad_message (a malformed message to the background)
-// timeout and truncated are not retried: the API may still be generating (and billing) the first attempt.
+// timeout and truncated are not retried: the API may still be generating (and billing) the first attempt. Neither is
+// a network or host failure that came after LONG_MS: the request most likely reached the API.
 export class ApiError extends Error {
   constructor(kind, message, status) {
     super(message);
@@ -10,6 +11,8 @@ export class ApiError extends Error {
 }
 
 const RETRYABLE = new Set(['rate', 'overloaded', 'server', 'network', 'host']);
+const MID_FLIGHT = new Set(['network', 'host']);
+const LONG_MS = 30000;
 const backoff = (attempt) => 1000 * 2 ** attempt;
 const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -41,14 +44,16 @@ function apiMessage(body) {
 
 // transport(body) resolves to { status, retry_after, body } or rejects (ApiError 'host' on port failure).
 // onUsage(body) runs once per 2xx body (it was billed), never throws into the call.
-export async function callClaude(body, { transport, sleep = realSleep, retries = 2, onUsage } = {}) {
+export async function callClaude(body, { transport, sleep = realSleep, retries = 2, onUsage, now = Date.now } = {}) {
   for (let attempt = 0; ; attempt++) {
+    const started = now();
+    const retry = (kind) => RETRYABLE.has(kind) && attempt < retries && !(MID_FLIGHT.has(kind) && now() - started > LONG_MS);
     let res;
     try {
       res = await transport(body);
     } catch (e) {
       const err = e instanceof ApiError ? e : new ApiError('host', String(e?.message || e));
-      if (RETRYABLE.has(err.kind) && attempt < retries) { await sleep(backoff(attempt)); continue; }
+      if (retry(err.kind)) { await sleep(backoff(attempt)); continue; }
       throw err;
     }
     if (res.status >= 200 && res.status < 300) {
@@ -56,7 +61,7 @@ export async function callClaude(body, { transport, sleep = realSleep, retries =
       return res.body;
     }
     const kind = classify(res.status, res.body);
-    if (RETRYABLE.has(kind) && attempt < retries) {
+    if (retry(kind)) {
       const ra = Number(res.retry_after);
       // Seconds from the host, clamped to 1-30: '0.001' must not retry at once into the rate limit.
       await sleep(ra > 0 ? Math.min(Math.max(ra, 1), 30) * 1000 : backoff(attempt));

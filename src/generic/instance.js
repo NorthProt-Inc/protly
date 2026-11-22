@@ -4,7 +4,7 @@ import { showToast } from '../ui/toast.js';
 import { errorText, GLOBAL_KINDS } from '../ui/errors.js';
 import { commitByRefocus, nextFrame, settleComposition } from '../lib/ime.js';
 import { decideBox, decideSelection } from './decide.js';
-import { deepActive, findTarget, selectionInfo } from './target.js';
+import { classify, deepActive, findTarget, selectionInfo } from './target.js';
 import { boxHolds, readBox, writeBox } from './writer.js';
 import { cutShortMessage, cutsShort } from '../lib/editable.js';
 import { isUndoKey } from '../lib/command.js';
@@ -13,7 +13,14 @@ import { addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../lib/lang.js';
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 const NOTHING = 'Put the cursor in a text box or select text.';
 const BLOCKED = 'protly cannot reach this frame. Right-click inside the box instead.';
-const MAX_CHARS = 8000;
+// Below LIMITS.text on purpose: the box reply carries the translation plus a Korean back_translation, and both
+// (with thinking) must fit the 32000-token outgoing budget in src/lib/prompts.js.
+const MAX_CHARS = 12000;
+// A field the user types or picks in, editable or not (password, number, date, readonly), as opposed to a checkbox,
+// a button or a file picker: a click on those leaves the box free to be written.
+const NOT_TYPED = new Set(['button', 'checkbox', 'color', 'file', 'hidden', 'image', 'radio', 'range', 'reset', 'submit']);
+const typedField = (el) => el.tagName === 'TEXTAREA' || el.tagName === 'SELECT'
+  || (el.tagName === 'INPUT' && !NOT_TYPED.has((el.getAttribute('type') || '').toLowerCase()));
 const TOO_LONG = `Too long for protly (over ${MAX_CHARS} characters).`;
 const FOCUS_MOVED = 'Focus moved, so the translation was not written.';
 const CORNER = { top: 16, bottom: 16, left: 16, right: 16, width: 0, height: 0, x: 16, y: 16 };
@@ -193,8 +200,16 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       cur.card.message('The draft changed, so nothing was changed.', { error: true, actions: actionsFor(cur) });
       return;
     }
-    // contenteditable needs focus to write; never pull it back from where the user went
-    const focusOk = () => cur.t.kind === 'text' || holdsFocus(cur);
+    // contenteditable needs focus to write. Take it back unless the user is typing in another box (or a frame
+    // this one cannot see into): a long email can take a minute, and a click on the page, a scroll or the
+    // editor's own autosave moves focus off the box without the user going anywhere else.
+    const typingElsewhere = () => {
+      const { el, blocked } = deepActive(top, { closed: true }); // a field in a web component's closed root counts
+      if (blocked) return true;
+      if (!el || el === cur.t.el || cur.t.el.contains(el)) return false;
+      return typedField(el) || classify(el) !== null;
+    };
+    const focusOk = () => cur.t.kind === 'text' || !typingElsewhere();
     const focusMoved = () => { close(); toast(FOCUS_MOVED); };
     if (!focusOk()) { focusMoved(); return; }
     const w = await writeBox(cur.t, r.translation, { stillOk: () => live() && focusOk() });

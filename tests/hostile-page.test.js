@@ -152,7 +152,7 @@ test('very long page text: the any-site path refuses it before any request', asy
   const asks = [];
   const inst = createInstance({ doc, ask: async (m) => { asks.push(m); return {}; }, hostname: 'evil.example' });
   const ta = doc.querySelector('textarea');
-  ta.value = '안녕'.repeat(5000) + '​'.repeat(1000);
+  ta.value = '안녕'.repeat(6000) + '​'.repeat(1000);
   ta.focus();
   globalThis.document = doc;
   await inst.run({ source: 'command' });
