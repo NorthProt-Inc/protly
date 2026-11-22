@@ -1,0 +1,14 @@
+CHECK wr-uikit-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=11.3 read=8193 reply=335/9/h49b6f226 caret-read=335,0 replace=3.89 kb=7.72 undo=5.29 kbundo=6.30} t2={real=335/9/h49b6f226 caret=335,0 s=9.8 read=5618 reply=335/9/h49b6f226 caret-read=335,0 replace=3.56 kb=7.25 undo=2.51 kbundo=5.70}
+CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=11.2 read=8148 reply=335/9/h49b6f226 caret-read=335,0 replace=4.54 kb=6.95 undo=2.53 kbundo=6.65}
+CHECK wr-uikit-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=12.5 read=6005 reply=335/9/h49b6f226 caret-read=335,0 replace=5.52 kb=6.70 undo=3.31 kbundo=6.92}
+CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec caret=3247,0 s=18.3 read=14507 reply=3247/15/h3ca63fec caret-read=3247,0 replace=10.48 kb=20.88 undo=3.00 kbundo=17.48} t2={real=3247/15/h3ca63fec caret=3247,0 s=20.5 read=17010 reply=3247/15/h3ca63fec caret-read=3247,0 replace=11.68 kb=18.92 undo=2.93 kbundo=16.94}
+CHECK wr-uikit-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=11.4 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0}
+CHECK wr-uikit-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=8.4 read=5302 reply=460/9/h0755cc33 caret-read=460,0 replace=3.58 kb=6.83 undo=2.98 kbundo=6.65}
+CHECK wr-uikit-r4k PASS t1={real=3975/15/h669f5dfc caret=3975,0 s=18.8 read=14667 reply=3975/15/h669f5dfc caret-read=3975,0 replace=9.97 kb=21.79 undo=2.88 kbundo=19.92}
+CHECK wr-uikit-cancel PASS t1={real=335/9/h49b6f226 caret=112,0 progress=5.0 cancelled=5.8 closed=0/0/0 left=335/9/h49b6f226 caret-left=112,0 want 112,0}
+CHECK wr-swiftui-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=10.0 read=5756 reply=335/9/h49b6f226 caret-read=335,0 replace=5.03 kb=7.06 undo=3.07 kbundo=6.56} t2={real=335/9/h49b6f226 caret=335,0 s=9.9 read=5568 reply=335/9/h49b6f226 caret-read=335,0 replace=4.37 kb=6.65 undo=3.16 kbundo=6.63}
+CHECK wr-swiftui-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=9.7 read=7083 reply=335/9/h49b6f226 caret-read=335,0 replace=3.78 kb=7.01 undo=2.73 kbundo=6.17}
+CHECK wr-swiftui-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=8.4 read=5620 reply=335/9/h49b6f226 caret-read=335,0 replace=4.33 kb=6.45 undo=2.74 kbundo=6.41}
+CHECK wr-swiftui-long PASS t1={real=3247/15/h3ca63fec caret=3247,0 s=19.7 read=14662 reply=3247/15/h3ca63fec caret-read=3247,0 replace=9.56 kb=18.75 undo=3.05 kbundo=18.72} t2={real=3247/15/h3ca63fec caret=3247,0 s=20.2 read=16151 reply=3247/15/h3ca63fec caret-read=3247,0 replace=8.82 kb=18.16 undo=2.75 kbundo=18.19}
+CHECK wr-swiftui-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=21.4 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0}
+CHECK wr-swiftui-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=9.6 read=5691 reply=460/9/h0755cc33 caret-read=460,0 replace=4.30 kb=7.86 undo=3.12 kbundo=7.50}
