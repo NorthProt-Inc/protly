@@ -1,0 +1,393 @@
+STATUS test-failed
+source 20c073c3b0c00cc53c85dbfb83d49ec619555c31
+xcode Xcode 26.6 Build version 17F113 
+network key: present (CI key); DerivedData cache: restore only, not saved in this run
+FILTER PhoneChecksUITests/test0_access PhoneChecksUITests/test5g_wholenative (a debug run, outside the run budget; other IDs are NOT-RUN)
+runtime iOS 26.5 (com.apple.CoreSimulator.SimRuntime.iOS-26-5)
+device iPhone-13-Pro (4FBD51D3-F915-47D8-8EE8-3F4731E32FF3), 390 pt wide
+build ok
+AppleKeyboards ("com.northprot.protly.cihost.keyboard","emoji@sw=Emoji","en_US@sw=QWERTY;hw=Automatic")
+appearance dark
+memory sampler pid 6839, probe 0, network 1
+test failures (3 lines, test-failures.txt):
+  2026-11-22 21:17:40.519383+0000 ProtlyCIUITests-Runner[8435:35349] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+  2026-11-22 21:17:40.568172+0000 ProtlyCIUITests-Runner[8435:35349] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+  /Users/runner/work/protly/protly/ios-app/CI/UITests/CardChecks.swift:117: error: -[ProtlyCIUITests.PhoneChecksUITests test5g_wholenative] : Failed to get screenshot: Timed out while requesting screenshot.
+web-events.txt: none (the web screen did not run)
+tests failed (xcodebuild exit 65)
+filter entries with no passing test case: PhoneChecksUITests/test5g_wholenative 
+RESULT NOT-RUN (filtered run: KeyboardShotsUITests not selected)
+CHECKS
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-en NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-fast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-ko NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-kofast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-kopick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pickmid NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pickmove NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-word NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-en NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-fast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-ko NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-kofast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-kopick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pickmid NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pickmove NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-word NOT-RUN filtered run: its test method was not selected
+CHECK hb-apple NOT-RUN filtered run: its test method was not selected
+CHECK hb-cancel NOT-RUN filtered run: its test method was not selected
+CHECK hb-card NOT-RUN filtered run: its test method was not selected
+CHECK hb-emoji NOT-RUN filtered run: its test method was not selected
+CHECK hb-globe NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-emoji NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-fresh NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-globe NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-long NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-switch NOT-RUN filtered run: its test method was not selected
+CHECK hb-kill-hidden NOT-RUN filtered run: its test method was not selected
+CHECK hb-kill-up NOT-RUN filtered run: its test method was not selected
+CHECK hb-launch NOT-RUN filtered run: its test method was not selected
+CHECK hb-switch NOT-RUN filtered run: its test method was not selected
+CHECK hb-switch-hidden NOT-RUN filtered run: its test method was not selected
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK lat-lexical-smid NOT-RUN filtered run: its test method was not selected
+CHECK lat-lexical-ssel NOT-RUN filtered run: its test method was not selected
+CHECK lat-lexical-swin NOT-RUN filtered run: its test method was not selected
+CHECK lat-swiftui-smid FAIL unreadable: no checks.txt
+CHECK lat-swiftui-ssel FAIL unreadable: no checks.txt
+CHECK lat-swiftui-swin FAIL unreadable: no checks.txt
+CHECK lat-textarea-smid NOT-RUN filtered run: its test method was not selected
+CHECK lat-textarea-ssel NOT-RUN filtered run: its test method was not selected
+CHECK lat-textarea-swin NOT-RUN filtered run: its test method was not selected
+CHECK lat-uikit-smid FAIL unreadable: no checks.txt
+CHECK lat-uikit-ssel FAIL unreadable: no checks.txt
+CHECK lat-uikit-swin FAIL unreadable: no checks.txt
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-emoji NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-long NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-mid NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-s3 NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-sel NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-smid NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-ssel NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-swin NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-win NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-x14k NOT-RUN filtered run: its test method was not selected
+CHECK wr-swiftui-emoji FAIL unreadable: no checks.txt
+CHECK wr-swiftui-etail FAIL unreadable: no checks.txt
+CHECK wr-swiftui-long FAIL unreadable: no checks.txt
+CHECK wr-swiftui-mid FAIL unreadable: no checks.txt
+CHECK wr-swiftui-s3 FAIL unreadable: no checks.txt
+CHECK wr-swiftui-sel FAIL unreadable: no checks.txt
+CHECK wr-swiftui-shead FAIL unreadable: no checks.txt
+CHECK wr-swiftui-smid FAIL unreadable: no checks.txt
+CHECK wr-swiftui-ssel FAIL unreadable: no checks.txt
+CHECK wr-swiftui-swin FAIL unreadable: no checks.txt
+CHECK wr-swiftui-win FAIL unreadable: no checks.txt
+CHECK wr-swiftui-x14k FAIL unreadable: no checks.txt
+CHECK wr-textarea-emoji NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-long NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-mid NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-s3 NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-sel NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-smid NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-ssel NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-swin NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-win NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-x14k NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-cancel FAIL unreadable: no checks.txt
+CHECK wr-uikit-emoji FAIL unreadable: no checks.txt
+CHECK wr-uikit-etail FAIL unreadable: no checks.txt
+CHECK wr-uikit-long FAIL unreadable: no checks.txt
+CHECK wr-uikit-mid FAIL unreadable: no checks.txt
+CHECK wr-uikit-r4k FAIL unreadable: no checks.txt
+CHECK wr-uikit-s3 FAIL unreadable: no checks.txt
+CHECK wr-uikit-sel FAIL unreadable: no checks.txt
+CHECK wr-uikit-shead FAIL unreadable: no checks.txt
+CHECK wr-uikit-smid FAIL unreadable: no checks.txt
+CHECK wr-uikit-ssel FAIL unreadable: no checks.txt
+CHECK wr-uikit-swin FAIL unreadable: no checks.txt
+CHECK wr-uikit-win FAIL unreadable: no checks.txt
+CHECK wr-uikit-x14k FAIL unreadable: no checks.txt
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
+CHECKS pass 0 fail 32 record 0 skip 0 not-run 138
+--- last 200 lines of test.log
+    t =     0.04s Set Up
+    t =     0.82s Open com.northprot.protly.cihost
+    t =     0.82s     Launch com.northprot.protly.cihost
+2026-11-22 21:18:44.198 xcodebuild[6844:29279] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-22 21:18:44.198 xcodebuild[6844:29279] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    10.26s         Setting up automation session
+    t =    10.94s         Wait for com.northprot.protly.cihost to idle
+    t =    12.54s Find the Window (First Match)
+    t =    14.13s Checking existence of `"q" Key`
+    t =    16.76s Checking existence of `"Q" Key`
+    t =    17.05s Checking existence of `Any (First Match)`
+    t =    17.56s Checking existence of `Key (First Match)`
+    t =    18.12s Checking existence of `"q" Key`
+    t =    18.20s Checking existence of `"Q" Key`
+    t =    18.33s Checking existence of `Any (First Match)`
+    t =    20.13s Checking existence of `Key (First Match)`
+    t =    21.17s Checking existence of `"q" Key`
+    t =    21.56s Checking existence of `"Q" Key`
+    t =    21.83s Checking existence of `Any (First Match)`
+    t =    22.30s Checking existence of `Key (First Match)`
+    t =    22.71s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    23.15s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    23.31s Waiting 2.0s for "clear" Button to exist
+    t =    24.35s     Checking `Expect predicate `existsNoRetry == 1` for object "clear" Button`
+    t =    24.35s         Checking existence of `"clear" Button`
+    t =    24.51s Tap "clear" Button
+    t =    24.51s     Wait for com.northprot.protly.cihost to idle
+    t =    24.51s     Find the "clear" Button
+    t =    24.61s     Check for interrupting elements affecting "clear" Button
+    t =    24.71s     Synthesize event
+    t =    25.04s     Wait for com.northprot.protly.cihost to idle
+    t =    25.65s Waiting 2.0s for "field" Any to exist
+    t =    26.68s     Checking `Expect predicate `existsNoRetry == 1` for object "field" Any`
+    t =    26.68s         Checking existence of `"field" Any`
+    t =    26.95s Find the "field" Any
+    t =    27.20s Checking existence of `"q" Key`
+    t =    27.27s Checking existence of `"Q" Key`
+    t =    27.38s Checking existence of `Any (First Match)`
+    t =    27.62s Checking existence of `Key (First Match)`
+    t =    27.93s Waiting 3.0s for "rfill-1" Button to exist
+    t =    28.97s     Checking `Expect predicate `existsNoRetry == 1` for object "rfill-1" Button`
+    t =    28.98s         Checking existence of `"rfill-1" Button`
+    t =    29.16s Tap "rfill-1" Button
+    t =    29.16s     Wait for com.northprot.protly.cihost to idle
+    t =    29.17s     Find the "rfill-1" Button
+    t =    29.30s     Check for interrupting elements affecting "rfill-1" Button
+    t =    29.41s     Synthesize event
+    t =    29.78s     Wait for com.northprot.protly.cihost to idle
+    t =    30.60s Waiting 3.0s for "rsync" Button to exist
+    t =    31.62s     Checking `Expect predicate `existsNoRetry == 1` for object "rsync" Button`
+    t =    31.62s         Checking existence of `"rsync" Button`
+    t =    31.75s Tap "rsync" Button
+    t =    31.75s     Wait for com.northprot.protly.cihost to idle
+    t =    31.75s     Find the "rsync" Button
+    t =    31.85s     Check for interrupting elements affecting "rsync" Button
+    t =    31.99s     Synthesize event
+    t =    32.31s     Wait for com.northprot.protly.cihost to idle
+    t =    33.62s Waiting 2.0s for "field" Any to exist
+    t =    34.66s     Checking `Expect predicate `existsNoRetry == 1` for object "field" Any`
+    t =    34.66s         Checking existence of `"field" Any`
+    t =    34.93s Find the "field" Any
+    t =    35.18s Waiting 2.0s for "sel" Any to exist
+    t =    36.21s     Checking `Expect predicate `existsNoRetry == 1` for object "sel" Any`
+    t =    36.21s         Checking existence of `"sel" Any`
+    t =    36.35s Find the "sel" Any
+    t =    36.71s Tap Target Application 'com.northprot.protly.cihost'[0.00, 0.00] -> (74.3, 747.5)
+    t =    36.71s     Wait for com.northprot.protly.cihost to idle
+    t =    36.71s     Find the Target Application 'com.northprot.protly.cihost'
+    t =    36.80s     Check for interrupting elements affecting "ProtlyCIHost" Application
+    t =    36.89s     Synthesize event
+    t =    36.90s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    36.96s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    37.04s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    37.39s     Wait for com.northprot.protly.cihost to idle
+    t =    37.79s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    38.73s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    41.03s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    41.75s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    43.70s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    44.32s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    44.57s Waiting 2.0s for "sel" Any to exist
+    t =    45.61s     Checking `Expect predicate `existsNoRetry == 1` for object "sel" Any`
+    t =    45.61s         Checking existence of `"sel" Any`
+    t =    45.66s Find the "sel" Any
+    t =    46.32s Tap Target Application 'com.northprot.protly.cihost'[0.00, 0.00] -> (322.6, 727.4)
+    t =    46.32s     Wait for com.northprot.protly.cihost to idle
+    t =    46.33s     Find the Target Application 'com.northprot.protly.cihost'
+    t =    46.40s     Check for interrupting elements affecting "ProtlyCIHost" Application
+    t =    46.49s     Synthesize event
+    t =    46.50s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    46.56s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    46.61s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    46.99s     Wait for com.northprot.protly.cihost to idle
+    t =    47.96s Waiting 2.0s for "field" Any to exist
+    t =    48.98s     Checking `Expect predicate `existsNoRetry == 1` for object "field" Any`
+    t =    48.98s         Checking existence of `"field" Any`
+    t =    49.20s Find the "field" Any
+    t =    49.42s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    50.21s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    50.97s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    51.40s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    52.16s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    52.48s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    52.88s Tap Target Application 'com.northprot.protly.cihost'[0.00, 0.00] -> (74.3, 747.5)
+    t =    52.88s     Wait for com.northprot.protly.cihost to idle
+    t =    52.88s     Find the Target Application 'com.northprot.protly.cihost'
+    t =    52.95s     Check for interrupting elements affecting "ProtlyCIHost" Application
+    t =    53.03s     Synthesize event
+    t =    53.04s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    53.11s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    53.20s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    53.58s     Wait for com.northprot.protly.cihost to idle
+    t =    53.95s Waiting 2.0s for "field" Any to exist
+    t =    55.01s     Checking `Expect predicate `existsNoRetry == 1` for object "field" Any`
+    t =    55.01s         Checking existence of `"field" Any`
+    t =    55.43s Find the "field" Any
+    t =    55.70s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    56.30s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    57.10s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    57.58s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    58.34s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    58.74s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    59.04s Waiting 2.0s for "clear" Button to exist
+    t =    60.06s     Checking `Expect predicate `existsNoRetry == 1` for object "clear" Button`
+    t =    60.07s         Checking existence of `"clear" Button`
+    t =    60.31s Tap "clear" Button
+    t =    60.31s     Wait for com.northprot.protly.cihost to idle
+    t =    60.32s     Find the "clear" Button
+    t =    60.41s     Check for interrupting elements affecting "clear" Button
+    t =    60.53s     Synthesize event
+    t =    60.86s     Wait for com.northprot.protly.cihost to idle
+    t =    61.47s Waiting 2.0s for "field" Any to exist
+    t =    62.48s     Checking `Expect predicate `existsNoRetry == 1` for object "field" Any`
+    t =    62.48s         Checking existence of `"field" Any`
+    t =    62.81s Find the "field" Any
+    t =    63.05s Checking existence of `"q" Key`
+    t =    63.13s Checking existence of `"Q" Key`
+    t =    63.21s Checking existence of `Any (First Match)`
+    t =    63.42s Checking existence of `Key (First Match)`
+    t =    63.76s Waiting 3.0s for "rfill-1" Button to exist
+    t =    64.81s     Checking `Expect predicate `existsNoRetry == 1` for object "rfill-1" Button`
+    t =    64.81s         Checking existence of `"rfill-1" Button`
+    t =    64.93s Tap "rfill-1" Button
+    t =    64.93s     Wait for com.northprot.protly.cihost to idle
+    t =    64.94s     Find the "rfill-1" Button
+    t =    65.04s     Check for interrupting elements affecting "rfill-1" Button
+    t =    65.15s     Synthesize event
+    t =    65.48s     Wait for com.northprot.protly.cihost to idle
+    t =    66.29s Waiting 3.0s for "rsync" Button to exist
+    t =    67.33s     Checking `Expect predicate `existsNoRetry == 1` for object "rsync" Button`
+    t =    67.33s         Checking existence of `"rsync" Button`
+    t =    67.41s Tap "rsync" Button
+    t =    67.41s     Wait for com.northprot.protly.cihost to idle
+    t =    67.42s     Find the "rsync" Button
+    t =    67.48s     Check for interrupting elements affecting "rsync" Button
+    t =    67.59s     Synthesize event
+    t =    67.92s     Wait for com.northprot.protly.cihost to idle
+    t =    69.24s Waiting 2.0s for "field" Any to exist
+    t =    70.28s     Checking `Expect predicate `existsNoRetry == 1` for object "field" Any`
+    t =    70.28s         Checking existence of `"field" Any`
+    t =    70.64s Find the "field" Any
+    t =    70.91s Waiting 2.0s for "sel" Any to exist
+    t =    71.99s     Checking `Expect predicate `existsNoRetry == 1` for object "sel" Any`
+    t =    72.00s         Checking existence of `"sel" Any`
+    t =    72.08s Find the "sel" Any
+    t =    72.38s Tap Target Application 'com.northprot.protly.cihost'[0.00, 0.00] -> (74.3, 747.5)
+    t =    72.38s     Wait for com.northprot.protly.cihost to idle
+    t =    72.38s     Find the Target Application 'com.northprot.protly.cihost'
+    t =    72.48s     Check for interrupting elements affecting "ProtlyCIHost" Application
+    t =    72.59s     Synthesize event
+    t =    72.60s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    72.69s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    72.79s         Find the Target Application 'com.northprot.protly.cihost'
+    t =    73.17s     Wait for com.northprot.protly.cihost to idle
+    t =    73.54s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    75.86s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    77.58s Requesting snapshot of accessibility hierarchy for app with pid 9058
+    t =    80.84s Requesting snapshot of accessibility hierarchy for app with pid 9058
+/Users/runner/work/protly/protly/ios-app/CI/UITests/CardChecks.swift:117: error: -[ProtlyCIUITests.PhoneChecksUITests test5g_wholenative] : Failed to get screenshot: Timed out while requesting screenshot.
+    t =   123.69s Tear Down
+Test Case '-[ProtlyCIUITests.PhoneChecksUITests test5g_wholenative]' failed (124.119 seconds).
+Test Suite 'PhoneChecksUITests' failed at 2026-11-22 21:20:45.608.
+	 Executed 2 tests, with 1 failure (0 unexpected) in 174.043 (174.048) seconds
+Test Suite 'ProtlyCIUITests.xctest' failed at 2026-11-22 21:20:45.609.
+	 Executed 2 tests, with 1 failure (0 unexpected) in 174.043 (174.050) seconds
+Test Suite 'Selected tests' failed at 2026-11-22 21:20:45.610.
+	 Executed 2 tests, with 1 failure (0 unexpected) in 174.043 (174.053) seconds
+2026-11-22 21:21:46.261 xcodebuild[6844:29279] [MT] IDETestOperationsObserverDebug: 367.666 elapsed -- Testing started completed.
+2026-11-22 21:21:46.262 xcodebuild[6844:29279] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-22 21:21:46.262 xcodebuild[6844:29279] [MT] IDETestOperationsObserverDebug: 367.666 sec, +367.666 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/protly-shots-work/Tests.xcresult
+
+Failing tests:
+	PhoneChecksUITests.test5g_wholenative()
+
+** TEST EXECUTE FAILED **
+
+Testing started
+LEAK-GUARD pass: no key prefix in 13 files
