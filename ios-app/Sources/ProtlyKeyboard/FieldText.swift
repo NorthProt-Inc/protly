@@ -258,14 +258,26 @@ enum FieldText {
     /// One move forward by a walk's length, back to the end it started from. Counted only when the contexts show the
     /// end again (the probe saw returns land a few units short: runs 154, 155); the next walk confirms the end anyway.
     /// nil: no time left for the move. Else whether the contexts show the end again (F02c's window proof needs it).
+    /// The contexts settled after a return can still be on their way (run 1b402b4-204 uikit smid: two polls agreed on
+    /// a before-context of the line before the end, then FM's probe saw the end's and called it a bad step): they get
+    /// up to WholeRead.emptyWait to show the end. A return that landed short never shows it.
     private static func returnMove(_ p: UITextDocumentProxy, by n: Int, end: Ctx, start t0: TimeInterval,
                                    track: Track) async -> Bool? {
         guard n > 0 else { return false }
-        guard WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait)) else { return nil }
+        guard WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait) + WholeRead.emptyWait) else {
+            return nil
+        }
         track.sending()
         let s = await step(p, by: n, wait: WholeRead.moveWait)
-        let atEnd = s.c.a.isEmpty && !s.c.b.isEmpty && WholeRead.agreeAtEnd(s.c.before, end.before)
-        track.landed(atEnd ? n : nil, s.c.b)
+        func showsEnd(_ c: Ctx) -> Bool { c.a.isEmpty && !c.b.isEmpty && WholeRead.agreeAtEnd(c.before, end.before) }
+        var c = s.c, atEnd = showsEnd(c)
+        let e0 = uptime()
+        while !atEnd, uptime() - e0 < WholeRead.emptyWait {
+            await pause()
+            c = ctx(p)
+            atEnd = showsEnd(c)
+        }
+        track.landed(atEnd ? n : nil, c.b)
         return atEnd
     }
 

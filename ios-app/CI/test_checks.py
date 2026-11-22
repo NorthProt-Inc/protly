@@ -1294,31 +1294,37 @@ class WholeReadTests(unittest.TestCase):
             cursor = second + utf16(paras[1]) // 2 if m.group(5) else utf16(text)
             drafts.append((m.group(1), text, cursor))
         # F02c's short and bug drafts, rebuilt from their definitions (HostApp.swift WholeDrafts.short, short3).
-        short = marker + "\u00a71 " + sentence
+        inline = swift_string(re.search(r'static let inline = "([^"]*)"', block).group(1))
+        self.assertEqual(inline, "protly-stub read ")
+        short = inline + "\u00a71 " + sentence
         short3 = short + " Send me the notes after the call. " + sentence
-        at26 = utf16(marker + "\u00a71 " + sentence[:6])
-        self.assertIn('static let short = marker + "\\u{00A7}1 " + sentence', block)
+        head = marker + "\u00a71 " + sentence
+        at26 = utf16(inline + "\u00a71 " + sentence[:6])
+        self.assertIn('static let short = inline + "\\u{00A7}1 " + sentence', block)
         self.assertIn('static let short3 = short + " Send me the notes after the call. " + sentence', block)
+        self.assertIn('static let head = marker + "\\u{00A7}1 " + sentence', block)
         listed = re.findall(r'Draft\(name: "(\w+)"', all_block)
-        self.assertEqual(listed, ["s1", "s1mid", "s3", "etail"])
+        self.assertEqual(listed, ["s1", "s1mid", "s3", "etail", "s1head"])
         drafts += [("s1", short, utf16(short)), ("s1mid", short, at26), ("s3", short3, utf16(short3)),
-                   ("etail", short + " \U0001F600", at26)]
+                   ("etail", short + " \U0001F600", at26), ("s1head", head, utf16(head))]
         return drafts
 
     def test_the_specs_match_the_host_drafts(self):
         drafts = self.host_drafts()
         self.assertEqual([d[0] for d in drafts], ["p5", "p5mid", "xlong", "x14k", "emoji", "r4k", "s1", "s1mid", "s3",
-                                                  "etail"])
+                                                  "etail", "s1head"])
         for name, (fill, units, cursor, _) in self.specs().items():
             _, text, at = drafts[fill - 1]
-            self.assertTrue(text.startswith("protly-stub read\n"), name)
+            self.assertTrue(text.startswith("protly-stub read"), name)
             self.assertEqual((utf16(text), at), (units, cursor), name)
         # The walk-back probe's drafts under the marker line (docs/research/2026-11-21-walk-back-probe.md).
         shapes = {d[0]: (utf16(d[1][len("protly-stub read\n"):]), sum(1 for c in d[1][len("protly-stub read\n"):]
                                                                        if ord(c) > 0xFFFF)) for d in drafts}
+        # The one-line drafts carry the marker and a space in the same 17 units.
         self.assertEqual(shapes, {"p5": (318, 0), "p5mid": (318, 0), "xlong": (3230, 0), "x14k": (14038, 320),
                                   "emoji": (443, 10), "r4k": (3958, 0), "s1": (22, 0), "s1mid": (22, 0),
-                                  "s3": (76, 0), "etail": (25, 1)})
+                                  "s3": (76, 0), "etail": (25, 1), "s1head": (22, 0)})
+        self.assertNotIn("\n", drafts[6][1] + drafts[8][1] + drafts[9][1])
 
     def test_the_hash_matches_the_page_and_the_probe(self):
         # p5 318/8/h6d75860b (walk-back probe); the Swift and the page hash the same way (FNV-1a 32 over UTF-16).
