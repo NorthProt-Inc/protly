@@ -24,6 +24,17 @@ the extension id Chrome shows:
 host/install.sh <extension-id>
 ```
 
+## Claude Code prompt (terminal)
+
+`host/protly_edit.py` is an editor shim. With it set as the editor for Claude Code, Ctrl+G on a prompt draft that
+contains Hangul rewrites the draft in English in place (Opus, low effort, the same API key as the host). A draft
+without Hangul, or any other file, opens in the real editor (`$PROTLY_EDITOR`, default `nano`). On a failure the
+draft is kept. Works in any terminal. Enable it in `~/.claude/settings.json`:
+
+```json
+{ "env": { "EDITOR": "/path/to/protly/host/protly_edit.py" } }
+```
+
 ## iPhone keyboard
 
 A KeyboardKit-based keyboard with Translate, Polish and Read clipboard in its bar. Code is in `ios-app/`:
@@ -39,7 +50,7 @@ gitignored and written by `ios-app/scripts/make-secrets.sh`. Never commit it.
 | Path | Contents |
 |------|----------|
 | `src/`, `popup/`, `options/`, `manifest.json` | extension |
-| `host/` | native messaging host and installer |
+| `host/` | native messaging host and installer, Claude Code editor shim (`protly_edit.py`) |
 | `ios-app/` | iPhone app and keyboard |
 | `scripts/build.mjs` | extension build |
 | `tests/` | extension tests |
