@@ -21,7 +21,7 @@ final class ProtlyActionHandler: KeyboardAction.StandardActionHandler {
             if action == .space, gesture == .press || gesture == .release || gesture == .end {
                 drag.reset()  // a new press or the end of a drag: the next trackpad takes a new snapshot
             }
-            if action == .space, gesture == .release, let host {
+            if action == .space, let host {
                 // K4E: the space the last pick typed takes this tap's place, as on Apple's keyboard. The tap types
                 // nothing (action(for:on:) below) but runs KeyboardKit's flow, so its double-space clock starts here
                 // and the next tap ends the sentence. A release that ends a trackpad hold types nothing anyway, and
