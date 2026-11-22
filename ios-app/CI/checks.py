@@ -2,7 +2,8 @@
 """Assembles the phone checks of one CI run (docs/plans/2026-10-30-sim-phone-checks.md, Tasks 1.2-1.6 and 2.3, and
 docs/plans/2026-10-30-typing-fixes.md, Sprint 004: dark-1, ret-*, menu-*, pad-*, and
 docs/plans/2026-10-30-keyboard-ui.md, Task 3.5: card-*, mem-stream, hit-1, bar-*, app-*, and
-fix/double-space-period and fix/pick-space (K4E), docs/research/2026-11-17-keyboard-diagnosis.md P4: dsp-*).
+fix/double-space-period and fix/pick-space (K4E), docs/research/2026-11-17-keyboard-diagnosis.md P4: dsp-*, and
+fix/keyboard-height (K2, P2): hb-*).
 
 Usage: checks.py <dir> [--network-key] [--ran <entry>,<entry>...]
 
@@ -52,8 +53,13 @@ BAR_IDS = ["hit-1", "bar-dark", "bar-light", "bar-xxl", "app-dark", "app-light"]
 PERIOD_FIELDS = ("uikit", "composer")
 PERIOD_KINDS = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2", "pickmid", "pickmove")
 PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
+# K2 (report P2, the keyboard height keeps changing): the band above the bar on every presentation path, against
+# Apple's band measured in the same run (hb-apple, RECORD). The same list as PhoneRun.heightIDs in
+# UITests/HeightChecks.swift; the UI test judges each item itself.
+HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-hide-used", "hb-globe", "hb-emoji", "hb-switch",
+              "hb-card", "hb-cancel"]
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
-                + PERIOD_IDS)
+                + PERIOD_IDS + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -71,11 +77,13 @@ METHOD_IDS = {
     "test5f_period": PERIOD_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
+    "test9_height": HEIGHT_IDS,
 }
 # Methods that run only in a filtered run: without FILTERED=1 (run-shots.sh sets it with a `[shots:...]` filter) they
 # throw XCTSkip, so a full run marks their IDs NOT-RUN with this reason. test5f_period takes about 15 minutes, and full
 # runs already come close to run-shots.sh's MAIN_TEST_DEADLINE.
-FILTERED_ONLY = {"test5f_period": "runs only in a filtered run (deadline)"}
+FILTERED_ONLY = {"test5f_period": "runs only in a filtered run (deadline)",
+                 "test9_height": "runs only in a filtered run (deadline)"}
 # Methods that write no ID of their own (Full Access, the probe) and the layout test.
 OTHER_METHODS ={"PhoneChecksUITests": ("test0_access", "test0_probe"), "KeyboardShotsUITests": ("testScenarios",)}
 NOT_RUN = "NOT-RUN"
