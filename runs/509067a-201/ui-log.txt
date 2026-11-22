@@ -1,0 +1,57 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5h_wholeweb
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wr-textarea-win-t1 1795378526.032
+tapped protlyKey
+MARK wr-textarea-win-t2 1795378618.673
+tapped protlyKey
+CHECK wr-textarea-win FAIL t1={real=335/9/h49b6f226 caret=335,0 s=33.9 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected) t2={real=335/9/h49b6f226 caret=335,0 s=4.8 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-textarea-mid-t1 1795378648.899
+tapped protlyKey
+CHECK wr-textarea-mid FAIL t1={real=335/9/h49b6f226 caret=112,0 s=4.8 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-textarea-sel-t1 1795378678.382
+tapped protlyKey
+CHECK wr-textarea-sel FAIL t1={real=335/9/h49b6f226 caret=0,335 s=5.5 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-textarea-long-t1 1795378706.416
+tapped protlyKey
+MARK wr-textarea-long-t2 1795378733.540
+tapped protlyKey
+CHECK wr-textarea-long FAIL t1={real=3247/15/h3ca63fec caret=3247,0 s=4.9 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected) t2={real=3247/15/h3ca63fec caret=3247,0 s=5.2 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-textarea-x14k-t1 1795378760.198
+tapped protlyKey
+CHECK wr-textarea-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=4.2 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0}
+MARK wr-textarea-emoji-t1 1795378794.882
+tapped protlyKey
+CHECK wr-textarea-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=6.6 panel="Could not read the whole text. Copy it, then use Read clipboard." left=460/9/h0755cc33 caret-left=460,0 want 460,0}
+MARK wr-lexical-win-t1 1795378827.742
+tapped protlyKey
+MARK wr-lexical-win-t2 1795378856.570
+tapped protlyKey
+CHECK wr-lexical-win FAIL t1={real=335/9/h49b6f226 caret=335,0 s=5.3 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected) t2={real=335/9/h49b6f226 caret=335,0 s=5.7 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-lexical-mid-t1 1795378887.008
+tapped protlyKey
+CHECK wr-lexical-mid FAIL t1={real=335/9/h49b6f226 caret=112,0 s=6.1 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-lexical-sel-t1 1795378916.749
+tapped protlyKey
+CHECK wr-lexical-sel FAIL t1={real=335/9/h49b6f226 caret=0,335 s=5.6 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-lexical-long-t1 1795378947.098
+tapped protlyKey
+MARK wr-lexical-long-t2 1795378979.272
+tapped protlyKey
+CHECK wr-lexical-long FAIL t1={real=3247/15/h3ca63fec caret=3247,0 s=6.7 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected) t2={real=3247/15/h3ca63fec caret=3247,0 s=5.7 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-lexical-x14k-t1 1795379008.490
+tapped protlyKey
+CHECK wr-lexical-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=6.5 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0}
+MARK wr-lexical-emoji-t1 1795379041.888
+tapped protlyKey
+CHECK wr-lexical-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=5.4 panel="Could not read the whole text. Copy it, then use Read clipboard." left=460/9/h0755cc33 caret-left=460,0 want 460,0}
