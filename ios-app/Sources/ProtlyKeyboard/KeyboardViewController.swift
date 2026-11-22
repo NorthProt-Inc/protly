@@ -229,12 +229,12 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// Called from host callbacks: it only reads the field and decides, never writes (KeyboardSourceRulesTests).
     private func noticeFieldMoved() {
         let o = observed()
-        pickSpace.noticed(o, now: now)  // a field that no longer shows the pick ends it (K4E)
         switch watch.decide(o, composing: session.isComposing, lastTail: session.lastTail, now: now) {
         case .keep: return
         case .abandon: abandonWord()
         case .forgetLast: session.forgetLast()
         }
+        pickSpace.noticed(o, now: now)
         refreshMode()
     }
 
