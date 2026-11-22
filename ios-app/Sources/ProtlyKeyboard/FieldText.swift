@@ -168,6 +168,8 @@ enum FieldText {
             guard fits(wait) else { return end(.failed("timeUp")) }
             // A Cancel during the wait above already put the cursor back (no step was on its way): never move it again.
             if Task.isCancelled { return end(.cancelled) }
+            // Checked again right before every move: the waits above can take 0.3 s (silent-failure review).
+            guard here() else { return end(.failed("focus")) }
             let k = back ? bw.plan(before: c.before, after: c.after) : fw.plan(before: c.before, after: c.after)
             steps += 1
             track.sending()
@@ -238,6 +240,7 @@ enum FieldText {
                 logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
                 if Task.isCancelled { return end(.cancelled) }
                 guard fits(WholeRead.moveWait) else { return end(.failed("timeUp")) }
+                guard here() else { return end(.failed("focus")) }
                 track.sending()
                 let u = await step(p, by: m, wait: WholeRead.moveWait)
                 let undone = back ? bw.undone(changed: u.changed, before: u.c.before, after: u.c.after)
@@ -268,9 +271,9 @@ enum FieldText {
     /// nil: no time left for the move. Else whether the contexts show the end again (F02c's window proof needs it).
     /// The contexts settled after a return can still be on their way (run 1b402b4-204 uikit smid: two polls agreed on
     /// a before-context of the line before the end, with nothing after the cursor, then FM's probe saw the end's and
-    /// called it a bad step): with nothing after the cursor they get up to WholeRead.emptyWait to show the end. Text
-    /// after the cursor is a return that landed short (the Lexical-shaped page, 2 units after its phantom): no wait
-    /// (run 52eeb7e-217: waiting there too put two Lexical long reads past the 20 s budget).
+    /// called it a bad step): with nothing after the cursor, or no change at all, they get up to WholeRead.emptyWait to
+    /// show the end. Text after the cursor once the move showed is a return that landed short (the Lexical-shaped page,
+    /// 2 units after its phantom): no wait (run 52eeb7e-217: waiting there too put two Lexical long reads past 20 s).
     private static func returnMove(_ p: UITextDocumentProxy, by n: Int, end: Ctx, start t0: TimeInterval,
                                    track: Track) async -> Bool? {
         guard n > 0 else { return false }
@@ -281,9 +284,12 @@ enum FieldText {
         let s = await step(p, by: n, wait: WholeRead.moveWait)
         func showsEnd(_ c: Ctx) -> Bool { c.a.isEmpty && !c.b.isEmpty && WholeRead.agreeAtEnd(c.before, end.before) }
         var c = s.c, atEnd = showsEnd(c)
-        lastReturnWaited = !atEnd && c.a.isEmpty
+        // Also when the move showed nothing within moveWait (run 46fdac6-223 textarea win: FE then planned from the
+        // field's start, where the contexts still were, and refused a good read).
+        let onItsWay = { (c: Ctx) in c.a.isEmpty || !s.changed }
+        lastReturnWaited = !atEnd && onItsWay(c)
         let e0 = uptime()
-        while !atEnd, c.a.isEmpty, uptime() - e0 < WholeRead.emptyWait {
+        while !atEnd, onItsWay(c), uptime() - e0 < WholeRead.emptyWait {
             await pause()
             c = ctx(p)
             atEnd = showsEnd(c)
@@ -395,32 +401,26 @@ enum FieldText {
         if let w = shown, !WholeRead.withinWindow(w, first) { leave("longer") }
         if !c0.s.isEmpty, !first.isEmpty || fResynced {
             // Not select all (WholeRead.collapsed): a partial selection from the field's start to a line feed also shows
-            // both contexts empty (tower review of f0533ae). K1a, a copy-only card of its own text, only when the
-            // before-context back where the collapse left the cursor is exactly selectedText; else refused. A resync
-            // alone: the +1 may not have moved (the collapse was at the end already), so the cursor stays.
-            var before: [UInt16] = []
-            if first.isEmpty {
+            // both contexts empty (tower review of f0533ae). K1a, a copy-only card of its own text, only when the walk
+            // back from the end to the start reads exactly selectedText, the line feed and what the walk to the end
+            // crossed; then the cursor goes to the selection's end. Else refused. A resync alone: the +1 may not have
+            // moved (the collapse was at the end already), so the cursor stays and the read is refused.
+            guard !first.isEmpty else {
                 track.landed(nil, ctx(p).b)
-            } else {
-                let move = track.cursor.back(before: ctx(p).b)
-                if move != 0 {
-                    track.sending()
-                    let s = await step(p, by: move, wait: WholeRead.moveWait)
-                    track.landed(nil, s.c.b)
-                }
-                // A native window stops at a line feed: right after the one the collapse crossed it shows nothing (run
-                // 8be8a93-218). One unit back, at the selection's end, it shows the selection's line.
-                if ctx(p).before.isEmpty, !Task.isCancelled {
-                    track.sending()
-                    let s = await step(p, by: -1, wait: WholeRead.moveWait)
-                    track.landed(nil, s.c.b)
-                }
-                before = ctx(p).before
+                return finish(.refused, "collapse:resync")
             }
-            switch WholeRead.collapsed(crossed: first, resynced: fResynced, selected: Array(c0.s.utf16), before: before) {
-            case .partial: return finish(.text(c0.s, isSelection: true), "partialSelection")
-            case .selectAll, .unknown: return finish(.refused, first.isEmpty ? "collapse:resync" : "collapse:unproven")
+            let selected = Array(c0.s.utf16)
+            let bh = await walk(true, cap: WholeRead.cap, "bh")
+            guard case .done(let whole) = bh else { return await stopped(bh, "bh") }
+            guard WholeRead.collapsed(crossed: first, resynced: fResynced, selected: selected, whole: whole) == .partial
+            else { return await refuse("collapse:unproven") }
+            // From the field's start to the selection's end, in one move (the selection cannot come back).
+            if WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait)), !Task.isCancelled {
+                track.sending()
+                let s = await step(p, by: selected.count, wait: WholeRead.moveWait)
+                track.landed(nil, s.c.b)
             }
+            return finish(.text(c0.s, isSelection: true), "partialSelection", whole)
         }
         let end = ctx(p)
         // Select all: the window is the field's end now that the walk there crossed nothing.
@@ -565,7 +565,8 @@ enum FieldText {
             // An empty field in the contexts after the bound, quiet: the proxy may have stopped following the host (run
             // 8be8a93-218 etail: b=0 a=0 for 4.7 s while the field held the result). The check walk moves the cursor,
             // which refreshes the contexts, and decides; an empty field fails it as before.
-            let blank = c.b.isEmpty && c.a.isEmpty && !new.isEmpty
+            // Only in the field Replace wrote to: with no document from iOS, another empty field would open it (code review).
+            let blank = c.b.isEmpty && c.a.isEmpty && !new.isEmpty && FieldGuard.focus(before: doc0, now: document()) == .same
             if uptime() >= settle, uptime() - quietFrom >= WholeRead.quiet, shows(new, c) || blank {
                 shown = true
                 break
@@ -633,9 +634,11 @@ enum FieldText {
                 } else {
                     found = "ve"
                 }
-            case .done:
+            case .done(let read):
                 found = "vOther"
-                evidence = true
+                // Nothing read (a start probe on contexts that did not follow the host yet) is no evidence of other text:
+                // the second attempt may run (silent-failure review).
+                evidence = !read.isEmpty
             case .failed(let w):
                 found = "v" + w.prefix(1).uppercased() + w.dropFirst()
                 evidence = w == "tooLong"
