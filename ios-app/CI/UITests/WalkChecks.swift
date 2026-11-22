@@ -122,7 +122,7 @@ extension PhoneRun {
             return
         }
         d.app.terminate()
-        d.launch(arguments: ["-screen", "readweb", "-uniquedrafts", "1"])
+        d.launch(arguments: ["-screen", "readweb"])
         d.fixedRow1 = row1
         defer { d.fixedRow1 = nil }
         let web = ReadWeb(d: d)
