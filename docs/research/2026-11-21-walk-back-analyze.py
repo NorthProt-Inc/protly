@@ -97,21 +97,24 @@ for name, _mt in marks:
         for l in L:
             if l.startswith(("walk start", "walk collapse", "walk base")):
                 print("   ", l[:200])
-        for pol in ("unit", "jump", "jump1"):
+        for pol in ("unit", "jump", "jump1", "np"):
             s = first(L, f"wb {pol} done ")
             if not s:
-                print(f"    {pol}: no summary")
                 continue
-            m = re.match(r"wb \S+ done (\d+)/(\d+)/h([0-9a-f]{8})/(\S+) steps=(\d+) ms=(\d+) (.*)", s)
-            n, lf, h, why, steps, ms, rest = m.groups()
-            ok = "MATCH" if h == real_hash else ""
-            wr = first(L, f"wr {pol} ")
-            code = re.search(r" (r1|rs|rx) ", wr).group(1) if wr else "-"
-            print(f"    {pol:5s} {n}/{lf}/h{h} {why} steps={steps} ms={ms} return={code} {ok}  [{rest[:160]}]")
-            totals[f"{pol} reason={why}"] += 1
-            if ok:
-                totals[f"{pol} match"] += 1
-        for tag in ("f", "fj", "fj1"):
+            # Every walk of this policy in the read (the k1b branch walks np twice).
+            for s in [l for l in L if l.startswith(f"wb {pol} done ")]:
+                m = re.match(r"wb \S+ done (\d+)/(\d+)/h([0-9a-f]{8})/(\S+) steps=(\d+) ms=(\d+) (.*)", s)
+                n, lf, h, why, steps, ms, rest = m.groups()
+                ok = "MATCH" if h == real_hash else ""
+                print(f"    {pol:5s} {n}/{lf}/h{h} {why} steps={steps} ms={ms} {ok}  [{rest[:170]}]")
+                totals[f"{pol} reason={why}"] += 1
+                totals[f"{pol} walks"] += 1
+                if ok:
+                    totals[f"{pol} match"] += 1
+        for l in L:
+            if l.startswith(("wr ", "walk big")):
+                print("   ", l[:200])
+        for tag in ("f", "fj", "fj1", "fa", "fm", "fe"):
             s = first(L, f"wf {tag} done ")
             if s:
                 print(f"    wf {tag}: {s.split(' done ', 1)[1][:90]}")
