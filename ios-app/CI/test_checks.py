@@ -1426,5 +1426,55 @@ def fnv16(text):
     return f"{h:08x}"
 
 
+HEIGHT_METHOD = "PhoneChecksUITests/test9_height"
+
+
+class HeightTests(unittest.TestCase):
+    """fix/keyboard-height (K2, report P2): the band above the bar on every presentation path (UITests/HeightChecks.swift)."""
+
+    def test_every_id_is_expected_and_has_a_method(self):
+        ids = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
+               "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
+               "hb-card", "hb-cancel"]
+        self.assertEqual(checks.HEIGHT_IDS, ids)
+        self.assertEqual(checks.METHOD_IDS["test9_height"], ids)
+        for i in ids:
+            self.assertIn(i, checks.EXPECTED_IDS)
+        self.assertTrue(checks.known_entry(HEIGHT_METHOD))
+
+    def test_the_ui_test_writes_the_same_ids(self):
+        with open(os.path.join(HERE, "UITests", "HeightChecks.swift"), encoding="utf-8") as f:
+            swift = f.read()
+        block = swift[swift.index("static let heightIDs"):]
+        self.assertEqual(re.findall(r'"(hb-[\w-]+)"', block[:block.index("]")]), checks.HEIGHT_IDS)
+
+    def test_the_ui_test_skips_itself_outside_a_filtered_run(self):
+        with open(os.path.join(HERE, "UITests", "PhoneChecksUITests.swift"), encoding="utf-8") as f:
+            swift = f.read()
+        method = swift[swift.index("func test9_height()"):]
+        method = method[:method.index("\n    }\n")]
+        self.assertIn('environment["FILTERED"] == "1"', method)
+        self.assertIn("XCTSkip", method)
+
+    def test_the_test_judges_pass_and_fail_and_checks_keeps_them(self):
+        lines = ('CHECK hb-hide-switch PASS shots="52.00@512.00/564.00" band=52.00..52.00 apple=52.00 wrong=0\n'
+                 'CHECK hb-globe FAIL shots="69.00@495.00/564.00" band=69.00..69.00 apple=52.00 wrong=1 (not as expected)\n'
+                 'CHECK hb-apple RECORD shots="52.00@509.00/561.00/english" band=52.00..52.00 apple=5/5\n')
+        final = {c.id: c for c in checks.assemble(lines, "", "", ran=checks.covered_ids([HEIGHT_METHOD]))}
+        self.assertEqual(final["hb-hide-switch"].status, "PASS")
+        self.assertEqual(final["hb-globe"].status, "FAIL")
+        self.assertEqual(final["hb-apple"].status, "RECORD")
+        # Every other height ID without a line is FAIL, and the other methods' IDs are NOT-RUN.
+        self.assertEqual(final["hb-switch"].status, "FAIL")
+        self.assertIn("no CHECK line", final["hb-switch"].evidence)
+        self.assertEqual(final["pad-1"].status, checks.NOT_RUN)
+
+    def test_a_full_run_marks_the_height_ids_not_run(self):
+        final = {c.id: c for c in checks.assemble(every_id_but(*checks.PERIOD_IDS, *checks.HEIGHT_IDS), "", "")}
+        for i in checks.HEIGHT_IDS:
+            self.assertEqual(final[i].status, checks.NOT_RUN, i)
+            self.assertIn("runs only in a filtered run (deadline)", final[i].evidence)
+        self.assertFalse(any(c.status == "FAIL" for c in final.values()))
+
 if __name__ == "__main__":
     unittest.main()

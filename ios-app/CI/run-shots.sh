@@ -84,8 +84,8 @@ if ! filter="$(python3 "$here/shotsfilter.py" 2> "$work/filter.err")"; then
 fi
 only_args=()
 layout=1
-# FILTERED=1 reaches the tests in a debug run: test5f_period runs only then (it would push a full run past
-# MAIN_TEST_DEADLINE; in a full run it skips itself and checks.py marks its IDs NOT-RUN).
+# FILTERED=1 reaches the tests in a debug run: test5f_period and test9_height run only then (they would push a full
+# run past MAIN_TEST_DEADLINE; in a full run they skip themselves and checks.py marks their IDs NOT-RUN).
 filtered=0
 if [ -n "$filter" ]; then
   layout=0
@@ -379,9 +379,9 @@ for test in manifest:
 EOF
 fi
 # The keyboard's own height log (ProtlyHeight.swift), for what iOS did between the screenshots, and its read log
-# (FieldText.swift, K1b): the whole test step (at most 75 min of tests after the build), not its last 30 minutes (run
-# 28c1fef-164 lost the read lines of its first 45 minutes).
-xcrun simctl spawn "$udid" log show --last 100m --debug --info --style compact \
+# (FieldText.swift, K1b). 120 minutes, the whole test step: with 30, a full run's log started after the layout test
+# (docs/research/2026-11-17-keyboard-diagnosis.md, P2), and run 28c1fef-164 lost the read lines of its first 45 minutes.
+xcrun simctl spawn "$udid" log show --last 120m --debug --info --style compact \
   --predicate 'subsystem == "com.northprot.protly"' > "$out/keyboard-log.txt" 2>&1
 # The web composer's DOM event log (typing-fixes 004, HostApp.swift `-screen web`): the host appends it in its
 # Documents folder; it goes into the run folder next to the ret-* lines.

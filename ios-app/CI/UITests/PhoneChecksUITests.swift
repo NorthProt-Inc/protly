@@ -21,7 +21,7 @@ final class PhoneChecksUITests: XCTestCase {
         "test5d_card": 720, "test5e_bar": 600, "test5f_period": 1500, "test5g_wholenative": 1800,
         "test5h_wholeweb": 1800,
         // K1b: every Translate and Polish reads the whole field first (3-5 s on a short draft, run 7cdefa4-180).
-        "test6_85net": 1380, "test7_77": 1380,
+        "test6_85net": 1380, "test7_77": 1380, "test9_height": 2100,
     ]
 
     override func setUpWithError() throws {
@@ -148,6 +148,16 @@ final class PhoneChecksUITests: XCTestCase {
     @MainActor
     func test7_77() throws {
         try PhoneRun(test: self, name: "test7_77").checks77()
+    }
+
+    /// K2 (HeightChecks.swift): the band above the bar on every presentation path, against Apple's band measured in
+    /// the same run. Only in a filtered run (FILTERED=1, run-shots.sh), like test5f_period: about 15 minutes.
+    @MainActor
+    func test9_height() throws {
+        guard ProcessInfo.processInfo.environment["FILTERED"] == "1" else {
+            throw XCTSkip("runs only in a filtered run (deadline)")
+        }
+        try PhoneRun(test: self, name: "test9_height", arguments: PhoneRun.heightArguments).heightChecks()
     }
 }
 
