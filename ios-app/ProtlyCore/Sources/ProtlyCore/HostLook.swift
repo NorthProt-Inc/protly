@@ -3,22 +3,27 @@ import Foundation
 // K2 (docs/research/2026-11-17-keyboard-diagnosis.md, P2: "why does the keyboard height keep changing"). iOS 26 draws
 // a third-party keyboard's glass in one of two looks: flush with the keyboard's view, or `hostTopMargin` above it. The
 // host's history decides which, never the keyboard's height: a pin of 240, 257, 260 or 274 pt got the same look on
-// every path (iOS 26.5 simulator, flight F03 runs 159-168). The keyboard cannot see the look in its own geometry
+// every path (iOS 26.5 simulator, flight F03 runs 159-174). The keyboard cannot see the look in its own geometry
 // (wide probe, runs 159-161). So it keeps what it knows across presentations and pins its view to the content's
 // height where it believes iOS draws no margin, and `hostTopMargin` less where it believes iOS does: the band above the
 // bar is Apple's 52 pt in both looks, and the rows do not move (the content sits at the view's bottom).
 //
 // Rules (what the simulator showed; the keyboard process keeps one HostLook for its host):
-// 1. A new host shows no margin. The controller before was never told it disappeared: its host was terminated.
-// 2. The host coming back from the background with the keyboard up shows the margin from then on. Its notice
+// 1. The host leaving with the keyboard up shows no margin afterwards, unless it comes back with the keyboard up
+//    (rule 2): a relaunch after the host was killed in the background is a fresh host. Leaving is a controller that
+//    disappears within `resignWindow` of NSExtensionHostWillResignActive (0.9-1.2 s on the simulator).
+//    1b. A controller that went without viewDidDisappear went with its host (terminated in the foreground): the next
+//    one is a fresh host.
+// 2. The host coming back with the keyboard up, after leaving with it up, shows the margin from then on. Its notice
 //    (NSExtensionHostDidBecomeActive) reaches a controller `freshWindow` or younger (0.22-0.41 s after loading), or
-//    comes up to `earlyWindow` before the controller loads (run 59: 32 ms). Over an older controller (Control Center,
-//    an alert, Face ID over a live keyboard) iOS keeps its look.
-// 3. Hide and show keep the look of the presentation before.
+//    comes up to `earlyWindow` before the controller loads (run 59: 32 ms). Without leaving first (Control Center, an
+//    alert, Face ID or a notification reply over a live keyboard, a cold launch) iOS keeps its look.
+// 3. Hide and show keep the look of the presentation before. An app switch with the keyboard hidden too (runs 177,
+//    178: no notice reaches the keyboard, and iOS kept no margin).
 // 4. Back from another keyboard shows no margin: the field kept its document (iOS's documentIdentifier) while another
-//    keyboard was up. True after Emoji; after Apple's English keyboard iOS draws the margin, and the keyboard cannot
-//    tell the two apart (a guess that Emoji is the one people come back from). A host return for this controller
-//    (rule 2) wins: the field keeps its document across the background too.
+//    keyboard was up. A hide leaves no document (run 177). True after Emoji; after Apple's English keyboard iOS draws
+//    the margin, and the keyboard cannot tell the two apart (a guess that Emoji is the one people come back from). A
+//    return from leaving (rule 2) is not this.
 
 public struct HostLook: Sendable, Equatable {
     /// The glass iOS 26 draws above a third-party keyboard in its margin look (iOS 26.5 simulator; the phone showed
@@ -28,14 +33,26 @@ public struct HostLook: Sendable, Equatable {
     public static let freshWindow = 2.0
     /// How soon before a controller loads the host's return still counts as meant for it.
     public static let earlyWindow = 0.5
+    /// How soon after the resign notice a disappearing controller counts as the host leaving with the keyboard up.
+    public static let resignWindow = 3.0
+
+    /// How the field's document at an appearance compares with the one when the last controller disappeared.
+    public enum Document: String, Sendable {
+        case none, same, other
+    }
 
     /// Whether the keyboard believes iOS draws its margin above the keyboard now.
     public private(set) var margin = false
-    /// When the current controller loaded (seconds, the keyboard's monotonic clock).
+    /// When the current controller loaded or was shown again (seconds, the keyboard's monotonic clock).
     private var loadedAt: Double?
-    /// When the host last came back (any controller saw it).
-    private var hostReturnedAt: Double?
-    /// Whether the last controller was told it disappeared (false while one is up).
+    private var resignedAt: Double?
+    /// The host left with the keyboard up and has not come back with it (rule 1).
+    private var leaving = false
+    /// When the host came back after leaving, while no controller had loaded for it yet.
+    private var returnedAt: Double?
+    /// The current controller is the host's return (rule 2), so rule 4 does not apply to it.
+    private var cameBack = false
+    /// Whether no controller is up: false from an appearance to its disappearance.
     private var endedCleanly = true
     /// The field's document when the last controller disappeared.
     private var lastDocument: UUID?
@@ -49,34 +66,60 @@ public struct HostLook: Sendable, Equatable {
 
     /// A new controller loaded.
     public mutating func loaded(at now: Double) {
-        if !endedCleanly { margin = false }  // rule 1
-        endedCleanly = false
+        if !endedCleanly {  // rule 1b
+            margin = false
+            leaving = false
+            endedCleanly = true
+        }
         loadedAt = now
-        if let back = hostReturnedAt, now >= back, now - back < Self.earlyWindow { margin = true }  // rule 2, early
+        cameBack = false
+        if let back = returnedAt, now >= back, now - back < Self.earlyWindow { arrived() }  // rule 2, early
     }
 
     /// The controller appears, in the field's `document` (nil when iOS gives none).
-    public mutating func appeared(document: UUID?, at now: Double) {
+    @discardableResult
+    public mutating func appeared(document: UUID?, at now: Double) -> Document {
         // Shown again after its fresh window: a new window for the host's return, as a new controller would get.
         if let loadedAt, now - loadedAt >= Self.freshWindow { self.loadedAt = now }
-        if margin, let document, document == lastDocument, !hostReturnedForThisController { margin = false }  // rule 4
+        endedCleanly = false
+        guard let document else { return .none }
+        guard document == lastDocument else { return .other }
+        if margin, !leaving, !cameBack { margin = false }  // rule 4
+        return .same
     }
 
-    /// The host came back within `earlyWindow` before this controller loaded, or since.
-    private var hostReturnedForThisController: Bool {
-        guard let back = hostReturnedAt, let loadedAt else { return false }
-        return back >= loadedAt - Self.earlyWindow
+    /// NSExtensionHostWillResignActive.
+    public mutating func hostWillResignActive(at now: Double) {
+        resignedAt = now
     }
 
     /// NSExtensionHostDidBecomeActive.
     public mutating func hostBecameActive(at now: Double) {
-        hostReturnedAt = now
-        if let loadedAt, now - loadedAt < Self.freshWindow { margin = true }  // rule 2
+        guard leaving else { return }
+        if let loadedAt, now >= loadedAt, now - loadedAt < Self.freshWindow {
+            arrived()
+        } else {
+            returnedAt = now
+        }
     }
 
     /// The controller disappeared from the field's `document` (viewDidDisappear; nil when iOS gives none).
-    public mutating func disappeared(document: UUID?) {
+    public mutating func disappeared(document: UUID?, at now: Double) {
         endedCleanly = true
         lastDocument = document
+        if let resignedAt, now >= resignedAt, now - resignedAt < Self.resignWindow {  // rule 1
+            margin = false
+            leaving = true
+            returnedAt = nil
+            self.resignedAt = nil
+        }
+    }
+
+    /// The host came back with the keyboard up (rule 2).
+    private mutating func arrived() {
+        margin = true
+        leaving = false
+        returnedAt = nil
+        cameBack = true
     }
 }

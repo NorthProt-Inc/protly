@@ -86,9 +86,12 @@ final class KeyboardSourceRulesTests: XCTestCase {
         let ns = text as NSString
         for (declaration, call) in [
             ("static func pin(", "look.loaded(at: now)"),
-            ("static func presented(", "look.appeared(document: document(controller)"),
-            ("static func disappeared(", "look.disappeared(document: document(controller))"),
-            ("private static func observeHost()", "look.hostBecameActive(at:"),
+            ("static func presented(", "look.appeared(document: document(controller), at: now)"),
+            ("static func disappeared(", "look.disappeared(document: document(controller), at: now)"),
+            ("private static func observeHost()", ".NSExtensionHostWillResignActive"),
+            ("private static func observeHost()", "$0.hostWillResignActive(at: $1)"),
+            ("private static func observeHost()", ".NSExtensionHostDidBecomeActive"),
+            ("private static func observeHost()", "$0.hostBecameActive(at: $1)"),
             ("private static func follow(", "look.pin(content:"),
         ] {
             let body = body(of: declaration, in: ns).map { ns.substring(with: $0) } ?? ""

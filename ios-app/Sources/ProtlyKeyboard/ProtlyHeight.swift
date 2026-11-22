@@ -49,44 +49,55 @@ final class ProtlyHeight: NSObject {
 
     /// Call from viewWillAppear.
     static func presented(_ controller: KeyboardInputViewController) {
-        look.appeared(document: document(controller), at: now)
-        follow("will appear")
+        let match = look.appeared(document: document(controller), at: now)
+        follow("will appear, document \(match.rawValue)")
     }
 
     /// Call from viewDidDisappear.
     static func disappeared(_ controller: KeyboardInputViewController) {
-        look.disappeared(document: document(controller))
+        look.disappeared(document: document(controller), at: now)
+        follow("did disappear")
     }
 
     /// The field's document, nil while iOS gives none. Swift imports `documentIdentifier` as a non-optional UUID, and
     /// reading it before iOS has a document traps (probe runs 170 and 173: the keyboard never logged a line).
     private static func document(_ controller: KeyboardInputViewController) -> UUID? {
-        guard let proxy = controller.textDocumentProxy as? NSObject else { return nil }
+        // UIKit's own proxy: KeyboardKit's textDocumentProxy is a preview stand-in with a random document until it
+        // syncs.
+        guard let proxy = controller.originalTextDocumentProxy as? NSObject else { return nil }
         let getter = NSSelectorFromString("documentIdentifier")
         guard proxy.responds(to: getter) else { return nil }
         return proxy.perform(getter)?.takeUnretainedValue() as? UUID
     }
 
-    /// Every live pin takes the height `look` asks for.
+    /// Every live pin takes the height `look` asks for; each logs the event and the belief (margin 0 or 1).
     private static func follow(_ reason: String) {
         let height = CGFloat(look.pin(content: Double(portrait)))
-        for pin in pins.allObjects where pin.constraint.constant != height {
+        for pin in pins.allObjects {
             pin.constraint.constant = height
-            pin.report(reason)
+            pin.report(reason + ", margin " + (look.margin ? "1" : "0"))
         }
     }
 
-    /// The host's notices, for the whole process. Selector-free blocks: they live as long as the process.
+    /// The host's notices, for the whole process. Selector-free blocks: they live as long as the process. Ignored
+    /// while no portrait pin is active: landscape keeps iOS's height, and its looks are not measured.
     private static func observeHost() {
         guard observers.isEmpty else { return }
-        observers.append(NotificationCenter.default.addObserver(
-            forName: .NSExtensionHostDidBecomeActive, object: nil, queue: .main
-        ) { _ in
-            MainActor.assumeIsolated {
-                ProtlyHeight.look.hostBecameActive(at: ProtlyHeight.now)
-                ProtlyHeight.follow("host became active")
-            }
-        })
+        let notices: [(Notification.Name, String, @Sendable (inout HostLook, Double) -> Void)] = [
+            (.NSExtensionHostWillResignActive, "host will resign active", { $0.hostWillResignActive(at: $1) }),
+            (.NSExtensionHostDidBecomeActive, "host became active", { $0.hostBecameActive(at: $1) }),
+        ]
+        for (name, reason, apply) in notices {
+            observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { _ in
+                MainActor.assumeIsolated {
+                    guard ProtlyHeight.pins.allObjects.contains(where: { $0.constraint.isActive }) else {
+                        return ProtlyHeight.follow(reason + ", not in portrait: ignored")
+                    }
+                    apply(&ProtlyHeight.look, ProtlyHeight.now)
+                    ProtlyHeight.follow(reason)
+                }
+            })
+        }
     }
 
     private init(_ controller: KeyboardInputViewController) {
