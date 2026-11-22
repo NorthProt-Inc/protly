@@ -1,0 +1,245 @@
+<!doctype html>
+<!--
+  K1b whole-field read page (HostApp.swift `-screen readweb`, UITests/WholeReadChecks.swift test5h_wholeweb). Offline.
+  Two fields, as in the walk-back probe (docs/research/2026-11-21-walk-back-probe.md on diag/p1-walk-back):
+  - textarea: a plain <textarea>.
+  - lexical: a contenteditable shaped like Lexical's DOM (Instagram/Meta web composers): one
+    <p dir="ltr"><span data-lexical-text="true">...</span></p> per paragraph, an empty paragraph <p><br></p>.
+    It is NOT Lexical: no Lexical script, no beforeinput handling, no reconciliation, no selection management. Only
+    the static DOM shape the keyboard's text proxy reads.
+  The host's buttons call fill(text, cursor) (a draft in the field that last had focus, the caret at a UTF-16 offset,
+  the field scrolled to its bottom), restoreCaret() (the caret back at the last fill's offset) and selectAllIn() (the
+  whole field selected). The page posts each field's UTF-16 length, line-feed count, FNV-1a hash and caret, never its
+  text.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="color-scheme" content="dark">
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; background: #000; color: #f2f2f2; overflow: hidden; }
+  body { font: 15px -apple-system, system-ui, sans-serif; }
+  .f {
+    display: block; box-sizing: border-box; width: 234px; height: 72px; margin: 6px 8px; padding: 4px 6px;
+    background: #000; color: #f2f2f2; border: 1px solid #333; border-radius: 6px; outline: none;
+    font: 15px -apple-system, system-ui, sans-serif; overflow-y: auto;
+  }
+  textarea.f { resize: none; }
+  #lexical p { margin: 0; }
+</style>
+</head>
+<body>
+<textarea id="textarea" class="f" aria-label="read textarea" autocapitalize="off" autocorrect="off"
+  spellcheck="false"></textarea>
+<div id="lexical" class="f" contenteditable="true" role="textbox" data-lexical-editor="true" aria-label="read lexical"
+  autocapitalize="off" autocorrect="off" spellcheck="false"><p><br></p></div>
+<script>
+"use strict";
+const fields = {
+  textarea: document.getElementById("textarea"),
+  lexical: document.getElementById("lexical"),
+};
+let last = "";
+let fillCursor = 0;
+
+function post(msg) {
+  try { window.webkit.messageHandlers.protly.postMessage(msg); } catch (e) { /* not in the host */ }
+}
+
+// The text a person sees in a contenteditable (or a fragment of one): loose text, then the blocks' text joined by
+// line feeds.
+function textOf(root) {
+  const blocks = Array.from(root.childNodes).filter((n) => n.nodeType === 1);
+  if (blocks.length === 0) return root.textContent;
+  const loose = Array.from(root.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent).join("");
+  return loose + blocks.map((b) => b.textContent).join("\n");
+}
+
+function text(name) {
+  return name === "textarea" ? fields.textarea.value : textOf(fields.lexical);
+}
+
+// FNV-1a (32 bit) over UTF-16 units, 8 hex digits, as ProtlyCore WholeRead.fnv and WholeReadChecks.swift.
+function fnv(t) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < t.length; i++) {
+    h ^= t.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return (h >>> 0).toString(16).padStart(8, "0");
+}
+
+// The selection's ends as UTF-16 offsets of text(name), or null while the field does not have the focus.
+function caret(name) {
+  const f = fields[name];
+  if (document.activeElement !== f) return null;
+  if (name === "textarea") return [f.selectionStart, f.selectionEnd];
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return null;
+  const r = sel.getRangeAt(0);
+  if (!f.contains(r.startContainer) || !f.contains(r.endContainer)) return null;
+  const at = (node, offset) => {
+    const before = document.createRange();
+    before.setStart(f, 0);
+    before.setEnd(node, offset);
+    return textOf(before.cloneContents()).length;
+  };
+  return [at(r.startContainer, r.startOffset), at(r.endContainer, r.endOffset)];
+}
+
+function shape(name) {
+  const t = text(name);
+  let lf = 0;
+  for (let i = 0; i < t.length; i++) if (t.charCodeAt(i) === 10) lf++;
+  return { len: t.length, lf, h: fnv(t), caret: caret(name) };
+}
+
+function rects() {
+  const r = {};
+  for (const [name, f] of Object.entries(fields)) {
+    const b = f.getBoundingClientRect();
+    r[name] = [b.left, b.top, b.width, b.height];
+  }
+  return r;
+}
+
+let pending = false;
+function state() {
+  if (pending) return;
+  pending = true;
+  setTimeout(() => { pending = false; postState(); }, 30);
+}
+
+function postState() {
+  const s = { focus: (document.activeElement && document.activeElement.id) || "", last };
+  for (const name of Object.keys(fields)) s[name] = shape(name);
+  post({ kind: "state", json: JSON.stringify(s), rects: rects() });
+}
+
+for (const [name, f] of Object.entries(fields)) {
+  f.addEventListener("focus", () => { last = name; state(); });
+  f.addEventListener("blur", state);
+  f.addEventListener("input", state);
+}
+document.addEventListener("selectionchange", state);
+setInterval(postState, 700);
+
+function block(line) {
+  const p = document.createElement("p");
+  if (line === "") {
+    p.appendChild(document.createElement("br"));
+    return p;
+  }
+  p.setAttribute("dir", "ltr");
+  const span = document.createElement("span");
+  span.setAttribute("data-lexical-text", "true");
+  span.appendChild(document.createTextNode(line));
+  p.appendChild(span);
+  return p;
+}
+
+// The DOM point of a UTF-16 offset of the Lexical-shaped field's text.
+function point(pos) {
+  const f = fields.lexical;
+  const blocks = Array.from(f.children);
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    const len = b.textContent.length;
+    if (pos <= len || i === blocks.length - 1) {
+      let left = Math.min(pos, len);
+      const w = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
+      for (let t = w.nextNode(); t; t = w.nextNode()) {
+        if (left <= t.length) return { node: t, offset: left };
+        left -= t.length;
+      }
+      return { node: b, offset: 0 };
+    }
+    pos -= len + 1;
+  }
+  return { node: f, offset: 0 };
+}
+
+function placeCaret(name, start, end) {
+  const f = fields[name];
+  if (name === "textarea") {
+    f.setSelectionRange(start, end);
+    return;
+  }
+  const a = point(start);
+  const b = point(end);
+  const range = document.createRange();
+  range.setStart(a.node, a.offset);
+  range.setEnd(b.node, b.offset);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function fill(draft, cursor) {
+  const name = last || "textarea";
+  const f = fields[name];
+  fillCursor = cursor;
+  if (name === "textarea") {
+    f.value = draft;
+  } else {
+    f.innerHTML = "";
+    for (const line of draft.split("\n")) f.appendChild(block(line));
+  }
+  f.focus();
+  placeCaret(name, cursor, cursor);
+  // A tap at the field's bottom-right corner then lands at the end of the text.
+  f.scrollTop = f.scrollHeight;
+  state();
+  return true;
+}
+
+function restoreCaret() {
+  const name = last || "textarea";
+  fields[name].focus();
+  placeCaret(name, fillCursor, fillCursor);
+  state();
+  return true;
+}
+
+function selectAllIn() {
+  const name = last || "textarea";
+  const f = fields[name];
+  f.focus();
+  if (name === "textarea") {
+    f.setSelectionRange(0, f.value.length);
+  } else {
+    const range = document.createRange();
+    range.selectNodeContents(f);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  state();
+  return true;
+}
+
+// F02c: the field's start up to its first line feed selected (a partial selection with no context on either side).
+function selectHeadIn() {
+  const name = last || "textarea";
+  const f = fields[name];
+  f.focus();
+  const t = text(name);
+  const end = t.indexOf("\n") < 0 ? t.length : t.indexOf("\n");
+  placeCaret(name, 0, end);
+  state();
+  return true;
+}
+
+function clearAll() {
+  fields.textarea.value = "";
+  fields.lexical.innerHTML = "<p><br></p>";
+  postState();
+  return true;
+}
+
+window.addEventListener("load", postState);
+</script>
+</body>
+</html>
