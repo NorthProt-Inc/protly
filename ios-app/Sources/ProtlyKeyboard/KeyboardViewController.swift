@@ -96,6 +96,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     deinit {
         actionTask?.cancel()
         writeTask?.cancel()
+        // A speculative call still held goes with the controller: Speculative's deinit cancels it.
     }
 
     override func viewDidLoad() {
@@ -333,16 +334,28 @@ final class KeyboardViewController: KeyboardInputViewController {
         let call = nextCall()
         mode.strip = StripState(call: call, action: action, label: tapped ?? BarAction.call(action, text: ""))
         readingCall = call
+        timing = CallTiming(call: call, tappedAt: now)
         actionTask = Task { [weak self] in
             guard let self else { return }
             defer { if readingCall == call { readingCall = nil } }
             guard !Task.isCancelled else { return }  // Cancel or a hide came first: never move the cursor
             touchedSinceRead = false
+            // F02c (speculative send): the call on the text the window shows starts as soon as the read has it, while
+            // the read walks. It is used only when the read proves that text was the whole field; it is cancelled as
+            // soon as a walk shows otherwise, on Cancel, a hide or a new call (restoreCursor, beginCall), and on every
+            // other way out of this task.
+            defer { dropSpeculative(of: call) }
             // The read keeps its own record of the cursor; every change lands here at once, for Cancel.
             let outcome = await FieldText.read(
                 textDocumentProxy, record: { [weak self] cursor in self?.cursorReturn = cursor },
-                progress: { [weak self] in self?.showReadProgress(call) })
+                progress: { [weak self] in self?.showReadProgress(call) },
+                window: { [weak self] text in
+                    guard let self, !Task.isCancelled else { return }
+                    speculative = (call, Speculative(mode: ActionAPI.mode(forDraft: text), text: text))
+                },
+                left: { [weak self] in self?.dropSpeculative(of: call, why: "longer") })
             readEndedAt = now
+            if let s = speculative, s.call == call { timing?.spec = Self.specOutcome(outcome, s.spec) }
             guard !Task.isCancelled else {
                 // Cancelled mid-step: the step has settled now, so the cursor can go back over exactly what landed.
                 if restoreWhenReadEnds {
@@ -376,8 +389,60 @@ final class KeyboardViewController: KeyboardInputViewController {
             if field.isSelection { cursorReturn.clear() }
             // The action comes from the text read here (the whole field or the selection), not from the bar's view of it.
             let draftAction = ActionAPI.mode(forDraft: field.text)
-            run(ActionCall(mode: draftAction, text: field.text, original: field.text, isSelection: field.isSelection),
-                call: call)
+            let sent = ActionCall(mode: draftAction, text: field.text, original: field.text, isSelection: field.isSelection)
+            // The read is proven whole and is exactly the text the speculative call carries: that call is the result.
+            if let held = speculative, held.call == call, !field.isSelection, held.spec.mode == draftAction,
+               held.spec.matches(field.text) {
+                speculative = nil
+                timing?.speculative = held.spec
+                run(sent, call: call, adopting: held.spec)
+            } else {
+                run(sent, call: call)
+            }
+        }
+    }
+
+    /// F02c timing for the CI latency checks (FieldText.logCall), for the field action tapped last.
+    private struct CallTiming {
+        let call: Int
+        let tappedAt: Double
+        var firstAt: Double?
+        /// When the call itself started (no speculative call) and its first update, in ms after that.
+        var startedAt: Double?
+        var apiMS = -1
+        /// The adopted speculative call (its own first-update time), and what became of one.
+        var speculative: Speculative?
+        var spec = "none"
+
+        init(call: Int, tappedAt: Double) {
+            self.call = call
+            self.tappedAt = tappedAt
+        }
+    }
+
+    private var timing: CallTiming?
+
+    /// F02c: the speculative call of a field action's read, until it is adopted or dropped.
+    private var speculative: (call: Int, spec: Speculative)?
+
+    /// Cancels the speculative call (of `call` only, when given): the read showed the field is more than the window,
+    /// or the call ended another way. `why` goes to the timing log.
+    private func dropSpeculative(of call: Int? = nil, why: String? = nil) {
+        guard let held = speculative, call == nil || held.call == call else { return }
+        held.spec.cancel()
+        speculative = nil
+        if let why, timing?.call == held.call { timing?.spec = "cancelled:" + why }
+    }
+
+    /// What became of a speculative call still held when the read ended, for the log: used, or why not.
+    private static func specOutcome(_ outcome: FieldText.Outcome, _ spec: Speculative) -> String {
+        switch outcome {
+        case .text(let text, let isSelection):
+            if isSelection { return "cancelled:selection" }
+            return spec.matches(text) ? "used" : "cancelled:longer"
+        case .empty: return "cancelled:empty"
+        case .refused: return "cancelled:refused"
+        case .cancelled: return "cancelled:cancelled"
         }
     }
 
@@ -426,6 +491,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         refreshMode()
         // Every path after this shows its own strip or panel: a request still running must not replace it later.
         actionTask?.cancel()
+        dropSpeculative()
         if mode.panel != nil { mode.panel = nil }
         guard hasFullAccess else {
             // F1: say why instead of a failed call (the bar shows the outlined lock pill).
@@ -479,7 +545,9 @@ final class KeyboardViewController: KeyboardInputViewController {
     }
 
     /// One call: the strip at once, the card at the first text, the result or the error at the end (design Part 3).
-    private func run(_ sent: ActionCall, call: Int? = nil) {
+    /// `adopting`: the speculative call whose updates are this call's (F02c), instead of a new call. The task holds it
+    /// while it reads them.
+    private func run(_ sent: ActionCall, call: Int? = nil, adopting: Speculative? = nil) {
         let call = call ?? nextCall()
         onScreen = sent
         let action = sent.mode, original = sent.original, isSelection = sent.isSelection, deep = sent.profile == .deep
@@ -491,11 +559,15 @@ final class KeyboardViewController: KeyboardInputViewController {
         let strip = StripState(call: call, action: action, label: label, deep: deep)
         if mode.strip != strip { mode.strip = strip }
         actionTask?.cancel()
+        if adopting == nil, timing?.call == call { timing?.startedAt = now }
         actionTask = Task { [weak self] in
             // self is bound per update, never before the loop: a torn-down controller is not held for up to 240 s. The
             // cancel check stops a late update from bringing a card back after Cancel or after a Retry replaced this task.
-            for await update in ActionClient.run(action, text: sent.text, profile: sent.profile) {
+            for await update in adopting?.relay ?? ActionClient.run(action, text: sent.text, profile: sent.profile) {
                 guard let self, !Task.isCancelled else { return }
+                if let t = timing, t.call == call, t.apiMS < 0, let started = t.startedAt {
+                    timing?.apiMS = Int((now - started) * 1000)
+                }
                 show(update, feed: callFeed, card: CardState(call: call, action: action, label: label, original: original,
                                                          isSelection: isSelection, deep: deep, shownAt: now))
                 // At most 20 redraws of the card's text a second: meanwhile the stream keeps only the newest partial
@@ -516,6 +588,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         case .partial(let text):
             feed.partial = text
             if openCard != nil { return }
+            if timing?.call == fresh.call, timing?.firstAt == nil { timing?.firstAt = now }
             // A card read from a selection opens copy-only: it never writes.
             var card = fresh
             card.copyOnly = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: nil)
@@ -530,6 +603,12 @@ final class KeyboardViewController: KeyboardInputViewController {
                 card.action, original: card.original, isSelection: card.isSelection, field: observed()) ?? touchedCopyOnly(card)
             mode.strip = nil
             mode.panel = .card(card)
+            if let t = timing, t.call == card.call {
+                let ms = { (at: Double) in Int((at - t.tappedAt) * 1000) }
+                FieldText.logCall(first: ms(t.firstAt ?? now), done: ms(now), api: t.speculative?.firstMS ?? t.apiMS,
+                                  spec: t.spec)
+                timing = nil
+            }
         case .failed(let error):
             guard var card = openCard else {
                 // No text yet: the error replaces the strip's label, the keys stay, no card opens.
@@ -586,6 +665,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         }
         // K1b: the deletes, the insert and the check run with the keys waiting (isReadingField) and the strip saying so.
         let original = card.original
+        let tapped = now
         beginWriting(card.action)
         writeTask = Task { [weak self] in
             guard let self else { return }
@@ -593,6 +673,7 @@ final class KeyboardViewController: KeyboardInputViewController {
                 self.flatMap { ProtlyHeight.document($0) }
             }
             endWriting()
+            FieldText.logWrite("replace", keys: Int((self.now - tapped) * 1000), held: held)
             if held {
                 // Undo puts back exactly the text that was read.
                 lastInsert = (result, original)
@@ -632,7 +713,7 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     /// A key, or a host callback that is not the read's own (more than 1 s after it ended), after the read.
     private func noteTouched(byHost: Bool) {
-        guard !isReadingField, !byHost || now - readEndedAt > 1 else { return }
+        guard !isReadingField, !byHost || !WriteGrace.isReadEcho(elapsed: now - readEndedAt) else { return }
         touchedSinceRead = true
     }
 
@@ -692,6 +773,7 @@ final class KeyboardViewController: KeyboardInputViewController {
             return
         }
         // K1b: Undo of a Replace is a Replace the other way round, with the keys waiting and the same checks.
+        let tapped = now
         beginWriting(.out)
         writeTask = Task { [weak self] in
             guard let self else { return }
@@ -699,6 +781,7 @@ final class KeyboardViewController: KeyboardInputViewController {
                 self.flatMap { ProtlyHeight.document($0) }
             }
             endWriting()
+            FieldText.logWrite("undo", keys: Int((self.now - tapped) * 1000), held: held)
             if !held { mode.panel = .unsure(Self.replaceUnsureText, original: l.original) }
             refreshField()
         }
@@ -718,6 +801,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     private func restoreCursor() {
         actionTask?.cancel()
         actionTask = nil
+        dropSpeculative(why: "cancelled")  // at once, not when the read's last step has settled (design review)
         if isReadingField, cursorReturn.isMoving {
             // A step is on its way: moving back now could count a step the host drops, or miss one it applies late.
             // The read settles it (at most 1 s, the keys still wait) and then puts the cursor back.
@@ -743,11 +827,14 @@ final class KeyboardViewController: KeyboardInputViewController {
         if mode.canUndo { mode.canUndo = false }
     }
 
-    /// A host callback after protly's own write has had its time (1 s, and 2.5 ms an inserted unit as for Replace's
-    /// bound: a long Insert keeps the host busy, silent-failure review round 2): the user changed the field or the
-    /// cursor (K1b).
+    /// A host callback after protly's own write has had its time (WriteGrace: 1 s after a proven Replace or Undo; 1 s
+    /// and 2.5 ms an inserted unit after Read's Insert, which a long insert keeps the host busy with): the user changed
+    /// the field or the cursor (K1b).
     private func endUndoIfTouched() {
-        guard let l = lastInsert, now - wroteAt > 1 + 0.0025 * Double(l.inserted.utf16.count) else { return }
+        // Replace's and its Undo's are proven (lastInsert is set only once the check held); Read's Insert is not.
+        guard let l = lastInsert,
+              !WriteGrace.isOwn(elapsed: now - wroteAt, inserted: l.inserted.utf16.count, proven: !l.original.isEmpty)
+        else { return }
         endUndo()
     }
 

@@ -4,7 +4,7 @@ import XCTest
 /// K1b (fix/whole-field-read): the protly key reads the whole field, Replace swaps all of it, Undo puts it back. The
 /// host's `rfill-<n>` buttons put a draft in the field (HostApp.swift WholeDrafts) that starts with the CI stub's
 /// `read` marker line, so the stub answers with the shape of the text the request carried,
-/// `read <utf16>/<lf>/h<fnv> t<read ms>` (StubActionClient). The check hashes the host's field the same way (FNV-1a
+/// `read <utf16>/<lf>/h<fnv>` (StubActionClient). The check hashes the host's field the same way (FNV-1a
 /// 32 over UTF-16 units; read-probe.html posts it for the web fields) and wants that shape, the field exactly equal to
 /// the reply after Replace, the keyboard's own check of it ended with no notice, and the draft back exactly after Undo
 /// (times recorded). checks.py then wants the keyboard's log to agree (`resolve_whole_log`). A refusal case wants the
@@ -18,7 +18,7 @@ enum WholeChecks {
     static let webCases = ["win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead"]
     static let webHosts = ["textarea", "lexical"]
     /// Tries per case, all of which must pass; 1 for the others (checks.py WHOLE_TRIES).
-    static let tries: [String: Int] = ["win": 2, "long": 2]
+    static let tries: [String: Int] = ["win": 2, "long": 2, "swin": 3, "smid": 2, "ssel": 2]
 
     /// The same lists as checks.py WHOLE_NATIVE_IDS and WHOLE_WEB_IDS.
     static var nativeIDs: [String] {
@@ -117,14 +117,15 @@ enum WholeChecks {
         return String(format: "%08x", h)
     }
 
-    /// The stub's reply: the shape it carried and the read's time in ms; nil when it is not one.
-    static func parseReply(_ s: String) -> (shape: Shape, ms: Int)? {
-        guard let re = try? NSRegularExpression(pattern: #"^read (\d+)/(\d+)/h([0-9a-f]{8}) t(\d+)$"#),
+    /// The stub's reply: the shape it carried; nil when it is not one. (Since F02c the reply has no read time: the
+    /// speculative call starts before the read ends. The keyboard log has the read's time.)
+    static func parseReply(_ s: String) -> (shape: Shape, ms: Int?)? {
+        guard let re = try? NSRegularExpression(pattern: #"^read (\d+)/(\d+)/h([0-9a-f]{8})$"#),
               let m = re.firstMatch(in: s, range: NSRange(location: 0, length: (s as NSString).length)) else { return nil }
         let ns = s as NSString
         let g = (1..<m.numberOfRanges).map { ns.substring(with: m.range(at: $0)) }
-        guard let len = Int(g[0]), let lf = Int(g[1]), let ms = Int(g[3]) else { return nil }
-        return (Shape(len: len, lf: lf, h: g[2]), ms)
+        guard let len = Int(g[0]), let lf = Int(g[1]) else { return nil }
+        return (Shape(len: len, lf: lf, h: g[2]), nil)
     }
 }
 
@@ -378,7 +379,6 @@ extension PhoneRun {
             closeCall(v)
             return r
         }
-        r.add("read=\(parsed.ms)")
         r.check(parsed.shape == before, "reply=\(parsed.shape.text)")
         // An accepted read leaves the cursor at the end of the field (recorded only on the SwiftUI field, whose
         // probe follows the text system's selection changes as SwiftUI reports them).

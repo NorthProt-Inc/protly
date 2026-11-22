@@ -121,6 +121,36 @@ public enum WholeRead {
         b.count <= a.count && a.suffix(b.count).elementsEqual(b)
     }
 
+    /// F02c, a short draft: the read is proven at FM, without B2, R2 and FE, when the window the proxy showed before the
+    /// walks (`window`: both contexts at the tap, or at the field's end after select all) is exactly what B1 read, F
+    /// crossed only its tail, every walk so far was clean (no false start or end undone, no phantom, no resync), R1 by
+    /// B1's length landed exactly at the end, and FM crossed nothing there.
+    ///
+    /// Why the last two (design review): B1's first jump is planned from the window itself, so a host whose window lags
+    /// after that jump can show B1 only the window's text and an empty context at its first unit. The start probe there
+    /// moves the cursor into the text before, even when the host applies it late, and R1 then lands short of the end, so
+    /// FM walks over something. What stays open: a host that drops an in-bounds -1 move outright while its window stays
+    /// empty for 0.8 s (never measured); today's proof needs that twice, about a second apart.
+    public static func windowProof(window: [UInt16]?, first: [UInt16], back1: [UInt16], mid: [UInt16],
+                                   returnedAtEnd: Bool, clean: Bool) -> Bool {
+        guard let window, !window.isEmpty, clean, returnedAtEnd, mid.isEmpty else { return false }
+        return back1 == window && hasSuffix(window, first)
+    }
+
+    /// A walk has read only text the window showed (`read` is the window's end): the speculative call on the window
+    /// can still be the result. false: cancel it now.
+    public static func withinWindow(_ window: [UInt16], _ read: [UInt16]) -> Bool {
+        hasSuffix(window, read)
+    }
+
+    /// After select all was collapsed with +1 (it lands at the selection's end): select all leaves nothing before the
+    /// field's end. Text the walk to the end crossed, or a move it made (`moved`: the cursor's way back to where the
+    /// collapse left it), means a partial selection that started at the field's start and reached a line feed, which
+    /// shows both contexts empty as select all does (tower review of f0533ae, bug 2).
+    public static func wasPartialSelection(crossed: [UInt16], moved: Int) -> Bool {
+        !crossed.isEmpty || moved != 0
+    }
+
     /// The verdict on a read whose walks all ended where they should (the forward walks at the end, the walks back at
     /// the start): nil = accept, else why not. `mid` and `last` are what the walks that confirmed the end crossed
     /// after each return move: a return that landed a few units short (probe runs 154, 155) walks the text's last

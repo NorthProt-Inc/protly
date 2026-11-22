@@ -15,7 +15,7 @@ import ProtlyCore
 /// - `slow`: pings past the strip's 8 s line, then a long translation in one-second deltas (memory during a stream).
 /// - `error`: an `overloaded_error` event before any text (the error line on the strip, with Retry).
 /// - `cut`: part of the translation, then an `overloaded_error` event (the kept text with the error line under it).
-/// - `read` (K1b): the shape of the whole text the request carried, `read <utf16>/<lf>/h<fnv> t<read ms>`, as the
+/// - `read` (K1b): the shape of the whole text the request carried, `read <utf16>/<lf>/h<fnv>`, as the
 ///   translation, so a UI check proves the request held the whole field and Replace leaves exactly this text.
 /// Any other word: a plain 400 error body, as the API sends it.
 enum StubActionClient {
@@ -65,7 +65,8 @@ struct StubScript: Sendable {
     /// K1b: lengths, counts, a hash and a time, never the text.
     static func read(_ text: String) -> StubScript {
         let u = Array(text.utf16)
-        let reply = "read \(u.count)/\(WholeRead.lineFeeds(u))/h\(WholeRead.fnv(u)) t\(FieldText.lastReadMS)"
+        // No read time: the speculative call (F02c) starts before the read ends; the keyboard log has the read's time.
+        let reply = "read \(u.count)/\(WholeRead.lineFeeds(u))/h\(WholeRead.fnv(u))"
         let body = #"{"translation": "# + json(reply) + #", "back_translation": "ok"}"#
         let c = [chunk(0, start), chunk(200, textStart), chunk(200, textDelta(body)), chunk(100, end("end_turn"))]
         return StubScript(status: 200, chunks: c)

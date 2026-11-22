@@ -1,3 +1,5 @@
+import Foundation
+
 // Whether the field still holds what protly read or inserted, so Insert and Undo delete only that text.
 // The keyboard deletes one character per call, `count` times: a field edited since the read (a paste or a
 // cut anywhere, the cursor moved) must stop the edit, not shift it onto the user's own text. Nothing is ever typed
@@ -31,6 +33,27 @@ public enum FieldGuard {
     public static func canUndoReplace(_ inserted: String, before: String, after: String, selected: String) -> Bool {
         after.isEmpty && offersUndo(true, selected: selected) && !inserted.isEmpty
             && (before.hasSuffix(inserted) || isEnd(of: inserted, before))
+    }
+
+    /// Replace's insert goes to the field its deletes went to (tower review of f0533ae, bug 4): the field's document
+    /// before the deletes and before the insert. Another field means no insert (it would land there; the original field
+    /// is left emptied, and the panel offers Copy original). With no document from iOS, nothing better is known.
+    public enum Focus: Sendable, Equatable {
+        case same, other, unknown
+
+        /// For the `replace` log line: 1 another field, 0 the same, -1 no document from iOS.
+        public var logValue: Int {
+            switch self {
+            case .same: 0
+            case .other: 1
+            case .unknown: -1
+            }
+        }
+    }
+
+    public static func focus(before: UUID?, now: UUID?) -> Focus {
+        guard let before, let now else { return .unknown }
+        return before == now ? .same : .other
     }
 
     /// `window` is non-empty and is `text`'s end: by whole characters (canonical equivalence counts), or by UTF-16

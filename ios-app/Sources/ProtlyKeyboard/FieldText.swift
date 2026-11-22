@@ -38,10 +38,6 @@ enum FieldText {
         case cancelled
     }
 
-    /// The last read's duration in ms: only the CI stub's reply reads it (StubActionClient, off the main actor; the
-    /// phone build has no reader). Written on the main actor only; an Int, never text.
-    nonisolated(unsafe) static var lastReadMS = 0
-
     private struct Ctx: Equatable {
         let b: String
         let a: String
@@ -109,14 +105,18 @@ enum FieldText {
 
     /// One walk to the end (`back` false) or the start. Every step settles before the next check, so a cancel or the
     /// budget stops the walk only between steps.
+    /// `read`: for a walk back, called with the units read so far after every step that read some (F02c: the read
+    /// cancels the speculative call as soon as they are not the window's end). `lastWalkClean` says afterwards whether
+    /// the walk undid no false start or end, met no phantom and needed no resync.
     private static func walk(_ p: UITextDocumentProxy, back: Bool, cap: Int, tag: String, start t0: TimeInterval,
-                             track: Track, progress: () -> Void) async -> WalkEnd {
+                             track: Track, progress: () -> Void, read: ([UInt16]) -> Void = { _ in }) async -> WalkEnd {
         // The second walk back steps elsewhere than the first (silent-failure review).
         var bw = BackWalk(cap: cap, shifted: tag == "b2")
         // Only the walk from the user's cursor may start from contexts the host never refreshed (run 163 web `mid`).
         var fw = ForwardWalk(cap: cap, resyncFirst: tag == "f")
-        var steps = 0, late = 0, firstMS = -1
+        var steps = 0, late = 0, firstMS = -1, phantoms = 0
         let w0 = uptime()
+        defer { lastWalkClean = bw.retries == 0 && fw.retries == 0 && fw.resyncs == 0 && phantoms == 0 }
         func fits(_ wait: TimeInterval) -> Bool {
             WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(wait))
         }
@@ -214,7 +214,9 @@ enum FieldText {
             switch r {
             case .moved(let d):
                 track.landed(d, s.c.b)
+                if back { read(bw.units) }
             case .phantom:
+                phantoms += 1
                 track.landed(nil, s.c.b)
             case .retry(let m):
                 // A false start or end: the probe moved one unit over text it cannot name. Undo it and look again.
@@ -249,22 +251,33 @@ enum FieldText {
 
     /// One move forward by a walk's length, back to the end it started from. Counted only when the contexts show the
     /// end again (the probe saw returns land a few units short: runs 154, 155); the next walk confirms the end anyway.
+    /// nil: no time left for the move. Else whether the contexts show the end again (F02c's window proof needs it).
     private static func returnMove(_ p: UITextDocumentProxy, by n: Int, end: Ctx, start t0: TimeInterval,
-                                   track: Track) async -> Bool {
-        guard n > 0 else { return true }
-        guard WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait)) else { return false }
+                                   track: Track) async -> Bool? {
+        guard n > 0 else { return false }
+        guard WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait)) else { return nil }
         track.sending()
         let s = await step(p, by: n, wait: WholeRead.moveWait)
         let atEnd = s.c.a.isEmpty && !s.c.b.isEmpty && WholeRead.agreeAtEnd(s.c.before, end.before)
         track.landed(atEnd ? n : nil, s.c.b)
-        return true
+        return atEnd
     }
+
+    /// The walk that ended last was clean (see walk).
+    private static var lastWalkClean = true
 
     /// The whole field, a partial selection, or a refusal. `record` gets the read's CursorReturn after every change
     /// (a step sent, a step settled, the end reached), for Cancel; `progress` is called while the read runs past
     /// WholeRead.progressAfter. Up to WholeRead.total (20 s) in all; the keys wait meanwhile.
+    ///
+    /// F02c: `window` gets, at most once, the text the proxy's window shows: both contexts at the tap, or for select all
+    /// those at the field's end once the walk there showed it was select all (never for a partial selection). The
+    /// keyboard starts its speculative call on it. `left` is called at most once, as soon as a walk shows the field is
+    /// not that text: the keyboard cancels the call then. When B1 reads exactly the window, R1 lands at the end and FM
+    /// crosses nothing (WholeRead.windowProof), the read is proven there, without B2, R2 and FE.
     static func read(_ p: UITextDocumentProxy, record: @escaping (CursorReturn) -> Void,
-                     progress: () -> Void) async -> Outcome {
+                     progress: () -> Void, window: (String) -> Void = { _ in },
+                     left: () -> Void = {}) async -> Outcome {
         let t0 = uptime()
         let c0 = ctx(p)
         let track = Track(report: record)
@@ -281,12 +294,27 @@ enum FieldText {
             }
             let count = units.count, lf = WholeRead.lineFeeds(units), hash = WholeRead.fnv(units), took = ms(since: t0)
             let known = track.cursor.isKnown ? 1 : 0
-            lastReadMS = took
             log.debug("read done outcome=\(outcome, privacy: .public) reason=\(reason, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) h=\(hash, privacy: .public) ms=\(took, privacy: .public) known=\(known, privacy: .public)")
             return o
         }
+        // The window's text (F02c): the speculative call's, and the window proof's.
+        var shown: [UInt16]?
+        func leave() {
+            guard shown != nil else { return }
+            shown = nil
+            left()
+        }
+        func show(_ c: Ctx) {
+            let units = c.before + c.after
+            guard !String(decoding: units, as: UTF16.self).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else { return }
+            shown = units
+            window(c.b + c.a)
+        }
         func walk(_ back: Bool, cap: Int, _ tag: String) async -> WalkEnd {
-            await FieldText.walk(p, back: back, cap: cap, tag: tag, start: t0, track: track, progress: progress)
+            await FieldText.walk(p, back: back, cap: cap, tag: tag, start: t0, track: track, progress: progress) { read in
+                if let w = shown, !WholeRead.withinWindow(w, read) { leave() }
+            }
         }
         /// A refusal puts the cursor back (the keyboard does, by the record). When a step since the field's end could
         /// not be named (a phantom at the start, a return that landed short), one more walk to the end makes the
@@ -318,16 +346,23 @@ enum FieldText {
             track.restart()
             if Task.isCancelled { return finish(.cancelled, "cancelled") }
             guard s.changed, s.c.s.isEmpty else { return finish(.refused, "collapse") }
+        } else {
+            show(c0)
         }
         // F: to the end. Its steps all fit the contexts, so it fixes where the end is from the user's cursor.
         let fEnd = await walk(false, cap: WholeRead.cap, "f")
-        guard case .done(let first) = fEnd else { return await stopped(fEnd, "f") }
+        guard case .done(let first) = fEnd else {
+            leave()
+            return await stopped(fEnd, "f")
+        }
+        var clean = lastWalkClean
+        if let w = shown, !WholeRead.withinWindow(w, first) { leave() }
         if !c0.s.isEmpty {
             // Select all leaves nothing between the collapse and the end. Text crossed: a partial selection at the
             // field's start that reached a line feed also shows both contexts empty (tower review of f0533ae). K1a: its
             // own text, a copy-only card; the cursor goes back to where the collapse left it.
             let move = track.cursor.back(before: ctx(p).b)
-            if !first.isEmpty || move != 0 {
+            if WholeRead.wasPartialSelection(crossed: first, moved: move) {
                 if move != 0 {
                     track.sending()
                     let s = await step(p, by: move, wait: WholeRead.moveWait)
@@ -337,26 +372,46 @@ enum FieldText {
             }
         }
         let end = ctx(p)
+        // Select all: the window is the field's end now that the walk there crossed nothing.
+        if !c0.s.isEmpty { show(end) }
         // B1: back to the start.
         let b1End = await walk(true, cap: WholeRead.cap, "b1")
-        guard case .done(let back1) = b1End else { return await stopped(b1End, "b1") }
+        guard case .done(let back1) = b1End else {
+            leave()
+            return await stopped(b1End, "b1")
+        }
+        clean = clean && lastWalkClean
+        if let w = shown, back1 != w { leave() }
         // An empty field (no text crossed either way): nothing to read twice, unless the proxy says there is text (a
         // host whose contexts and moves show nothing: refused, never read as empty; silent-failure review).
         if back1.isEmpty, first.isEmpty {
+            leave()
             return p.hasText ? await refuse("emptyHasText") : finish(.empty, "empty")
         }
         // R1 and FM: forward again, confirm the end. B2: the second walk back may not read more than the first.
         if Task.isCancelled { return finish(.cancelled, "cancelled") }
-        guard await returnMove(p, by: back1.count, end: end, start: t0, track: track) else {
+        guard let r1AtEnd = await returnMove(p, by: back1.count, end: end, start: t0, track: track) else {
+            leave()
             return await refuse("r1:timeUp")
         }
         let fmEnd = await walk(false, cap: WholeRead.cap, "fm")
-        guard case .done(let mid) = fmEnd else { return await stopped(fmEnd, "fm") }
+        guard case .done(let mid) = fmEnd else {
+            leave()
+            return await stopped(fmEnd, "fm")
+        }
+        clean = clean && lastWalkClean
+        if Task.isCancelled { return finish(.cancelled, "cancelled") }
+        // F02c: the window the proxy showed was the whole field.
+        if WholeRead.windowProof(window: shown, first: first, back1: back1, mid: mid, returnedAtEnd: r1AtEnd,
+                                 clean: clean) {
+            let text = String(decoding: back1, as: UTF16.self)
+            return finish(.text(text, isSelection: false), "window", back1)
+        }
         let b2End = await walk(true, cap: back1.count, "b2")
         guard case .done(let back2) = b2End else { return await stopped(b2End, "b2") }
         // R2 and FE: the cursor goes to the end for Replace, and the end is confirmed once more.
         if Task.isCancelled { return finish(.cancelled, "cancelled") }
-        guard await returnMove(p, by: back2.count, end: end, start: t0, track: track) else {
+        guard await returnMove(p, by: back2.count, end: end, start: t0, track: track) != nil else {
             return await refuse("r2:timeUp")
         }
         let feEnd = await walk(false, cap: WholeRead.cap, "fe")
@@ -378,6 +433,19 @@ enum FieldText {
         log.debug("read restore units=\(units, privacy: .public) known=\(position, privacy: .public)")
         guard move != 0 else { return }
         p.adjustTextPosition(byCharacterOffset: move)
+    }
+
+    /// F02c, the CI latency checks: a field action's times in ms since its tap (the card's first text, the finished
+    /// card), the call's own first update in ms after it started, and whether the speculative call was used
+    /// (`used`, `none`, or `cancelled:<why>`). Numbers and fixed words only.
+    static func logCall(first: Int, done: Int, api: Int, spec: String) {
+        log.debug("call done first=\(first, privacy: .public) done=\(done, privacy: .public) api=\(api, privacy: .public) spec=\(spec, privacy: .public)")
+    }
+
+    /// F02c: how long Replace or Undo (`kind`) kept the keys waiting, in ms, and whether it was proven.
+    static func logWrite(_ kind: String, keys: Int, held: Bool) {
+        let ok = held ? 1 : 0
+        log.debug("write \(kind, privacy: .public) keys=\(keys, privacy: .public) held=\(ok, privacy: .public)")
     }
 
     /// A step of this read or Replace took longer than WholeRead.slowStep to show: probes get a second look.
@@ -420,7 +488,7 @@ enum FieldText {
         let emptyMS = ms(since: t0)
         let doc1 = document()
         // 1: another field now; 0: the same; -1: iOS gave no document.
-        let focus = doc0 == nil || doc1 == nil ? -1 : doc0 == doc1 ? 0 : 1
+        let focus = FieldGuard.focus(before: doc0, now: doc1).logValue
         if focus == 1 {
             let deletedNow = deleted
             log.debug("replace deleted=\(deletedNow, privacy: .public) emptyms=\(emptyMS, privacy: .public) focus=\(focus, privacy: .public) held=0")

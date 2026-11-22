@@ -72,10 +72,24 @@ HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-glo
 WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead", "etail")
 WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead")
 WHOLE_WEB_HOSTS = ("textarea", "lexical")
-WHOLE_TRIES = {"win": 2, "long": 2}
+WHOLE_TRIES = {"win": 2, "long": 2, "swin": 3, "smid": 2, "ssel": 2}
 WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r4k", "wr-uikit-cancel"]
                     + [f"wr-swiftui-{c}" for c in WHOLE_NATIVE_CASES])
 WHOLE_WEB_IDS = [f"wr-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in WHOLE_WEB_CASES]
+# F02c, the latency target (owner decision 2026-11-22): a short draft the proxy window shows whole is at most
+# LATENCY_SLACK_MS slower than main, tap to the card's first text and tap to the finished card; the tower's reading adds
+# Replace's and Undo's keys-wait. lat-<host>-<case> is derived by checks.py from the keyboard's `call done` and
+# `write replace|undo` lines of the wr- tries (FieldText.logCall, logWrite), never written by the test. Each try must
+# also have used the speculative call (`spec=used`: the window showed the whole field). PASS or FAIL against
+# LATENCY_MAIN; RECORD while that has no entry for the case (the main baseline run itself).
+LATENCY_CASES = ("swin", "smid", "ssel")
+LATENCY_NATIVE_IDS = [f"lat-{h}-{c}" for h in ("uikit", "swiftui") for c in LATENCY_CASES]
+LATENCY_WEB_IDS = [f"lat-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in LATENCY_CASES]
+LATENCY_SLACK_MS = 500
+LATENCY_KEYS = ("first", "done", "replace", "undo")
+# main's medians in ms per (host, case) from its baseline run (diag/k1b-base-*: main's read and write path with this
+# harness). Select all on main is a selection (a copy-only card, no Replace): ssel's Replace and Undo are held to swin's.
+LATENCY_MAIN = {}
 # What the keyboard's own log (keyboard-log.txt, category `read`) must say for each wr- try, between the try's MARK
 # (wr-<host>-<case>-t<n> in ui-log.txt) and the next MARK: a refusal case its refusal reason (`<walk>:<why>`; the web
 # drafts with emoji are refused for the emoji, the native 14 055-unit one at the read's 4000-unit cap or, as in run
@@ -96,7 +110,7 @@ WHOLE_SELECTION = {"shead"}
 # a little after the test's tap; the race this check is for opened the gate 6-11 s before the host was done (run 172).
 WHOLE_HOST_SLACK_MS = 2000
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
-                + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS + HEIGHT_IDS)
+                + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS + LATENCY_NATIVE_IDS + LATENCY_WEB_IDS + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -112,8 +126,8 @@ METHOD_IDS = {
     "test5d_card": CARD_IDS,
     "test5e_bar": BAR_IDS,
     "test5f_period": PERIOD_IDS,
-    "test5g_wholenative": WHOLE_NATIVE_IDS,
-    "test5h_wholeweb": WHOLE_WEB_IDS,
+    "test5g_wholenative": WHOLE_NATIVE_IDS + LATENCY_NATIVE_IDS,
+    "test5h_wholeweb": WHOLE_WEB_IDS + LATENCY_WEB_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
     "test9_height": HEIGHT_IDS,
@@ -1342,7 +1356,7 @@ def resolve_whole_log(check, marks, kb_text):
             if case in WHOLE_SELECTION:
                 notes.append(f"t{t}:{outcome}/{reason}")
                 writes = [line for line in lines if line.startswith("replace ")]
-                if outcome != "accepted" or reason != "selection" or writes:
+                if outcome != "accepted" or reason not in ("selection", "partialSelection") or writes:
                     problems.append(f"t{t}:{outcome}/{reason} writes={len(writes)} want accepted/selection, no write")
                 continue
             if refusal:
@@ -1398,6 +1412,67 @@ def resolve_whole_log(check, marks, kb_text):
     return Check(check.id, status, evidence)
 
 
+def latency_tries(wr_id, case, marks, kb_text):
+    """Per try of a wr- line: {first, done, api, spec, replace, undo} from the keyboard log between the try's MARK and
+    the next one; None for a try without its MARK. A value the log does not have is None."""
+    events = parse_kb_read(kb_text)
+    out = []
+    for t in range(1, WHOLE_TRIES.get(case, 1) + 1):
+        start = marks.get(f"{wr_id}-t{t}")
+        if start is None:
+            out.append(None)
+            continue
+        end = min((m for m in marks.values() if m > start), default=float("inf"))
+        lines = [line for at, line in events if start - 0.5 <= at < end]
+        def one(prefix, name):
+            found = [line for line in lines if line.startswith(prefix)]
+            if len(found) != 1:
+                return None
+            value = kv(found[0], name)
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return value
+        out.append({"first": one("call done ", "first"), "done": one("call done ", "done"),
+                    "api": one("call done ", "api"), "spec": one("call done ", "spec"),
+                    "replace": one("write replace ", "keys"), "undo": one("write undo ", "keys")})
+    return out
+
+
+def resolve_latency(lat_id, wr, marks, kb_text):
+    """F02c: lat-<host>-<case> from the keyboard log of wr-<host>-<case>'s tries (see LATENCY_MAIN)."""
+    _, host, case = lat_id.split("-", 2)
+    if kb_text is None:
+        return unreadable(lat_id, "no keyboard-log.txt")
+    main_ms = LATENCY_MAIN.get((host, case))
+    parts, problems = [], []
+    for i, t in enumerate(latency_tries(wr.id, case, marks, kb_text), 1):
+        if t is None:
+            problems.append(f"t{i}:no MARK")
+            continue
+        parts.append(f"t{i}={{" + " ".join(f"{k}={'none' if v is None else v}" for k, v in t.items()) + "}")
+        if main_ms is None:
+            continue
+        if t["spec"] != "used":
+            problems.append(f"t{i}:spec={t['spec']} want used")
+        for k in LATENCY_KEYS:
+            want = main_ms.get(k)
+            if want is None:
+                continue
+            got = t[k]
+            if not isinstance(got, int):
+                problems.append(f"t{i}:{k}={got}")
+            elif got > want + LATENCY_SLACK_MS:
+                problems.append(f"t{i}:{k}={got}ms over main {want}+{LATENCY_SLACK_MS}")
+    evidence = " ".join(parts)
+    if main_ms is None:
+        return Check(lat_id, "RECORD", f"{evidence} main=none (the baseline run)".strip())
+    evidence += " main={" + " ".join(f"{k}={main_ms.get(k, 'none')}" for k in LATENCY_KEYS) + "}"
+    if problems:
+        return Check(lat_id, "FAIL", f"{evidence} problems={','.join(problems)}")
+    return Check(lat_id, "PASS", evidence)
+
+
 def guard_network(c, network_key):
     """A RULES item passes only through its model output; with the key a missing key is the CI's failure."""
     if c.id in RULES and c.status == "PASS":
@@ -1443,6 +1518,14 @@ def assemble(checks_text, log_text, mem_text, network_key=False, ran=None, run_d
             if check_id in WHOLE_NATIVE_IDS + WHOLE_WEB_IDS and c.status in ("PASS", "FAIL") \
                     and not c.evidence.startswith("unreadable"):
                 by_id[check_id] = resolve_whole_log(c, marks, kb_text)
+        for lat_id in LATENCY_NATIVE_IDS + LATENCY_WEB_IDS:
+            wr = by_id.get("wr-" + lat_id.split("-", 1)[1])
+            if lat_id in by_id or wr is None:
+                continue  # a line the test wrote stays (a duplicate is the test's bug); no wr- line: no lat- line
+            if wr.evidence.startswith("unreadable"):
+                by_id[lat_id] = unreadable(lat_id, f"{wr.id} is unreadable")
+            else:
+                by_id[lat_id] = resolve_latency(lat_id, wr, marks, kb_text)
     for check_id, c in list(by_id.items()):
         if c.evidence.startswith("unreadable") or c.status not in ("PASS", "SKIP"):
             continue

@@ -679,3 +679,49 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(WholeRead.refusal(first: u("more text") + text, back1: text, mid: [], back2: text, last: []), "firstEnd")
     }
 }
+
+/// F02c: the read proven at FM when the proxy's window already showed the whole field (the short draft).
+final class WindowProofTests: XCTestCase {
+    private func u(_ s: String) -> [UInt16] { Array(s.utf16) }
+
+    func testTheWindowProofNeedsEveryCondition() {
+        let w = u("protly-stub read\n§1 오늘 회의 내용.")
+        // B1 read exactly the window, F crossed its tail, R1 landed at the end and FM crossed nothing, all clean.
+        XCTAssertTrue(WholeRead.windowProof(window: w, first: [], back1: w, mid: [], returnedAtEnd: true, clean: true))
+        XCTAssertTrue(WholeRead.windowProof(window: w, first: Array(w.suffix(5)), back1: w, mid: [], returnedAtEnd: true,
+                                            clean: true))
+        // The field is longer than the window: today's proof.
+        XCTAssertFalse(WholeRead.windowProof(window: Array(w.suffix(20)), first: [], back1: w, mid: [], returnedAtEnd: true,
+                                             clean: true))
+        // No window (whitespace, a selection), or an empty one.
+        XCTAssertFalse(WholeRead.windowProof(window: nil, first: [], back1: w, mid: [], returnedAtEnd: true, clean: true))
+        XCTAssertFalse(WholeRead.windowProof(window: [], first: [], back1: [], mid: [], returnedAtEnd: true, clean: true))
+        // F crossed something the window did not end with.
+        XCTAssertFalse(WholeRead.windowProof(window: w, first: u("xyz"), back1: w, mid: [], returnedAtEnd: true, clean: true))
+        // A walk had a retry, a phantom or a resync.
+        XCTAssertFalse(WholeRead.windowProof(window: w, first: [], back1: w, mid: [], returnedAtEnd: true, clean: false))
+    }
+
+    /// The design review's case: the host's window lags after B1's first jump (planned from the window itself), so B1
+    /// sees only the window's own text and stops at a false start at its first unit. A -1 probe there that the host
+    /// applied late puts the cursor one unit into the text before; R1 then lands one unit short of the end and FM walks
+    /// that unit: not proven here, today's proof (B2 from the end) goes on.
+    func testAFalseStartAtTheWindowsStartIsNotProven() {
+        let w = u("§1 오늘 회의 내용 정리해서 보내줄게.")
+        XCTAssertFalse(WholeRead.windowProof(window: w, first: [], back1: w, mid: Array(w.suffix(1)),
+                                             returnedAtEnd: false, clean: true))
+        XCTAssertFalse(WholeRead.windowProof(window: w, first: [], back1: w, mid: [], returnedAtEnd: false, clean: true))
+        XCTAssertFalse(WholeRead.windowProof(window: w, first: [], back1: w, mid: Array(w.suffix(1)),
+                                             returnedAtEnd: true, clean: true))
+    }
+
+    /// While a walk still reads only text the window showed, the speculative call may go on; once it reads anything
+    /// else the call is cancelled at once (owner decision: save the tokens).
+    func testAWalkLeavesTheWindowAsSoonAsItReadsOtherText() {
+        let w = u("abc def\nghi")
+        XCTAssertTrue(WholeRead.withinWindow(w, Array("ghi".utf16)))
+        XCTAssertTrue(WholeRead.withinWindow(w, w))
+        XCTAssertFalse(WholeRead.withinWindow(w, u("x") + w))
+        XCTAssertFalse(WholeRead.withinWindow(w, u("ghx")))
+    }
+}

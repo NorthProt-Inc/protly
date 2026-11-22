@@ -173,3 +173,30 @@ final class FieldGuardTests: XCTestCase {
         XCTAssertEqual(FieldGuard.CopyOnly.selection.message, "Protly does not type over selected text. Copy the result instead.")
     }
 }
+
+/// Tower review of f0533ae, bugs 2 and 4: the two decisions FieldText makes on the proxy, as pure rules.
+final class FieldDecisionTests: XCTestCase {
+    /// Bug 4: the user tapped another field between Replace's deletes and its insert (up to WholeRead.moveWait): the
+    /// insert would land there. Only a known, different document says so; with none from iOS the insert goes ahead (as
+    /// before K1b: nothing better is known).
+    func testTheInsertWaitsForTheSameField() {
+        let a = UUID(), b = UUID()
+        XCTAssertEqual(FieldGuard.focus(before: a, now: a), .same)
+        XCTAssertEqual(FieldGuard.focus(before: a, now: b), .other)
+        XCTAssertEqual(FieldGuard.focus(before: nil, now: b), .unknown)
+        XCTAssertEqual(FieldGuard.focus(before: a, now: nil), .unknown)
+        XCTAssertEqual(FieldGuard.focus(before: a, now: b).logValue, 1)
+        XCTAssertEqual(FieldGuard.focus(before: a, now: a).logValue, 0)
+        XCTAssertEqual(FieldGuard.focus(before: nil, now: nil).logValue, -1)
+    }
+
+    /// Bug 2: a selection at the field's start that reaches a line feed shows both contexts empty, as select all
+    /// does. After the +1 collapse, select all leaves nothing before the end: any text the walk to the end crossed, or
+    /// any move it made, means the selection was partial (K1a: its own text, copy-only).
+    func testACollapsedSelectionWithTextAfterItWasPartial() {
+        XCTAssertFalse(WholeRead.wasPartialSelection(crossed: [], moved: 0))
+        XCTAssertTrue(WholeRead.wasPartialSelection(crossed: Array("\nprivate notes".utf16), moved: -14))
+        // A resync step moves without naming a unit: still not select all.
+        XCTAssertTrue(WholeRead.wasPartialSelection(crossed: [], moved: -1))
+    }
+}

@@ -6,7 +6,9 @@ import subprocess
 import sys
 import tempfile
 import unicodedata
+import datetime
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -1106,6 +1108,66 @@ def swift_string(literal):
     return re.sub(r"\\u\{([0-9A-Fa-f]+)\}|\\n", lambda m: chr(int(m.group(1), 16)) if m.group(1) else "\n", literal)
 
 
+class LatencyTests(unittest.TestCase):
+    """F02c: lat-<host>-<case>, derived from the keyboard log of the short wr- cases."""
+
+    KB = ("2026-11-22 12:00:01.000 Db K[1:2] [com.northprot.protly:read] call done first=1700 done=1800 api=410 spec=used\n"
+          "2026-11-22 12:00:05.000 Db K[1:2] [com.northprot.protly:read] write replace keys=3100 held=1\n"
+          "2026-11-22 12:00:09.000 Db K[1:2] [com.northprot.protly:read] write undo keys=2900 held=1\n")
+
+    def marks(self, wr_id, tries=1):
+        # MARKs at 12:00:00 UTC for t1 and an hour later for the next (no log lines there).
+        t0 = datetime.datetime(2026, 11, 22, 12, 0, 0, tzinfo=datetime.timezone.utc).timestamp()
+        out = {f"{wr_id}-t{t}": t0 + 3600 * (t - 1) for t in range(1, tries + 1)}
+        out["next"] = t0 + 3600 * tries
+        return out
+
+    def wr(self, case="smid"):
+        return checks.Check(f"wr-uikit-{case}", "PASS", "t1={real=39/1/h00000000}")
+
+    def test_without_a_main_baseline_it_records_the_times(self):
+        with mock.patch.dict(checks.LATENCY_MAIN, {}, clear=True):
+            c = checks.resolve_latency("lat-uikit-smid", self.wr(), self.marks("wr-uikit-smid", 2), self.KB)
+        self.assertEqual(c.status, "RECORD")
+        self.assertIn("t1={first=1700 done=1800 api=410 spec=used replace=3100 undo=2900}", c.evidence)
+        self.assertIn("t2={first=none", c.evidence)
+
+    def test_each_try_is_held_to_main_plus_the_slack(self):
+        main_ms = {("uikit", "smid"): {"first": 1300, "done": 1400, "replace": 2700, "undo": 2300}}
+        with mock.patch.dict(checks.LATENCY_MAIN, main_ms, clear=True), \
+                mock.patch.dict(checks.WHOLE_TRIES, {"smid": 1}):
+            c = checks.resolve_latency("lat-uikit-smid", self.wr(), self.marks("wr-uikit-smid", 1), self.KB)
+            self.assertEqual(c.status, "FAIL")
+            self.assertIn("problems=t1:undo=2900ms over main 2300+500", c.evidence)
+            main_ms[("uikit", "smid")]["undo"] = 2400  # 2900 is exactly main + 500: at most, so a PASS
+            c = checks.resolve_latency("lat-uikit-smid", self.wr(), self.marks("wr-uikit-smid", 1), self.KB)
+            self.assertEqual(c.status, "PASS", c.evidence)
+            self.assertIn("main={first=1300 done=1400 replace=2700 undo=2400}", c.evidence)
+
+    def test_a_try_without_the_speculative_call_or_a_time_fails(self):
+        main_ms = {("uikit", "smid"): {"first": 5000, "done": 5000, "replace": 9000, "undo": 9000}}
+        kb = self.KB.replace("spec=used", "spec=cancelled:longer").replace("write undo keys=2900 held=1\n", "")
+        with mock.patch.dict(checks.LATENCY_MAIN, main_ms, clear=True), \
+                mock.patch.dict(checks.WHOLE_TRIES, {"smid": 1}):
+            c = checks.resolve_latency("lat-uikit-smid", self.wr(), self.marks("wr-uikit-smid", 1), kb)
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("t1:spec=cancelled:longer want used", c.evidence)
+        self.assertIn("t1:undo=None", c.evidence)
+
+    def test_assemble_derives_a_lat_line_for_each_short_wr_line(self):
+        raw = "CHECK wr-uikit-smid PASS t1={real=39/1/h00000000} t2={real=39/1/h00000000}\n"
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "keyboard-log.txt"), "w", encoding="utf-8") as f:
+                f.write(self.KB)
+            ui = "".join(f"MARK {k} {v}\n" for k, v in self.marks("wr-uikit-smid", 2).items())
+            with mock.patch.dict(checks.LATENCY_MAIN, {}, clear=True):
+                out = {c.id: c for c in checks.assemble(raw, ui, None, ran=checks.covered_ids(
+                    ["PhoneChecksUITests/test5g_wholenative"]), run_dir=d)}
+        self.assertEqual(out["lat-uikit-smid"].status, "RECORD")
+        # No wr- line for a case: its lat- line is a FAIL like any missing line, not a crash.
+        self.assertEqual(out["lat-uikit-swin"].status, "FAIL")
+
+
 class WholeReadTests(unittest.TestCase):
     """K1b (fix/whole-field-read): wr-<host>-<case>, written PASS or FAIL by UITests/WholeReadChecks.swift."""
 
@@ -1122,8 +1184,13 @@ class WholeReadTests(unittest.TestCase):
         cases = ("win", "mid", "sel", "long", "x14k", "emoji") + short + ("etail",)
         native = [f"wr-uikit-{c}" for c in cases] + ["wr-uikit-r4k", "wr-uikit-cancel"] + [f"wr-swiftui-{c}" for c in cases]
         web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji") + short]
-        self.assertEqual(checks.METHOD_IDS["test5g_wholenative"], native)
-        self.assertEqual(checks.METHOD_IDS["test5h_wholeweb"], web)
+        lat_native = [f"lat-{h}-{c}" for h in ("uikit", "swiftui") for c in ("swin", "smid", "ssel")]
+        lat_web = [f"lat-{h}-{c}" for h in ("textarea", "lexical") for c in ("swin", "smid", "ssel")]
+        self.assertEqual(checks.METHOD_IDS["test5g_wholenative"], native + lat_native)
+        self.assertEqual(checks.METHOD_IDS["test5h_wholeweb"], web + lat_web)
+        for i in lat_native + lat_web:
+            self.assertIn(i, checks.EXPECTED_IDS)
+            self.assertNotIn(i, checks.RESOLVERS)
         for i in native + web:
             self.assertIn(i, checks.EXPECTED_IDS)
             # The test writes PASS or FAIL itself: no resolver, no model output.
@@ -1140,7 +1207,7 @@ class WholeReadTests(unittest.TestCase):
         self.assertEqual(self.swift_list("webHosts"), list(checks.WHOLE_WEB_HOSTS))
         m = re.search(r"static let tries: \[String: Int\] = \[([^\]]*)\]", self.swift())
         self.assertEqual({k: int(v) for k, v in re.findall(r'"(\w+)": (\d+)', m.group(1))}, checks.WHOLE_TRIES)
-        self.assertEqual(checks.WHOLE_TRIES, {"win": 2, "long": 2})
+        self.assertEqual(checks.WHOLE_TRIES, {"win": 2, "long": 2, "swin": 3, "smid": 2, "ssel": 2})
         native = re.search(r"static var nativeIDs: \[String\] \{\n(.*?)\n    \}", self.swift(), re.S).group(1)
         self.assertEqual(" ".join(native.split()),
                          'nativeCases.map { "wr-uikit-\\($0)" } + ["wr-uikit-r4k", "wr-uikit-cancel"] + '
