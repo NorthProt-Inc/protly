@@ -348,11 +348,12 @@ without the read's time, as the speculative call starts before the read ends). T
   and `long` run twice; every try must pass.
 - **F02c cases** (drafts the proxy window shows whole, and the tower review's bugs): `swin` (39 units: the marker line
   and one sentence, under select all's 43-unit `selectedText`; cursor at the end, 3 tries), `smid` (the same, cursor at
-  26, 2 tries), `ssel` (select all on it, 2 tries), `s3` (93 units, three sentences on one line), `shead` (`rselhead`:
-  the field's start up to its first line feed selected, a partial selection that shows no context on either side as
-  select all does; it must stay a selection: a copy-only card of exactly the marker line, the field unchanged, the log
-  `reason=selection` or `partialSelection` and no write), `etail` (native only: a lone emoji ends the line after a
-  cursor at 26, so the walk forward's last jump leaves exactly one surrogate pair).
+  26, 2 tries), `ssel` (select all on it, 2 tries), `s3` (93 units, three sentences on one line; the web window showed
+  45 of them in run 297dc27-205), `shead` (native only: `rselhead` selects the field's start up to its first line
+  feed, a partial selection that shows no context on either side as select all does; it must stay a selection: a
+  copy-only card of exactly the marker line, the field unchanged, the log `reason=selection` or `partialSelection` and
+  no write; on the read page a selection set by script never reached the keyboard, run 205), `etail` (native only: a
+  lone emoji ends the line after a cursor at 26, so the walk forward's last jump leaves exactly one surrogate pair).
 - **Accept**: the reply's shape equals the field's, the cursor is at the end after the read (UITextView `sel` probe, the
   page's caret), Replace leaves the field exactly the reply (native: the XCUITest value; web: the page's length, line
   feeds and hash) within 40 s of the tap (`replace=<s>`, recorded: the host applies one delete per character, 7-12 s

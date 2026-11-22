@@ -1129,7 +1129,8 @@ class LatencyTests(unittest.TestCase):
         with mock.patch.dict(checks.LATENCY_MAIN, {}, clear=True):
             c = checks.resolve_latency("lat-uikit-smid", self.wr(), self.marks("wr-uikit-smid", 2), self.KB)
         self.assertEqual(c.status, "RECORD")
-        self.assertIn("t1={first=1700 done=1800 api=410 spec=used replace=3100 undo=2900}", c.evidence)
+        self.assertIn("t1={first=1700 done=1800 api=410 spec=used replace=3100 undo=2900 reason=none read=none}",
+                      c.evidence)
         self.assertIn("t2={first=none", c.evidence)
 
     def test_each_try_is_held_to_main_plus_the_slack(self):
@@ -1143,6 +1144,19 @@ class LatencyTests(unittest.TestCase):
             c = checks.resolve_latency("lat-uikit-smid", self.wr(), self.marks("wr-uikit-smid", 1), self.KB)
             self.assertEqual(c.status, "PASS", c.evidence)
             self.assertIn("main={first=1300 done=1400 replace=2700 undo=2400}", c.evidence)
+
+    def test_a_failed_wr_line_or_a_missing_time_fails_the_lat_line(self):
+        main_ms = {("uikit", "ssel"): {"first": 5000, "done": 5000}, ("uikit", "swin"): {"replace": 2000, "undo": 9000}}
+        wr = checks.Check("wr-uikit-ssel", "FAIL", "t1={real=39/1/h00000000}")
+        kb = self.KB.replace("first=1700", "first=-1")
+        with mock.patch.dict(checks.LATENCY_MAIN, main_ms, clear=True), \
+                mock.patch.dict(checks.WHOLE_TRIES, {"ssel": 1}):
+            c = checks.resolve_latency("lat-uikit-ssel", wr, self.marks("wr-uikit-ssel", 1), kb)
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("wr-uikit-ssel FAIL", c.evidence)
+        self.assertIn("t1:first=-1", c.evidence)
+        # Select all's Replace and Undo are held to swin's: 3100 > 2000 + 500.
+        self.assertIn("t1:replace=3100ms over main 2000+500", c.evidence)
 
     def test_a_try_without_the_speculative_call_or_a_time_fails(self):
         main_ms = {("uikit", "smid"): {"first": 5000, "done": 5000, "replace": 9000, "undo": 9000}}
@@ -1191,8 +1205,8 @@ class WholeReadTests(unittest.TestCase):
         return re.findall(r'"(\w+)"', m.group(1))
 
     def test_every_id_is_expected_and_has_its_method(self):
-        short = ("swin", "smid", "ssel", "s3", "shead")
-        cases = ("win", "mid", "sel", "long", "x14k", "emoji") + short + ("etail",)
+        short = ("swin", "smid", "ssel", "s3")
+        cases = ("win", "mid", "sel", "long", "x14k", "emoji") + short + ("shead", "etail")
         native = [f"wr-uikit-{c}" for c in cases] + ["wr-uikit-r4k", "wr-uikit-cancel"] + [f"wr-swiftui-{c}" for c in cases]
         web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji") + short]
         lat_native = [f"lat-{h}-{c}" for h in ("uikit", "swiftui") for c in ("swin", "smid", "ssel")]
@@ -1235,8 +1249,9 @@ class WholeReadTests(unittest.TestCase):
     def test_every_case_has_a_spec_and_the_refusals_are_the_long_and_emoji_drafts(self):
         specs = self.specs()
         self.assertEqual(set(specs), set(checks.WHOLE_NATIVE_CASES) | set(checks.WHOLE_WEB_CASES) | {"r4k", "cancel"})
-        # Web hosts refuse text with emoji: etail (a lone emoji at the end) is a native case only.
-        self.assertEqual(set(checks.WHOLE_NATIVE_CASES) - set(checks.WHOLE_WEB_CASES), {"etail"})
+        # Web hosts refuse text with emoji: etail (a lone emoji at the end) is a native case only; so is shead (the
+        # page's script selection never reached the keyboard, run 297dc27-205).
+        self.assertEqual(set(checks.WHOLE_NATIVE_CASES) - set(checks.WHOLE_WEB_CASES), {"etail", "shead"})
         self.assertEqual({k for k, v in specs.items() if "cancel: true" in v[3]}, {"cancel"})
         self.assertEqual({k for k, v in specs.items() if "refusal: true" in v[3]}, {"x14k", "emoji"})
         self.assertEqual({k for k, v in specs.items() if "selectAll: true" in v[3]}, {"sel", "ssel"})

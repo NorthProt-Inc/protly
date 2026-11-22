@@ -143,12 +143,26 @@ public enum WholeRead {
         hasSuffix(window, read)
     }
 
-    /// After select all was collapsed with +1 (it lands at the selection's end): select all leaves nothing before the
-    /// field's end. Text the walk to the end crossed, or a move it made (`moved`: the cursor's way back to where the
-    /// collapse left it), means a partial selection that started at the field's start and reached a line feed, which
-    /// shows both contexts empty as select all does (tower review of f0533ae, bug 2).
-    public static func wasPartialSelection(crossed: [UInt16], moved: Int) -> Bool {
-        !crossed.isEmpty || moved != 0
+    /// What a selection that showed no context on either side was, once collapsed with +1 (it lands at the
+    /// selection's end) and walked to the end (tower review of f0533ae, bug 2).
+    public enum Collapse: Sendable, Equatable {
+        /// Nothing between the selection's end and the field's end: select all; the field is read whole.
+        case selectAll
+        /// A selection from the field's start up to a line feed, proven to be exactly `selectedText`: K1a's card.
+        case partial
+        /// Neither can be shown: refused.
+        case unknown
+    }
+
+    /// `crossed`: what the walk from the collapse to the end read; `resynced`: its first step named no unit (stale
+    /// contexts); `selected`: selectedText before the collapse; `before`: the before-context back at the collapse point,
+    /// which starts at the field's start. selectedText can hold only a selection's first units (43 after a select all,
+    /// P1a cause 3), so a partial selection counts only when that before-context is exactly it (silent-failure
+    /// review). A resync alone is no evidence either way (code review: it sent select all's first units as a
+    /// selection).
+    public static func collapsed(crossed: [UInt16], resynced: Bool, selected: [UInt16], before: [UInt16]) -> Collapse {
+        if crossed.isEmpty { return resynced ? .unknown : .selectAll }
+        return !selected.isEmpty && before == selected ? .partial : .unknown
     }
 
     /// The verdict on a read whose walks all ended where they should (the forward walks at the end, the walks back at

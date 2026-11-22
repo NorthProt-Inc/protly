@@ -353,7 +353,7 @@ final class KeyboardViewController: KeyboardInputViewController {
                     guard let self, !Task.isCancelled else { return }
                     speculative = (call, Speculative(mode: ActionAPI.mode(forDraft: text), text: text))
                 },
-                left: { [weak self] in self?.dropSpeculative(of: call, why: "longer") })
+                left: { [weak self] why in self?.dropSpeculative(of: call, why: why) })
             readEndedAt = now
             if let s = speculative, s.call == call { timing?.spec = Self.specOutcome(outcome, s.spec) }
             guard !Task.isCancelled else {
@@ -561,6 +561,9 @@ final class KeyboardViewController: KeyboardInputViewController {
         actionTask?.cancel()
         if adopting == nil, timing?.call == call { timing?.startedAt = now }
         actionTask = Task { [weak self] in
+            // An adopted call's download stops with this task, however it ends (code review: Cancel between two updates
+            // left it running, its relay still held by the timing record).
+            defer { adopting?.cancel() }
             // self is bound per update, never before the loop: a torn-down controller is not held for up to 240 s. The
             // cancel check stops a late update from bringing a card back after Cancel or after a Retry replaced this task.
             for await update in adopting?.relay ?? ActionClient.run(action, text: sent.text, profile: sent.profile) {

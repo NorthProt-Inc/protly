@@ -191,12 +191,20 @@ final class FieldDecisionTests: XCTestCase {
     }
 
     /// Bug 2: a selection at the field's start that reaches a line feed shows both contexts empty, as select all
-    /// does. After the +1 collapse, select all leaves nothing before the end: any text the walk to the end crossed, or
-    /// any move it made, means the selection was partial (K1a: its own text, copy-only).
+    /// does. After the +1 collapse, select all leaves nothing before the end; text the walk to the end crossed means a
+    /// partial selection. Its card shows selectedText, which can hold only the selection's first units (43 after a
+    /// select all, P1a cause 3), so it counts only when the before-context back at the collapse point, which starts at
+    /// the field's start, is exactly that text (silent-failure review). A resync alone (a move that named no unit:
+    /// the contexts were stale) is neither: refused (code review: it sent select all's first 43 units as a selection).
     func testACollapsedSelectionWithTextAfterItWasPartial() {
-        XCTAssertFalse(WholeRead.wasPartialSelection(crossed: [], moved: 0))
-        XCTAssertTrue(WholeRead.wasPartialSelection(crossed: Array("\nprivate notes".utf16), moved: -14))
-        // A resync step moves without naming a unit: still not select all.
-        XCTAssertTrue(WholeRead.wasPartialSelection(crossed: [], moved: -1))
+        let head = Array("Title".utf16)
+        XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: false, selected: head, before: head), .selectAll)
+        XCTAssertEqual(WholeRead.collapsed(crossed: Array("\nprivate notes".utf16), resynced: false, selected: head,
+                                           before: head), .partial)
+        // The selection longer than selectedText showed: not proven, refused.
+        XCTAssertEqual(WholeRead.collapsed(crossed: Array("\nmore".utf16), resynced: false, selected: Array("Titl".utf16),
+                                           before: head), .unknown)
+        // Stale contexts: the first step resynced and crossed nothing it could name.
+        XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: true, selected: head, before: head), .unknown)
     }
 }
