@@ -20,6 +20,9 @@ public enum WholeRead {
     public static let moveWait: TimeInterval = 1
     /// A probe step (one unit past an empty context): no change for this long is the end or the start.
     public static let probeWait: TimeInterval = 0.5
+    /// A step slower than this to show (probe runs 154-155: 286 ms at most, 26-33 ms at the median) marks a slow host:
+    /// from then on a probe that saw no change gets a second look before it counts as the end or the start.
+    public static let slowStep: TimeInterval = 0.2
     /// An empty before-context mid-field comes back within this long (probe run 153); only then is it probed.
     public static let emptyWait: TimeInterval = 0.3
     /// The poll interval; a step has settled when two polls in a row agree, at most `settlePolls` more polls.
@@ -237,8 +240,11 @@ public struct BackWalk: Sendable {
     }
 }
 
-/// One walk forward to the end of the field.
+/// One walk forward to the end of the field. `landed` changes nothing until a step fits, so a step that fit nothing
+/// can be judged again on contexts read a moment later.
 public struct ForwardWalk: Sendable {
+    /// False ends a walk may undo and look at again (an after-context that showed empty mid-line: run 0f1bcd6-185).
+    public static let maxRetries = 5
     public let cap: Int
     public private(set) var units: [UInt16] = []
     private var a0: [UInt16] = []
@@ -248,6 +254,9 @@ public struct ForwardWalk: Sendable {
     private let resyncFirst: Bool
     private var steps = 0
     public private(set) var resyncs = 0
+    public private(set) var retries = 0
+    /// The unit the last false end crossed: the undo must show it after the cursor again.
+    private var crossed: UInt16?
     /// For the log after a step that fits nothing: did the before- and after-context fit the planned move?
     public private(set) var fit = (before: true, after: true)
 
@@ -261,9 +270,10 @@ public struct ForwardWalk: Sendable {
     /// way to the end, and the host would cut it short while the record counted all of it (design review).
     public mutating func plan(after: [UInt16]) -> Int {
         a0 = after
+        steps += 1
         if after.isEmpty {
             k = 1
-        } else if resyncFirst, steps == 0 {
+        } else if resyncFirst, steps == 1 {
             // Never inside an emoji (code review): two units over a surrogate pair.
             k = after.count > 1 && WholeRead.isLow(after[1]) ? 2 : 1
         } else {
@@ -273,13 +283,20 @@ public struct ForwardWalk: Sendable {
     }
 
     public mutating func landed(changed: Bool, before b1: [UInt16], after a1: [UInt16]) -> WalkStep {
-        steps += 1
         if a0.isEmpty {
             guard changed else { return .done }
-            // The after-context stops at a line feed, so the probe crossed one; any other change is not a move this
-            // walk can name (a window that changed by itself, or a lagging context).
+            // The after-context stops at a line feed, so the probe crossed one. A unit other than a line feed: the
+            // after-context showed empty mid-line (a window on its way), a false end; undone and looked at again.
             fit = (b1.last == 10, true)
-            guard b1.last == 10 else { return resync() ?? .failed("badStep", moved: 1) }
+            guard b1.last == 10 else {
+                if let r = resync() { return r }
+                guard let x = b1.last, retries < Self.maxRetries else {
+                    return .failed(b1.isEmpty ? "badStep" : "falseEnd", moved: 1)
+                }
+                retries += 1
+                crossed = x
+                return .retry(-1)
+            }
             units.append(10)
         } else {
             guard changed else { return .failed("stuck", moved: nil) }
@@ -291,6 +308,14 @@ public struct ForwardWalk: Sendable {
         }
         if units.count > cap { return .failed("tooLong", moved: k) }
         return .moved(k)
+    }
+
+    /// After `.retry`: the undo moved back by one unit and must show the unit the probe crossed after the cursor again.
+    /// nil `moved`: neither move can be named then.
+    public mutating func undone(changed: Bool, before b1: [UInt16], after a1: [UInt16]) -> WalkStep {
+        guard changed, let x = crossed, a1.first == x else { return .failed("badUndo", moved: nil) }
+        crossed = nil
+        return .moved(-1)
     }
 
     /// The first step of a walk from the user's cursor fit nothing: the contexts it planned from were stale. The host

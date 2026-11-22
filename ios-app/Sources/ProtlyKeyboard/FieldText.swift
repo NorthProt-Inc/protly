@@ -128,7 +128,7 @@ enum FieldText {
             // No hash here: a walk's piece can be a few units long, and a 32-bit hash of so little can be reversed (code
             // review). `read done` hashes the whole read.
             let count = units.count, lf = WholeRead.lineFeeds(units), took = ms(since: w0)
-            let retries = bw.retries, resyncs = fw.resyncs
+            let retries = bw.retries + fw.retries, resyncs = fw.resyncs
             log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) first=\(firstMS, privacy: .public) retries=\(retries, privacy: .public) resyncs=\(resyncs, privacy: .public) late=\(late, privacy: .public)")
             return e
         }
@@ -161,20 +161,45 @@ enum FieldText {
             let s0 = uptime()
             var s = await step(p, by: back ? -k : k, wait: wait)
             if steps == 1 { firstMS = ms(since: s0) }
-            if !s.changed, !probing, fits(WholeRead.moveWait) {
-                // A move that has not shown after 1 s may still come (run 163 textarea: the first step back; steps
-                // take 26-33 ms at the median, 286 ms at most in probe runs 154-155): one more look before "stuck".
+            if s.changed, uptime() - s0 > WholeRead.slowStep { slowSeen = true }
+            // A move that has not shown may still come (run 163 textarea: the first step back took over 1 s; steps take
+            // 26-33 ms at the median, 286 ms at most in probe runs 154-155): one more look before "stuck". A probe's
+            // "nothing changed" gets it too once this read or Replace has seen a slow step (run b039057-182 textarea
+            // mid: a probe at a line feed that showed late ended the first walk 39 units early; silent-failure review:
+            // such an end in every walk would accept a partial read). A host that has been fast pays nothing: every
+            // read has five such probes (run 7cdefa4-180: the main suite ran past its deadline on the reads' time).
+            let second = !s.changed && (!probing || slowSeen)
+            // No time left for that look: nothing changed is then no end, no start, only out of time.
+            let outOfTime = second && !fits(wait)
+            if second, !outOfTime {
                 late += 1
-                s = await watch(p, from: c, wait: WholeRead.moveWait)
+                s = await watch(p, from: c, wait: wait)
+                if s.changed { slowSeen = true }
             }
-            if !back, s.changed, s.c.before.isEmpty {
-                // An empty before-context after a step forward is a window on its way, not the field: wait for it.
+            if s.changed, s.c.before.isEmpty, !back || !probing {
+                // An empty before-context after a step forward, or after a jump back (which always leaves text before
+                // the cursor), is a window on its way, not the field: wait for it (run 0f1bcd6-185 swiftui emoji).
                 let e0 = uptime()
                 while uptime() - e0 < WholeRead.emptyWait, ctx(p).before.isEmpty { await pause() }
                 s.c = ctx(p)
             }
-            let r = back ? bw.landed(changed: s.changed, before: s.c.before, after: s.c.after)
-                : fw.landed(changed: s.changed, before: s.c.before, after: s.c.after)
+            func judge() -> WalkStep {
+                back ? bw.landed(changed: s.changed, before: s.c.before, after: s.c.after)
+                    : fw.landed(changed: s.changed, before: s.c.before, after: s.c.after)
+            }
+            var r = judge()
+            if case .failed(let why, _) = r, why == "badStep" || why == "characters", fits(WholeRead.emptyWait) {
+                // A pair of contexts caught half-updated (run 185 uikit win: two polls 20 ms apart agreed on it): judged
+                // once more on the contexts a moment later. The walk changes nothing until a step fits.
+                await pause(WholeRead.emptyWait)
+                let again = ctx(p)
+                if again != s.c {
+                    logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
+                    s.c = again
+                    r = judge()
+                }
+            }
+            if outOfTime { r = .failed("timeUp", moved: nil) }
             if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: ms(since: s0)) }
             if !back, case .moved = r, fw.resyncs > 0, steps == 1 {
                 logStep("resync", k: k, from: c, to: s, ms: ms(since: s0))
@@ -185,14 +210,16 @@ enum FieldText {
             case .phantom:
                 track.landed(nil, s.c.b)
             case .retry(let m):
-                // A false start: the probe moved one unit back over text it cannot name. Undo it and look again.
-                track.landed(-1, s.c.b)
-                logStep("falseStart", k: k, from: c, to: s, ms: ms(since: s0))
+                // A false start or end: the probe moved one unit over text it cannot name. Undo it and look again.
+                track.landed(-m, s.c.b)
+                logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
                 if Task.isCancelled { return end(.cancelled) }
                 guard fits(WholeRead.moveWait) else { return end(.failed("timeUp")) }
                 track.sending()
                 let u = await step(p, by: m, wait: WholeRead.moveWait)
-                switch bw.undone(changed: u.changed, before: u.c.before, after: u.c.after) {
+                let undone = back ? bw.undone(changed: u.changed, before: u.c.before, after: u.c.after)
+                    : fw.undone(changed: u.changed, before: u.c.before, after: u.c.after)
+                switch undone {
                 case .moved(let d):
                     track.landed(d, u.c.b)
                 default:
@@ -234,6 +261,7 @@ enum FieldText {
         let t0 = uptime()
         let c0 = ctx(p)
         let track = Track(report: record)
+        slowSeen = false
         let sb = c0.before.count, sa = c0.after.count, ss = c0.s.utf16.count
         log.debug("read start b=\(sb, privacy: .public) a=\(sa, privacy: .public) s=\(ss, privacy: .public)")
         func finish(_ o: Outcome, _ reason: String, _ units: [UInt16] = []) -> Outcome {
@@ -331,6 +359,9 @@ enum FieldText {
         p.adjustTextPosition(byCharacterOffset: move)
     }
 
+    /// A step of this read or Replace took longer than WholeRead.slowStep to show: probes get a second look.
+    private static var slowSeen = false
+
     /// Host callbacks (textDidChange, selectionDidChange) so far: Replace waits until they stop (KeyboardViewController
     /// counts them). The proxy shows the keyboard's own deletes and insert at once, long before the host has applied
     /// them (run 162: an empty field 0.36 s after 3247 deletes the host needed 7-12 s for).
@@ -347,6 +378,7 @@ enum FieldText {
     /// hidden: the Task is cancelled); the caller says so and offers no Undo.
     static func replace(_ old: String, with new: String, _ p: UITextDocumentProxy) async -> Bool {
         let t0 = uptime()
+        slowSeen = false
         let events0 = hostEvents
         var deleted = 0
         for _ in old {

@@ -66,6 +66,9 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(WholeRead.progressAfter, 2)
         XCTAssertEqual(WholeRead.probeWait, 0.5)
         XCTAssertEqual(WholeRead.emptyWait, 0.3)
+        // Above the slowest step the probe saw (286 ms with its settle polls), so a fast host pays nothing for probes'
+        // second look.
+        XCTAssertEqual(WholeRead.slowStep, 0.2)
         // The old 2 s budget fits no two-walk read (3 s at least, probe runs 149-155); the end and start probes alone
         // take 3 x 0.5 + 2 x 0.5 s.
         XCTAssertGreaterThan(WholeRead.total, 5 * WholeRead.probeWait)
@@ -103,9 +106,12 @@ final class WholeReadTests: XCTestCase {
         /// Positions where the before-context shows empty (a window on its way, run 162 swiftui long t2) until the
         /// cursor has left them once.
         var blanks: Set<Int> = []
+        /// Positions where the after-context shows empty mid-line (run 0f1bcd6-185 uikit cancel), until the cursor has
+        /// left them once.
+        var blankAfter: Set<Int> = []
 
         var before: [UInt16] { blanks.contains(pos) ? [] : Array(text[max(0, pos - window)..<pos]) }
-        var after: [UInt16] { Array(text[pos...].prefix { $0 != 10 }) }
+        var after: [UInt16] { blankAfter.contains(pos) ? [] : Array(text[pos...].prefix { $0 != 10 }) }
 
         mutating func move(_ k: Int) -> Bool {
             let old = pos
@@ -173,9 +179,19 @@ final class WholeReadTests: XCTestCase {
             // `stale`: what the keyboard was shown before the first step (the host moved the caret without telling it).
             let b0 = shown?.before ?? f.before, a0 = shown?.after ?? f.after
             shown = nil
+            let from = f.pos
             let k = w.plan(after: a0)
             let changed = f.move(k)
-            let s = w.landed(changed: changed && (f.before != b0 || f.after != a0), before: f.before, after: f.after)
+            var s = w.landed(changed: changed && (f.before != b0 || f.after != a0), before: f.before, after: f.after)
+            if case .retry(let m) = s {
+                // The driver undoes the probe; the blank it stood on has caught up by then.
+                net = net.map { $0 + 1 }
+                f.blankAfter.remove(from)
+                let b1 = f.before, a1 = f.after
+                let moved = f.move(m)
+                s = w.undone(changed: moved && (f.before != b1 || f.after != a1), before: f.before, after: f.after)
+                if case .moved = s {} else { return (s, w.units, net) }
+            }
             switch s {
             case .moved(let d): net = net.map { $0 + d }
             case .phantom, .retry: net = nil
@@ -412,10 +428,14 @@ final class WholeReadTests: XCTestCase {
         _ = v.plan(after: [])
         XCTAssertEqual(v.landed(changed: true, before: u("abc\n"), after: u("next")), .moved(1))
         XCTAssertEqual(v.units, [10])
-        // A change that shows no line feed before the cursor is not a move the walk can name.
+        // A change that shows no line feed before the cursor: a false end, undone and looked at again
+        // (testAFalseEndIsUndoneAndLookedAtAgain); with no before-context at all, not a move the walk can name.
         var x = ForwardWalk(cap: 100)
         _ = x.plan(after: [])
-        XCTAssertEqual(x.landed(changed: true, before: u("bc"), after: []), .failed("badStep", moved: 1))
+        XCTAssertEqual(x.landed(changed: true, before: u("bc"), after: []), .retry(-1))
+        var y = ForwardWalk(cap: 100)
+        _ = y.plan(after: [])
+        XCTAssertEqual(y.landed(changed: true, before: [], after: u("q")), .failed("badStep", moved: 1))
     }
 
     /// Runs 163 textarea and lexical `mid`, `sel`: the page moved the caret without telling the keyboard, so the
@@ -456,6 +476,67 @@ final class WholeReadTests: XCTestCase {
         // Never inside an emoji: two units over a surrogate pair.
         var y = ForwardWalk(cap: 100, resyncFirst: true)
         XCTAssertEqual(y.plan(after: u("\u{1F602}abc")), 2)
+    }
+
+    /// Run 0f1bcd6-185 uikit cancel: an after-context that showed empty mid-line made the probe cross a letter, not a
+    /// line feed. Such a false end is undone (one unit back, checked against the after-context) and looked at again,
+    /// at most `maxRetries` times a walk, as a false start on the way back.
+    func testAFalseEndIsUndoneAndLookedAtAgain() {
+        let t = u(draft)
+        var f = Field(text: t, pos: 40)
+        f.blankAfter = [45, 52, 130]
+        // The walk lands on 45 and 52 only if its jumps do: put blanks where the jumps from 40 land.
+        var g = Field(text: t, pos: 40)
+        var w0 = ForwardWalk(cap: WholeRead.cap)
+        var stops: [Int] = []
+        while stops.count < 4 {
+            _ = g.move(w0.plan(after: g.after))
+            _ = w0.landed(changed: true, before: g.before, after: g.after)
+            stops.append(g.pos)
+        }
+        f.blankAfter = Set(stops.prefix(3).filter { t[$0] != 10 })
+        XCTAssertFalse(f.blankAfter.isEmpty)
+        let fw = walkForward(&f)
+        XCTAssertEqual(fw.step, .done)
+        XCTAssertEqual(fw.units, Array(t[40...]))
+        XCTAssertEqual(fw.net, t.count - 40)
+        // One by one, and the limit.
+        var w = ForwardWalk(cap: 100)
+        XCTAssertEqual(w.plan(after: []), 1)
+        XCTAssertEqual(w.landed(changed: true, before: u("ab x"), after: u("yz")), .retry(-1))
+        XCTAssertEqual(w.undone(changed: true, before: u("ab "), after: u("xyz")), .moved(-1))
+        XCTAssertEqual(w.retries, 1)
+        XCTAssertEqual(w.units, [])
+        // An undo that shows something else cannot be named.
+        _ = w.plan(after: [])
+        XCTAssertEqual(w.landed(changed: true, before: u("ab x"), after: u("yz")), .retry(-1))
+        XCTAssertEqual(w.undone(changed: true, before: u("q"), after: u("qq")), .failed("badUndo", moved: nil))
+        var x = ForwardWalk(cap: 100)
+        for _ in 0..<ForwardWalk.maxRetries {
+            _ = x.plan(after: [])
+            XCTAssertEqual(x.landed(changed: true, before: u("ab x"), after: u("yz")), .retry(-1))
+        }
+        _ = x.plan(after: [])
+        XCTAssertEqual(x.landed(changed: true, before: u("ab x"), after: u("yz")), .failed("falseEnd", moved: 1))
+    }
+
+    /// A step that fit nothing may be judged again on contexts read a moment later (run 185: a pair of contexts caught
+    /// half-updated): judging changes nothing until a step fits.
+    func testAStepThatFitNothingCanBeJudgedAgain() {
+        var w = ForwardWalk(cap: 100)
+        XCTAssertEqual(w.plan(after: u("abcdef")), 5)
+        XCTAssertEqual(w.landed(changed: true, before: u("qq"), after: u("zz")), .failed("badStep", moved: 5))
+        XCTAssertEqual(w.landed(changed: true, before: u("xabcde"), after: u("f")), .moved(5))
+        XCTAssertEqual(w.units, u("abcde"))
+        var r = ForwardWalk(cap: 100, resyncFirst: true)
+        XCTAssertEqual(r.plan(after: u("abcdef")), 1)
+        XCTAssertEqual(r.landed(changed: true, before: u("xa"), after: u("bcdef")), .moved(1))
+        XCTAssertEqual(r.resyncs, 0)
+        var b = BackWalk(cap: 100)
+        XCTAssertEqual(b.plan(before: u("hello world")), 10)
+        XCTAssertEqual(b.landed(changed: true, before: u("xyz"), after: u("qqqqqqqqqqqqq")), .failed("badStep", moved: -10))
+        XCTAssertEqual(b.landed(changed: true, before: u("h"), after: u("ello world")), .moved(-10))
+        XCTAssertEqual(b.units, u("ello world"))
     }
 
     /// The limits of the resync when the host already had the caret at the end: if the contexts stay stale, the step
