@@ -1,3 +1,4 @@
+import ProtlyCore
 import UIKit
 import XCTest
 
@@ -25,6 +26,9 @@ extension PhoneRun {
     static let bandTolerance: CGFloat = 1.0
     /// Row 1's top on the iPhone 13 Pro in every layout scenario since Sprint 5 (measure.txt, 02-07: 564.00).
     static let row1: CGFloat = 564
+    /// How long the host stays in the background with the keyboard hidden: longer than HostLook's expiry, as leaving
+    /// for another app usually is (HostLook, rule 5). A quicker round trip is a known gap (run 183, hb-r1 and hb-r2).
+    static let away = HostLook.hiddenExpiry + 3
 
     /// One measured screen: glass top and row 1 in points (nil when not found), and which keyboard was up.
     struct HeightShot {
@@ -92,13 +96,16 @@ extension PhoneRun {
             take("hb-emoji", heightEmoji())
             take("hb-hide-emoji", heightRefocus(1))
         }
-        // 5. An app switch with the keyboard hidden, then the field tapped: no keyboard is up while the host is away.
+        // 5. After iOS's margin look (an app switch with the keyboard up, then hide/show), an app switch with the
+        // keyboard hidden, `away` seconds in the background, then the field tapped: no notice reaches the keyboard.
         launch()
         for _ in 0..<5 {
+            take("hb-switch", heightAppSwitch())
+            take("hb-hide-switch", heightRefocus(1))
             d.dismissKeyboard()
             d.pause(1)
             XCUIDevice.shared.press(.home)
-            d.pause(2)
+            d.pause(PhoneRun.away)
             d.app.activate()
             d.pause(1)
             d.focusField()
@@ -205,14 +212,14 @@ extension PhoneRun {
     }
 
     /// An app switch with the keyboard up came first. Leaves the host (the keyboard hidden first unless
-    /// `keyboardUp`), terminates it in the background and launches it again.
+    /// `keyboardUp`, then `away` seconds in the background), terminates it there and launches it again.
     private func heightKill(keyboardUp: Bool) -> Bool {
         if !keyboardUp {
             d.dismissKeyboard()
             d.pause(1)
         }
         XCUIDevice.shared.press(.home)
-        d.pause(2)
+        d.pause(keyboardUp ? 2 : PhoneRun.away)
         d.app.terminate()
         d.launch(arguments: PhoneRun.heightArguments)
         if !d.waitForKeyboard() { d.focusField() }

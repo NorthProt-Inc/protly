@@ -301,9 +301,9 @@ Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis br
   hidden), `hb-globe` (Protly picked right after Apple's English keyboard), `hb-hide-globe` (hide and show after it),
   `hb-emoji` (the Emoji round trip in a fresh host, after the globe pick and after an app switch), `hb-hide-emoji` (hide
   and show after it), `hb-switch` (an app switch back with the keyboard up), `hb-hide-switch` (hide and show after
-  it), `hb-switch-hidden` (an app switch with the keyboard hidden, then the field tapped), `hb-kill-up` and
-  `hb-kill-hidden` (after an app switch with the keyboard up, the host left with the keyboard up or hidden, terminated
-  in the background and launched again), `hb-card` (a stub Translate's finished card in a fresh host, judged by the
+  it), `hb-switch-hidden` (after an app switch with the keyboard up and a hide/show, an app switch with the keyboard
+  hidden, 13 s away, then the field tapped), `hb-kill-up` and `hb-kill-hidden` (after an app switch with the keyboard
+  up, the host left with the keyboard up, or hidden and 13 s away, terminated in the background and launched again), `hb-card` (a stub Translate's finished card in a fresh host, judged by the
   glass top only: it covers row 1; a card that did not finish FAILs) and `hb-cancel` (the keys after the card's
   Cancel). Fewer than 5 shots, or no Apple band, is FAIL `unreadable`. One more card after an app switch is not judged:
   runs 159 and 178 could not read the bar's center at the 240 pt pin, and its tree goes to

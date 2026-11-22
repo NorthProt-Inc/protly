@@ -138,6 +138,35 @@ final class HostLookTests: XCTestCase {
         }
     }
 
+    func testALongHideClearsTheMargin() {
+        // iOS drops its margin when the host goes to the background with the keyboard hidden (run 183, hb-r2 5/5;
+        // and a relaunch, hb-r1 5/5), and no notice reaches the keyboard then. Hidden for `hiddenExpiry` or longer
+        // counts as that (a guess: on the simulator a hide and show took about 7 s from disappear to load).
+        var look = afterAppSwitch()
+        look.disappeared(document: nil, at: 20)
+        present(&look, at: 20 + HostLook.hiddenExpiry - 0.1, document: UUID())
+        XCTAssertTrue(look.margin, "just under the expiry")
+        look.disappeared(document: nil, at: 40)
+        present(&look, at: 40 + HostLook.hiddenExpiry, document: UUID())
+        XCTAssertFalse(look.margin)
+    }
+
+    func testAnAppSwitchAfterALongHideStillMeansTheMargin() {
+        var look = afterAppSwitch()
+        look.disappeared(document: nil, at: 20)
+        present(&look, at: 50, document: UUID())
+        XCTAssertFalse(look.margin)
+        appSwitch(&look, at: 70, document: nil)
+        XCTAssertTrue(look.margin)
+    }
+
+    func testAControllerShownAgainAfterALongHideHasNoMargin() {
+        var look = afterAppSwitch()
+        look.disappeared(document: nil, at: 20)
+        look.appeared(document: UUID(), at: 20 + HostLook.hiddenExpiry)
+        XCTAssertFalse(look.margin)
+    }
+
     func testHideAndShowKeepNoMargin() {
         var look = HostLook()
         for i in 0...5 {
@@ -172,16 +201,17 @@ final class HostLookTests: XCTestCase {
         // iOS sometimes loads a controller and shows another keyboard instead (runs 159-169).
         var look = afterAppSwitch()
         look.disappeared(document: nil, at: 20)
-        look.loaded(at: 25)
-        present(&look, at: 30, document: UUID())
+        look.loaded(at: 22)
+        present(&look, at: 25, document: UUID())
         XCTAssertTrue(look.margin)
     }
 
     func testAShownAgainControllerThatGoesWithItsHostIsATerminatedHost() {
         var look = afterAppSwitch()
         look.disappeared(document: nil, at: 20)
-        look.appeared(document: UUID(), at: 30)  // shown again, then the host is terminated with it up
-        present(&look, at: 40, document: UUID())
+        look.appeared(document: UUID(), at: 25)  // shown again, then the host is terminated with it up
+        XCTAssertTrue(look.margin)
+        present(&look, at: 28, document: UUID())
         XCTAssertFalse(look.margin)
     }
 
@@ -192,14 +222,14 @@ final class HostLookTests: XCTestCase {
         let doc = UUID()
         var look = afterAppSwitch(doc)
         look.disappeared(document: doc, at: 20)
-        XCTAssertEqual(present(&look, at: 30, document: doc), .same)
+        XCTAssertEqual(present(&look, at: 25, document: doc), .same)
         XCTAssertFalse(look.margin)
     }
 
     func testAnotherDocumentIsHideAndShow() {
         var look = afterAppSwitch()
         look.disappeared(document: UUID(), at: 20)
-        XCTAssertEqual(present(&look, at: 30, document: UUID()), .other)
+        XCTAssertEqual(present(&look, at: 25, document: UUID()), .other)
         XCTAssertTrue(look.margin)
     }
 
@@ -207,11 +237,11 @@ final class HostLookTests: XCTestCase {
         let doc = UUID()
         var look = afterAppSwitch(doc)
         look.disappeared(document: doc, at: 20)
-        XCTAssertEqual(present(&look, at: 30, document: nil), .none)
+        XCTAssertEqual(present(&look, at: 25, document: nil), .none)
         XCTAssertTrue(look.margin)
         var other = afterAppSwitch(doc)
         other.disappeared(document: nil, at: 20)
-        XCTAssertEqual(present(&other, at: 30, document: doc), .other)
+        XCTAssertEqual(present(&other, at: 25, document: doc), .other)
         XCTAssertTrue(other.margin)
     }
 

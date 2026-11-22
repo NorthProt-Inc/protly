@@ -18,8 +18,13 @@ import Foundation
 //    (NSExtensionHostDidBecomeActive) reaches a controller `freshWindow` or younger (0.22-0.41 s after loading), or
 //    comes up to `earlyWindow` before the controller loads (run 59: 32 ms). Without leaving first (Control Center, an
 //    alert, Face ID or a notification reply over a live keyboard, a cold launch) iOS keeps its look.
-// 3. Hide and show keep the look of the presentation before. An app switch with the keyboard hidden too (runs 177,
-//    178: no notice reaches the keyboard, and iOS kept no margin).
+// 3. Hide and show keep the look of the presentation before, while the host stays in the foreground.
+// 5. A hide of `hiddenExpiry` or longer shows no margin afterwards. iOS drops its margin when the host goes to the
+//    background with the keyboard hidden (run 183, 5/5) or is relaunched after that (5/5), and no notice reaches the
+//    keyboard then (runs 177, 183). The keyboard cannot see that background; a long hide stands for it. A guess: on
+//    the simulator a hide and show took about 7 s from disappear to load, and leaving for another app and coming back
+//    rarely takes less than 10 s. A quicker round trip with the keyboard hidden after the margin look gives a band 17
+//    pt short.
 // 4. Back from another keyboard shows no margin: the field kept its document (iOS's documentIdentifier) while another
 //    keyboard was up. A hide leaves no document (run 177). True after Emoji; after Apple's English keyboard iOS draws
 //    the margin, and the keyboard cannot tell the two apart (a guess that Emoji is the one people come back from). A
@@ -35,6 +40,8 @@ public struct HostLook: Sendable, Equatable {
     public static let earlyWindow = 0.5
     /// How soon after the resign notice a disappearing controller counts as the host leaving with the keyboard up.
     public static let resignWindow = 3.0
+    /// How long the keyboard can stay hidden before the margin look no longer counts (rule 5).
+    public static let hiddenExpiry = 10.0
 
     /// How the field's document at an appearance compares with the one when the last controller disappeared.
     public enum Document: String, Sendable {
@@ -56,6 +63,8 @@ public struct HostLook: Sendable, Equatable {
     private var endedCleanly = true
     /// The field's document when the last controller disappeared.
     private var lastDocument: UUID?
+    /// When the last controller disappeared.
+    private var disappearedAt: Double?
 
     public init() {}
 
@@ -73,6 +82,7 @@ public struct HostLook: Sendable, Equatable {
         }
         loadedAt = now
         cameBack = false
+        expire(at: now)
         if let back = returnedAt, now >= back, now - back < Self.earlyWindow { arrived() }  // rule 2, early
     }
 
@@ -80,7 +90,10 @@ public struct HostLook: Sendable, Equatable {
     @discardableResult
     public mutating func appeared(document: UUID?, at now: Double) -> Document {
         // Shown again after its fresh window: a new window for the host's return, as a new controller would get.
-        if let loadedAt, now - loadedAt >= Self.freshWindow { self.loadedAt = now }
+        if let loadedAt, now - loadedAt >= Self.freshWindow {
+            self.loadedAt = now
+            expire(at: now)
+        }
         endedCleanly = false
         guard let document else { return .none }
         guard document == lastDocument else { return .other }
@@ -107,12 +120,18 @@ public struct HostLook: Sendable, Equatable {
     public mutating func disappeared(document: UUID?, at now: Double) {
         endedCleanly = true
         lastDocument = document
+        disappearedAt = now
         if let resignedAt, now >= resignedAt, now - resignedAt < Self.resignWindow {  // rule 1
             margin = false
             leaving = true
             returnedAt = nil
             self.resignedAt = nil
         }
+    }
+
+    /// Rule 5: hidden long enough to have been in the background.
+    private mutating func expire(at now: Double) {
+        if margin, let gone = disappearedAt, now - gone >= Self.hiddenExpiry { margin = false }
     }
 
     /// The host came back with the keyboard up (rule 2).
