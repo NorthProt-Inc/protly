@@ -1,24 +1,24 @@
 memsample: process name ProtlyCIKeyboard, interval 2.0 s
-memsample: started at 1795349417.436 after '== PhoneChecksUITests.test1' in /Users/runner/work/_temp/shots/ui-log.txt
-pgrep -x ProtlyCIKeyboard: 19129
-footprint: `footprint -p 19129` exit 0 value_kb 20480
+memsample: started at 1795353872.698 after '== PhoneChecksUITests.test1' in /Users/runner/work/_temp/shots/ui-log.txt
+pgrep -x ProtlyCIKeyboard: 15345
+footprint: `footprint -p 15345` exit 0 value_kb 12288
     ======================================================================
-    ProtlyCIKeyboard [19129]: 64-bit    Footprint: 20 MB (16384 bytes per page)
-    ======================================================================
-    
-      Dirty      Clean  Reclaimable    Regions    Category
-        ---        ---          ---        ---    ---
-    7953 KB      16 KB          0 B        912    __DATA_CONST
-    3456 KB        0 B      2256 KB          4    MALLOC_SMALL
-sudo-footprint: `sudo -n footprint -p 19129` exit 0 value_kb 53248
-    ======================================================================
-    ProtlyCIKeyboard [19129]: 64-bit    Footprint: 52 MB (16384 bytes per page)
+    ProtlyCIKeyboard [15345]: 64-bit    Footprint: 12 MB (16384 bytes per page)
     ======================================================================
     
       Dirty      Clean  Reclaimable    Regions    Category
         ---        ---          ---        ---    ---
-      15 MB        0 B          0 B         70    dyld private memory
-      13 MB        0 B        17 MB          9    MALLOC_SMALL
-rss: `ps -o rss= -p 19129` exit 0 value_kb 311488
-    311488
+    4796 KB        0 B          0 B        471    __DATA_CONST
+    2114 KB      32 KB          0 B        451    __DATA
+sudo-footprint: `sudo -n footprint -p 15345` exit 0 value_kb 12288
+    ======================================================================
+    ProtlyCIKeyboard [15345]: 64-bit    Footprint: 12 MB (16384 bytes per page)
+    ======================================================================
+    
+      Dirty      Clean  Reclaimable    Regions    Category
+        ---        ---          ---        ---    ---
+    4796 KB        0 B          0 B        471    __DATA_CONST
+    2114 KB      32 KB          0 B        451    __DATA
+rss: `ps -o rss= -p 15345` exit 0 value_kb 102144
+    102144
 chosen footprint method: footprint

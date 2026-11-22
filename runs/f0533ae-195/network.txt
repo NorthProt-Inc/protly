@@ -4,4 +4,4 @@ allow paste (7.7-3 read): tapped Allow Paste in SpringBoard
 allow paste (7.7-3 test-note): tapped Allow Paste in SpringBoard
 allow paste (7.7-5 confirm-clear): tapped Allow Paste in SpringBoard
 allow paste (7.7-5 confirm-again): tapped Allow Paste in SpringBoard
-requests: 15 of at most 60
+requests: 13 of at most 60
