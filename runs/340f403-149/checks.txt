@@ -1,0 +1,176 @@
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-long NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-ce-xlong NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-long NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-lexical-xlong NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-long NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-swiftui-xlong NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-long NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-textarea-xlong NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-l5 NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-long NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-longmid NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-p3 NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-p3mid NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-p5 NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-p5mid NOT-RUN filtered run: its test method was not selected
+CHECK read-uikit-xlong NOT-RUN filtered run: its test method was not selected
+CHECK readt-ce-longa NOT-RUN filtered run: its test method was not selected
+CHECK readt-ce-p3mida NOT-RUN filtered run: its test method was not selected
+CHECK readt-ce-p5a NOT-RUN filtered run: its test method was not selected
+CHECK readt-ce-p5mida NOT-RUN filtered run: its test method was not selected
+CHECK readt-ce-typed NOT-RUN filtered run: its test method was not selected
+CHECK readt-lexical-longa NOT-RUN filtered run: its test method was not selected
+CHECK readt-lexical-p3mida NOT-RUN filtered run: its test method was not selected
+CHECK readt-lexical-p5a NOT-RUN filtered run: its test method was not selected
+CHECK readt-lexical-p5mida NOT-RUN filtered run: its test method was not selected
+CHECK readt-lexical-typed NOT-RUN filtered run: its test method was not selected
+CHECK readt-swiftui-typed NOT-RUN filtered run: its test method was not selected
+CHECK readt-textarea-longa NOT-RUN filtered run: its test method was not selected
+CHECK readt-textarea-p3mida NOT-RUN filtered run: its test method was not selected
+CHECK readt-textarea-p5a NOT-RUN filtered run: its test method was not selected
+CHECK readt-textarea-p5mida NOT-RUN filtered run: its test method was not selected
+CHECK readt-textarea-typed NOT-RUN filtered run: its test method was not selected
+CHECK readt-uikit-typed NOT-RUN filtered run: its test method was not selected
+CHECK readw-lexical-fillsync NOT-RUN filtered run: its test method was not selected
+CHECK readw-swiftui-en NOT-RUN filtered run: its test method was not selected
+CHECK readw-swiftui-l5mid NOT-RUN filtered run: its test method was not selected
+CHECK readw-swiftui-lines NOT-RUN filtered run: its test method was not selected
+CHECK readw-swiftui-run NOT-RUN filtered run: its test method was not selected
+CHECK readw-swiftui-trail NOT-RUN filtered run: its test method was not selected
+CHECK readw-swiftui-typedsync NOT-RUN filtered run: its test method was not selected
+CHECK readw-swiftui-w1 NOT-RUN filtered run: its test method was not selected
+CHECK readw-swiftui-w12 NOT-RUN filtered run: its test method was not selected
+CHECK readw-textarea-fillsync NOT-RUN filtered run: its test method was not selected
+CHECK readw-textarea-typedsync NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-en NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-kotypedsync NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-l5mid NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-lines NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-run NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-sellong NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-selp5 NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-selxlong NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-skip NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-skipend NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-skipl NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-trail NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-typedsync NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-w1 NOT-RUN filtered run: its test method was not selected
+CHECK readw-uikit-w12 NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK walk-lexical-p5 RECORD t1={real=443/8/h442c6280 sel=- carried="read 433 8 1.2.3.4.5 h627e53ea | f=355/8/ha67bbead/end/1723ms j=433/8/h627e53ea/start/rx/1367ms j1=433/8/h627e53ea/start/rx/1390ms fm=2/end fe=2/end pick=none agree=1 ms=5979" whole=0 s=9.8 selafter=- left=443/8/h442c6280} t2={real=443/8/h442c6280 sel=- carried="read 433 8 1.2.3.4.5 h627e53ea | f=355/8/ha67bbead/end/1748ms j=433/8/h627e53ea/start/rx/1253ms j1=433/8/h627e53ea/start/rx/1328ms fm=2/end fe=2/end pick=none agree=1 ms=5762" whole=0 s=9.3 selafter=- left=443/8/h442c6280}
+CHECK walk-lexical-xlong RECORD t1={real=14038/14/hef7a2fcb sel=- carried="read 13718 14 1.2.3.4.5.6.7.8 h046a8302 | f=13640/14/h31eb54fa/end/37102ms j=13718/14/h046a8302/start/rx/20308ms j1=13718/14/h046a8302/start/rx/21775ms fm=2/end fe=2/end pick=none agree=1 ms=80861" whole=0 s=84.1 selafter=- left=14038/14/hef7a2fcb}
+CHECK walk-swiftui-l5 RECORD t1={real=143/4/h73806425 sel=- carried="read 143 4 1.2.3.4.5 h73806425 | f=0/0/h811c9dc5/end/512ms j=143/4/h73806425/start/r1/857ms j1=143/4/h73806425/start/r1/817ms fm=0/end fe=0/end pick=np2 agree=1 ms=3333" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.6 selafter=- left=143/4/h73806425} t2={real=143/4/h73806425 sel=- carried="read 143 4 1.2.3.4.5 h73806425 | f=0/0/h811c9dc5/end/504ms j=143/4/h73806425/start/r1/798ms j1=143/4/h73806425/start/r1/831ms fm=0/end fe=0/end pick=np2 agree=1 ms=3339" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.5 selafter=- left=143/4/h73806425}
+CHECK walk-swiftui-p5 RECORD t1={real=443/8/h442c6280 sel=- carried="read 443 8 1.2.3.4.5 h442c6280 | f=0/0/h811c9dc5/end/515ms j=443/8/h442c6280/start/r1/1205ms j1=443/8/h442c6280/start/r1/1046ms fm=0/end fe=0/end pick=np2 agree=1 ms=3915" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.4 selafter=- left=443/8/h442c6280} t2={real=443/8/h442c6280 sel=- carried="read 443 8 1.2.3.4.5 h442c6280 | f=0/0/h811c9dc5/end/513ms j=443/8/h442c6280/start/r1/1053ms j1=443/8/h442c6280/start/r1/1007ms fm=0/end fe=0/end pick=np2 agree=1 ms=3708" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=8.1 selafter=- left=443/8/h442c6280}
+CHECK walk-swiftui-xlong RECORD t1={real=14038/14/hef7a2fcb sel=- carried="Could not read the whole text. Select all, then tap again." outcome=panel s=103.5 selafter=- left=14038/14/hef7a2fcb} t2={real=14038/14/hef7a2fcb sel=- carried="read 14038 14 1.2.3.4.5.6.8 h0fd4d114 | f=0/0/h811c9dc5/end/506ms j=14038/14/h0fd4d114/start/r1/28516ms j1=14038/14/h1c3032e8/start/r1/27744ms fm=0/end fe=0/end pick=none agree=0 ms=57947" whole=0 f=suf1 j=pre0/all1 j1=pre0/all1 s=60.5 selafter=- left=14038/14/hef7a2fcb}
+CHECK walk-textarea-p5 RECORD t1={real=443/8/h442c6280 sel=- carried="read 433 8 1.2.3.4.5 h627e53ea | f=355/8/ha67bbead/end/1958ms j=433/8/h627e53ea/start/r1/1307ms j1=433/8/h627e53ea/start/r1/1406ms fm=0/end fe=0/end pick=np2 agree=1 ms=5857" whole=0 s=11.1 selafter=- left=443/8/h442c6280} t2={real=443/8/h442c6280 sel=- carried="read 433 8 1.2.3.4.5 h627e53ea | f=355/8/ha67bbead/end/2401ms j=433/8/h627e53ea/start/r1/1514ms j1=433/8/h627e53ea/start/rx/1480ms fm=0/end fe=23/end pick=none agree=1 ms=6759" whole=0 s=10.3 selafter=- left=443/8/h442c6280}
+CHECK walk-textarea-xlong RECORD t1={real=14038/14/hef7a2fcb sel=- carried="read 13718 14 1.2.3.4.5.6.7.8 hf4932458 | f=13640/14/h4161dbac/end/48651ms j=13718/14/hf4932458/start/rx/27231ms j1=13718/14/h5f11a86a/start/rx/26210ms fm=22/end fe=22/end pick=none agree=0 ms=105606" whole=0 s=110.3 selafter=- left=14038/14/hef7a2fcb}
+CHECK walk-uikit-l5 RECORD t1={real=143/4/h73806425 sel=143,0 carried="read 143 4 1.2.3.4.5 h73806425 | f=0/0/h811c9dc5/end/506ms j=143/4/h73806425/start/r1/747ms j1=143/4/h73806425/start/r1/695ms fm=0/end fe=0/end pick=np2 agree=1 ms=3082" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=6.9 selafter=143,0 left=143/4/h73806425} t2={real=143/4/h73806425 sel=143,0 carried="read 143 4 1.2.3.4.5 h73806425 | f=0/0/h811c9dc5/end/504ms j=143/4/h73806425/start/r1/883ms j1=143/4/h73806425/start/r1/794ms fm=0/end fe=0/end pick=np2 agree=1 ms=3334" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=8.1 selafter=143,0 left=143/4/h73806425}
+CHECK walk-uikit-l5mid RECORD t1={real=143/4/h73806425 sel=36,0 carried="read 143 4 1.2.3.4.5 h73806425 | f=107/3/h9a4ae503/end/1278ms j=143/4/h73806425/start/r1/913ms j1=143/4/h73806425/start/r1/725ms fm=0/end fe=0/end pick=np2 agree=1 ms=4059" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.5 selafter=143,0 left=143/4/h73806425}
+CHECK walk-uikit-longmid RECORD t1={real=2173/8/h588289c6 sel=651,0 carried="read 2173 8 1.2.3.4.5 h588289c6 | f=1522/6/hdb5edfd8/end/7328ms j=2173/8/h588289c6/start/r1/3555ms j1=2173/8/h588289c6/start/r1/3673ms fm=0/end fe=0/end pick=np2 agree=1 ms=15695" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=20.2 selafter=2173,0 left=2173/8/h588289c6}
+CHECK walk-uikit-p5 RECORD t1={real=443/8/h442c6280 sel=443,0 carried="read 443 8 1.2.3.4.5 h442c6280 | f=0/0/h811c9dc5/end/509ms j=443/8/h442c6280/start/r1/1007ms j1=443/8/h442c6280/start/r1/1012ms fm=0/end fe=0/end pick=np2 agree=1 ms=3660" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=6.4 selafter=443,0 left=443/8/h442c6280} t2={real=443/8/h442c6280 sel=443,0 carried="read 443 8 1.2.3.4.5 h442c6280 | f=0/0/h811c9dc5/end/505ms j=443/8/h442c6280/start/r1/1002ms j1=443/8/h442c6280/start/r1/940ms fm=0/end fe=0/end pick=np2 agree=1 ms=3564" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=6.4 selafter=443,0 left=443/8/h442c6280}
+CHECK walk-uikit-p5mid RECORD t1={real=443/8/h442c6280 sel=132,0 carried="read 443 8 1.2.3.4.5 h442c6280 | f=311/6/h596ef1ce/end/2089ms j=443/8/h442c6280/start/r1/979ms j1=443/8/h442c6280/start/r1/956ms fm=0/end fe=0/end pick=np2 agree=1 ms=5143" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=9.3 selafter=443,0 left=443/8/h442c6280} t2={real=443/8/h442c6280 sel=132,0 carried="read 443 8 1.2.3.4.5 h442c6280 | f=311/6/h596ef1ce/end/2611ms j=443/8/h442c6280/start/r1/1162ms j1=443/8/h442c6280/start/r1/1110ms fm=0/end fe=0/end pick=np2 agree=1 ms=6043" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=8.5 selafter=443,0 left=443/8/h442c6280}
+CHECK walk-uikit-selp5 RECORD t1={real=443/8/h442c6280 sel=0,443 carried="read 443 8 1.2.3.4.5 h442c6280 | c1=1/b43/a0/s0 f=1/0/h2b0c98f1/end/698ms j=443/8/h442c6280/start/r1/1087ms j1=443/8/h442c6280/start/r1/1111ms fm=0/end fe=0/end pick=np2 agree=1 ms=4091" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.9 selafter=443,0 left=443/8/h442c6280} t2={real=443/8/h442c6280 sel=0,443 carried="read 443 8 1.2.3.4.5 h442c6280 | c1=1/b60/a0/s0 f=0/0/h811c9dc5/end/574ms j=443/8/h442c6280/start/r1/1012ms j1=443/8/h442c6280/start/r1/1071ms fm=0/end fe=0/end pick=np2 agree=1 ms=3963" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.8 selafter=443,0 left=443/8/h442c6280} t3={real=443/8/h442c6280 sel=0,443 carried="read 443 8 1.2.3.4.5 h442c6280 | c1=1/b60/a0/s0 f=0/0/h811c9dc5/end/576ms j=443/8/h442c6280/start/r1/1027ms j1=443/8/h442c6280/start/r1/1051ms fm=0/end fe=0/end pick=np2 agree=1 ms=3962" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.5 selafter=443,0 left=443/8/h442c6280}
+CHECK walk-uikit-selxlong RECORD t1={real=14038/14/hef7a2fcb sel=0,14038 carried="read 14038 14 1.2.3.4.5.6.7.8 h8d24c16f | c1=1/b62/a0/s0 f=0/0/h811c9dc5/end/508ms j=14038/14/h8d24c16f/start/r1/32855ms j1=14038/14/hb92334fb/start/r1/30593ms fm=0/end fe=0/end pick=none agree=0 ms=65254" whole=0 f=suf1 j=pre0/all1 j1=pre0/all1 s=68.0 selafter=14038,0 left=14038/14/hef7a2fcb} t2={real=14038/14/hef7a2fcb sel=0,14038 carried="read 14038 14 1.2.3.4.5.6.7.8 h55f0c88e | c1=1/b62/a0/s0 f=0/0/h811c9dc5/end/603ms j=14038/14/h55f0c88e/start/r1/29541ms j1=14038/14/h5a354f38/start/r1/29574ms fm=0/end fe=0/end pick=none agree=0 ms=61193" whole=0 f=suf1 j=pre0/all1 j1=pre0/all1 s=65.4 selafter=14038,0 left=14038/14/hef7a2fcb} t3={real=14038/14/hef7a2fcb sel=0,14038 carried="read 14038 14 1.2.3.4.5.6.7.8 hc23c0dc0 | c1=1/b62/a0/s0 f=0/0/h811c9dc5/end/503ms j=14038/14/hc23c0dc0/start/r1/25811ms j1=14038/14/hac9f6229/start/r1/26127ms fm=0/end fe=0/end pick=none agree=0 ms=53831" whole=0 f=suf1 j=pre0/all1 j1=pre0/all1 s=56.7 selafter=14038,0 left=14038/14/hef7a2fcb}
+CHECK walk-uikit-trail RECORD t1={real=96/5/h607edc41 sel=96,0 carried="read 96 5 1.2.3 h607edc41 | f=0/0/h811c9dc5/end/500ms j=96/5/h607edc41/start/r1/837ms j1=96/5/h607edc41/start/r1/759ms fm=0/end fe=0/end pick=np2 agree=1 ms=3386" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.8 selafter=96,0 left=96/5/h607edc41}
+CHECK walk-uikit-xlong RECORD t1={real=14038/14/hef7a2fcb sel=14038,0 carried="read 279 0 none hc885de15 | f=0/0/h811c9dc5/end/517ms j=279/0/hc885de15/start/rx/1175ms j1=14038/14/h891dbb31/start/r1/29154ms fm=1/end fe=0/end pick=none agree=0 ms=32162" whole=0 f=suf1 j=pre0/all0 j1=pre0/all1 s=35.7 selafter=14038,0 left=14038/14/hef7a2fcb} t2={real=14038/14/hef7a2fcb sel=14038,0 carried="read 14038 14 1.2.3.4.5.6.7.8 h21fa0701 | f=0/0/h811c9dc5/end/521ms j=14038/14/h21fa0701/start/r1/25260ms j1=14038/14/h09eaf414/start/r1/21213ms fm=0/end fe=0/end pick=none agree=0 ms=48124" whole=0 f=suf1 j=pre0/all1 j1=pre0/all1 s=53.6 selafter=14038,0 left=14038/14/hef7a2fcb}
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
