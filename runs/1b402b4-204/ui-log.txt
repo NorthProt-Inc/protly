@@ -1,0 +1,111 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5g_wholenative
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wr-uikit-win-t1 1795379718.544
+tapped protlyKey
+MARK wr-uikit-win-t2 1795379739.808
+tapped protlyKey
+CHECK wr-uikit-win FAIL t1={real=335/9/h49b6f226 caret=335,0 s=5.7 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected) t2={real=335/9/h49b6f226 caret=335,0 s=9.4 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-uikit-mid-t1 1795379776.681
+tapped protlyKey
+CHECK wr-uikit-mid FAIL t1={real=335/9/h49b6f226 caret=112,0 s=6.8 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-uikit-sel-t1 1795379800.207
+tapped protlyKey
+CHECK wr-uikit-sel FAIL t1={real=335/9/h49b6f226 caret=0,335 s=5.3 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-uikit-long-t1 1795379821.014
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-long-t2 1795379890.964
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec caret=3247,0 s=17.0 read=13534 reply=3247/15/h3ca63fec caret-read=3247,0 replace=7.01 kb=18.98 undo=3.08 kbundo=19.27} t2={real=3247/15/h3ca63fec caret=3247,0 s=17.7 read=14017 reply=3247/15/h3ca63fec caret-read=3247,0 replace=9.09 kb=18.41 undo=2.75 kbundo=20.61}
+MARK wr-uikit-x14k-t1 1795379962.514
+tapped protlyKey
+CHECK wr-uikit-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=12.5 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0}
+MARK wr-uikit-emoji-t1 1795379993.984
+tapped protlyKey
+CHECK wr-uikit-emoji FAIL t1={real=460/9/h0755cc33 caret=460,0 s=4.5 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-uikit-swin-t1 1795380013.808
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-swin PASS t1={real=39/1/h2dea6b2a caret=39,0 s=8.7 read=5028 reply=39/1/h2dea6b2a caret-read=39,0 replace=2.96 kb=6.13 undo=3.15 kbundo=6.97}
+MARK wr-uikit-smid-t1 1795380054.087
+tapped protlyKey
+CHECK wr-uikit-smid FAIL t1={real=39/1/h2dea6b2a caret=26,0 s=7.3 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-uikit-ssel-t1 1795380077.174
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-ssel PASS t1={real=39/1/h2dea6b2a caret=0,39 s=7.9 read=4921 reply=39/1/h2dea6b2a caret-read=39,0 replace=2.37 kb=6.00 undo=3.22 kbundo=5.24}
+MARK wr-uikit-s3-t1 1795380113.211
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-s3 PASS t1={real=93/1/hde1c7e15 caret=93,0 s=10.9 read=5187 reply=93/1/hde1c7e15 caret-read=93,0 replace=2.28 kb=5.49 undo=2.58 kbundo=5.56}
+MARK wr-uikit-shead-t1 1795380150.684
+tapped protlyKey
+CHECK wr-uikit-shead PASS t1={real=39/1/h2dea6b2a caret=0,16 s=4.9 reply=16/0/h2a9361e2 want 16/0/h2a9361e2 replace=none left=39/1/h2dea6b2a caret-left=17,0}
+MARK wr-uikit-etail-t1 1795380174.385
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-etail PASS t1={real=42/1/hce1d71bb caret=26,0 s=8.1 read=5272 reply=42/1/hce1d71bb caret-read=42,0 replace=2.54 kb=5.68 undo=2.92 kbundo=5.26}
+MARK wr-uikit-r4k-t1 1795380208.306
+tapped protlyKey
+CHECK wr-uikit-r4k FAIL t1={real=3975/15/h669f5dfc caret=3975,0 s=4.4 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-uikit-cancel-t1 1795380228.482
+tapped protlyKey
+CHECK wr-uikit-cancel FAIL t1={real=335/9/h49b6f226 caret=112,0 progress=5.8 cancelled=6.7 closed=0/3/0 left=335/9/h49b6f226 caret-left=112,0 want 112,0} t1=closed=0/3/0 (not as expected)
+MARK wr-swiftui-win-t1 1795380284.184
+tapped protlyKey
+MARK wr-swiftui-win-t2 1795380308.255
+tapped protlyKey
+CHECK wr-swiftui-win FAIL t1={real=335/9/h49b6f226 caret=335,0 s=4.5 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected) t2={real=335/9/h49b6f226 caret=335,0 s=4.9 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-swiftui-mid-t1 1795380326.421
+tapped protlyKey
+CHECK wr-swiftui-mid FAIL t1={real=335/9/h49b6f226 caret=112,0 s=5.5 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-swiftui-sel-t1 1795380347.667
+tapped protlyKey
+CHECK wr-swiftui-sel FAIL t1={real=335/9/h49b6f226 caret=0,335 s=5.1 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-swiftui-long-t1 1795380374.417
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-long-t2 1795380455.545
+tapped protlyKey
+CHECK wr-swiftui-long FAIL t1={real=3247/15/h3ca63fec caret=3247,0 s=20.2 read=15550 reply=3247/15/h3ca63fec caret-read=3247,0 replace=6.79 kb=19.19 undo=3.10 kbundo=15.19 kbundo-notice="Replace may not have finished. Check the text."} t1=kbundo-notice="Replace may not have finished. Check the text." (not as expected) t2={real=3247/15/h3ca63fec caret=3247,0 s=7.5 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-swiftui-x14k-t1 1795380483.319
+tapped protlyKey
+CHECK wr-swiftui-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=16.2 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0}
+MARK wr-swiftui-emoji-t1 1795380528.109
+tapped protlyKey
+CHECK wr-swiftui-emoji FAIL t1={real=460/9/h0755cc33 caret=460,0 s=5.2 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-swiftui-swin-t1 1795380553.991
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-swin PASS t1={real=39/1/h2dea6b2a caret=39,0 s=10.0 read=4983 reply=39/1/h2dea6b2a caret-read=39,0 replace=2.36 kb=6.11 undo=2.91 kbundo=4.80}
+MARK wr-swiftui-smid-t1 1795380587.674
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-smid PASS t1={real=39/1/h2dea6b2a caret=26,0 s=7.4 read=5001 reply=39/1/h2dea6b2a caret-read=39,0 replace=2.58 kb=6.23 undo=3.06 kbundo=6.00}
+MARK wr-swiftui-ssel-t1 1795380623.317
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-ssel PASS t1={real=39/1/h2dea6b2a caret=0,39 s=7.3 read=4912 reply=39/1/h2dea6b2a caret-read=39,0 replace=1.98 kb=4.74 undo=2.65 kbundo=6.23}
+MARK wr-swiftui-s3-t1 1795380662.459
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-s3 PASS t1={real=93/1/hde1c7e15 caret=93,0 s=11.6 read=7610 reply=93/1/hde1c7e15 caret-read=93,0 replace=3.63 kb=6.14 undo=3.09 kbundo=5.58}
+MARK wr-swiftui-shead-t1 1795380701.251
+tapped protlyKey
+CHECK wr-swiftui-shead PASS t1={real=39/1/h2dea6b2a caret=0,16 s=4.3 reply=16/0/h2a9361e2 want 16/0/h2a9361e2 replace=none left=39/1/h2dea6b2a caret-left=17,0}
+MARK wr-swiftui-etail-t1 1795380721.752
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-etail PASS t1={real=42/1/hce1d71bb caret=26,0 s=7.2 read=5124 reply=42/1/hce1d71bb caret-read=42,0 replace=2.45 kb=5.32 undo=3.37 kbundo=5.31}
