@@ -1,0 +1,273 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-11-22 10:58:27.393 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 10:58:27.393 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 10:58:27.505 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 10:58:44.228 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 10:58:44.228 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 10:58:44.234 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 10:58:45.177 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 461.000000 window 461.000000 pin 257.000000 active true
+2026-11-22 10:58:45.189 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 10:59:03.615 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-22 10:59:04.138 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=522 first=521 retries=0 resyncs=0 late=0
+2026-11-22 10:59:05.943 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=13 ms=1804 first=95 retries=0 resyncs=0 late=0
+2026-11-22 10:59:06.675 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=501 first=500 retries=0 resyncs=0 late=0
+2026-11-22 10:59:07.004 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step b2 s=4 why=badStep k=41 b0=43 a0=21 b1=44 a1=20 fitb=0 fita=0 ch=1 ms=177
+2026-11-22 10:59:07.004 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=62 lf=0 reason=badStep steps=4 ms=328 first=42 retries=0 resyncs=0 late=0
+2026-11-22 10:59:07.004 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=refused reason=b2:badStep units=0 lf=0 h=811c9dc5 ms=3389 known=1
+2026-11-22 10:59:07.004 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=103 known=1
+2026-11-22 10:59:10.913 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 10:59:28.671 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-22 10:59:29.182 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=510 first=510 retries=0 resyncs=0 late=0
+2026-11-22 10:59:30.737 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1555 first=85 retries=0 resyncs=0 late=0
+2026-11-22 10:59:31.330 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=513 first=513 retries=0 resyncs=0 late=0
+2026-11-22 10:59:33.085 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=335 lf=9 reason=done steps=14 ms=1755 first=65 retries=0 resyncs=0 late=0
+2026-11-22 10:59:33.730 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=505 first=505 retries=0 resyncs=0 late=0
+2026-11-22 10:59:33.731 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=5059 known=1
+2026-11-22 10:59:42.242 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=26 lf=0 reason=done steps=3 ms=978 first=71 retries=0 resyncs=0 late=0
+2026-11-22 10:59:42.874 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=504 first=504 retries=0 resyncs=0 late=0
+2026-11-22 10:59:42.874 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=335 inserted=26 sentms=0 emptyms=59 empty=1 quietms=2914 quiet=1 changes=2 lastch=1603 events=11 firstev=1500 lastev=1656 b=26 a=0 ends=1 heldms=4525 held=1 tries=1 cancelled=0
+2026-11-22 10:59:48.033 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=335 lf=9 reason=done steps=3 ms=975 first=88 retries=0 resyncs=0 late=0
+2026-11-22 10:59:48.603 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=501 first=501 retries=0 resyncs=0 late=0
+2026-11-22 10:59:48.603 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=26 inserted=335 sentms=0 emptyms=52 empty=1 quietms=1940 quiet=1 changes=0 lastch=-1 events=5 firstev=-1 lastev=-1 b=335 a=0 ends=1 heldms=3487 held=1 tries=1 cancelled=0
+2026-11-22 11:00:06.082 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=52 a=12 s=0
+2026-11-22 11:00:09.044 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=223 lf=6 reason=done steps=30 ms=2961 first=129 retries=0 resyncs=0 late=0
+2026-11-22 11:00:10.575 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1530 first=50 retries=0 resyncs=0 late=0
+2026-11-22 11:00:11.172 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=506 first=505 retries=0 resyncs=0 late=0
+2026-11-22 11:00:12.931 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=335 lf=9 reason=done steps=14 ms=1759 first=81 retries=0 resyncs=0 late=0
+2026-11-22 11:00:13.527 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=505 first=505 retries=0 resyncs=0 late=0
+2026-11-22 11:00:13.528 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=7445 known=1
+2026-11-22 11:00:22.711 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=26 lf=0 reason=done steps=3 ms=939 first=62 retries=0 resyncs=0 late=0
+2026-11-22 11:00:23.262 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=504 first=504 retries=0 resyncs=0 late=0
+2026-11-22 11:00:23.262 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=335 inserted=26 sentms=0 emptyms=52 empty=1 quietms=2888 quiet=1 changes=2 lastch=1674 events=11 firstev=1518 lastev=1780 b=26 a=0 ends=1 heldms=4378 held=1 tries=1 cancelled=0
+2026-11-22 11:00:30.085 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=335 lf=9 reason=done steps=3 ms=920 first=63 retries=0 resyncs=0 late=0
+2026-11-22 11:00:30.671 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=503 first=503 retries=0 resyncs=0 late=0
+2026-11-22 11:00:30.671 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=26 inserted=335 sentms=0 emptyms=53 empty=1 quietms=2029 quiet=1 changes=0 lastch=-1 events=5 firstev=-1 lastev=-1 b=335 a=0 ends=1 heldms=3536 held=1 tries=1 cancelled=0
+2026-11-22 11:00:51.003 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=0 a=0 s=37
+2026-11-22 11:00:51.191 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step f s=1 why=resync k=1 b0=37 a0=0 b1=62 a1=0 fitb=0 fita=1 ch=1 ms=141
+2026-11-22 11:00:51.695 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=2 ms=646 first=141 retries=0 resyncs=1 late=0
+2026-11-22 11:00:53.233 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1537 first=69 retries=0 resyncs=0 late=0
+2026-11-22 11:00:53.847 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=511 first=510 retries=0 resyncs=0 late=0
+2026-11-22 11:00:55.591 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=335 lf=9 reason=done steps=14 ms=1744 first=58 retries=0 resyncs=0 late=0
+2026-11-22 11:00:56.199 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=504 first=504 retries=0 resyncs=0 late=0
+2026-11-22 11:00:56.199 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=5195 known=1
+2026-11-22 11:01:06.032 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=26 lf=0 reason=done steps=3 ms=978 first=78 retries=0 resyncs=0 late=0
+2026-11-22 11:01:06.600 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=500 first=500 retries=0 resyncs=0 late=0
+2026-11-22 11:01:06.600 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=335 inserted=26 sentms=0 emptyms=54 empty=1 quietms=2907 quiet=1 changes=2 lastch=1848 events=11 firstev=1694 lastev=1953 b=26 a=0 ends=1 heldms=4454 held=1 tries=1 cancelled=0
+2026-11-22 11:01:12.765 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=335 lf=9 reason=done steps=3 ms=1016 first=78 retries=0 resyncs=0 late=0
+2026-11-22 11:01:13.340 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=505 first=505 retries=0 resyncs=0 late=0
+2026-11-22 11:01:13.340 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=26 inserted=335 sentms=0 emptyms=50 empty=1 quietms=1950 quiet=1 changes=0 lastch=-1 events=5 firstev=-1 lastev=-1 b=335 a=0 ends=1 heldms=3541 held=1 tries=1 cancelled=0
+2026-11-22 11:01:31.416 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=59 a=0 s=0
+2026-11-22 11:01:31.930 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=513 first=513 retries=0 resyncs=0 late=0
+2026-11-22 11:01:38.989 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=3247 lf=15 reason=done steps=88 ms=7059 first=89 retries=0 resyncs=0 late=0
+2026-11-22 11:01:39.679 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=503 first=503 retries=0 resyncs=0 late=0
+2026-11-22 11:01:46.425 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=3247 lf=15 reason=done steps=91 ms=6746 first=74 retries=0 resyncs=0 late=0
+2026-11-22 11:01:47.121 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=500 first=500 retries=0 resyncs=0 late=0
+2026-11-22 11:01:47.123 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=3247 lf=15 h=3ca63fec ms=15706 known=1
+2026-11-22 11:02:08.717 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=29 lf=0 reason=done steps=3 ms=1013 first=77 retries=0 resyncs=0 late=0
+2026-11-22 11:02:09.283 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=506 first=506 retries=0 resyncs=0 late=0
+2026-11-22 11:02:09.283 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=3247 inserted=29 sentms=2 emptyms=58 empty=1 quietms=14562 quiet=1 changes=2 lastch=7996 events=62 firstev=6900 lastev=8940 b=29 a=0 ends=1 heldms=16142 held=1 tries=1 cancelled=0
+2026-11-22 11:02:18.806 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step v s=18 why=badStep k=1 b0=1 a0=59 b1=41 a1=19 fitb=1 fita=0 ch=1 ms=118
+2026-11-22 11:02:18.806 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=1066 lf=4 reason=badStep steps=18 ms=1335 first=44 retries=0 resyncs=0 late=0
+2026-11-22 11:02:18.936 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step vr s=1 why=badStep k=1 b0=60 a0=0 b1=59 a1=0 fitb=0 fita=1 ch=1 ms=83
+2026-11-22 11:02:18.936 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk vr units=0 lf=0 reason=badStep steps=1 ms=83 first=83 retries=0 resyncs=0 late=0
+2026-11-22 11:02:25.796 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=3247 lf=14 reason=done steps=86 ms=6860 first=51 retries=0 resyncs=0 late=0
+2026-11-22 11:02:26.388 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk vr units=0 lf=0 reason=done steps=1 ms=517 first=517 retries=0 resyncs=0 late=0
+2026-11-22 11:02:26.388 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=29 inserted=3247 sentms=0 emptyms=52 empty=1 quietms=4902 quiet=1 changes=0 lastch=-1 events=108 firstev=-1 lastev=-1 b=500 a=0 ends=1 heldms=13820 held=0 tries=2 cancelled=0
+2026-11-22 11:02:31.380 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:02:55.882 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=59 a=0 s=0
+2026-11-22 11:02:56.402 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=519 first=519 retries=0 resyncs=0 late=0
+2026-11-22 11:03:03.770 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=3247 lf=15 reason=done steps=88 ms=7367 first=80 retries=0 resyncs=0 late=0
+2026-11-22 11:03:04.391 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=505 first=505 retries=0 resyncs=0 late=0
+2026-11-22 11:03:11.419 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=3247 lf=15 reason=done steps=91 ms=7028 first=76 retries=0 resyncs=0 late=0
+2026-11-22 11:03:12.041 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=518 first=518 retries=0 resyncs=0 late=0
+2026-11-22 11:03:12.042 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=3247 lf=15 h=3ca63fec ms=16159 known=1
+2026-11-22 11:03:34.031 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=29 lf=0 reason=done steps=3 ms=957 first=88 retries=0 resyncs=0 late=0
+2026-11-22 11:03:34.619 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=513 first=513 retries=0 resyncs=0 late=0
+2026-11-22 11:03:34.620 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=3247 inserted=29 sentms=3 emptyms=55 empty=1 quietms=14525 quiet=1 changes=2 lastch=6545 events=62 firstev=5591 lastev=7489 b=29 a=0 ends=1 heldms=16071 held=1 tries=1 cancelled=0
+2026-11-22 11:03:47.708 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=3247 lf=15 reason=done steps=75 ms=5939 first=82 retries=0 resyncs=0 late=0
+2026-11-22 11:03:48.285 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=518 first=518 retries=0 resyncs=0 late=0
+2026-11-22 11:03:48.285 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=29 inserted=3247 sentms=0 emptyms=52 empty=1 quietms=4912 quiet=1 changes=0 lastch=-1 events=77 firstev=-1 lastev=-1 b=500 a=0 ends=1 heldms=11430 held=1 tries=1 cancelled=0
+2026-11-22 11:04:06.081 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-22 11:04:06.595 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=513 first=513 retries=0 resyncs=0 late=0
+2026-11-22 11:04:06.708 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step b1 s=2 why=characters k=45 b0=47 a0=41 b1=1 a1=87 fitb=0 fita=0 ch=1 ms=44
+2026-11-22 11:04:06.708 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=61 lf=0 reason=characters steps=2 ms=113 first=68 retries=0 resyncs=0 late=0
+2026-11-22 11:04:06.708 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=refused reason=b1:characters units=0 lf=0 h=811c9dc5 ms=627 known=1
+2026-11-22 11:04:06.708 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=106 known=1
+2026-11-22 11:04:09.479 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:04:28.198 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=60 a=0 s=0
+2026-11-22 11:04:28.707 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=508 first=508 retries=0 resyncs=0 late=0
+2026-11-22 11:04:30.527 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=460 lf=9 reason=done steps=13 ms=1819 first=74 retries=0 resyncs=0 late=0
+2026-11-22 11:04:31.163 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=502 first=501 retries=0 resyncs=0 late=0
+2026-11-22 11:04:33.120 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=460 lf=9 reason=done steps=15 ms=1956 first=116 retries=0 resyncs=0 late=0
+2026-11-22 11:04:33.733 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=520 first=520 retries=0 resyncs=0 late=0
+2026-11-22 11:04:33.733 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=460 lf=9 h=0755cc33 ms=5534 known=1
+2026-11-22 11:04:42.985 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=26 lf=0 reason=done steps=3 ms=947 first=58 retries=0 resyncs=0 late=0
+2026-11-22 11:04:43.540 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=504 first=504 retries=0 resyncs=0 late=0
+2026-11-22 11:04:43.540 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=450 inserted=26 sentms=0 emptyms=52 empty=1 quietms=3334 quiet=1 changes=2 lastch=1916 events=14 firstev=1738 lastev=2021 b=26 a=0 ends=1 heldms=4836 held=1 tries=1 cancelled=0
+2026-11-22 11:04:48.973 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=460 lf=9 reason=done steps=3 ms=964 first=62 retries=0 resyncs=0 late=0
+2026-11-22 11:04:49.549 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=516 first=516 retries=0 resyncs=0 late=0
+2026-11-22 11:04:49.549 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=26 inserted=460 sentms=0 emptyms=53 empty=1 quietms=2067 quiet=1 changes=0 lastch=-1 events=5 firstev=-1 lastev=-1 b=460 a=0 ends=1 heldms=3608 held=1 tries=1 cancelled=0
+2026-11-22 11:05:05.643 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=49 a=0 s=0
+2026-11-22 11:05:06.161 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=517 first=517 retries=0 resyncs=0 late=0
+2026-11-22 11:05:12.913 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=3975 lf=15 reason=done steps=85 ms=6752 first=72 retries=0 resyncs=0 late=0
+2026-11-22 11:05:13.528 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=510 first=510 retries=0 resyncs=0 late=0
+2026-11-22 11:05:20.418 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=3975 lf=15 reason=done steps=87 ms=6889 first=122 retries=0 resyncs=0 late=0
+2026-11-22 11:05:21.012 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=521 first=521 retries=0 resyncs=0 late=0
+2026-11-22 11:05:21.014 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=3975 lf=15 h=669f5dfc ms=15370 known=1
+2026-11-22 11:05:44.591 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=29 lf=0 reason=done steps=3 ms=931 first=54 retries=0 resyncs=0 late=0
+2026-11-22 11:05:45.159 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=517 first=517 retries=0 resyncs=0 late=0
+2026-11-22 11:05:45.159 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=3975 inserted=29 sentms=4 emptyms=55 empty=1 quietms=17442 quiet=1 changes=2 lastch=8222 events=86 firstev=7223 lastev=9006 b=29 a=0 ends=1 heldms=18942 held=1 tries=1 cancelled=0
+2026-11-22 11:06:00.036 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=3975 lf=15 reason=done steps=77 ms=6662 first=102 retries=0 resyncs=0 late=0
+2026-11-22 11:06:00.642 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=512 first=512 retries=0 resyncs=0 late=0
+2026-11-22 11:06:00.642 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=29 inserted=3975 sentms=0 emptyms=52 empty=1 quietms=5596 quiet=1 changes=0 lastch=-1 events=79 firstev=-1 lastev=-1 b=500 a=0 ends=1 heldms=12865 held=1 tries=1 cancelled=0
+2026-11-22 11:06:18.867 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=52 a=12 s=0
+2026-11-22 11:06:19.663 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step f s=10 why=badStep k=1 b0=44 a0=0 b1=45 a1=19 fitb=0 fita=1 ch=1 ms=138
+2026-11-22 11:06:19.663 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=56 lf=2 reason=badStep steps=10 ms=795 first=106 retries=0 resyncs=0 late=0
+2026-11-22 11:06:19.663 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=refused reason=f:badStep units=0 lf=0 h=811c9dc5 ms=795 known=1
+2026-11-22 11:06:19.663 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=57 known=1
+2026-11-22 11:06:30.029 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:06:51.368 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:06:51.368 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:06:51.373 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:06:51.953 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-22 11:06:51.962 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 11:07:05.445 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:07:05.985 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:07:08.624 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:07:08.624 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:07:08.629 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:07:09.061 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-22 11:07:09.077 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 11:07:15.763 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-22 11:07:16.271 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=507 first=507 retries=0 resyncs=0 late=0
+2026-11-22 11:07:17.954 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1683 first=71 retries=0 resyncs=0 late=0
+2026-11-22 11:07:18.589 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=520 first=520 retries=0 resyncs=0 late=0
+2026-11-22 11:07:20.521 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=335 lf=9 reason=done steps=14 ms=1932 first=100 retries=0 resyncs=0 late=0
+2026-11-22 11:07:21.146 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=505 first=505 retries=0 resyncs=0 late=0
+2026-11-22 11:07:21.147 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=5383 known=1
+2026-11-22 11:07:30.789 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=26 lf=0 reason=done steps=3 ms=934 first=64 retries=0 resyncs=0 late=0
+2026-11-22 11:07:31.346 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=508 first=508 retries=0 resyncs=0 late=0
+2026-11-22 11:07:31.346 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=335 inserted=26 sentms=0 emptyms=53 empty=1 quietms=2887 quiet=1 changes=2 lastch=1635 events=11 firstev=1476 lastev=1739 b=26 a=0 ends=1 heldms=4379 held=1 tries=1 cancelled=0
+2026-11-22 11:07:36.388 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=335 lf=9 reason=done steps=3 ms=975 first=89 retries=0 resyncs=0 late=0
+2026-11-22 11:07:37.024 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=518 first=518 retries=0 resyncs=0 late=0
+2026-11-22 11:07:37.024 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=26 inserted=335 sentms=0 emptyms=52 empty=1 quietms=1947 quiet=1 changes=0 lastch=-1 events=5 firstev=-1 lastev=-1 b=335 a=0 ends=1 heldms=3558 held=1 tries=1 cancelled=0
+2026-11-22 11:07:46.919 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:07:47.361 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:07:49.855 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:07:49.855 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:07:49.861 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:07:50.378 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-22 11:07:50.389 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 11:07:56.669 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-22 11:07:57.170 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=500 first=500 retries=0 resyncs=0 late=0
+2026-11-22 11:07:59.048 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1878 first=78 retries=0 resyncs=0 late=0
+2026-11-22 11:07:59.686 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=520 first=519 retries=0 resyncs=0 late=0
+2026-11-22 11:08:01.695 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=335 lf=9 reason=done steps=14 ms=2008 first=94 retries=0 resyncs=0 late=0
+2026-11-22 11:08:02.317 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=508 first=508 retries=0 resyncs=0 late=0
+2026-11-22 11:08:02.317 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=5647 known=1
+2026-11-22 11:08:10.719 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=26 lf=0 reason=done steps=3 ms=962 first=70 retries=0 resyncs=0 late=0
+2026-11-22 11:08:11.313 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=502 first=502 retries=0 resyncs=0 late=0
+2026-11-22 11:08:11.313 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=335 inserted=26 sentms=0 emptyms=53 empty=1 quietms=2876 quiet=1 changes=2 lastch=1473 events=11 firstev=1368 lastev=1526 b=26 a=0 ends=1 heldms=4432 held=1 tries=1 cancelled=0
+2026-11-22 11:08:16.672 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=335 lf=9 reason=done steps=3 ms=945 first=53 retries=0 resyncs=0 late=0
+2026-11-22 11:08:17.285 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=512 first=512 retries=0 resyncs=0 late=0
+2026-11-22 11:08:17.285 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=26 inserted=335 sentms=0 emptyms=52 empty=1 quietms=1944 quiet=1 changes=0 lastch=-1 events=5 firstev=-1 lastev=-1 b=335 a=0 ends=1 heldms=3502 held=1 tries=1 cancelled=0
+2026-11-22 11:08:30.317 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=52 a=12 s=0
+2026-11-22 11:08:33.151 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=223 lf=6 reason=done steps=30 ms=2833 first=94 retries=0 resyncs=0 late=0
+2026-11-22 11:08:34.803 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1651 first=63 retries=0 resyncs=0 late=0
+2026-11-22 11:08:35.444 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=516 first=516 retries=0 resyncs=0 late=0
+2026-11-22 11:08:37.191 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=335 lf=9 reason=done steps=14 ms=1747 first=75 retries=0 resyncs=0 late=0
+2026-11-22 11:08:37.833 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=516 first=516 retries=0 resyncs=0 late=0
+2026-11-22 11:08:37.834 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=7516 known=1
+2026-11-22 11:08:46.902 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=26 lf=0 reason=done steps=3 ms=953 first=67 retries=0 resyncs=0 late=0
+2026-11-22 11:08:47.489 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=505 first=505 retries=0 resyncs=0 late=0
+2026-11-22 11:08:47.489 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=335 inserted=26 sentms=0 emptyms=53 empty=1 quietms=2902 quiet=1 changes=2 lastch=1862 events=11 firstev=1757 lastev=1966 b=26 a=0 ends=1 heldms=4443 held=1 tries=1 cancelled=0
+2026-11-22 11:08:53.418 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=335 lf=9 reason=done steps=3 ms=990 first=93 retries=0 resyncs=0 late=0
+2026-11-22 11:08:54.022 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=507 first=507 retries=0 resyncs=0 late=0
+2026-11-22 11:08:54.022 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=26 inserted=335 sentms=0 emptyms=53 empty=1 quietms=1983 quiet=1 changes=0 lastch=-1 events=5 firstev=-1 lastev=-1 b=335 a=0 ends=1 heldms=3578 held=1 tries=1 cancelled=0
+2026-11-22 11:09:13.381 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-22 11:09:13.892 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=510 first=510 retries=0 resyncs=0 late=0
+2026-11-22 11:09:15.730 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1838 first=107 retries=0 resyncs=0 late=0
+2026-11-22 11:09:16.408 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=521 first=521 retries=0 resyncs=0 late=0
+2026-11-22 11:09:18.507 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=335 lf=9 reason=done steps=15 ms=2098 first=97 retries=0 resyncs=0 late=0
+2026-11-22 11:09:19.137 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=515 first=515 retries=0 resyncs=0 late=0
+2026-11-22 11:09:19.137 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=5755 known=1
+2026-11-22 11:09:28.671 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=26 lf=0 reason=done steps=3 ms=924 first=50 retries=0 resyncs=0 late=0
+2026-11-22 11:09:29.257 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=503 first=503 retries=0 resyncs=0 late=0
+2026-11-22 11:09:29.257 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=335 inserted=26 sentms=0 emptyms=53 empty=1 quietms=2877 quiet=1 changes=2 lastch=1571 events=11 firstev=1423 lastev=1677 b=26 a=0 ends=1 heldms=4389 held=1 tries=1 cancelled=0
+2026-11-22 11:09:35.160 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=335 lf=9 reason=done steps=3 ms=937 first=58 retries=0 resyncs=0 late=0
+2026-11-22 11:09:35.764 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=511 first=511 retries=0 resyncs=0 late=0
+2026-11-22 11:09:35.764 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=26 inserted=335 sentms=0 emptyms=53 empty=1 quietms=1980 quiet=1 changes=0 lastch=-1 events=5 firstev=-1 lastev=-1 b=335 a=0 ends=1 heldms=3520 held=1 tries=1 cancelled=0
+2026-11-22 11:09:48.020 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:09:48.523 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:09:51.156 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:09:51.156 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:09:51.158 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:09:51.714 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-22 11:09:51.730 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 11:09:57.785 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=59 a=0 s=0
+2026-11-22 11:09:58.300 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=515 first=515 retries=0 resyncs=0 late=0
+2026-11-22 11:10:05.003 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=3247 lf=15 reason=done steps=86 ms=6702 first=53 retries=0 resyncs=0 late=0
+2026-11-22 11:10:05.696 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=578 first=578 retries=0 resyncs=0 late=0
+2026-11-22 11:10:13.011 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=3247 lf=15 reason=done steps=89 ms=7314 first=52 retries=0 resyncs=0 late=0
+2026-11-22 11:10:13.628 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=514 first=514 retries=0 resyncs=0 late=0
+2026-11-22 11:10:13.629 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=3247 lf=15 h=3ca63fec ms=15844 known=1
+2026-11-22 11:10:34.753 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=29 lf=0 reason=done steps=3 ms=1031 first=89 retries=0 resyncs=0 late=0
+2026-11-22 11:10:35.336 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=518 first=518 retries=0 resyncs=0 late=0
+2026-11-22 11:10:35.336 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=3247 inserted=29 sentms=3 emptyms=53 empty=1 quietms=14560 quiet=1 changes=2 lastch=6753 events=62 firstev=5843 lastev=7635 b=29 a=0 ends=1 heldms=16174 held=1 tries=1 cancelled=0
+2026-11-22 11:10:43.593 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step v s=12 why=badStep k=39 b0=41 a0=19 b1=41 a1=19 fitb=0 fita=0 ch=1 ms=103
+2026-11-22 11:10:43.593 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=867 lf=4 reason=badStep steps=12 ms=1050 first=92 retries=0 resyncs=0 late=0
+2026-11-22 11:10:44.197 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk vr units=0 lf=0 reason=done steps=1 ms=511 first=511 retries=0 resyncs=0 late=0
+2026-11-22 11:10:50.973 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=3247 lf=15 reason=done steps=89 ms=6775 first=74 retries=0 resyncs=0 late=0
+2026-11-22 11:10:51.564 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=518 first=518 retries=0 resyncs=0 late=0
+2026-11-22 11:10:51.565 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=29 inserted=3247 sentms=0 emptyms=51 empty=1 quietms=4911 quiet=1 changes=0 lastch=-1 events=105 firstev=-1 lastev=-1 b=500 a=0 ends=1 heldms=13937 held=1 tries=2 cancelled=0
+2026-11-22 11:11:04.048 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:11:04.493 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:11:07.074 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:11:07.074 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:11:07.080 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:11:07.557 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-22 11:11:07.566 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 11:11:14.986 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=59 a=0 s=0
+2026-11-22 11:11:15.495 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=507 first=507 retries=0 resyncs=0 late=0
+2026-11-22 11:11:22.088 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=3247 lf=15 reason=done steps=88 ms=6592 first=51 retries=0 resyncs=0 late=0
+2026-11-22 11:11:22.669 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=522 first=522 retries=0 resyncs=0 late=0
+2026-11-22 11:11:29.107 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=3247 lf=15 reason=done steps=91 ms=6437 first=73 retries=0 resyncs=0 late=0
+2026-11-22 11:11:29.696 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fe units=0 lf=0 reason=done steps=1 ms=519 first=519 retries=0 resyncs=0 late=0
+2026-11-22 11:11:29.697 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=accepted reason=- units=3247 lf=15 h=3ca63fec ms=14711 known=1
+2026-11-22 11:11:51.453 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=29 lf=0 reason=done steps=3 ms=967 first=79 retries=0 resyncs=0 late=0
+2026-11-22 11:11:52.053 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=509 first=509 retries=0 resyncs=0 late=0
+2026-11-22 11:11:52.053 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=3247 inserted=29 sentms=3 emptyms=57 empty=1 quietms=14539 quiet=1 changes=2 lastch=6236 events=62 firstev=5240 lastev=6966 b=29 a=0 ends=1 heldms=16107 held=1 tries=1 cancelled=0
+2026-11-22 11:12:03.861 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk v units=3247 lf=15 reason=done steps=75 ms=5495 first=83 retries=0 resyncs=0 late=0
+2026-11-22 11:12:04.434 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk ve units=0 lf=0 reason=done steps=1 ms=508 first=508 retries=0 resyncs=0 late=0
+2026-11-22 11:12:04.434 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] replace deleted=29 inserted=3247 sentms=0 emptyms=52 empty=1 quietms=4880 quiet=1 changes=0 lastch=-1 events=77 firstev=-1 lastev=-1 b=500 a=0 ends=1 heldms=10948 held=1 tries=1 cancelled=0
+2026-11-22 11:12:15.827 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:12:16.420 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:12:19.061 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:12:19.061 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:12:19.069 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:12:19.556 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-22 11:12:19.576 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 11:12:26.141 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-22 11:12:26.645 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=503 first=500 retries=0 resyncs=0 late=0
+2026-11-22 11:12:26.770 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step b1 s=2 why=characters k=45 b0=47 a0=41 b1=1 a1=87 fitb=0 fita=0 ch=1 ms=42
+2026-11-22 11:12:26.770 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=61 lf=0 reason=characters steps=2 ms=124 first=81 retries=0 resyncs=0 late=0
+2026-11-22 11:12:26.770 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=refused reason=b1:characters units=0 lf=0 h=811c9dc5 ms=628 known=1
+2026-11-22 11:12:26.770 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=106 known=1
+2026-11-22 11:12:29.179 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:12:44.450 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:12:44.964 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-22 11:12:47.686 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:12:47.686 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:12:47.689 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 11:12:48.399 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-22 11:12:48.413 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 11:12:56.940 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read start b=60 a=0 s=0
+2026-11-22 11:12:57.455 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=514 first=514 retries=0 resyncs=0 late=0
+2026-11-22 11:12:59.310 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b1 units=460 lf=9 reason=done steps=13 ms=1854 first=74 retries=0 resyncs=0 late=0
+2026-11-22 11:12:59.933 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=504 first=504 retries=0 resyncs=0 late=0
+2026-11-22 11:12:59.982 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read step b2 s=1 why=characters k=58 b0=60 a0=0 b1=0 a1=60 fitb=1 fita=0 ch=1 ms=48
+2026-11-22 11:12:59.982 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read walk b2 units=0 lf=0 reason=characters steps=1 ms=48 first=47 retries=0 resyncs=0 late=0
+2026-11-22 11:12:59.982 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read done outcome=refused reason=b2:characters units=0 lf=0 h=811c9dc5 ms=3041 known=1
+2026-11-22 11:12:59.982 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=58 known=1
+2026-11-22 11:13:04.398 Db ProtlyCIKeyboard[18975:f8fe] [com.northprot.protly:read] read restore units=0 known=1
