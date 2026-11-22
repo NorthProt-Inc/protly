@@ -1,0 +1,136 @@
+STATUS measured
+source a6de577e579dad8a66a6046cdf20bd0543755e2a
+xcode Xcode 26.6 Build version 17F113 
+network key: present (CI key); DerivedData cache: restore only, not saved in this run
+FILTER PhoneChecksUITests/test0_access PhoneChecksUITests/test5g_wholenative (a debug run, outside the run budget; other IDs are NOT-RUN)
+runtime iOS 26.5 (com.apple.CoreSimulator.SimRuntime.iOS-26-5)
+device iPhone-13-Pro (8C0109E5-B558-4DAC-9870-1644720888CD), 390 pt wide
+build ok
+AppleKeyboards ("com.northprot.protly.cihost.keyboard","emoji@sw=Emoji","en_US@sw=QWERTY;hw=Automatic")
+appearance dark
+memory sampler pid 9577, probe 0, network 1
+web-events.txt: none (the web screen did not run)
+RESULT NOT-RUN (filtered run: KeyboardShotsUITests not selected)
+CHECKS
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-en NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-fast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-ko NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-kofast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-kopick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pickmid NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pickmove NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-word NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-en NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-fast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-ko NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-kofast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-kopick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pickmid NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pickmove NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-word NOT-RUN filtered run: its test method was not selected
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-emoji NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-long NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-mid NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-sel NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-win NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-x14k NOT-RUN filtered run: its test method was not selected
+CHECK wr-swiftui-long FAIL t1={real=3247/15/h3ca63fec caret=unprobed s=18.8 read=16108 reply=3247/15/h3ca63fec replace=11.76 undo=3.62} t1=replace=11.76 (not as expected) t2={real=3247/15/h3ca63fec caret=unprobed s=6.3 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+CHECK wr-swiftui-mid PASS t1={real=335/9/h49b6f226 caret=unprobed s=9.9 read=6848 reply=335/9/h49b6f226 replace=3.84 undo=3.31}
+CHECK wr-swiftui-sel PASS t1={real=335/9/h49b6f226 caret=unprobed s=7.1 read=4884 reply=335/9/h49b6f226 replace=3.36 undo=2.67}
+CHECK wr-swiftui-win PASS t1={real=335/9/h49b6f226 caret=unprobed s=7.0 read=4681 reply=335/9/h49b6f226 replace=4.04 undo=2.79} t2={real=335/9/h49b6f226 caret=unprobed s=7.1 read=4874 reply=335/9/h49b6f226 replace=4.16 undo=3.12}
+CHECK wr-swiftui-x14k PASS t1={real=14055/15/h0c02b8be caret=unprobed s=3.1 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be}
+CHECK wr-textarea-emoji NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-long NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-mid NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-sel NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-win NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-x14k NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-long FAIL t1={real=3247/15/h3ca63fec caret=3247,0 s=17.8 read=15457 reply=3247/15/h3ca63fec caret-read=3247,0 replace=8.25 undo=3.26} t1=replace=8.25 (not as expected) t2={real=3247/15/h3ca63fec caret=3247,0 s=17.2 read=12992 reply=3247/15/h3ca63fec caret-read=3247,0 replace=6.96 undo=2.94} t2=replace=6.96 (not as expected)
+CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=10.3 read=6815 reply=335/9/h49b6f226 caret-read=335,0 replace=3.43 undo=3.17}
+CHECK wr-uikit-r4k FAIL t1={real=3975/15/h669f5dfc caret=3975,0 s=20.7 read=17943 reply=3975/15/h669f5dfc caret-read=3975,0 replace=8.67 undo=2.86} t1=replace=8.67 (not as expected)
+CHECK wr-uikit-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=9.8 read=5077 reply=335/9/h49b6f226 caret-read=335,0 replace=3.81 undo=3.10}
+CHECK wr-uikit-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=8.0 read=4871 reply=335/9/h49b6f226 caret-read=335,0 replace=4.79 undo=2.96} t2={real=335/9/h49b6f226 caret=335,0 s=21.1 read=4482 reply=335/9/h49b6f226 caret-read=335,0 replace=3.87 undo=3.58}
+CHECK wr-uikit-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=3.4 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0}
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
+CHECKS pass 8 fail 3 record 0 skip 0 not-run 109
+LEAK-GUARD pass: no key prefix in 25 files

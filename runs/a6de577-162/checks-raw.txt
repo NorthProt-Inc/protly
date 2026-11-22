@@ -1,0 +1,11 @@
+CHECK wr-uikit-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=8.0 read=4871 reply=335/9/h49b6f226 caret-read=335,0 replace=4.79 undo=2.96} t2={real=335/9/h49b6f226 caret=335,0 s=21.1 read=4482 reply=335/9/h49b6f226 caret-read=335,0 replace=3.87 undo=3.58}
+CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=10.3 read=6815 reply=335/9/h49b6f226 caret-read=335,0 replace=3.43 undo=3.17}
+CHECK wr-uikit-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=9.8 read=5077 reply=335/9/h49b6f226 caret-read=335,0 replace=3.81 undo=3.10}
+CHECK wr-uikit-long FAIL t1={real=3247/15/h3ca63fec caret=3247,0 s=17.8 read=15457 reply=3247/15/h3ca63fec caret-read=3247,0 replace=8.25 undo=3.26} t1=replace=8.25 (not as expected) t2={real=3247/15/h3ca63fec caret=3247,0 s=17.2 read=12992 reply=3247/15/h3ca63fec caret-read=3247,0 replace=6.96 undo=2.94} t2=replace=6.96 (not as expected)
+CHECK wr-uikit-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=3.4 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0}
+CHECK wr-uikit-r4k FAIL t1={real=3975/15/h669f5dfc caret=3975,0 s=20.7 read=17943 reply=3975/15/h669f5dfc caret-read=3975,0 replace=8.67 undo=2.86} t1=replace=8.67 (not as expected)
+CHECK wr-swiftui-win PASS t1={real=335/9/h49b6f226 caret=unprobed s=7.0 read=4681 reply=335/9/h49b6f226 replace=4.04 undo=2.79} t2={real=335/9/h49b6f226 caret=unprobed s=7.1 read=4874 reply=335/9/h49b6f226 replace=4.16 undo=3.12}
+CHECK wr-swiftui-mid PASS t1={real=335/9/h49b6f226 caret=unprobed s=9.9 read=6848 reply=335/9/h49b6f226 replace=3.84 undo=3.31}
+CHECK wr-swiftui-sel PASS t1={real=335/9/h49b6f226 caret=unprobed s=7.1 read=4884 reply=335/9/h49b6f226 replace=3.36 undo=2.67}
+CHECK wr-swiftui-long FAIL t1={real=3247/15/h3ca63fec caret=unprobed s=18.8 read=16108 reply=3247/15/h3ca63fec replace=11.76 undo=3.62} t1=replace=11.76 (not as expected) t2={real=3247/15/h3ca63fec caret=unprobed s=6.3 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t2=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+CHECK wr-swiftui-x14k PASS t1={real=14055/15/h0c02b8be caret=unprobed s=3.1 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be}
