@@ -1,0 +1,19 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5h_wholeweb
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+CHECK wr-textarea-swin FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39 t3={real=0/0/h811c9dc5} t3: the fill gave 0 units, want 39
+CHECK wr-textarea-smid FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
+CHECK wr-textarea-ssel FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
+CHECK wr-lexical-swin FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39 t3={real=0/0/h811c9dc5} t3: the fill gave 0 units, want 39
+CHECK wr-lexical-smid FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
+CHECK wr-lexical-ssel FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39

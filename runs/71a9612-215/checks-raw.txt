@@ -1,0 +1,6 @@
+CHECK wr-textarea-swin FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39 t3={real=0/0/h811c9dc5} t3: the fill gave 0 units, want 39
+CHECK wr-textarea-smid FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
+CHECK wr-textarea-ssel FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
+CHECK wr-lexical-swin FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39 t3={real=0/0/h811c9dc5} t3: the fill gave 0 units, want 39
+CHECK wr-lexical-smid FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
+CHECK wr-lexical-ssel FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
