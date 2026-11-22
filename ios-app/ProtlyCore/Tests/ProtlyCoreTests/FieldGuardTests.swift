@@ -201,6 +201,12 @@ final class FieldDecisionTests: XCTestCase {
         XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: false, selected: head, before: head), .selectAll)
         XCTAssertEqual(WholeRead.collapsed(crossed: Array("\nprivate notes".utf16), resynced: false, selected: head,
                                            before: head), .partial)
+        // The +1 collapse of a partial selection lands one past its end, over the line feed (run 1b402b4-204: the caret
+        // at 17 after a 16-unit selection): the before-context there is the selection and that line feed.
+        XCTAssertEqual(WholeRead.collapsed(crossed: Array("private notes".utf16), resynced: false, selected: head,
+                                           before: head + [10]), .partial)
+        XCTAssertEqual(WholeRead.collapsed(crossed: Array("private notes".utf16), resynced: false, selected: head,
+                                           before: head + Array(" x".utf16)), .unknown)
         // The selection longer than selectedText showed: not proven, refused.
         XCTAssertEqual(WholeRead.collapsed(crossed: Array("\nmore".utf16), resynced: false, selected: Array("Titl".utf16),
                                            before: head), .unknown)

@@ -565,18 +565,25 @@ enum WholeDrafts {
         make("x14k", paragraphs(8, sentences: 60, .mixed)),  // 14 055/15, 320 emoji
         make("emoji", paragraphs(5, sentences: 3, .mixed)),  // 460/9, 10 emoji
         make("r4k", paragraphs(8, sentences: 20, .numbered)),  // 3975/15: under the read's 4000-unit cap
-        // F02c: short drafts the proxy window shows whole (the latency target), and the bug cases.
-        Draft(name: "s1", text: short, cursor: short.utf16.count),  // 39/1, under select all's 43-unit selectedText
-        Draft(name: "s1mid", text: short, cursor: (marker + "\u{00A7}1 \u{C624}\u{B298} \u{D68C}\u{C758} ").utf16.count),  // 39/1 at 26
-        Draft(name: "s3", text: short3, cursor: short3.utf16.count),  // 93/1: three sentences on one line
+        // F02c: short drafts the proxy window shows whole (the latency target), and the bug cases. One line each: a
+        // native host's window stops at a line feed (run 1b402b4-204 showed 22 of the two-line draft's 39 units).
+        Draft(name: "s1", text: short, cursor: short.utf16.count),  // 39/0, under select all's 43-unit selectedText
+        Draft(name: "s1mid", text: short, cursor: (inline + "\u{00A7}1 \u{C624}\u{B298} \u{D68C}\u{C758} ").utf16.count),  // 39/0 at 26
+        Draft(name: "s3", text: short3, cursor: short3.utf16.count),  // 93/0: three sentences on one line
         // A lone emoji ends the line after a mid-text cursor: the forward walk's last jump leaves exactly one pair.
-        Draft(name: "etail", text: short + " \u{1F600}", cursor: (marker + "\u{00A7}1 \u{C624}\u{B298} \u{D68C}\u{C758} ").utf16.count),  // 42/1 at 26
+        Draft(name: "etail", text: short + " \u{1F600}", cursor: (inline + "\u{00A7}1 \u{C624}\u{B298} \u{D68C}\u{C758} ").utf16.count),  // 42/0 at 26
+        // The marker on its own line (`rselhead` selects it: a partial selection up to a line feed).
+        Draft(name: "s1head", text: head, cursor: head.utf16.count),  // 39/1
     ]
 
-    /// The marker line and one numbered sentence.
-    static let short = marker + "\u{00A7}1 " + sentence
-    /// The marker line and three sentences on one line, as a chat message.
+    /// StubActionClient.marker + `read` on the draft's own line: the stub answers any text that starts so.
+    static let inline = "protly-stub read "
+    /// The marker and one numbered sentence, on one line.
+    static let short = inline + "\u{00A7}1 " + sentence
+    /// The marker and three sentences on one line, as a chat message.
     static let short3 = short + " Send me the notes after the call. " + sentence
+    /// The marker line, then one numbered sentence.
+    static let head = marker + "\u{00A7}1 " + sentence
 
     /// `rselhead`: the field's start up to its first line feed (the marker line) selected, a partial selection that
     /// shows no context on either side.

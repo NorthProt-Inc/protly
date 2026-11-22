@@ -346,10 +346,11 @@ without the read's time, as the speculative call starts before the read ends). T
   cap), `wr-uikit-cancel` (the `mid` draft: once the strip says "Reading the whole text…", its Cancel; the strip goes,
   no panel or card comes, the field and the caret are as before, and the keyboard log says `outcome=cancelled`). `win`
   and `long` run twice; every try must pass.
-- **F02c cases** (drafts the proxy window shows whole, and the tower review's bugs): `swin` (39 units: the marker line
-  and one sentence, under select all's 43-unit `selectedText`; cursor at the end, 3 tries), `smid` (the same, cursor at
+- **F02c cases** (drafts the proxy window shows whole, and the tower review's bugs): `swin` (39 units on one line,
+  `protly-stub read §1` and one sentence: a native window stops at a line feed, run 1b402b4-204 showed 22 of the
+  two-line draft's 39 units; under select all's 43-unit `selectedText`; cursor at the end, 3 tries), `smid` (the same, cursor at
   26, 2 tries), `ssel` (select all on it, 2 tries), `s3` (93 units, three sentences on one line; the web window showed
-  45 of them in run 297dc27-205), `shead` (native only: `rselhead` selects the field's start up to its first line
+  45 of them in run 297dc27-205), `shead` (native only: on a two-line draft, `rselhead` selects the field's start up to its first line
   feed, a partial selection that shows no context on either side as select all does; it must stay a selection: a
   copy-only card of exactly the marker line, the field unchanged, the log `reason=selection` or `partialSelection` and
   no write; on the read page a selection set by script never reached the keyboard, run 205), `etail` (native only: a

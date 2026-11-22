@@ -76,7 +76,7 @@ enum WholeChecks {
         case "smid": return Spec(name: name, fill: 8, units: 39, cursor: 26)
         case "ssel": return Spec(name: name, fill: 7, units: 39, cursor: 39, selectAll: true)
         case "s3": return Spec(name: name, fill: 9, units: 93, cursor: 93)
-        case "shead": return Spec(name: name, fill: 7, units: 39, cursor: 39, head: true)
+        case "shead": return Spec(name: name, fill: 11, units: 39, cursor: 39, head: true)
         case "etail": return Spec(name: name, fill: 10, units: 42, cursor: 26)
         default: return nil
         }
