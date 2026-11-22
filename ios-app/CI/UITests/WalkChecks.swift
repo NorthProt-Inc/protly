@@ -21,17 +21,16 @@ enum WalkProbe {
     }
 
     static let uikit: [Case] = [
-        Case(name: "p5", fill: 3, tries: 2), Case(name: "l5", fill: 5, tries: 2), Case(name: "xlong", fill: 8, tries: 2),
+        // diag/p1-walk-back-unit: the settled unit walk on the short drafts only (no xlong, no selxlong).
+        Case(name: "p5", fill: 3, tries: 2), Case(name: "l5", fill: 5, tries: 2),
         Case(name: "p5mid", fill: 4, tries: 2), Case(name: "l5mid", fill: 13, tries: 1),
         Case(name: "longmid", fill: 7, tries: 1), Case(name: "trail", fill: 14, tries: 1),
         // The keyboard collapses the selection with +1, -1 and 0 in turn (FieldText.selCalls).
-        Case(name: "selp5", fill: 3, tries: 3, selectAll: true), Case(name: "selxlong", fill: 8, tries: 3, selectAll: true),
+        Case(name: "selp5", fill: 3, tries: 3, selectAll: true),
     ]
-    static let swiftui: [Case] = [
-        Case(name: "p5", fill: 3, tries: 2), Case(name: "l5", fill: 5, tries: 2), Case(name: "xlong", fill: 8, tries: 2),
-    ]
+    static let swiftui: [Case] = [Case(name: "p5", fill: 3, tries: 2), Case(name: "l5", fill: 5, tries: 2)]
     static let webHosts = ["textarea", "lexical"]
-    static let web: [Case] = [Case(name: "p5", fill: 3, tries: 2), Case(name: "xlong", fill: 8, tries: 1)]
+    static let web: [Case] = [Case(name: "p5", fill: 3, tries: 2)]
 
     static func ids(_ host: String, _ cases: [Case]) -> [String] { cases.map { "walk-\(host)-\($0.name)" } }
 

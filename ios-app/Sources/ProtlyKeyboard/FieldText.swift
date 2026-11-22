@@ -234,9 +234,18 @@ enum FieldText {
             if c1 != c0 {
                 let ms = Int((uptime() - sent) * 1000)
                 guard settle else { return (true, polls, ms, false, c1) }
-                await pause()
-                let c2 = ctx(p)
-                return (true, polls, ms, c2 != c1, c2)
+                // diag/p1-walk-back-unit: settle until two polls in a row read the same (up to 5 more polls). Run
+                // 7f2f443-135: unit steps read without a settle gave right lengths but other texts.
+                var prev = c1
+                var late = false
+                for _ in 0..<5 {
+                    await pause()
+                    let c2 = ctx(p)
+                    if c2 == prev { break }
+                    late = true
+                    prev = c2
+                }
+                return (true, polls, ms, late, prev)
             }
         }
         // A last look: a stalled main thread can end the loop between two polls, never call that "no change".
@@ -275,7 +284,7 @@ enum FieldText {
                 }
             }
             r.steps += 1
-            let s = await step(p, by: -k, limit: probing ? 0.5 : 1.0, settle: policy != .unit)
+            let s = await step(p, by: -k, limit: probing ? 0.5 : 1.0, settle: true)  // diag/p1-walk-back-unit: unit too
             maxPolls = max(maxPolls, s.polls)
             guard s.changed else {
                 r.reason = probing ? "start" : "stuck"
