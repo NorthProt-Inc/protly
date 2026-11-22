@@ -1086,5 +1086,202 @@ class PeriodTests(unittest.TestCase):
         self.assertEqual(c.status, "FAIL")
 
 
+
+WHOLE_METHODS = ("test5g_wholenative", "test5h_wholeweb")
+
+
+def read_here(*parts):
+    with open(os.path.join(HERE, *parts), encoding="utf-8") as f:
+        return f.read()
+
+
+def swift_string(literal):
+    r"""A Swift string literal's text: \u{...} and \n escapes, as in HostApp.swift WholeDrafts."""
+    return re.sub(r"\\u\{([0-9A-Fa-f]+)\}|\\n", lambda m: chr(int(m.group(1), 16)) if m.group(1) else "\n", literal)
+
+
+class WholeReadTests(unittest.TestCase):
+    """K1b (fix/whole-field-read): wr-<host>-<case>, written PASS or FAIL by UITests/WholeReadChecks.swift."""
+
+    def swift(self):
+        return read_here("UITests", "WholeReadChecks.swift")
+
+    def swift_list(self, name):
+        m = re.search(r"static let " + name + r" = \[([^\]]*)\]", self.swift())
+        self.assertIsNotNone(m, name)
+        return re.findall(r'"(\w+)"', m.group(1))
+
+    def test_every_id_is_expected_and_has_its_method(self):
+        native = [f"wr-uikit-{c}" for c in ("win", "mid", "sel", "long", "x14k")] + ["wr-uikit-r4k"] + [
+            f"wr-swiftui-{c}" for c in ("win", "mid", "sel", "long", "x14k")]
+        web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji")]
+        self.assertEqual(checks.METHOD_IDS["test5g_wholenative"], native)
+        self.assertEqual(checks.METHOD_IDS["test5h_wholeweb"], web)
+        for i in native + web:
+            self.assertIn(i, checks.EXPECTED_IDS)
+            # The test writes PASS or FAIL itself: no resolver, no model output.
+            self.assertNotIn(i, checks.RESOLVERS)
+            self.assertNotIn(i, checks.RULES)
+        for m in WHOLE_METHODS:
+            self.assertTrue(checks.known_entry(f"PhoneChecksUITests/{m}"))
+            self.assertEqual(checks.FILTERED_ONLY[m], "runs only in a filtered run (deadline)")
+
+    def test_the_ui_test_lists_the_same_cases_and_tries(self):
+        # WholeChecks is the other half of WHOLE_*_IDS: a case missing there is a FAIL `no CHECK line` in CI.
+        self.assertEqual(self.swift_list("nativeCases"), list(checks.WHOLE_NATIVE_CASES))
+        self.assertEqual(self.swift_list("webCases"), list(checks.WHOLE_WEB_CASES))
+        self.assertEqual(self.swift_list("webHosts"), list(checks.WHOLE_WEB_HOSTS))
+        m = re.search(r"static let tries: \[String: Int\] = \[([^\]]*)\]", self.swift())
+        self.assertEqual({k: int(v) for k, v in re.findall(r'"(\w+)": (\d+)', m.group(1))}, checks.WHOLE_TRIES)
+        self.assertEqual(checks.WHOLE_TRIES, {"win": 2, "long": 2})
+        native = re.search(r"static var nativeIDs: \[String\] \{\n(.*?)\n    \}", self.swift(), re.S).group(1)
+        self.assertEqual(" ".join(native.split()),
+                         'nativeCases.map { "wr-uikit-\\($0)" } + ["wr-uikit-r4k"] + nativeCases.map { "wr-swiftui-\\($0)" }')
+        self.assertIn('webHosts.flatMap { h in webCases.map { "wr-\\(h)-\\($0)" } }', self.swift())
+
+    def specs(self):
+        out = {}
+        for m in re.finditer(r'case "(\w+)": return Spec\(name: name, fill: (\d+), units: (\d+), cursor: (\d+)([^)]*)\)',
+                             self.swift()):
+            out[m.group(1)] = (int(m.group(2)), int(m.group(3)), int(m.group(4)), m.group(5))
+        return out
+
+    def test_every_case_has_a_spec_and_the_refusals_are_the_long_and_emoji_drafts(self):
+        specs = self.specs()
+        self.assertEqual(set(specs), set(checks.WHOLE_WEB_CASES) | {"r4k"})
+        self.assertEqual({k for k, v in specs.items() if "refusal: true" in v[3]}, {"x14k", "emoji"})
+        self.assertEqual({k for k, v in specs.items() if "selectAll: true" in v[3]}, {"sel"})
+        # The read's cap is 4000 UTF-16 units: every accepted draft stays under it, marker line included.
+        for name, (_, units, cursor, extra) in specs.items():
+            self.assertLessEqual(cursor, units, name)
+            if "refusal: true" not in extra:
+                self.assertLessEqual(units, 4000, name)
+
+    def host_drafts(self):
+        """HostApp.swift WholeDrafts.all, rebuilt here: [(name, text, cursor)] in rfill order."""
+        host = read_here("Host", "HostApp.swift")
+        block = host[host.index("enum WholeDrafts"):]
+        marker = swift_string(re.search(r'static let marker = "([^"]*)"', block).group(1))
+        sentence = swift_string(re.search(r'static let sentence = "([^"]*)"', block).group(1))
+        listed = re.search(r"static let mixed = \[(.*?)\]\n", block).group(1)
+        # The first is the `sentence` constant itself, then two literals.
+        self.assertTrue(listed.startswith("sentence, "))
+        mixed = [sentence] + [swift_string(x) for x in re.findall(r'"((?:[^"\\]|\\.)*)"', listed)]
+        self.assertEqual(len(mixed), 3)
+        def paragraphs(count, sentences, kind):
+            out = []
+            for k in range(1, count + 1):
+                if kind == "plain":
+                    body = [sentence] * sentences
+                elif kind == "numbered":
+                    body = [f"{k}-{j} " + sentence for j in range(1, sentences + 1)]
+                else:
+                    body = [f"{k}-{j} " + mixed[(k + j) % 3] for j in range(1, sentences + 1)]
+                out.append(f"\u00a7{k} " + " ".join(body))
+            return out
+        all_block = block[block.index("static let all: [Draft] = ["):]
+        all_block = all_block[:all_block.index("\n    ]\n")]
+        drafts = []
+        for m in re.finditer(r'make\("(\w+)", paragraphs\((\d+), sentences: (\d+), \.(\w+)\)(, mid: true)?\)', all_block):
+            paras = paragraphs(int(m.group(2)), int(m.group(3)), m.group(4))
+            text = marker + "\n\n".join(paras)
+            second = utf16(marker + paras[0] + "\n\n")
+            cursor = second + utf16(paras[1]) // 2 if m.group(5) else utf16(text)
+            drafts.append((m.group(1), text, cursor))
+        return drafts
+
+    def test_the_specs_match_the_host_drafts(self):
+        drafts = self.host_drafts()
+        self.assertEqual([d[0] for d in drafts], ["p5", "p5mid", "xlong", "x14k", "emoji", "r4k"])
+        for name, (fill, units, cursor, _) in self.specs().items():
+            _, text, at = drafts[fill - 1]
+            self.assertTrue(text.startswith("protly-stub read\n"), name)
+            self.assertEqual((utf16(text), at), (units, cursor), name)
+        # The walk-back probe's drafts under the marker line (docs/research/2026-11-21-walk-back-probe.md).
+        shapes = {d[0]: (utf16(d[1][len("protly-stub read\n"):]), sum(1 for c in d[1][len("protly-stub read\n"):]
+                                                                       if ord(c) > 0xFFFF)) for d in drafts}
+        self.assertEqual(shapes, {"p5": (318, 0), "p5mid": (318, 0), "xlong": (3230, 0), "x14k": (14038, 320),
+                                  "emoji": (443, 10), "r4k": (3958, 0)})
+
+    def test_the_hash_matches_the_page_and_the_probe(self):
+        # p5 318/8/h6d75860b (walk-back probe); the Swift and the page hash the same way (FNV-1a 32 over UTF-16).
+        p5 = self.host_drafts()[0][1][len("protly-stub read\n"):]
+        self.assertEqual(fnv16(p5), "6d75860b")
+        self.assertIn("0x811C_9DC5", self.swift())
+        self.assertIn("0x0100_0193", self.swift())
+        page = read_here("Host", "read-probe.html")
+        self.assertIn("let h = 0x811c9dc5;", page)
+        self.assertIn("h = Math.imul(h, 0x01000193) >>> 0;", page)
+
+    def test_the_methods_skip_outside_a_filtered_run_and_call_their_checks(self):
+        swift = read_here("UITests", "PhoneChecksUITests.swift")
+        for m, call in (("test5g_wholenative", ".checksWholeNative()"), ("test5h_wholeweb", ".checksWholeWeb()")):
+            body = swift[swift.index(f"func {m}()"):]
+            body = body[:body.index("\n    }\n")]
+            self.assertIn('environment["FILTERED"] == "1"', body)
+            self.assertIn('throw XCTSkip("runs only in a filtered run (deadline)")', body)
+            self.assertIn(call, body)
+            self.assertIn(f'"{m}": ', swift[swift.index("static let allowance"):swift.index("override func setUp")])
+        self.assertIn('"-wholefills", "1"', swift[swift.index("func test5g_wholenative()"):])
+
+    def test_the_refusal_and_notice_texts_are_the_keyboards(self):
+        kvc = read_here("..", "Sources", "ProtlyKeyboard", "KeyboardViewController.swift")
+        swift = self.swift()
+        for name in ("refusedText", "replaceUnsureText"):
+            m = re.search(r"static let " + name + r' = "([^"]*)"', kvc)
+            if m is None:
+                self.skipTest(f"KeyboardViewController.{name} not in this tree")
+            self.assertIn(f'"{m.group(1)}"', swift)
+
+    def test_a_full_run_marks_the_whole_ids_not_run(self):
+        ids = checks.WHOLE_NATIVE_IDS + checks.WHOLE_WEB_IDS
+        final = {c.id: c for c in checks.assemble(every_id_but(*ids), "", "")}
+        for i in ids:
+            self.assertEqual(final[i].status, checks.NOT_RUN, i)
+            self.assertIn("runs only in a filtered run (deadline)", final[i].evidence)
+        self.assertFalse(any(c.status == "FAIL" for c in final.values()))
+
+    def test_a_filtered_whole_run_fails_its_missing_ids_and_skips_the_others(self):
+        ran = checks.covered_ids(["PhoneChecksUITests/test0_access", "PhoneChecksUITests/test5g_wholenative"])
+        final = {c.id: c for c in checks.assemble("", "", "", ran=ran)}
+        self.assertEqual(final["wr-uikit-r4k"].status, "FAIL")
+        self.assertIn("no CHECK line", final["wr-uikit-r4k"].evidence)
+        self.assertEqual(final["wr-lexical-win"].status, checks.NOT_RUN)
+        self.assertEqual(final["dsp-uikit-en"].status, checks.NOT_RUN)
+
+    def test_the_test_lines_keep_their_status(self):
+        lines = ('CHECK wr-uikit-win PASS t1={real=335/9/h49b6f226 read=4210 replace=1.20 undo=2.10}\n'
+                 'CHECK wr-uikit-long FAIL t1={replace=7.10} t1=replace=7.10 (not as expected)\n'
+                 'CHECK wr-textarea-win FAIL unreadable: t1: set-up: no rfill-1 button\n')
+        ran = checks.covered_ids(["PhoneChecksUITests/test5g_wholenative", "PhoneChecksUITests/test5h_wholeweb"])
+        final = {c.id: c for c in checks.assemble(lines, "", "", ran=ran)}
+        self.assertEqual(final["wr-uikit-win"].status, "PASS")
+        self.assertEqual(final["wr-uikit-long"].status, "FAIL")
+        self.assertEqual(final["wr-textarea-win"].status, "FAIL")
+        self.assertEqual(final["wr-lexical-emoji"].status, "FAIL")  # selected, no line
+
+    def test_main_without_a_filter_counts_every_filtered_only_id_not_run(self):
+        ids = [i for m in checks.FILTERED_ONLY for i in checks.METHOD_IDS[m]]
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "checks.txt"), "w", encoding="utf-8") as f:
+                f.write(every_id_but(*ids))
+            out = subprocess.run([sys.executable, os.path.join(HERE, "checks.py"), d], capture_output=True, text=True)
+            self.assertEqual(out.returncode, 0, out.stdout)
+            self.assertTrue(out.stdout.splitlines()[-1].endswith(f" not-run {len(ids)}"), out.stdout)
+
+
+def utf16(text):
+    return len(text.encode("utf-16-le")) // 2
+
+
+def fnv16(text):
+    b = text.encode("utf-16-le")
+    h = 0x811C9DC5
+    for i in range(0, len(b), 2):
+        h ^= b[i] | (b[i + 1] << 8)
+        h = (h * 0x01000193) & 0xFFFFFFFF
+    return f"{h:08x}"
+
+
 if __name__ == "__main__":
     unittest.main()
