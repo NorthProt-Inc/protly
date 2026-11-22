@@ -158,11 +158,14 @@ public enum WholeRead {
     /// contexts); `selected`: selectedText before the collapse; `before`: the before-context back at the collapse point,
     /// which starts at the field's start. selectedText can hold only a selection's first units (43 after a select all,
     /// P1a cause 3), so a partial selection counts only when that before-context is exactly it (silent-failure
-    /// review). A resync alone is no evidence either way (code review: it sent select all's first units as a
+    /// review). The +1 collapse of such a selection lands one unit past its end, over the line feed it reached (run
+    /// 1b402b4-204: the caret at 17 after a 16-unit selection), so the before-context may also be the selection and
+    /// that line feed. A resync alone is no evidence either way (code review: it sent select all's first units as a
     /// selection).
     public static func collapsed(crossed: [UInt16], resynced: Bool, selected: [UInt16], before: [UInt16]) -> Collapse {
         if crossed.isEmpty { return resynced ? .unknown : .selectAll }
-        return !selected.isEmpty && before == selected ? .partial : .unknown
+        guard !selected.isEmpty else { return .unknown }
+        return before == selected || before == selected + [10] ? .partial : .unknown
     }
 
     /// The verdict on a read whose walks all ended where they should (the forward walks at the end, the walks back at
