@@ -135,6 +135,11 @@ final class KeyboardViewController: KeyboardInputViewController {
         refreshField()
     }
 
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        ProtlyHeight.disappeared(self)
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         // The word is already plain text in the field: only the session state goes, so the next key starts a new

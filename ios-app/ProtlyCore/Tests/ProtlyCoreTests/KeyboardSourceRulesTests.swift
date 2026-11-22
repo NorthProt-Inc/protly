@@ -76,16 +76,42 @@ final class KeyboardSourceRulesTests: XCTestCase {
         }
     }
 
-    /// Tower decision D-E: the host's became-active notice can come just before the new controller pins (run 59: 32 ms),
-    /// so every pin remembers it and a pin made soon after takes the drop itself.
-    func testTheHeightPinCatchesAHostReturnThatCameJustBefore() throws {
-        guard let text = try sources().first(where: { $0.name == "ProtlyHeight.swift" })?.text else { return }
+    /// K2: the height rules live in ProtlyCore's HostLook (HostLookTests; tower decision D-E, a return just before the
+    /// pin, is `testAReturnJustBeforeLoadingMeansTheMargin`). The keyboard feeds it every event it uses and pins what
+    /// it asks for.
+    func testTheHeightPinFeedsHostLook() throws {
+        let all = try sources()
+        guard let text = all.first(where: { $0.name == "ProtlyHeight.swift" })?.text,
+              let controller = all.first(where: { $0.name == "KeyboardViewController.swift" })?.text else { return }
         let ns = text as NSString
-        let became = body(of: "@objc private func hostBecameActive(", in: ns).map { ns.substring(with: $0) } ?? ""
-        XCTAssertTrue(became.contains("Self.lastHostBecameActive = "), "hostBecameActive records the time for the next pin")
-        let initBody = body(of: "private init(_ controller: KeyboardInputViewController)", in: ns).map { ns.substring(with: $0) } ?? ""
-        XCTAssertTrue(initBody.contains("Self.lastHostBecameActive"), "a new pin checks the host's last return")
-        XCTAssertTrue(initBody.contains("< Self.earlyWindow"), "only a return just before the pin counts")
+        for (declaration, call) in [
+            ("static func pin(", "look.loaded(at: now)"),
+            ("static func presented(", "look.appeared(document: document(controller), at: now)"),
+            ("static func disappeared(", "look.disappeared(document: document(controller), at: now)"),
+            ("private static func observeHost()", ".NSExtensionHostWillResignActive"),
+            ("private static func observeHost()", "$0.hostWillResignActive(at: $1)"),
+            ("private static func observeHost()", ".NSExtensionHostDidBecomeActive"),
+            ("private static func observeHost()", "$0.hostBecameActive(at: $1)"),
+            ("private static func follow(", "look.pin(content:"),
+        ] {
+            let body = body(of: declaration, in: ns).map { ns.substring(with: $0) } ?? ""
+            XCTAssertTrue(body.contains(call), "\(declaration) calls \(call)")
+        }
+        // documentIdentifier traps on nil when read as Swift's non-optional UUID (runs 170 and 173): only through the
+        // Objective-C getter in document(_:).
+        XCTAssertTrue(matches(#"\.documentIdentifier\b"#, in: text).isEmpty, "documentIdentifier read as a UUID")
+        for (name, other) in all where name != "ProtlyHeight.swift" {
+            XCTAssertTrue(matches(#"\.documentIdentifier\b"#, in: other).isEmpty, "\(name) reads documentIdentifier")
+        }
+        let vc = controller as NSString
+        for (declaration, call) in [
+            ("override func viewDidLoad()", "ProtlyHeight.pin(self)"),
+            ("override func viewWillAppear(", "ProtlyHeight.presented(self)"),
+            ("override func viewDidDisappear(", "ProtlyHeight.disappeared(self)"),
+        ] {
+            let body = body(of: declaration, in: vc).map { vc.substring(with: $0) } ?? ""
+            XCTAssertTrue(body.contains(call), "KeyboardViewController.\(declaration) calls \(call)")
+        }
     }
 
     func testTheKeyGoesOnlyIntoTheRequest() throws {
