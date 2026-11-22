@@ -361,8 +361,9 @@ enum FieldText {
         }
         let emptyMS = ms(since: t0)
         p.insertText(new)
-        let settle = t0 + WholeRead.replaceSettle(deletes: deleted)
-        let deadline = t0 + WholeRead.replaceLimit(deletes: deleted)
+        let size = new.utf16.count
+        let settle = t0 + WholeRead.replaceSettle(deletes: deleted, inserted: size)
+        let deadline = t0 + WholeRead.replaceLimit(deletes: deleted, inserted: size)
         var last = ctx(p), events = hostEvents, quietFrom = uptime(), changes = 0
         var firstEvent = -1, lastEvent = -1, lastChange = -1
         var shown = false
@@ -389,10 +390,11 @@ enum FieldText {
         let quietMS = ms(since: t0)
         let c = ctx(p)
         let lb = c.before.count, la = c.after.count, ends = new.utf16.reversed().starts(with: c.before.reversed()) ? 1 : 0
-        let held = shown && !Task.isCancelled ? await holds(new, p) : false
-        let inserted = new.utf16.count, heldMS = ms(since: t0), ok = held ? 1 : 0, gate = shown ? 1 : 0
+        let check = shown && !Task.isCancelled ? await holds(new, p, until: deadline) : (ok: false, tries: 0)
+        let held = check.ok, tries = check.tries
+        let inserted = size, heldMS = ms(since: t0), ok = held ? 1 : 0, gate = shown ? 1 : 0
         let empty = emptied ? 1 : 0, seen = hostEvents - events0, cancelled = Task.isCancelled ? 1 : 0
-        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) emptyms=\(emptyMS, privacy: .public) empty=\(empty, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) lastch=\(lastChange, privacy: .public) events=\(seen, privacy: .public) firstev=\(firstEvent, privacy: .public) lastev=\(lastEvent, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) cancelled=\(cancelled, privacy: .public)")
+        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) emptyms=\(emptyMS, privacy: .public) empty=\(empty, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) lastch=\(lastChange, privacy: .public) events=\(seen, privacy: .public) firstev=\(firstEvent, privacy: .public) lastev=\(lastEvent, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) tries=\(tries, privacy: .public) cancelled=\(cancelled, privacy: .public)")
         return held
     }
 
@@ -405,26 +407,34 @@ enum FieldText {
     /// forward by its length, and a walk forward reaches the end over `new`'s last units (a long move can land a few
     /// units short: probe runs 154, 155). Called once the host has had its time and the contexts show `new`'s end.
     /// Whatever the outcome, the cursor ends at the field's end (both reviews: the next key must not land mid-text).
-    private static func holds(_ new: String, _ p: UITextDocumentProxy) async -> Bool {
+    /// A second attempt, once back at the end, while Replace's limit allows: run 181 had a walk that counted one unit
+    /// too many and one that saw a change at the end, both while the field held exactly the result. Each attempt is a
+    /// whole proof on its own.
+    private static func holds(_ new: String, _ p: UITextDocumentProxy,
+                              until deadline: TimeInterval) async -> (ok: Bool, tries: Int) {
         let units = Array(new.utf16)
-        guard !units.isEmpty else { return !p.hasText }
-        var cursor = CursorReturn()
-        let track = Track { cursor = $0 }
-        let t0 = uptime()
-        var ok = false
-        if case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: t0, track: track,
-                                             progress: {}),
-           read == units {
-            track.sending()
-            let s = await step(p, by: units.count, wait: WholeRead.moveWait)
-            track.landed(nil, s.c.b)  // may land short: the walk forward finds the end
-            if s.changed, case .done(let rest) = await walk(p, back: false, cap: units.count, tag: "ve", start: t0,
-                                                             track: track, progress: {}) {
-                ok = Array(units.suffix(rest.count)) == rest
+        guard !units.isEmpty else { return (!p.hasText, 1) }
+        for attempt in 1...2 {
+            var cursor = CursorReturn()
+            let track = Track { cursor = $0 }
+            let t0 = uptime()
+            var ok = false
+            if case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: t0, track: track,
+                                                 progress: {}),
+               read == units {
+                track.sending()
+                let s = await step(p, by: units.count, wait: WholeRead.moveWait)
+                track.landed(nil, s.c.b)  // may land short: the walk forward finds the end
+                if s.changed, case .done(let rest) = await walk(p, back: false, cap: units.count, tag: "ve", start: t0,
+                                                                 track: track, progress: {}) {
+                    ok = Array(units.suffix(rest.count)) == rest
+                }
             }
+            if ok { return (true, attempt) }
+            await backToEnd(p, cursor, cap: units.count + WholeRead.cap)
+            guard !Task.isCancelled, uptime() < deadline else { return (false, attempt) }
         }
-        if !ok { await backToEnd(p, cursor, cap: units.count + WholeRead.cap) }
-        return ok
+        return (false, 2)
     }
 
     /// After a check that did not prove the result: back to the field's end, by the record while it knows the way (one

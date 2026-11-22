@@ -33,15 +33,17 @@ public enum WholeRead {
     /// been still `quiet` and show the result, at most until `replaceLimit`.
     public static let quiet: TimeInterval = 0.5
 
-    /// 1.5 s and 4 ms a delete: above every Replace measured in CI (3247 deletes: 11.9 s at most, with the UI test's
-    /// polling in it). A bound from measurements, not a signal from the host: none was found.
-    public static func replaceSettle(deletes: Int) -> TimeInterval {
-        1.5 + 0.004 * Double(deletes)
+    /// 1.5 s, 4 ms a delete and 1 ms an inserted unit: above every Replace measured in CI (3247 deletes: 11.9 s at
+    /// most, with the UI test's polling in it) and Undo's one long insert (3247 units: the field was still changing
+    /// at 1.6 s, run 181). A bound from measurements, not a signal from the host: native hosts send callbacks while
+    /// they catch up (run 181: the last 6.4-7.2 s after 3247 deletes), web hosts none (run 172).
+    public static func replaceSettle(deletes: Int, inserted: Int) -> TimeInterval {
+        1.5 + 0.004 * Double(deletes) + 0.001 * Double(inserted)
     }
 
     /// Replace gives up 3 s after `replaceSettle` (20.5 s for 4000 deletes).
-    public static func replaceLimit(deletes: Int) -> TimeInterval {
-        replaceSettle(deletes: deletes) + 3
+    public static func replaceLimit(deletes: Int, inserted: Int) -> TimeInterval {
+        replaceSettle(deletes: deletes, inserted: inserted) + 3
     }
 
     /// A step that may wait `wait` s still ends within `total`: the cap stops a read only between steps, so a step

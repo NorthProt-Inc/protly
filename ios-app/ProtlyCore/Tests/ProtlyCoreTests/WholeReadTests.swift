@@ -79,13 +79,16 @@ final class WholeReadTests: XCTestCase {
     /// gives up 3 s after that.
     func testReplaceWaitsForTheHostInProportion() {
         XCTAssertEqual(WholeRead.quiet, 0.5)
-        XCTAssertEqual(WholeRead.replaceSettle(deletes: 0), 1.5)
-        XCTAssertEqual(WholeRead.replaceSettle(deletes: 3247), 14.488, accuracy: 0.001)
-        XCTAssertEqual(WholeRead.replaceSettle(deletes: 4000), 17.5, accuracy: 0.001)
-        XCTAssertEqual(WholeRead.replaceLimit(deletes: 4000), 20.5, accuracy: 0.001)
+        XCTAssertEqual(WholeRead.replaceSettle(deletes: 0, inserted: 0), 1.5)
+        XCTAssertEqual(WholeRead.replaceSettle(deletes: 3247, inserted: 29), 14.517, accuracy: 0.001)
+        XCTAssertEqual(WholeRead.replaceSettle(deletes: 4000, inserted: 0), 17.5, accuracy: 0.001)
+        XCTAssertEqual(WholeRead.replaceLimit(deletes: 4000, inserted: 0), 20.5, accuracy: 0.001)
         // The slowest measured rate, with the UI test's polling in it, still ends before the keyboard moves again.
-        XCTAssertGreaterThan(WholeRead.replaceSettle(deletes: 3247), 11.92)
-        XCTAssertGreaterThan(WholeRead.replaceSettle(deletes: 4000), 4000 * 0.0037)
+        XCTAssertGreaterThan(WholeRead.replaceSettle(deletes: 3247, inserted: 29), 11.92)
+        XCTAssertGreaterThan(WholeRead.replaceSettle(deletes: 4000, inserted: 0), 4000 * 0.0037)
+        // Undo of a long Replace inserts the read text in one go: the host needed 2.5-6.6 s for 3247 units (runs 162,
+        // 172, 181, with the UI test's polling); its check walk at 1.6 s found the field still changing (run 181).
+        XCTAssertEqual(WholeRead.replaceSettle(deletes: 29, inserted: 3247), 4.863, accuracy: 0.001)
     }
 
     // MARK: Walks on a fake field
