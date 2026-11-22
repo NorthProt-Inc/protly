@@ -883,7 +883,7 @@ extension PhoneRun {
         let read: @MainActor () -> String?
         /// The caret as the host reports it: the UITextView's `location,length` (`sel`), the composer's offset.
         let caret: @MainActor () -> String?
-        /// A tap in front of the first word (the caret goes to 0), and one right of or below the text (to the end).
+        /// A tap in front of the first word (the caret goes to 0), one right of the last word on its line (to the end).
         /// false without a frame to tap (a driver problem, collected for the line).
         let tapStart: @MainActor () -> Bool
         let tapEnd: @MainActor () -> Bool
@@ -918,13 +918,13 @@ extension PhoneRun {
                 return true
             },
             tapEnd: {
-                let f = self.d.field.frame
-                guard f.width > 20, f.height > 20 else {
-                    self.d.fail("no frame for the field")
+                guard let r = Self.rect(self.d.probeValue("last-word")) else {
+                    self.d.fail("no frame for the last word")
                     return false
                 }
-                // Below the text (the view is 80 pt tall, the text one line): the caret goes to the end.
-                self.d.point(f.maxX - 8, f.maxY - 8).tap()
+                // On the last word's line, right of it over the trailing spaces: the caret goes to the end. Not in the
+                // empty area below the text: there a tap opened iOS's AutoFill menu (runs 141, 144).
+                self.d.point(r.maxX + 14, r.midY).tap()
                 self.d.pause(0.8)
                 return true
             },
@@ -1018,8 +1018,11 @@ extension PhoneRun {
                 d.tapSlot(.right, settle: 0.6)
                 reads += " p\(i)=\(q(f.read()))"
                 if kind == "pickmove" {
-                    let away = f.tapStart() ? f.caret() : nil
-                    let back = f.tapEnd() ? f.caret() : nil
+                    // The caret readings lag the tap now and then (run 144: the composer read 4 after a tap that
+                    // moved it): each is polled until it shows the move, for 2 s at most.
+                    let end = (f.read() ?? "").utf16.count
+                    let away = f.tapStart() ? caretSettled(f, at: 0) : nil
+                    let back = f.tapEnd() ? caretSettled(f, at: end) : nil
                     reads += " away\(i)=\(q(away)) back\(i)=\(q(back))"
                 }
                 d.type(" ")
@@ -1047,6 +1050,22 @@ extension PhoneRun {
         ev += " gaps=\(gaps.joined(separator: ","))"
         if !calls.isEmpty { ev += " edits=\(edits.joined(separator: ",")) calls=\(calls.joined(separator: ","))" }
         pending(id, ev + reads + extra)
+    }
+
+    /// The caret reading once it shows `offset` (the first number of the reading), or the last one after 2 s.
+    private func caretSettled(_ f: PeriodField, at offset: Int) -> String? {
+        let end = Date().addingTimeInterval(2)
+        var now = f.caret()
+        while Self.caretOffset(now) != offset && Date() < end {
+            d.pause(0.25)
+            now = f.caret()
+        }
+        return now
+    }
+
+    /// The offset in a caret reading: `location,length` or a plain number.
+    static func caretOffset(_ s: String?) -> Int? {
+        s.flatMap { Int($0.split(separator: ",").first.map(String.init) ?? "") }
     }
 
     /// A double tap on space by coordinate, as the probe's `fast` cases. Returns the doubleTap call's own duration in
