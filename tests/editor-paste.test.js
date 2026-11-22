@@ -107,6 +107,10 @@ test('Lexical drafts that a paste replaces whole are written, lists too', async 
     assert.equal(await writeBox(box(d, el), EN, { settleMs: 0 }), true, html);
     assert.deepEqual(log.pastes, [EN], html);
     assert.deepEqual(log.inserts, [], html);
+    const fresh = page(); // the composer path too
+    fakeEditor(fresh.el, { kind: 'lexical' });
+    fresh.el.innerHTML = html;
+    assert.equal(await setComposerText(fresh.el, EN), true, html);
   }
 });
 
