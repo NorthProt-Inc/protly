@@ -54,9 +54,36 @@ final class KeyboardSourceRulesTests: XCTestCase {
     func testNothingIsLogged() throws {
         for (name, text) in try sources() {
             for call in [#"\bprint\("#, #"\bdebugPrint\("#, #"\bdump\("#, #"\bNSLog\b"#, #"\bos_log\b"#, #"\bLogger\("#] {
-                // ProtlyHeight logs layout numbers for the phone and CI height checks; see the test below.
-                let allowed = name == "ProtlyHeight.swift" && call == #"\bLogger\("# ? 1 : 0
+                // ProtlyHeight logs layout numbers for the phone and CI height checks, FieldText the field read's
+                // lengths, hashes and timings (K1b); see the tests below.
+                let allowed = ["ProtlyHeight.swift", "FieldText.swift"].contains(name) && call == #"\bLogger\("# ? 1 : 0
                 XCTAssertEqual(matches(call, in: text).count, allowed, "\(name): \(call)")
+            }
+        }
+    }
+
+    /// K1b: the read log names a text only by its length, line feeds and hash, never by its content.
+    func testTheReadLogCarriesOnlyNumbers() throws {
+        guard let text = try sources().first(where: { $0.name == "FieldText.swift" })?.text else {
+            return XCTFail("FieldText.swift not found")
+        }
+        let ns = text as NSString
+        let calls = matches(#"\blog\.(debug|info|notice|error|fault|log)\("#, in: text)
+        XCTAssertGreaterThanOrEqual(calls.count, 4)
+        let values = Set(["tag", "count", "lf", "hash", "reason", "steps", "took", "outcome", "units", "deleted",
+                          "inserted", "sent", "emptyMS", "empty", "heldMS", "ok"])
+        for range in calls {
+            let line = lineText(ns, range)
+            for m in matches(#"\\\(([A-Za-z_][A-Za-z0-9_.]*)"#, in: line) {
+                let name = (line as NSString).substring(with: NSRange(location: m.location + 2, length: m.length - 2))
+                XCTAssertTrue(values.contains(name), "FieldText logs \(name): \(line)")
+            }
+            XCTAssertFalse(line.contains("privacy: .private"), line)
+        }
+        // The names logged are numbers or fixed words: never a context, a piece or the read text.
+        for forbidden in ["documentContext", "selectedText", "String(decoding"] {
+            for range in calls {
+                XCTAssertFalse(lineText(ns, range).contains(forbidden), "FieldText logs \(forbidden)")
             }
         }
     }
@@ -580,29 +607,32 @@ final class KeyboardSourceRulesTests: XCTestCase {
                        "the bar offers Undo through FieldGuard.offersUndo")
     }
 
-    /// P1a cause 3 (track K1a): a selection is read cut short too, so the cut-short panel no longer sends the user to
-    /// Select all, and no other text does. Retry stays.
-    func testTheCutShortPanelDoesNotSendUsersToSelectAll() throws {
+    /// P1a cause 3 (track K1a), K1b: a read that is not proven whole is refused; the panel sends the user to Copy and
+    /// Read clipboard, never to Select all (selectedText holds only about 43 units of it). Retry stays.
+    func testTheRefusalPanelDoesNotSendUsersToSelectAll() throws {
         let controller = try controllerSource()
-        XCTAssertTrue(controller.contains(#".failed("Could not read the whole text.", retry: action)"#), "the cut-short panel")
+        XCTAssertTrue(controller.contains(#"static let refusedText = "Could not read the whole text. Copy it, then use Read clipboard.""#))
+        XCTAssertTrue(controller.contains(".failed(Self.refusedText, retry: action)"), "the refusal panel")
         for (name, text) in try sources() {
             XCTAssertFalse(text.lowercased().contains("select all"), "\(name): sends the user to Select all")
         }
     }
 
-    /// Tower decision D-B: the keys wait during the field read, so the read runs on FieldReadBudget's clock (2 s in all,
-    /// a started step always settles) instead of a fixed count of polls.
+    /// K1b: the keys wait during the whole-field read, so the read runs on WholeRead's clock (20 s in all, a started
+    /// step always settles) instead of a fixed count of steps, and a cancel stops it only between steps.
     func testTheFieldReadIsCapped() throws {
         guard let text = try sources().first(where: { $0.name == "FieldText.swift" })?.text else {
             return XCTFail("FieldText.swift not found")
         }
         let ns = text as NSString
-        let read = body(of: "static func read(", in: ns).map { ns.substring(with: $0) } ?? ""
-        for needle in ["FieldReadBudget(start:", "for _ in 0..<FieldReadBudget.maxSteps", "budget.canStartStep(now:",
-                       "while budget.isWaiting(sentAt: sent,"] {
-            XCTAssertTrue(read.contains(needle), "FieldText.read: \(needle)")
+        let walk = body(of: "private static func walk(", in: ns).map { ns.substring(with: $0) } ?? ""
+        for needle in ["WholeRead.canStart(elapsed:", "if Task.isCancelled { return end(.cancelled) }", "BackWalk(cap:",
+                       "ForwardWalk(cap:"] {
+            XCTAssertTrue(walk.contains(needle), "FieldText.walk: \(needle)")
         }
-        XCTAssertTrue(matches(#"for _ in 0\.\.<\d"#, in: read).isEmpty, "FieldText.read: a fixed count of steps or polls")
+        let read = body(of: "static func read(", in: ns).map { ns.substring(with: $0) } ?? ""
+        XCTAssertTrue(read.contains("WholeRead.refusal("), "FieldText.read: accepts only agreeing walks")
+        XCTAssertTrue(matches(#"for _ in 0\.\.<\d"#, in: read + walk).isEmpty, "FieldText: a fixed count of steps or polls")
     }
 
     private func lineText(_ ns: NSString, _ r: NSRange) -> String {
