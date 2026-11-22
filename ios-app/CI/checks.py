@@ -72,9 +72,9 @@ WHOLE_WEB_IDS = [f"wr-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in WHOLE_WEB_CASES
 # a6de577-162 on both native hosts, at its second step back, where the host's move fit one more unit per emoji crossed
 # (probe run 150 saw 11 such native steps in 14 038-unit walks)), an accepted
 # case the read accepted and Replace and Undo both proven by the keyboard (`replace ... held=1`, twice), with the
-# keyboard's check ending no earlier than WHOLE_HOST_SLACK_MS before the test saw the field hold the result
-# (`heldms` against the test's replace= and undo=): a check that ends while the host is still deleting proved only
-# the proxy's own copy of the field (design review).
+# keyboard's check beginning no earlier than WHOLE_HOST_SLACK_MS before the test saw the field hold the result
+# (`quietms` against the test's replace= and undo=): a check that moves the cursor while the host is still deleting
+# can prove only the proxy's own copy of the field, and moved the Lexical-shaped page's text away in run 172.
 # wr-uikit-cancel (Cancel on the strip mid-read) needs `outcome=cancelled`.
 WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong", "b1:characters", "b1:badStep"),
                   ("web", "x14k"): ("b1:characters", "b1:badStep"),
@@ -1339,19 +1339,25 @@ def resolve_whole_log(check, marks, kb_text):
             if held != ["1", "1"]:
                 problems.append(f"t{t}:held={','.join(held) or 'none'} want 1,1 (Replace, Undo)")
                 continue
-            heldms = [kv(line, "heldms") for line in lines if line.startswith("replace ")]
+            # The check's first move goes out at `quietms` (the gate): it may not come before the field held the result
+            # (silent-failure review, round 2: a move sent while the host was still deleting left run 172's Lexical-
+            # shaped page empty; `heldms`, the check's end, would hide that).
+            starts = [kv(line, "quietms") for line in lines if line.startswith("replace ")]
+            tries = [kv(line, "tries") for line in lines if line.startswith("replace ")]
+            if any(n not in (None, "1") for n in tries):
+                notes.append(f"t{t}:tries={','.join(n or '?' for n in tries)}")
             ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
-            for name, ms_text in zip(("replace", "undo"), heldms):
+            for name, ms_text in zip(("replace", "undo"), starts):
                 seen = kv(ui.group(1), name) if ui else None
                 try:
                     host_ms, kb_ms = float(seen) * 1000, int(ms_text)
                 except (TypeError, ValueError):
                     # No time on either side (`undo=timeout`: the field never held it): nothing to hold the keyboard's
                     # claim against, which is a FAIL, not a crash (silent-failure review).
-                    problems.append(f"t{t}:{name}={seen} heldms={ms_text}: no time to hold heldms against")
+                    problems.append(f"t{t}:{name}={seen} quietms={ms_text}: no time to hold the check against")
                     continue
-                if kb_ms + WHOLE_HOST_SLACK_MS < host_ms:
-                    problems.append(f"t{t}:{name} checked at {ms_text}ms, the field held it at {seen}s")
+                if not kb_ms + WHOLE_HOST_SLACK_MS >= host_ms:  # also a NaN
+                    problems.append(f"t{t}:{name} check began at {ms_text}ms, the field held it at {seen}s")
     evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
     if problems:
         evidence += " log-problems=" + ",".join(problems)

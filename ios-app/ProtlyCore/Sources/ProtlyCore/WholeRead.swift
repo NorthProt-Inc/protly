@@ -36,12 +36,12 @@ public enum WholeRead {
     /// been still `quiet` and show the result, at most until `replaceLimit`.
     public static let quiet: TimeInterval = 0.5
 
-    /// 1.5 s, 4 ms a delete and 1 ms an inserted unit: above every Replace measured in CI (3247 deletes: 11.9 s at
-    /// most, with the UI test's polling in it) and Undo's one long insert (3247 units: the field was still changing
-    /// at 1.6 s, run 181). A bound from measurements, not a signal from the host: native hosts send callbacks while
-    /// they catch up (run 181: the last 6.4-7.2 s after 3247 deletes), web hosts none (run 172).
+    /// 1.5 s, 4 ms a delete and 2.5 ms an inserted unit: above every Replace measured in CI (3247 deletes: 11.9 s at
+    /// most, with the UI test's polling in it; native hosts' last callback at 6.4-9.0 s, runs 181 and 185) and Undo's
+    /// one long insert (3247 units: 2.9-8.5 s as the UI test saw it, no callback from the host). A bound from
+    /// measurements, not a signal from the host: web hosts send no callback at all (run 172).
     public static func replaceSettle(deletes: Int, inserted: Int) -> TimeInterval {
-        1.5 + 0.004 * Double(deletes) + 0.001 * Double(inserted)
+        1.5 + 0.004 * Double(deletes) + 0.0025 * Double(inserted)
     }
 
     /// Replace gives up 3 s after `replaceSettle` (20.5 s for 4000 deletes).
@@ -210,6 +210,16 @@ public struct BackWalk: Sendable {
             return .phantom
         }
         guard changed else { return .failed("stuck", moved: nil) }
+        // A jump below the context's length always leaves text before the cursor, so an empty before-context is no
+        // evidence (an empty context agrees with anything; silent-failure review, round 2). The after-context must then
+        // show the piece crossed (a blank on its way: the next probe finds the false start); with nothing to show
+        // there either (an empty after-context, or a piece that starts with a line feed) the step names nothing. A
+        // step over the whole context (one unit, or one emoji) may reach the start.
+        let shown = Array(b0.suffix(k).prefix { $0 != 10 })
+        guard !b1.isEmpty || k >= b0.count || (!shown.isEmpty && !a1.isEmpty) else {
+            fit = (false, a1.isEmpty)
+            return .failed("badStep", moved: -k)
+        }
         func fits(_ c: Int) -> Bool {
             WholeRead.agree(b1, Array(b0.prefix(b0.count - c)), atEnd: true)
                 && WholeRead.agree(a1, Array(b0.suffix(c).prefix { $0 != 10 }), atEnd: false)
@@ -248,6 +258,8 @@ public struct ForwardWalk: Sendable {
     public let cap: Int
     public private(set) var units: [UInt16] = []
     private var a0: [UInt16] = []
+    /// The before-context the step was planned from: a probe at the end must show whether it moved at all.
+    private var b0: [UInt16] = []
     private var k = 0
     /// The first step may count as a resync (the walk from the user's cursor only: the host can move the caret
     /// without telling the keyboard, run 163 web `mid` and `sel`).
@@ -268,7 +280,8 @@ public struct ForwardWalk: Sendable {
     /// Units to move forward: a jump, or one unit over the line feed an empty after-context stops at. The first step
     /// of a walk that may resync is one unit: planned from a window that may be stale, a jump could be longer than the
     /// way to the end, and the host would cut it short while the record counted all of it (design review).
-    public mutating func plan(after: [UInt16]) -> Int {
+    public mutating func plan(before: [UInt16] = [], after: [UInt16]) -> Int {
+        b0 = before
         a0 = after
         steps += 1
         if after.isEmpty {
@@ -290,9 +303,13 @@ public struct ForwardWalk: Sendable {
             fit = (b1.last == 10, true)
             guard b1.last == 10 else {
                 if let r = resync() { return r }
-                guard let x = b1.last, retries < Self.maxRetries else {
-                    return .failed(b1.isEmpty ? "badStep" : "falseEnd", moved: 1)
-                }
+                // The window grew in place (no move: the end; code review, round 2), or the probe crossed one unit the
+                // after-context did not show (a false end). Both or neither: nothing this walk can name.
+                let still = !b0.isEmpty && !b1.isEmpty && WholeRead.agree(b1, b0, atEnd: true)
+                let over = !b0.isEmpty && !b1.isEmpty && WholeRead.agree(Array(b1.dropLast()), b0, atEnd: true)
+                if still, !over { return .done }
+                guard over, !still, let x = b1.last else { return .failed("badStep", moved: nil) }
+                guard retries < Self.maxRetries else { return .failed("falseEnd", moved: 1) }
                 retries += 1
                 crossed = x
                 return .retry(-1)
@@ -310,10 +327,12 @@ public struct ForwardWalk: Sendable {
         return .moved(k)
     }
 
-    /// After `.retry`: the undo moved back by one unit and must show the unit the probe crossed after the cursor again.
-    /// nil `moved`: neither move can be named then.
+    /// After `.retry`: the undo moved back by one unit and must show the unit the probe crossed after the cursor again,
+    /// and the before-context the probe started from. nil `moved`: neither move can be named then.
     public mutating func undone(changed: Bool, before b1: [UInt16], after a1: [UInt16]) -> WalkStep {
-        guard changed, let x = crossed, a1.first == x else { return .failed("badUndo", moved: nil) }
+        guard changed, let x = crossed, a1.first == x, WholeRead.agree(b1, b0, atEnd: true) else {
+            return .failed("badUndo", moved: nil)
+        }
         crossed = nil
         return .moved(-1)
     }

@@ -1288,7 +1288,7 @@ class WholeReadTests(unittest.TestCase):
 
     ACCEPTED = "read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=4871 known=1"
     HELD = ("replace deleted=335 inserted=26 sentms=0 quietms=2900 quiet=1 changes=3 events=40 b=26 a=0 ends=1 heldms=3600 "
-            "held=1 cancelled=0")
+            "held=1 tries=1 why=- cancelled=0")
     UNSURE = HELD.replace("held=1", "held=0")
 
     def test_an_accepted_try_needs_the_read_and_both_writes_proven_in_the_keyboard_log(self):
@@ -1307,35 +1307,36 @@ class WholeReadTests(unittest.TestCase):
         late = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("11", "02.000", self.HELD))
         self.assertEqual(self.assemble_with_logs(line, ui, late)["wr-uikit-mid"].status, "FAIL")
 
-    def test_the_keyboards_check_may_not_end_before_the_field_held_the_result(self):
-        # The host needed 9 s for the deletes; a check that ended at 1.4 s proved only the proxy's own copy.
+    def test_the_keyboards_check_may_not_begin_before_the_field_held_the_result(self):
+        # The host needed 9 s for the deletes; a check that began moving the cursor at 1.4 s raced the host.
         line = "CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec read=15457 replace=9.00 kb=9.60 undo=3.10 kbundo=4.00}\n"
         ui = self.marks(("wr-uikit-long-t1", 10, 0), ("wr-uikit-long-t2", 11, 0))
-        early = self.HELD.replace("heldms=3600", "heldms=1400")
+        early = self.HELD.replace("quietms=2900", "quietms=1400")
         kb = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", early), ("10", "20.000", self.HELD))
         final = self.assemble_with_logs(line, ui, kb)["wr-uikit-long"]
         self.assertEqual(final.status, "FAIL")
-        self.assertIn("t1:replace checked at 1400ms, the field held it at 9.00s", final.evidence)
+        self.assertIn("t1:replace check began at 1400ms, the field held it at 9.00s", final.evidence)
         self.assertNotIn("t1:undo", final.evidence.split("log-problems=")[1])
         # Within the slack (the test polls every 0.2 s and its clock starts first): PASS.
-        close = self.HELD.replace("heldms=3600", "heldms=8100")
+        close = self.HELD.replace("quietms=2900", "quietms=8100").replace("tries=1", "tries=2")
         kb = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", close), ("10", "20.000", self.HELD))
         line2 = line.replace("wr-uikit-long PASS t1=", "wr-uikit-long PASS t1=").replace("}\n", "} t2={replace=1.0 undo=1.0}\n")
         kb += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
         final = self.assemble_with_logs(line2, ui, kb)["wr-uikit-long"]
         self.assertEqual(final.status, "PASS", final.evidence)
+        self.assertIn("t1:tries=2,1", final.evidence)  # a second attempt is shown, not judged
         # No replace= time on the test's side: nothing to hold the keyboard against, which is a FAIL.
         bare = "CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec read=15457} t2={replace=1.0 undo=1.0}\n"
         final = self.assemble_with_logs(bare, ui, kb)["wr-uikit-long"]
         self.assertEqual(final.status, "FAIL")
-        self.assertIn("t1:replace=None heldms=", final.evidence)
+        self.assertIn("t1:replace=None quietms=", final.evidence)
         # The test timed out waiting for Undo while the keyboard said it held: a FAIL with both sides, not a crash.
         timeout = "CHECK wr-uikit-long FAIL t1={real=3247/15/h3ca63fec replace=9.00 undo=timeout} t2={replace=1.0 undo=1.0}\n"
         kb2 = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", close), ("10", "20.000", self.HELD))
         kb2 += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
         final = self.assemble_with_logs(timeout, ui, kb2)["wr-uikit-long"]
         self.assertEqual(final.status, "FAIL")
-        self.assertIn("t1:undo=timeout heldms=3600: no time", final.evidence)
+        self.assertIn("t1:undo=timeout quietms=2900: no time", final.evidence)
 
     def test_a_refusal_try_needs_its_reason(self):
         ui = self.marks(("wr-uikit-x14k-t1", 10, 0), ("wr-textarea-emoji-t1", 20, 0), ("wr-textarea-x14k-t1", 30, 0))

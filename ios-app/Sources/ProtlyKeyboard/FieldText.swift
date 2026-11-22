@@ -155,7 +155,7 @@ enum FieldText {
             guard fits(wait) else { return end(.failed("timeUp")) }
             // A Cancel during the wait above already put the cursor back (no step was on its way): never move it again.
             if Task.isCancelled { return end(.cancelled) }
-            let k = back ? bw.plan(before: c.before, after: c.after) : fw.plan(after: c.after)
+            let k = back ? bw.plan(before: c.before, after: c.after) : fw.plan(before: c.before, after: c.after)
             steps += 1
             track.sending()
             let s0 = uptime()
@@ -193,7 +193,8 @@ enum FieldText {
                 // once more on the contexts a moment later. The walk changes nothing until a step fits.
                 await pause(WholeRead.emptyWait)
                 let again = ctx(p)
-                if again != s.c {
+                // Never on an empty before-context: it agrees with anything (silent-failure review, round 2).
+                if again != s.c, !again.before.isEmpty {
                     logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
                     s.c = again
                     r = judge()
@@ -422,11 +423,11 @@ enum FieldText {
         let quietMS = ms(since: t0)
         let c = ctx(p)
         let lb = c.before.count, la = c.after.count, ends = new.utf16.reversed().starts(with: c.before.reversed()) ? 1 : 0
-        let check = shown && !Task.isCancelled ? await holds(new, p, until: deadline) : (ok: false, tries: 0)
-        let held = check.ok, tries = check.tries
+        let check = shown && !Task.isCancelled ? await holds(new, p) : (ok: false, tries: 0, why: "gate")
+        let held = check.ok, tries = check.tries, why = check.why
         let inserted = size, heldMS = ms(since: t0), ok = held ? 1 : 0, gate = shown ? 1 : 0
         let empty = emptied ? 1 : 0, seen = hostEvents - events0, cancelled = Task.isCancelled ? 1 : 0
-        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) emptyms=\(emptyMS, privacy: .public) empty=\(empty, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) lastch=\(lastChange, privacy: .public) events=\(seen, privacy: .public) firstev=\(firstEvent, privacy: .public) lastev=\(lastEvent, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) tries=\(tries, privacy: .public) cancelled=\(cancelled, privacy: .public)")
+        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) emptyms=\(emptyMS, privacy: .public) empty=\(empty, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) lastch=\(lastChange, privacy: .public) events=\(seen, privacy: .public) firstev=\(firstEvent, privacy: .public) lastev=\(lastEvent, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) tries=\(tries, privacy: .public) why=\(why, privacy: .public) cancelled=\(cancelled, privacy: .public)")
         return held
     }
 
@@ -439,42 +440,64 @@ enum FieldText {
     /// forward by its length, and a walk forward reaches the end over `new`'s last units (a long move can land a few
     /// units short: probe runs 154, 155). Called once the host has had its time and the contexts show `new`'s end.
     /// Whatever the outcome, the cursor ends at the field's end (both reviews: the next key must not land mid-text).
-    /// A second attempt, once back at the end, while Replace's limit allows: run 181 had a walk that counted one unit
-    /// too many and one that saw a change at the end, both while the field held exactly the result. Each attempt is a
-    /// whole proof on its own.
-    private static func holds(_ new: String, _ p: UITextDocumentProxy,
-                              until deadline: TimeInterval) async -> (ok: Bool, tries: Int) {
+    /// A second attempt (run 181: a walk that counted one unit too many and one that saw a change at the end, both
+    /// while the field held exactly the result), but never after evidence of other text (a walk that read more than
+    /// `new` or other units: old text left in the field), only once back at the end with the contexts showing `new`,
+    /// and within the first half of the check's budget: both attempts share one 20 s budget (silent-failure review,
+    /// round 2). `why`: what the first failed attempt found, for the log.
+    private static func holds(_ new: String, _ p: UITextDocumentProxy) async -> (ok: Bool, tries: Int, why: String) {
         let units = Array(new.utf16)
-        guard !units.isEmpty else { return (!p.hasText, 1) }
+        guard !units.isEmpty else { return (!p.hasText, 1, "-") }
+        let t0 = uptime()
+        var why = "-"
         for attempt in 1...2 {
             var cursor = CursorReturn()
             let track = Track { cursor = $0 }
-            let t0 = uptime()
-            var ok = false
-            if case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: t0, track: track,
-                                                 progress: {}),
-               read == units {
+            var evidence = false
+            var found: String
+            switch await walk(p, back: true, cap: units.count, tag: "v", start: t0, track: track, progress: {}) {
+            case .done(let read) where read == units:
                 track.sending()
                 let s = await step(p, by: units.count, wait: WholeRead.moveWait)
                 track.landed(nil, s.c.b)  // may land short: the walk forward finds the end
-                if s.changed, case .done(let rest) = await walk(p, back: false, cap: units.count, tag: "ve", start: t0,
-                                                                 track: track, progress: {}) {
-                    ok = Array(units.suffix(rest.count)) == rest
+                if !s.changed {
+                    found = "jump"
+                } else if case .done(let rest) = await walk(p, back: false, cap: units.count, tag: "ve", start: t0,
+                                                            track: track, progress: {}) {
+                    if Array(units.suffix(rest.count)) == rest { return (true, attempt, why) }
+                    found = "veOther"
+                    evidence = true
+                } else {
+                    found = "ve"
                 }
+            case .done:
+                found = "vOther"
+                evidence = true
+            case .failed(let w):
+                found = "v" + w.prefix(1).uppercased() + w.dropFirst()
+                evidence = w == "tooLong"
+            case .cancelled:
+                found = "cancelled"
             }
-            if ok { return (true, attempt) }
-            await backToEnd(p, cursor, cap: units.count + WholeRead.cap)
-            guard !Task.isCancelled, uptime() < deadline else { return (false, attempt) }
+            if attempt == 1 { why = found }
+            let atEnd = await backToEnd(p, cursor, cap: units.count + WholeRead.cap)
+            guard attempt == 1, !evidence, atEnd, !Task.isCancelled, shows(new, ctx(p)),
+                  uptime() - t0 < WholeRead.total / 2 else { return (false, attempt, why) }
         }
-        return (false, 2)
+        return (false, 2, why)
     }
 
     /// After a check that did not prove the result: back to the field's end, by the record while it knows the way (one
-    /// move, sent even after a hide), then, unless the keyboard was hidden, by a walk forward.
-    private static func backToEnd(_ p: UITextDocumentProxy, _ cursor: CursorReturn, cap: Int) async {
+    /// move, sent even after a hide), then, unless the keyboard was hidden, by a walk forward (its own budget: the
+    /// cursor must get there). true when that walk reached the end.
+    private static func backToEnd(_ p: UITextDocumentProxy, _ cursor: CursorReturn, cap: Int) async -> Bool {
         let move = cursor.back(before: ctx(p).b)
         if move != 0 { _ = await step(p, by: move, wait: WholeRead.moveWait) }
-        guard !Task.isCancelled else { return }
-        _ = await walk(p, back: false, cap: cap, tag: "vr", start: uptime(), track: Track { _ in }, progress: {})
+        guard !Task.isCancelled else { return false }
+        if case .done = await walk(p, back: false, cap: cap, tag: "vr", start: uptime(), track: Track { _ in },
+                                   progress: {}) {
+            return true
+        }
+        return false
     }
 }

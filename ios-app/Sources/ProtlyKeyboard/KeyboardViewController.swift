@@ -734,9 +734,11 @@ final class KeyboardViewController: KeyboardInputViewController {
         if mode.canUndo { mode.canUndo = false }
     }
 
-    /// A host callback more than 1 s after protly's own write: the user changed the field or the cursor (K1b).
+    /// A host callback after protly's own write has had its time (1 s, and 2.5 ms an inserted unit as for Replace's
+    /// bound: a long Insert keeps the host busy, silent-failure review round 2): the user changed the field or the
+    /// cursor (K1b).
     private func endUndoIfTouched() {
-        guard lastInsert != nil, now - wroteAt > 1 else { return }
+        guard let l = lastInsert, now - wroteAt > 1 + 0.0025 * Double(l.inserted.utf16.count) else { return }
         endUndo()
     }
 
