@@ -1,0 +1,12 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-11-22 04:24:01.445 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 04:24:01.446 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 04:24:01.564 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 04:24:02.645 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-22 04:24:02.697 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-22 04:33:55.023 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 04:33:55.023 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 04:33:55.027 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-22 04:33:55.382 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-22 04:33:55.392 Db ProtlyCIKeyboard[28103:13faf] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true

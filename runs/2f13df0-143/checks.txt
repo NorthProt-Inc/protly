@@ -1,0 +1,97 @@
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-en PASS kind=en tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=1.03,1.16,0.99 => 3/3 tries added 'hello. ' at the end
+CHECK dsp-composer-fast PASS kind=fast tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.071,0.070,0.062 edits=0/71/78/79/84,0/70/81/82/89,0/62/69/69/77 calls=0.57,0.56,0.58 => 3/3 tries added 'hello. ' at the end
+CHECK dsp-composer-ko PASS kind=ko tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.90,1.00,0.92 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-composer-kofast PASS kind=kofast tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.073,0.086,0.077 edits=0/73/81/82/95,0/86/94/95/101,0/77/85/85/96 calls=0.60,0.63,0.61 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-composer-kopick2 PASS kind=kopick2 tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.99,1.04,1.24 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-composer-pick1 FAIL kind=pick1 tries=4 t0="" t1="the  " t2="the  the  " t3="the  the  the  " t4="the  the  the  the  " gaps=3.51,3.44,3.74,3.37 p1="the " p2="the  the " p3="the  the  the " p4="the  the  the  the " => try 1: '' became 'the  ', want 'the '; try 2: 'the  ' became 'the  the  ', want 'the  the '; try 3: 'the  the  ' became 'the  the  the  ', want 'the  the  the '; try 4: 'the  the  the  ' became 'the  the  the  the  ', want 'the  the  the  the '; 0/4 tries added 'the ' at the end; the field showed the pick 'the ' before each tap
+CHECK dsp-composer-pick2 PASS kind=pick2 tries=3 t0="" t1="the. " t2="the. the. " t3="the. the. the. " gaps=0.99,1.00,0.93 => 3/3 tries added 'the. ' at the end
+CHECK dsp-composer-pickmid FAIL kind=pickmid tries=4 t0="world" t1="the  world" t2="the  the  world" t3="the  the  the  world" t4="the  the  the  the  world" gaps=4.36,4.24,4.06,4.23 p1="the world" p2="the  the world" p3="the  the  the world" p4="the  the  the  the world" sel0="0" => try 1: 'world' became 'the  world', want 'the world'; try 2: 'the  world' became 'the  the  world', want 'the  the world'; try 3: 'the  the  world' became 'the  the  the  world', want 'the  the  the world'; try 4: 'the  the  the  world' became 'the  the  the  the  world', want 'the  the  the  the world'; 0/4 tries added 'the ' before 'world'; the field showed the pick 'the ' before each tap
+CHECK dsp-composer-pickmove PASS kind=pickmove tries=3 t0="" t1="the  " t2="the  the  " t3="the  the  the  " gaps=10.26,9.66,9.46 p1="the " away1="0" back1="4" p2="the  the " away2="0" back2="9" p3="the  the  the " away3="0" back3="14" => 3/3 tries added 'the  ' at the end; the field showed the pick 'the ' before each tap
+CHECK dsp-composer-word PASS kind=word tries=6 t0="world" t1="hello. world" t2="hello. hello. world" t3="hello. hello. hello. world" t4="hello. hello. hello. hello. world" t5="hello. hello. hello. hello. hello. world" t6="hello. hello. hello. hello. hello. hello. world" gaps=1.07,1.15,0.95,1.06,0.96,0.95 sel0="0" => 6/6 tries added 'hello. ' before 'world'
+CHECK dsp-uikit-en FAIL kind=en tries=3 t0="" t1="hello  " t2="hello  hello. " t3="hello  hello. hello. " gaps=3.35,1.06,1.59 => try 1: '' became 'hello  ', want 'hello. '; 2/3 tries added 'hello. ' at the end
+CHECK dsp-uikit-fast PASS kind=fast tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.244,0.125,0.116 edits=0/244/272,0/125/133,0/116/128 calls=0.97,1.00,0.88 => 3/3 tries added 'hello. ' at the end
+CHECK dsp-uikit-ko PASS kind=ko tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=1.13,1.18,1.12 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-uikit-kofast PASS kind=kofast tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.103,0.114,0.093 edits=0/103/111,0/114/123,0/93/99 calls=0.93,0.90,0.75 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-uikit-kopick2 PASS kind=kopick2 tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=1.31,0.99,1.01 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-uikit-pick1 FAIL kind=pick1 tries=4 t0="" t1="the  " t2="the  the  " t3="the  the  the  " t4="the  the  the  the  " gaps=5.76,5.11,4.64,5.05 p1="the " p2="the  the " p3="the  the  the " p4="the  the  the  the " => try 1: '' became 'the  ', want 'the '; try 2: 'the  ' became 'the  the  ', want 'the  the '; try 3: 'the  the  ' became 'the  the  the  ', want 'the  the  the '; try 4: 'the  the  the  ' became 'the  the  the  the  ', want 'the  the  the  the '; 0/4 tries added 'the ' at the end; the field showed the pick 'the ' before each tap
+CHECK dsp-uikit-pick2 PASS kind=pick2 tries=3 t0="" t1="the. " t2="the. the. " t3="the. the. the. " gaps=1.07,0.99,1.57 => 3/3 tries added 'the. ' at the end
+CHECK dsp-uikit-pickmid FAIL kind=pickmid tries=4 t0="world" t1="the  world" t2="the  the  world" t3="the  the  the  world" t4="the  the  the  the  world" gaps=4.29,5.15,4.12,4.18 p1="the world" p2="the  the world" p3="the  the  the world" p4="the  the  the  the world" sel0="0,0" => try 1: 'world' became 'the  world', want 'the world'; try 2: 'the  world' became 'the  the  world', want 'the  the world'; try 3: 'the  the  world' became 'the  the  the  world', want 'the  the  the world'; try 4: 'the  the  the  world' became 'the  the  the  the  world', want 'the  the  the  the world'; 0/4 tries added 'the ' before 'world'; the field showed the pick 'the ' before each tap
+CHECK dsp-uikit-pickmove FAIL unreadable: try 1: the caret did not move to the start and back to the pick (away='0,0', back='0,0', want 0 and 4): 'kind=pickmove tries=3 t0="" t1="the " t2="the " t3="the " gaps=15.78,12.52,13.50 p1="the " away1="0,0" back1="0,0" p2="the " away2="0,0" back2="0,0" p3="the " away3="0,0" back3="0,0"'
+CHECK dsp-uikit-word PASS kind=word tries=6 t0="world" t1="hello. world" t2="hello. hello. world" t3="hello. hello. hello. world" t4="hello. hello. hello. hello. world" t5="hello. hello. hello. hello. hello. world" t6="hello. hello. hello. hello. hello. hello. world" gaps=1.11,1.14,1.11,1.20,1.63,1.33 sel0="0,0" => 6/6 tries added 'hello. ' before 'world'
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
