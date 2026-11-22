@@ -405,7 +405,8 @@ enum FieldText {
         }
         let base = ctx(p)
         walkLog("walk base before=\(shape(base.b)) after=\(shape(base.a)) sel=\(shape(base.s))")
-        let cap = longUnitWalks == 0 ? 6000 : unitShortCap
+        // diag/p1-walk-back-unique: no unit walk (run 7f2f443-135 measured it); the jump walks are the question.
+        let cap = 0
         let unit = await walkBack(p, .unit, maxSteps: cap, timeCap: 200)
         if unit.steps > unitShortCap { longUnitWalks += 1 }
         let unitBack = await walkReturn(p, unit, base: base, tag: "unit")

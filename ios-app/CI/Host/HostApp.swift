@@ -430,8 +430,14 @@ enum ReadDrafts {
 
     static let sentence = "\u{C624}\u{B298} \u{D68C}\u{C758} \u{B0B4}\u{C6A9} \u{C815}\u{B9AC}\u{D574}\u{C11C} \u{BCF4}\u{B0B4}\u{C904}\u{AC8C}."
 
+    /// diag/p1-walk-back-unique (`-uniquedrafts 1`): every sentence starts with its own number (`3-12 `), so no two
+    /// stretches of a draft read the same (run 7f2f443-135: jumps over 3 repeated sentences changed nothing).
+    static var unique: Bool { UserDefaults.standard.string(forKey: "uniquedrafts") == "1" }
+
     static func paragraphs(_ count: Int, sentences: Int) -> [String] {
-        (1...count).map { k in "\u{00A7}\(k) " + Array(repeating: sentence, count: sentences).joined(separator: " ") }
+        (1...count).map { k in
+            "\u{00A7}\(k) " + (1...sentences).map { j in unique ? "\(k)-\(j) " + sentence : sentence }.joined(separator: " ")
+        }
     }
 
     static func make(_ name: String, _ paras: [String], _ separator: String, mid: Bool) -> Draft {
