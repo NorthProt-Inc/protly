@@ -1,0 +1,148 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5g_wholenative
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wr-uikit-win-t1 1795386179.166
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-win-t2 1795386219.921
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=9.8 reply=335/9/h49b6f226 caret-read=335,0 replace=5.45 kb=6.51 undo=3.66 kbundo=6.77} t2={real=335/9/h49b6f226 caret=335,0 s=8.4 reply=335/9/h49b6f226 caret-read=335,0 replace=4.40 kb=6.99 undo=3.19 kbundo=5.97}
+MARK wr-uikit-mid-t1 1795386257.198
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=12.8 reply=335/9/h49b6f226 caret-read=335,0 replace=4.22 kb=6.85 undo=3.62 kbundo=5.88}
+MARK wr-uikit-sel-t1 1795386297.877
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=8.3 reply=335/9/h49b6f226 caret-read=335,0 replace=4.04 kb=7.40 undo=2.82 kbundo=6.67}
+MARK wr-uikit-long-t1 1795386336.593
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-long-t2 1795386409.698
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec caret=3247,0 s=19.2 reply=3247/15/h3ca63fec caret-read=3247,0 replace=9.33 kb=18.93 undo=2.97 kbundo=18.14} t2={real=3247/15/h3ca63fec caret=3247,0 s=18.9 reply=3247/15/h3ca63fec caret-read=3247,0 replace=14.55 kb=20.55 undo=4.40 kbundo=18.06}
+MARK wr-uikit-x14k-t1 1795386485.859
+tapped protlyKey
+CHECK wr-uikit-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=15.3 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0}
+MARK wr-uikit-emoji-t1 1795386519.889
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=8.3 reply=460/9/h0755cc33 caret-read=460,0 replace=4.18 kb=7.80 undo=3.21 kbundo=7.08}
+MARK wr-uikit-swin-t1 1795386559.434
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-swin-t2 1795386591.486
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-swin-t3 1795386623.774
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=5.1 reply=39/0/h84d73b78 caret-read=39,0 replace=2.52 kb=5.28 undo=3.05 kbundo=5.49} t2={real=39/0/h84d73b78 caret=39,0 s=5.0 reply=39/0/h84d73b78 caret-read=39,0 replace=3.10 kb=6.04 undo=3.56 kbundo=5.94} t3={real=39/0/h84d73b78 caret=39,0 s=4.1 reply=39/0/h84d73b78 caret-read=39,0 replace=2.36 kb=5.53 undo=2.73 kbundo=4.71}
+MARK wr-uikit-smid-t1 1795386653.413
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-smid-t2 1795386686.840
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-smid PASS t1={real=39/0/h84d73b78 caret=26,0 s=5.2 reply=39/0/h84d73b78 caret-read=39,0 replace=2.42 kb=6.34 undo=2.90 kbundo=5.12} t2={real=39/0/h84d73b78 caret=26,0 s=5.7 reply=39/0/h84d73b78 caret-read=39,0 replace=2.65 kb=5.03 undo=2.75 kbundo=5.02}
+MARK wr-uikit-ssel-t1 1795386718.950
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-ssel-t2 1795386750.748
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-ssel PASS t1={real=39/0/h84d73b78 caret=0,39 s=4.9 reply=39/0/h84d73b78 caret-read=39,0 replace=2.75 kb=5.16 undo=2.82 kbundo=4.74} t2={real=39/0/h84d73b78 caret=0,39 s=4.7 reply=39/0/h84d73b78 caret-read=39,0 replace=2.62 kb=6.07 undo=3.06 kbundo=4.99}
+MARK wr-uikit-s3-t1 1795386782.671
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-s3 PASS t1={real=93/0/h063bc933 caret=93,0 s=7.3 reply=93/0/h063bc933 caret-read=93,0 replace=2.59 kb=5.95 undo=2.76 kbundo=4.79}
+MARK wr-uikit-shead-t1 1795386816.305
+tapped protlyKey
+CHECK wr-uikit-shead FAIL t1={real=39/1/h2dea6b2a caret=0,16 s=4.4 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-uikit-etail-t1 1795386835.928
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-etail PASS t1={real=42/0/h6a6e593d caret=26,0 s=7.0 reply=42/0/h6a6e593d caret-read=42,0 replace=2.51 kb=6.00 undo=2.84 kbundo=5.47}
+MARK wr-uikit-r4k-t1 1795386871.207
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-r4k PASS t1={real=3975/15/h669f5dfc caret=3975,0 s=19.9 reply=3975/15/h669f5dfc caret-read=3975,0 replace=9.49 kb=21.63 undo=3.12 kbundo=19.69}
+MARK wr-uikit-cancel-t1 1795386947.578
+tapped protlyKey
+CHECK wr-uikit-cancel PASS t1={real=335/9/h49b6f226 caret=112,0 progress=4.6 cancelled=5.2 closed=0/0/0 left=335/9/h49b6f226 caret-left=112,0 want 112,0}
+MARK wr-swiftui-win-t1 1795386995.685
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-win-t2 1795387035.335
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=8.8 reply=335/9/h49b6f226 caret-read=335,0 replace=4.30 kb=6.57 undo=2.51 kbundo=5.80} t2={real=335/9/h49b6f226 caret=335,0 s=9.3 reply=335/9/h49b6f226 caret-read=335,0 replace=2.91 kb=6.87 undo=2.42 kbundo=5.30}
+MARK wr-swiftui-mid-t1 1795387068.391
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=10.2 reply=335/9/h49b6f226 caret-read=335,0 replace=3.33 kb=7.10 undo=3.22 kbundo=7.25}
+MARK wr-swiftui-sel-t1 1795387110.234
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=9.5 reply=335/9/h49b6f226 caret-read=335,0 replace=3.45 kb=6.22 undo=2.18 kbundo=5.62}
+MARK wr-swiftui-long-t1 1795387150.074
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-long-t2 1795387219.183
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-long PASS t1={real=3247/15/h3ca63fec caret=3247,0 s=17.2 reply=3247/15/h3ca63fec caret-read=3247,0 replace=5.73 kb=17.53 undo=2.28 kbundo=16.54} t2={real=3247/15/h3ca63fec caret=3247,0 s=15.5 reply=3247/15/h3ca63fec caret-read=3247,0 replace=6.84 kb=17.68 undo=2.28 kbundo=17.17}
+MARK wr-swiftui-x14k-t1 1795387288.585
+tapped protlyKey
+CHECK wr-swiftui-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=11.1 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0}
+MARK wr-swiftui-emoji-t1 1795387320.190
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=8.9 reply=460/9/h0755cc33 caret-read=460,0 replace=2.84 kb=6.66 undo=2.36 kbundo=6.33}
+MARK wr-swiftui-swin-t1 1795387359.837
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-swin-t2 1795387390.490
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-swin-t3 1795387424.367
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=3.6 reply=39/0/h84d73b78 caret-read=39,0 replace=1.86 kb=4.85 undo=2.29 kbundo=4.94} t2={real=39/0/h84d73b78 caret=39,0 s=4.3 reply=39/0/h84d73b78 caret-read=39,0 replace=2.52 kb=6.13 undo=2.73 kbundo=5.07} t3={real=39/0/h84d73b78 caret=39,0 s=4.3 reply=39/0/h84d73b78 caret-read=39,0 replace=2.02 kb=4.80 undo=2.29 kbundo=5.77}
+MARK wr-swiftui-smid-t1 1795387451.758
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-smid-t2 1795387481.149
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-smid PASS t1={real=39/0/h84d73b78 caret=26,0 s=5.1 reply=39/0/h84d73b78 caret-read=39,0 replace=2.86 kb=5.64 undo=3.07 kbundo=5.56} t2={real=39/0/h84d73b78 caret=26,0 s=4.9 reply=39/0/h84d73b78 caret-read=39,0 replace=2.46 kb=5.75 undo=2.74 kbundo=5.05}
+MARK wr-swiftui-ssel-t1 1795387511.560
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-ssel-t2 1795387540.498
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-ssel PASS t1={real=39/0/h84d73b78 caret=0,39 s=4.1 reply=39/0/h84d73b78 caret-read=39,0 replace=2.54 kb=5.62 undo=2.37 kbundo=5.16} t2={real=39/0/h84d73b78 caret=0,39 s=4.5 reply=39/0/h84d73b78 caret-read=39,0 replace=2.50 kb=6.24 undo=2.61 kbundo=4.99}
+MARK wr-swiftui-s3-t1 1795387575.024
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-s3 PASS t1={real=93/0/h063bc933 caret=93,0 s=6.9 reply=93/0/h063bc933 caret-read=93,0 replace=2.34 kb=5.83 undo=2.58 kbundo=5.15}
+MARK wr-swiftui-shead-t1 1795387609.806
+tapped protlyKey
+CHECK wr-swiftui-shead FAIL t1={real=39/1/h2dea6b2a caret=0,16 s=5.0 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected)
+MARK wr-swiftui-etail-t1 1795387628.125
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-etail PASS t1={real=42/0/h6a6e593d caret=26,0 s=7.3 reply=42/0/h6a6e593d caret-read=42,0 replace=2.20 kb=5.87 undo=2.67 kbundo=5.02}
