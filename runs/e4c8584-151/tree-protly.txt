@@ -1,0 +1,167 @@
+Attributes: Application, 0x11cb6f200, pid: 9612, label: 'ProtlyCIHost'
+Element subtree:
+ →Application, 0x11cb6f200, pid: 9612, label: 'ProtlyCIHost'
+    Window (Main), 0x11cb6f480, {{0.0, 0.0}, {390.0, 844.0}}
+      Other, 0x11cb6f340, {{0.0, 0.0}, {390.0, 844.0}}
+        Other, 0x11cb6db80, {{0.0, 0.0}, {390.0, 844.0}}
+          Other, 0x11cb6dcc0, {{0.0, 0.0}, {390.0, 844.0}}
+            Other, 0x11cb6c3c0, {{0.0, 0.0}, {390.0, 844.0}}
+              TextView, 0x11c8b4a00, {{16.0, 71.0}, {200.0, 80.0}}, identifier: 'field', Keyboard Focused
+                Other, 0x11c8b57c0, {{16.0, 71.0}, {0.0, 0.0}}, identifier: '_UITextSelectionRangeAdjustmentContainerView'
+                  Other, 0x11c8b5900, {{16.0, 71.0}, {0.0, 0.0}}, identifier: 'com.apple.text.grabber.leading'
+                    Other, 0x11c8b61c0, {{8.8, 57.5}, {16.5, 16.5}}
+                    Other, 0x11c8b7840, {{16.0, 71.0}, {2.0, 0.0}}
+                  Other, 0x11c8b5b80, {{16.0, 71.0}, {0.0, 0.0}}, identifier: 'com.apple.text.grabber.leading'
+                    Other, 0x11c8b5cc0, {{8.8, 57.5}, {16.5, 16.5}}
+                    Other, 0x11c8b5a40, {{16.0, 71.0}, {2.0, 0.0}}
+                Other, 0x11c8b5040, {{183.0, 71.0}, {30.0, 80.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
+                  Other, 0x11c8b5f40, {{210.0, 116.0}, {3.0, 32.0}}
+                Other, 0x11c8b5680, {{16.0, 118.0}, {200.0, 30.0}}, label: 'Horizontal scroll bar, 1 page', value: 0%
+                  Other, 0x11c8b6300, {{19.0, 145.0}, {194.0, 3.0}}
+              Button, 0x11c8b43c0, {{334.0, 71.0}, {40.0, 20.3}}, identifier: 'clear', label: 'Clear'
+              Button, 0x11c8b5e00, {{314.7, 101.3}, {59.3, 20.3}}, identifier: 'dismiss', label: 'Dismiss'
+              StaticText, 0x11c8b4280, {{344.7, 131.7}, {29.3, 11.0}}, identifier: 'sel', label: 'sel 0,0', value: 0,0
+              StaticText, 0x11c8b7ac0, {{327.7, 152.7}, {46.3, 11.0}}, identifier: 'marked', label: 'marked no', value: no
+              StaticText, 0x11c8b6bc0, {{327.7, 173.7}, {46.3, 11.0}}, identifier: 'first-word', label: 'first-word '
+              StaticText, 0x11c8b7c00, {{329.7, 194.7}, {44.3, 11.0}}, identifier: 'last-word', label: 'last-word '
+              StaticText, 0x11c8b7980, {{341.0, 215.7}, {33.0, 11.0}}, identifier: 'edits', label: 'edits 0:', value: 0:
+    Window, 0x11c8b6d00, {{0.0, 0.0}, {390.0, 844.0}}
+      Other, 0x11c8b6a80, {{0.0, 0.0}, {390.0, 844.0}}
+        Other, 0x11c8b6580, {{0.0, 0.0}, {390.0, 844.0}}
+        Other, 0x11c8b48c0, {{0.0, 529.0}, {390.0, 315.0}}
+          Other, 0x11c8b5540, {{0.0, 529.0}, {390.0, 315.0}}, identifier: 'inputView'
+    Window, 0x11c8b66c0, {{0.0, 0.0}, {390.0, 844.0}}
+      Other, 0x11c8b6080, {{0.0, 0.0}, {390.0, 844.0}}
+        Other, 0x11c8b4780, {{0.0, 495.0}, {390.0, 349.0}}
+          Other, 0x11c8b6440, {{0.0, 495.0}, {390.0, 349.0}}
+            Other, 0x11dd5c000, {{0.0, 495.0}, {390.0, 349.0}}
+              Other, 0x11dd5c140, {{0.0, 495.0}, {390.0, 349.0}}
+          Other, 0x11dd5c280, {{0.0, 512.0}, {390.0, 257.0}}
+            Other, 0x11dd5c3c0, {{0.0, 512.0}, {390.0, 257.0}}
+              Other, 0x11dd5c500, {{0.0, 512.0}, {390.0, 257.0}}
+                Other, 0x11dd5c640, {{0.0, 512.0}, {390.0, 257.0}}
+                  Other, 0x11dd5c780, {{0.0, 512.0}, {390.0, 257.0}}
+                    Other, 0x11dd5c8c0, {{0.0, 512.0}, {390.0, 257.0}}
+                      Other, 0x11dd5ca00, {{0.0, 512.0}, {390.0, 257.0}}
+                        Other, 0x11dd5cb40, {{0.0, 512.0}, {390.0, 257.0}}
+                          Other, 0x11dd5cc80, {{0.0, 512.0}, {390.0, 257.0}}
+                            Other, 0x11dd5cdc0, {{0.0, 512.0}, {390.0, 257.0}}
+                              Other, 0x11dd5cf00, {{0.0, 512.0}, {390.0, 257.0}}
+                                Button, 0x11dd5d040, {{3.7, 558.7}, {38.3, 54.0}}, label: 'ㅂ'
+                                  StaticText, 0x11dd5d180, {{9.7, 568.7}, {26.0, 33.7}}, label: 'ㅂ'
+                                  Button, 0x11dd5d2c0, {{3.7, 558.7}, {38.3, 54.0}}
+                                Button, 0x11dd5d400, {{42.0, 558.7}, {38.3, 54.0}}, label: 'ㅈ'
+                                  StaticText, 0x11dd5d540, {{48.0, 568.7}, {26.0, 33.7}}, label: 'ㅈ'
+                                  Button, 0x11dd5d680, {{42.0, 558.7}, {38.3, 54.0}}
+                                Button, 0x11dd5d7c0, {{80.3, 558.7}, {38.0, 54.0}}, label: 'ㄷ'
+                                  StaticText, 0x11dd5d900, {{86.3, 568.7}, {26.0, 33.7}}, label: 'ㄷ'
+                                  Button, 0x11dd5da40, {{80.3, 558.7}, {38.0, 54.0}}
+                                Button, 0x11dd5db80, {{118.3, 558.7}, {38.3, 54.0}}, label: 'ㄱ'
+                                  StaticText, 0x11dd5dcc0, {{124.7, 568.7}, {26.0, 33.7}}, label: 'ㄱ'
+                                  Button, 0x11dd5de00, {{118.3, 558.7}, {38.3, 54.0}}
+                                Button, 0x11dd5df40, {{156.7, 558.7}, {38.3, 54.0}}, label: 'ㅅ'
+                                  StaticText, 0x11dd5e080, {{163.0, 568.7}, {26.0, 33.7}}, label: 'ㅅ'
+                                  Button, 0x11dd5e1c0, {{156.7, 558.7}, {38.3, 54.0}}
+                                Button, 0x11dd5e300, {{195.0, 558.7}, {38.3, 54.0}}, label: 'ㅛ'
+                                  StaticText, 0x11dd5e440, {{201.0, 568.7}, {26.0, 33.7}}, label: 'ㅛ'
+                                  Button, 0x11dd5e580, {{195.0, 558.7}, {38.3, 54.0}}
+                                Button, 0x11dd5e6c0, {{233.3, 558.7}, {38.3, 54.0}}, label: 'ㅕ'
+                                  StaticText, 0x11dd5e800, {{239.3, 568.7}, {26.0, 33.7}}, label: 'ㅕ'
+                                  Button, 0x11dd5e940, {{233.3, 558.7}, {38.3, 54.0}}
+                                Button, 0x11dd5ea80, {{271.7, 558.7}, {38.0, 54.0}}, label: 'ㅑ'
+                                  StaticText, 0x11dd5ebc0, {{277.7, 568.7}, {26.0, 33.7}}, label: 'ㅑ'
+                                  Button, 0x11dd5ed00, {{271.7, 558.7}, {38.0, 54.0}}
+                                Button, 0x11dd5ee40, {{309.7, 558.7}, {38.3, 54.0}}, label: 'ㅐ'
+                                  StaticText, 0x11dd5ef80, {{316.0, 568.7}, {26.0, 33.7}}, label: 'ㅐ'
+                                  Button, 0x11dd5f0c0, {{309.7, 558.7}, {38.3, 54.0}}
+                                Button, 0x11dd5f200, {{348.0, 558.7}, {38.3, 54.0}}, label: 'ㅔ'
+                                  StaticText, 0x11dd5f340, {{354.3, 568.7}, {26.0, 33.7}}, label: 'ㅔ'
+                                  Button, 0x11dd5f480, {{348.0, 558.7}, {38.3, 54.0}}
+                                StaticText, 0x11dd5f5c0, {{0.0, 0.0}, {0.0, 0.0}}
+                                Button, 0x11dd5f700, {{3.7, 612.7}, {19.0, 54.0}}
+                                Button, 0x11dd5f840, {{22.7, 612.7}, {38.3, 54.0}}, label: 'ㅁ'
+                                  StaticText, 0x11dd5f980, {{29.0, 622.7}, {26.0, 33.7}}, label: 'ㅁ'
+                                  Button, 0x11dd5fac0, {{22.7, 612.7}, {38.3, 54.0}}
+                                Button, 0x11dd5fc00, {{61.0, 612.7}, {38.3, 54.0}}, label: 'ㄴ'
+                                  StaticText, 0x11dd5fd40, {{67.3, 622.7}, {26.0, 33.7}}, label: 'ㄴ'
+                                  Button, 0x11dd5fe80, {{61.0, 612.7}, {38.3, 54.0}}
+                                Button, 0x11dd70000, {{99.3, 612.7}, {38.3, 54.0}}, label: 'ㅇ'
+                                  StaticText, 0x11dd70140, {{105.3, 622.7}, {26.0, 33.7}}, label: 'ㅇ'
+                                  Button, 0x11dd70280, {{99.3, 612.7}, {38.3, 54.0}}
+                                Button, 0x11dd703c0, {{137.7, 612.7}, {38.3, 54.0}}, label: 'ㄹ'
+                                  StaticText, 0x11dd70500, {{143.7, 622.7}, {26.0, 33.7}}, label: 'ㄹ'
+                                  Button, 0x11dd70640, {{137.7, 612.7}, {38.3, 54.0}}
+                                Button, 0x11dd70780, {{176.0, 612.7}, {38.0, 54.0}}, label: 'ㅎ'
+                                  StaticText, 0x11dd708c0, {{182.0, 622.7}, {26.0, 33.7}}, label: 'ㅎ'
+                                  Button, 0x11dd70a00, {{176.0, 612.7}, {38.0, 54.0}}
+                                Button, 0x11dd70b40, {{214.0, 612.7}, {38.3, 54.0}}, label: 'ㅗ'
+                                  StaticText, 0x11dd70c80, {{220.3, 622.7}, {26.0, 33.7}}, label: 'ㅗ'
+                                  Button, 0x11dd70dc0, {{214.0, 612.7}, {38.3, 54.0}}
+                                Button, 0x11dd70f00, {{252.3, 612.7}, {38.3, 54.0}}, label: 'ㅓ'
+                                  StaticText, 0x11dd71040, {{258.7, 622.7}, {26.0, 33.7}}, label: 'ㅓ'
+                                  Button, 0x11dd71180, {{252.3, 612.7}, {38.3, 54.0}}
+                                Button, 0x11dd712c0, {{290.7, 612.7}, {38.3, 54.0}}, label: 'ㅏ'
+                                  StaticText, 0x11dd71400, {{296.7, 622.7}, {26.0, 33.7}}, label: 'ㅏ'
+                                  Button, 0x11dd71540, {{290.7, 612.7}, {38.3, 54.0}}
+                                Button, 0x11dd71680, {{329.0, 612.7}, {38.3, 54.0}}, label: 'ㅣ'
+                                  StaticText, 0x11dd717c0, {{335.0, 622.7}, {26.0, 33.7}}, label: 'ㅣ'
+                                  Button, 0x11dd71900, {{329.0, 612.7}, {38.3, 54.0}}
+                                StaticText, 0x11dd71a40, {{0.0, 0.0}, {0.0, 0.0}}
+                                Button, 0x11dd71b80, {{367.3, 612.7}, {19.0, 54.0}}
+                                Button, 0x11dd71cc0, {{3.7, 666.7}, {49.7, 54.0}}, label: 'Shift'
+                                  Image, 0x11dd71e00, {{13.0, 680.0}, {31.3, 27.0}}, identifier: 'shift', label: 'Shift'
+                                  Button, 0x11dd71f40, {{3.7, 666.7}, {49.7, 54.0}}
+                                StaticText, 0x11dd72080, {{0.0, 0.0}, {0.0, 0.0}}
+                                Button, 0x11dd721c0, {{53.3, 666.7}, {7.7, 54.0}}
+                                Button, 0x11dd72300, {{61.0, 666.7}, {38.3, 54.0}}, label: 'ㅋ'
+                                  StaticText, 0x11dd72440, {{67.3, 676.7}, {26.0, 33.7}}, label: 'ㅋ'
+                                  Button, 0x11dd72580, {{61.0, 666.7}, {38.3, 54.0}}
+                                Button, 0x11dd726c0, {{99.3, 666.7}, {38.3, 54.0}}, label: 'ㅌ'
+                                  StaticText, 0x11dd72800, {{105.3, 676.7}, {26.0, 33.7}}, label: 'ㅌ'
+                                  Button, 0x11dd72940, {{99.3, 666.7}, {38.3, 54.0}}
+                                Button, 0x11dd72a80, {{137.7, 666.7}, {38.3, 54.0}}, label: 'ㅊ'
+                                  StaticText, 0x11dd72bc0, {{143.7, 676.7}, {26.0, 33.7}}, label: 'ㅊ'
+                                  Button, 0x11dd72d00, {{137.7, 666.7}, {38.3, 54.0}}
+                                Button, 0x11dd72e40, {{176.0, 666.7}, {38.0, 54.0}}, label: 'ㅍ'
+                                  StaticText, 0x11dd72f80, {{182.0, 676.7}, {26.0, 33.7}}, label: 'ㅍ'
+                                  Button, 0x11dd730c0, {{176.0, 666.7}, {38.0, 54.0}}
+                                Button, 0x11dd73200, {{214.0, 666.7}, {38.3, 54.0}}, label: 'ㅠ'
+                                  StaticText, 0x11dd73340, {{220.3, 676.7}, {26.0, 33.7}}, label: 'ㅠ'
+                                  Button, 0x11dd73480, {{214.0, 666.7}, {38.3, 54.0}}
+                                Button, 0x11dd735c0, {{252.3, 666.7}, {38.3, 54.0}}, label: 'ㅜ'
+                                  StaticText, 0x11dd73700, {{258.7, 676.7}, {26.0, 33.7}}, label: 'ㅜ'
+                                  Button, 0x11dd73840, {{252.3, 666.7}, {38.3, 54.0}}
+                                Button, 0x11dd73980, {{290.7, 666.7}, {38.3, 54.0}}, label: 'ㅡ'
+                                  StaticText, 0x11dd73ac0, {{296.7, 676.7}, {26.0, 33.7}}, label: 'ㅡ'
+                                  Button, 0x11dd73c00, {{290.7, 666.7}, {38.3, 54.0}}
+                                StaticText, 0x11dd73d40, {{0.0, 0.0}, {0.0, 0.0}}
+                                Button, 0x11dd73e80, {{329.0, 666.7}, {7.7, 54.0}}
+                                Button, 0x11dda4000, {{336.7, 666.7}, {49.7, 54.0}}, label: 'Backspace'
+                                  Image, 0x11dda4140, {{345.7, 680.0}, {31.7, 27.0}}, identifier: 'delete.left', label: 'Backspace'
+                                  Button, 0x11dda4280, {{336.7, 666.7}, {49.7, 54.0}}
+                                Button, 0x11dda43c0, {{3.7, 720.7}, {47.0, 48.3}}, label: 'Keyboard Type - numeric'
+                                  StaticText, 0x11dda4500, {{11.0, 735.0}, {32.3, 25.3}}, label: '123'
+                                  Button, 0x11dda4640, {{3.7, 720.7}, {47.0, 48.3}}
+                                Button, 0x11dda4780, {{50.7, 720.7}, {47.0, 48.3}}, label: 'Read clipboard'
+                                Button, 0x11dda48c0, {{97.7, 720.7}, {193.0, 48.3}}, label: 'space'
+                                  Button, 0x11dda4a00, {{97.7, 720.7}, {193.0, 48.3}}
+                                Button, 0x11dda4b40, {{290.7, 720.7}, {95.7, 48.3}}, label: 'return'
+                                  Image, 0x11dda4c80, {{324.0, 735.3}, {29.0, 24.3}}, identifier: 'arrow.turn.down.left', label: 'arrow.turn.down.left'
+                                  Button, 0x11dda4dc0, {{290.7, 720.7}, {95.7, 48.3}}
+                                Button, 0x11dda4f00, {{0.0, 0.0}, {0.0, 0.0}}
+                                StaticText, 0x11dda5040, {{0.0, 0.0}, {0.0, 0.0}}
+                                Other, 0x11dda5180, {{195.0, 257.0}, {0.0, 0.0}}
+          Other, 0x11dda52c0, {{0.0, 512.0}, {390.0, 332.0}}
+            Button, 0x11dda5400, {{8.5, 775.7}, {68.1, 68.7}}, label: 'Next keyboard', value: English (US)
+              StaticText, 0x11dda5540, {{8.5, 775.7}, {0.0, 0.0}}
+            Button, 0x11dda5680, {{313.4, 775.4}, {68.1, 68.7}}, identifier: 'dictation', label: 'Dictate'
+              StaticText, 0x11dda57c0, {{313.4, 775.4}, {0.0, 0.0}}
+            Button, 0x11dda5900, {{313.4, 775.4}, {68.1, 68.7}}, identifier: 'dictation', label: 'Dictate'
+              StaticText, 0x11dda5a40, {{313.4, 775.4}, {0.0, 0.0}}
+Path to element:
+ →Application, 0x11cb6f200, pid: 9612, label: 'ProtlyCIHost'
+Query chain:
+ →Find: Target Application 'com.northprot.protly.cihost'
+  Output: {
+    Application, 0x11dda5b80, pid: 9612, label: 'ProtlyCIHost'
+  }
