@@ -4,15 +4,23 @@ import { showToast } from '../ui/toast.js';
 import { errorText, GLOBAL_KINDS } from '../ui/errors.js';
 import { commitByRefocus, nextFrame, settleComposition } from '../lib/ime.js';
 import { decideBox, decideSelection } from './decide.js';
-import { deepActive, findTarget, selectionInfo } from './target.js';
+import { classify, deepActive, findTarget, selectionInfo } from './target.js';
 import { boxHolds, readBox, writeBox } from './writer.js';
+import { cutShortMessage, cutsShort } from '../lib/editable.js';
 import { isUndoKey } from '../lib/command.js';
 import { addsNote, NOTES_ONLY, NOTE_ON_TRANSLATION } from '../lib/lang.js';
 
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 const NOTHING = 'Put the cursor in a text box or select text.';
 const BLOCKED = 'protly cannot reach this frame. Right-click inside the box instead.';
-const MAX_CHARS = 8000;
+// Below LIMITS.text on purpose: the box reply carries the translation plus a Korean back_translation, and both
+// (with thinking) must fit the 32000-token outgoing budget in src/lib/prompts.js.
+const MAX_CHARS = 12000;
+// A field the user types or picks in, editable or not (password, number, date, readonly), as opposed to a checkbox,
+// a button or a file picker: a click on those leaves the box free to be written.
+const NOT_TYPED = new Set(['button', 'checkbox', 'color', 'file', 'hidden', 'image', 'radio', 'range', 'reset', 'submit']);
+const typedField = (el) => el.tagName === 'TEXTAREA' || el.tagName === 'SELECT'
+  || (el.tagName === 'INPUT' && !NOT_TYPED.has((el.getAttribute('type') || '').toLowerCase()));
 const TOO_LONG = `Too long for protly (over ${MAX_CHARS} characters).`;
 const FOCUS_MOVED = 'Focus moved, so the translation was not written.';
 const CORNER = { top: 16, bottom: 16, left: 16, right: 16, width: 0, height: 0, x: 16, y: 16 };
@@ -152,6 +160,12 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
   }
 
   async function request(cur) {
+    // A box the write would cut short is refused before the billed call: a re-run (Deep, the language chip, Alt+T,
+    // Replace anyway) can find the shown translation in that shape. doBox refuses a first call with a toast instead.
+    if (cur.t.kind !== 'text' && cutsShort(cur.t.el)) {
+      cur.card.message(cutShortMessage(cur.t.el), { error: true, actions: actionsFor(cur) });
+      return;
+    }
     const reqId = ++seq;
     cur.reqId = reqId;
     cur.prev = cur.mode;
@@ -186,8 +200,16 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       cur.card.message('The draft changed, so nothing was changed.', { error: true, actions: actionsFor(cur) });
       return;
     }
-    // contenteditable needs focus to write; never pull it back from where the user went
-    const focusOk = () => cur.t.kind === 'text' || holdsFocus(cur);
+    // contenteditable needs focus to write. Take it back unless the user is typing in another box (or a frame
+    // this one cannot see into): a long email can take a minute, and a click on the page, a scroll or the
+    // editor's own autosave moves focus off the box without the user going anywhere else.
+    const typingElsewhere = () => {
+      const { el, blocked } = deepActive(top, { closed: true }); // a field in a web component's closed root counts
+      if (blocked) return true;
+      if (!el || el === cur.t.el || cur.t.el.contains(el)) return false;
+      return typedField(el) || classify(el) !== null;
+    };
+    const focusOk = () => cur.t.kind === 'text' || !typingElsewhere();
     const focusMoved = () => { close(); toast(FOCUS_MOVED); };
     if (!focusOk()) { focusMoved(); return; }
     const w = await writeBox(cur.t, r.translation, { stillOk: () => live() && focusOk() });
@@ -200,8 +222,8 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
         : 'Could not write into this box. Check the text: Ctrl+Z may bring it back.', { error: true, actions: actionsFor(cur) });
       return;
     }
-    if (!live()) { // Esc landed while the write was verified: put the text back
-      if (holdsFocus(cur)) await writeBox(cur.t, before);
+    if (!live()) { // Esc landed while the write was verified: put the text back (a toast if that fails)
+      if (holdsFocus(cur)) await restore(cur.t, before);
       return;
     }
     Object.assign(cur, { mode: 'preview', shown: r.translation, last: r, lang: polish ? null : (r.lang ?? cur.lang) });
@@ -257,6 +279,8 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       const d = decideBox(original);
       if (d.kind === 'notes-only') { toast(NOTES_ONLY); return; }
       if (d.kind === 'none') { toast('Nothing to translate or polish in this box.'); return; }
+      // A draft the write would cut short is refused before the billed request; writeBox checks again.
+      if (t.kind !== 'text' && cutsShort(t.el)) { toast(cutShortMessage(t.el)); return; }
       close();
       kept = null;
       const card = createCard({ doc: t.doc, place: { float: () => t.el.getBoundingClientRect() } });

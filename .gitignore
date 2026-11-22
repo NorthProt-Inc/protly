@@ -7,3 +7,4 @@ ios-app/xtool/
 ios-app/Sources/ProtlyKeyboard/Secrets.swift
 ios-app/.bsp/
 .claude/campaigns/
+.claude/worktrees/

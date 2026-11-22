@@ -67,6 +67,35 @@ test('transport rejection retries then fails as host', async () => {
   assert.equal(t.calls.length, 3);
 });
 
+test('a network or host failure after a long wait is not retried: the request most likely reached the API', async () => {
+  const net = { status: 0, body: { error: { type: 'host_network', message: 'reset' } } };
+  for (const first of [net, new ApiError('host', 'gone')]) {
+    let clock = 0;
+    const t = fakeTransport([first, { ...net }]);
+    const slow = (b) => { clock += 31000; return t(b); }; // each attempt takes 31 s
+    await assert.rejects(callClaude({}, { transport: slow, sleep: noSleep, now: () => clock }), (e) => e.kind === (first === net ? 'network' : 'host'));
+    assert.equal(t.calls.length, 1);
+  }
+});
+
+test('a server error after a long wait is still retried: the API answered, nothing was billed', async () => {
+  let clock = 0;
+  const t = fakeTransport([{ status: 529, body: {} }, { status: 200, body: { ok: 1 } }]);
+  const slow = (b) => { clock += 31000; return t(b); };
+  assert.deepEqual(await callClaude({}, { transport: slow, sleep: noSleep, now: () => clock }), { ok: 1 });
+  assert.equal(t.calls.length, 2);
+});
+
+test('the long-wait clock is per attempt: a quick network failure after a slow 529 is still retried', async () => {
+  let clock = 0;
+  const took = [31000, 1000, 1000];
+  const t = fakeTransport([{ status: 529, body: {} }, { status: 0, body: { error: { type: 'host_network', message: 'reset' } } },
+    { status: 200, body: { ok: 1 } }]);
+  const timed = (b) => { clock += took.shift(); return t(b); };
+  assert.deepEqual(await callClaude({}, { transport: timed, sleep: noSleep, now: () => clock }), { ok: 1 });
+  assert.equal(t.calls.length, 3);
+});
+
 test('callJson re-requests once on parse error', async () => {
   const t = fakeTransport([{ status: 200, body: { n: 1 } }, { status: 200, body: { n: 2 } }]);
   let seen = 0;

@@ -3,7 +3,7 @@ import XCTest
 
 final class AboutMeTests: XCTestCase {
     func testClipboardWithTheMarkerIsANoteToConfirm() {
-        XCTAssertEqual(AboutMe.parse(clipboard: "protly about me v1\nCyan, Langara student.\n"), .note("Cyan, Langara student."))
+        XCTAssertEqual(AboutMe.parse(clipboard: "protly about me v1\nCyan, Riverside student.\n"), .note("Cyan, Riverside student."))
         XCTAssertEqual(AboutMe.parse(clipboard: AboutMe.clipboardText(for: "x")), .note("x"))
     }
 

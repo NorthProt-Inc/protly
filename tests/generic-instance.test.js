@@ -171,6 +171,13 @@ function editable(s, delayMs = 0) {
 }
 const CE = '<div id="b" contenteditable="true" tabindex="0"></div><input id="o">';
 
+// chrome.dom.openOrClosedShadowRoot as a content script has it: open roots, protly's own closed card root, and the
+// closed roots a test registers. Returns the undo.
+function chromeDom(closed = new Map()) {
+  globalThis.chrome = { dom: { openOrClosedShadowRoot: (el) => el.shadowRoot ?? shadowOf(el) ?? closed.get(el) ?? null } };
+  return () => { delete globalThis.chrome; };
+}
+
 test('contenteditable that renders the insert late (Slate, Draft.js): preview, not an error', async () => {
   const s = setup(CE);
   editable(s, 80);
@@ -228,7 +235,7 @@ test('focus moved while working: a textarea is written without taking focus back
   assert.equal(s.doc.activeElement, other);
 });
 
-test('focus moved while working: a contenteditable is left alone, with a toast', async () => {
+test('focus moved into an input while working: a contenteditable is left alone, with a toast', async () => {
   const s = setup(CE);
   const writes = editable(s);
   s.box.textContent = '내일 봐';
@@ -243,6 +250,123 @@ test('focus moved while working: a contenteditable is left alone, with a toast',
   assert.equal(s.box.textContent, '내일 봐');
   assert.equal(s.doc.activeElement, other);
   assert.equal(s.root(), undefined);
+});
+
+// Outlook: a long email takes a while, and a click on the page, a scroll or the autosave blurs the body.
+const focusOn = (id) => (s) => s.doc.getElementById(id).focus();
+for (const [what, move] of [
+  ['blurred to the page', (s) => s.box.blur()],
+  ['onto a button', focusOn('btn')],
+  ['onto a non-editable element with tabindex', focusOn('pane')],
+  ['onto a checkbox', focusOn('cb')],
+  ['onto a submit input', focusOn('sub')],
+  ['onto a custom toolbar button with no shadow root', focusOn('md')],
+  ['onto a custom tab whose open shadow root holds no field', (s) => {
+    s.doc.getElementById('tab').attachShadow({ mode: 'open' }).innerHTML = '<span>Inbox</span>';
+    s.doc.getElementById('tab').focus();
+  }],
+  ['onto the custom composer wrapping the box (a click in its padding)', focusOn('w')],
+]) {
+  test(`focus ${what} while working: a contenteditable is still written and keeps the preview`, async (t) => {
+    t.after(chromeDom());
+    const s = setup(`<x-composer id="w" tabindex="-1">${CE}</x-composer><button id="btn">Send</button>`
+      + '<div id="pane" tabindex="0">quoted mail</div><input id="cb" type="checkbox"><input id="sub" type="submit">'
+      + '<md-bold id="md" tabindex="0">B</md-bold><x-tab id="tab" tabindex="0"></x-tab>');
+    const writes = editable(s);
+    s.box.textContent = '내일 봐';
+    s.box.focus();
+    s.inst.run({ source: 'command' });
+    await until(() => s.calls.length === 1);
+    move(s);
+    assert.notEqual(s.doc.activeElement, s.box);
+    s.pending[0].res(reply('see you tomorrow'));
+    await until(() => s.btn('Undo'));
+    assert.deepEqual(writes, ['see you tomorrow']);
+    assert.equal(s.box.textContent, 'see you tomorrow');
+    assert.equal(s.doc.activeElement, s.box);
+    assert.doesNotMatch(s.toasts(), /Focus moved/);
+  });
+}
+
+for (const field of ['<input id="f" type="password">', '<input id="f" type="number">', '<input id="f" readonly>', '<select id="f"><option>a</option></select>']) {
+  test(`focus moved into ${field} while working: a contenteditable is left alone`, async () => {
+    const s = setup(`${CE}${field}`);
+    const writes = editable(s);
+    s.box.textContent = '내일 봐';
+    s.box.focus();
+    s.inst.run({ source: 'command' });
+    await until(() => s.calls.length === 1);
+    const f = s.doc.getElementById('f');
+    f.focus();
+    s.pending[0].res(reply('see you tomorrow'));
+    await until(() => /Focus moved, so the translation was not written\./.test(s.toasts()));
+    assert.deepEqual(writes, []);
+    assert.equal(s.doc.activeElement, f);
+  });
+}
+
+test('focus moved into another contenteditable while working: left alone, with a toast', async () => {
+  const s = setup(`${CE}<div id="o2" contenteditable="true" tabindex="0"></div>`);
+  const writes = editable(s);
+  s.box.textContent = '내일 봐';
+  s.box.focus();
+  s.inst.run({ source: 'command' });
+  await until(() => s.calls.length === 1);
+  const other = s.doc.getElementById('o2');
+  other.focus();
+  s.pending[0].res(reply('see you tomorrow'));
+  await until(() => /Focus moved, so the translation was not written\./.test(s.toasts()));
+  assert.deepEqual(writes, []);
+  assert.equal(s.box.textContent, '내일 봐');
+  assert.equal(s.doc.activeElement, other);
+});
+
+for (const host of ['x-field', 'div']) {
+  test(`focus moved into a field in a closed shadow root on a <${host}> while working: a contenteditable is left alone`, async (t) => {
+    const closed = new Map();
+    t.after(chromeDom(closed));
+    const s = setup(`${CE}<${host} id="x"></${host}>`);
+    const writes = editable(s);
+    const x = s.doc.getElementById('x');
+    const input = s.doc.createElement('input');
+    const root = x.attachShadow({ mode: 'closed' });
+    root.appendChild(input);
+    closed.set(x, root);
+    s.box.textContent = '내일 봐';
+    s.box.focus();
+    s.inst.run({ source: 'command' });
+    await until(() => s.calls.length === 1);
+    input.focus();
+    assert.equal(s.doc.activeElement, x); // the page sees only the host
+    s.pending[0].res(reply('see you tomorrow'));
+    await until(() => /Focus moved, so the translation was not written\./.test(s.toasts()));
+    assert.deepEqual(writes, []);
+    assert.equal(s.box.textContent, '내일 봐');
+  });
+}
+
+// The working card drops the chip, so focus falls to the page and the box is taken back. With chrome.dom in
+// place, a chip still focused at the write (inside the card's closed root) would refuse it and fail this test.
+test('the language chip on a contenteditable: the re-run is written after focus was on the chip', async (t) => {
+  t.after(chromeDom());
+  const s = setup(CE);
+  const writes = editable(s);
+  s.box.textContent = '내일 봐';
+  s.box.focus();
+  s.inst.run({ source: 'command' });
+  await until(() => s.calls.length === 1);
+  s.pending[0].res(reply('see you tomorrow'));
+  await until(() => s.btn('Undo'));
+  const chip = s.root().querySelector('select.pl-chip');
+  chip.focus();
+  chip.value = 'ru';
+  chip.dispatchEvent(new s.dom.window.Event('change', { bubbles: true }));
+  await until(() => s.calls.length === 2);
+  assert.equal(s.calls[1].lang, 'ru');
+  s.pending[1].res(reply('до завтра'));
+  await until(() => writes.length === 2);
+  assert.deepEqual(writes, ['see you tomorrow', 'до завтра']);
+  assert.doesNotMatch(s.toasts(), /Focus moved/);
 });
 
 test('a box inside a shadow root: Alt+Z in it undoes', async () => {
@@ -332,14 +456,14 @@ test('a second Alt+T while the box is being read sends no second request', async
   assert.equal(s.calls.length, 1);
 });
 
-test('over 8000 characters: a toast, no call', async () => {
+test('over 12000 characters: a toast, no call', async () => {
   const s = setup();
-  s.box.value = '가'.repeat(8001);
+  s.box.value = '가'.repeat(12001);
   s.box.focus();
   await s.inst.run({ source: 'command' });
-  assert.match(s.toasts(), /Too long for protly \(over 8000 characters\)\./);
+  assert.match(s.toasts(), /Too long for protly \(over 12000 characters\)\./);
   _resetToasts();
-  await s.inst.run({ source: 'menu-selection', selectionText: 'a'.repeat(8001) });
+  await s.inst.run({ source: 'menu-selection', selectionText: 'a'.repeat(12001) });
   assert.match(s.toasts(), /Too long for protly/);
   assert.equal(s.calls.length, 0);
 });

@@ -4,12 +4,12 @@ import { ENGLISH_STYLE, POLISH_VOICE, TRANSLATE_TONE, EMAIL_SHAPE, READ_TONE } f
 
 // useFormat: the Task 2 spike confirmed format works with adaptive thinking; false is only a fallback switch.
 export const PROFILES = {
-  incoming: { thinkingOff: true, effort: 'low', max_tokens: 8192, useFormat: true },
-  outgoing: { thinkingOff: false, effort: 'low', max_tokens: 16000, useFormat: true },
-  hard: { thinkingOff: false, effort: 'high', max_tokens: 32000, useFormat: true },
-  memo: { thinkingOff: false, effort: 'low', max_tokens: 16000, useFormat: true },
-  email: { thinkingOff: false, effort: 'low', max_tokens: 16000, useFormat: true },
-  polish: { thinkingOff: false, effort: 'low', max_tokens: 16000, useFormat: true },
+  incoming: { thinkingOff: true, effort: 'low', max_tokens: 16000, useFormat: true },
+  outgoing: { thinkingOff: false, effort: 'low', max_tokens: 32000, useFormat: true },
+  hard: { thinkingOff: false, effort: 'high', max_tokens: 64000, useFormat: true },
+  memo: { thinkingOff: false, effort: 'low', max_tokens: 32000, useFormat: true },
+  email: { thinkingOff: false, effort: 'low', max_tokens: 32000, useFormat: true },
+  polish: { thinkingOff: false, effort: 'low', max_tokens: 32000, useFormat: true },
 };
 
 export function thinkingFor(model, off) {

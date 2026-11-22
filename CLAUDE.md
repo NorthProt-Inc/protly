@@ -19,6 +19,8 @@ that types Korean and English on one QWERTY grid and offers Translate / Polish /
 ## Layout
 
 - Chrome extension: `src/`, `tests/`, `manifest.json`, build `scripts/build.mjs`. Native host: `host/`.
+  `host/protly_edit.py` is the Claude Code editor shim (Ctrl+G turns a Korean prompt draft into English), enabled
+  by `env.EDITOR` in `~/.claude/settings.json`.
 - iPhone: `ios-app/` (xtool app: container `Protly`, extension `ProtlyKeyboard`), logic in the Swift package
   `ios-app/ProtlyCore`, KeyboardKit 9.9.1 vendored at `ios-app/Vendor/KeyboardKit` (every change from upstream
   is in `protly.patch` and listed in `VENDORED.md`; keep both in sync).
@@ -30,7 +32,7 @@ that types Korean and English on one QWERTY grid and offers Translate / Polish /
   `ios-app/scripts/make-secrets.sh`; cloud sessions use a stand-in with an empty key. From Sprint 002 of
   the sim-phone-checks plan, the keyboard-shots workflow writes Secrets.swift from the Actions secret
   `PROTLY_API_KEY` (a CI-only key) through make-secrets.sh when it is set (empty stand-in otherwise), never prints
-  it, and publish-shots.sh refuses any file containing `sk-ant-`.
+  it, and publish-shots.sh runs leak-guard.sh first, which refuses any run folder containing `sk-ant-`.
 - Tests run offline: `npm test` (extension, host) and `swift test --package-path ios-app/ProtlyCore` (needs a
   Swift toolchain). Both pass before every commit.
 - The phone build (`xtool dev build` on the laptop) must keep working: do not edit `ios-app/Package.swift` or

@@ -17,7 +17,7 @@ import urllib.error
 import urllib.request
 
 API_URL = 'https://api.anthropic.com/v1/messages'
-TIMEOUT_S = 240  # Opus hard (effort high, 32k tokens, non-streaming) can take minutes
+TIMEOUT_S = 600  # Opus hard (effort high, 64k tokens, non-streaming) can take many minutes
 MAX_REPLY = 1024 * 1024  # Chrome rejects host messages larger than 1 MB
 MAX_REQUEST = 16 * 1024 * 1024  # far above any request the extension builds (its messages are size-checked)
 
