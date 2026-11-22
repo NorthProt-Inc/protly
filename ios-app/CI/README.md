@@ -32,7 +32,9 @@ checks the same thing, but the keyboard has not learned the words earlier method
 result with a full run before calling it fixed. The memory sampler starts at the first selected phone method. A new
 push with either tag cancels a run in progress on the branch, and the workflow sees a tag anywhere in the head
 commit message: a message that only describes the syntax starts a run too (b784f28 did: `bad-filter`, and it
-cancelled the full run in progress). Name the syntax in a commit message without its opening bracket.
+cancelled the full run in progress). Name the syntax in a commit message without its opening bracket. The push
+trigger has a paths filter (`ios-app/**` and the workflow file), so the tagged head commit must change a file there:
+an empty commit, or one that touches only other paths, starts no run at all.
 
 Runner image `macos-26` (GitHub-hosted, arm64): Xcode 26.6 by default and iOS 26.x simulator runtimes. The
 script takes the newest iOS 26 runtime and an iPhone 13 Pro (else the first 390 pt wide iPhone it can create).
