@@ -106,8 +106,11 @@ class ParseReply(unittest.TestCase):
     def reply(self, text, stop_reason='end_turn'):
         return {'status': 200, 'body': {'stop_reason': stop_reason, 'content': [{'type': 'text', 'text': text}]}}
 
-    def test_returns_the_translation_stripped(self):
-        self.assertEqual(e.parse_reply(self.reply('{"translation": " Look at foo()\\n"}')), 'Look at foo()')
+    def test_returns_the_translation_without_outer_newlines(self):
+        self.assertEqual(e.parse_reply(self.reply('{"translation": "\\nLook at foo()\\n"}')), 'Look at foo()')
+
+    def test_keeps_a_leading_indent(self):
+        self.assertEqual(e.parse_reply(self.reply('{"translation": "    foo()\\nwhy slow"}')), '    foo()\nwhy slow')
 
     def test_truncated(self):
         with self.assertRaisesRegex(e.EditError, 'truncated'):
@@ -198,6 +201,37 @@ class Run(unittest.TestCase):
         for op in (api_ok('ok'), mock.Mock(side_effect=urllib.error.URLError('down'))):
             _, err, _, _ = run(make_file(KOREAN), op)
             self.assertNotIn(KEY, err)
+
+    def test_reply_that_is_not_json_keeps_the_draft(self):
+        path = make_file(KOREAN)
+        raw = mock.Mock(status=200, headers={}, read=mock.Mock(return_value=b'<html>gateway</html>'))
+        raw.__enter__ = mock.Mock(return_value=raw)
+        raw.__exit__ = mock.Mock(return_value=False)
+        code, err, _, pause = run(path, mock.Mock(return_value=raw))
+        self.assertEqual(code, 0)
+        self.assertEqual(read(path), KOREAN)
+        self.assertIn('draft kept: JSONDecodeError', err)
+        pause.assert_called_once_with(e.FAIL_PAUSE_S)
+
+    def test_ctrl_c_while_waiting_keeps_the_draft(self):
+        path = make_file(KOREAN)
+        code, err, _, _ = run(path, mock.Mock(side_effect=KeyboardInterrupt()))
+        self.assertEqual(code, 0)
+        self.assertEqual(read(path), KOREAN)
+        self.assertIn('draft kept: KeyboardInterrupt', err)
+
+    def test_translation_that_cannot_be_encoded_leaves_the_draft_whole(self):
+        path = make_file(KOREAN)
+        code, err, _, _ = run(path, api_ok('ok \ud800'))
+        self.assertEqual(code, 0)
+        self.assertEqual(read(path), KOREAN)
+        self.assertIn('draft kept: UnicodeEncodeError', err)
+        self.assertEqual(os.listdir(os.path.dirname(path)), [os.path.basename(path)])  # no temp file left
+
+    def test_blank_protly_editor_falls_back_to_nano(self):
+        path = make_file('why is foo() slow')
+        _, _, execvp, _ = run(path, mock.Mock(), env={'PROTLY_EDITOR': '  '})
+        execvp.assert_called_once_with('nano', ['nano', path])
 
     def test_no_arguments(self):
         err = io.StringIO()

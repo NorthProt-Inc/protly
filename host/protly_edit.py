@@ -15,6 +15,7 @@ import os
 import re
 import shlex
 import sys
+import tempfile
 import time
 import urllib.request
 
@@ -80,7 +81,7 @@ def parse_reply(reply):
         raise EditError('reply was not the expected JSON') from None
     if not isinstance(translation, str) or not translation.strip():
         raise EditError('empty translation')
-    return translation.strip()
+    return translation.strip('\r\n')  # keeps a leading indent (a draft that opens with code)
 
 
 def translate(draft, home, urlopen=None):
@@ -89,7 +90,23 @@ def translate(draft, home, urlopen=None):
 
 
 def real_editor(env):
-    return shlex.split(env.get('PROTLY_EDITOR') or DEFAULT_EDITOR)
+    return shlex.split(env.get('PROTLY_EDITOR') or '') or [DEFAULT_EDITOR]  # a blank value must not run the file
+
+
+def write_whole(path, text):
+    """Replaces the file in one step: encoded first, written beside it, then renamed over it."""
+    data = text.encode('utf-8')  # a lone surrogate fails here, before the draft is touched
+    fd, tmp = tempfile.mkstemp(prefix='.protly-', dir=os.path.dirname(os.path.abspath(path)))
+    try:
+        with os.fdopen(fd, 'wb') as f:
+            f.write(data)
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 
 def run(args, home, env, err, urlopen=None, execvp=os.execvp, pause=time.sleep):
@@ -110,10 +127,8 @@ def run(args, home, env, err, urlopen=None, execvp=os.execvp, pause=time.sleep):
     err.write('protly: translating...\n')
     err.flush()
     try:
-        translation = translate(text, home, urlopen)
-        with open(path, 'w', encoding='utf-8') as f:
-            f.write(translation)
-    except (EditError, OSError) as e:
+        write_whole(path, translate(text, home, urlopen))
+    except (Exception, KeyboardInterrupt) as e:  # anything, Ctrl+C included: the draft must survive
         reason = e if isinstance(e, EditError) else type(e).__name__
         err.write(f'protly: not translated, draft kept: {reason}\n')
         err.flush()
