@@ -272,7 +272,8 @@ logging. Every line is `PENDING` with the field before the first try (`t0`) and 
     (`XCUICoordinate.doubleTap`, its taps 46-75 ms apart in the probe); each try adds `hello. ` / `안녕. `. `gaps` is
     the spacing of the two taps as the host saw its edits (the longest wait between two edits in a row; `edits` lists
     each edit's ms after the first, from the UITextView screen's `edits` probe or the page's `edits` state, which it
-    posts only with `?caret=1`), and `calls` the doubleTap call's own duration as XCTest saw it. Not judged.
+    posts only with `?caret=1`; -1 when the host saw fewer than two edits), and `calls` the doubleTap call's own
+    duration as XCTest saw it. Neither is judged.
   A field that did not start empty (or as `world`), a missing reading, a pick reading (`p<i>`) that does not show the
   pick, a pickmove caret that did not go to 0 and back, or fewer tries than these is FAIL `unreadable`.
   `test_checks.py` also checks that `PhoneRun.periodCases` lists the same kinds as checks.py, with enough tries.
