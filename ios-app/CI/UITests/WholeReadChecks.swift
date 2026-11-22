@@ -22,7 +22,7 @@ enum WholeChecks {
 
     /// The same lists as checks.py WHOLE_NATIVE_IDS and WHOLE_WEB_IDS.
     static var nativeIDs: [String] {
-        nativeCases.map { "wr-uikit-\($0)" } + ["wr-uikit-r4k"] + nativeCases.map { "wr-swiftui-\($0)" }
+        nativeCases.map { "wr-uikit-\($0)" } + ["wr-uikit-r4k", "wr-uikit-cancel"] + nativeCases.map { "wr-swiftui-\($0)" }
     }
 
     static var webIDs: [String] { webHosts.flatMap { h in webCases.map { "wr-\(h)-\($0)" } } }
@@ -30,6 +30,8 @@ enum WholeChecks {
     /// KeyboardViewController refusedText and replaceUnsureText.
     static let refusal = "Could not read the whole text. Copy it, then use Read clipboard."
     static let notice = "Replace may not have finished. Check the text."
+    /// ProgressStrip's second line once a read runs past 2 s.
+    static let progress = "Reading the whole text\u{2026}"
     /// Replace must leave the reply in the field, and Undo the draft, within this long after the tap; the keyboard
     /// then checks the field (its strip says "Replacing the text…" until it is done). The host applies one delete per
     /// character: run 162 took 7-12 s for 3247 units on native hosts. The times are recorded, not judged.
@@ -48,6 +50,8 @@ enum WholeChecks {
         var selectAll = false
         /// The keyboard must refuse (too long, or text with emoji on a web host).
         var refusal = false
+        /// Cancel on the strip once it says the read is still going: the caret goes back, the field stays.
+        var cancel = false
     }
 
     static func spec(_ name: String) -> Spec? {
@@ -59,6 +63,7 @@ enum WholeChecks {
         case "x14k": return Spec(name: name, fill: 4, units: 14055, cursor: 14055, refusal: true)
         case "emoji": return Spec(name: name, fill: 5, units: 460, cursor: 460, refusal: true)
         case "r4k": return Spec(name: name, fill: 6, units: 3975, cursor: 3975)
+        case "cancel": return Spec(name: name, fill: 2, units: 335, cursor: 112, cancel: true)
         default: return nil
         }
     }
@@ -196,7 +201,7 @@ extension PhoneRun {
     /// The UITextView screen (PhoneRun launched it with `-wholefills 1`), then the SwiftUI field of the default screen.
     func checksWholeNative() {
         if notReady(WholeChecks.nativeIDs) { return }
-        for name in WholeChecks.nativeCases + ["r4k"] { wholeCase("uikit", name, web: nil) }
+        for name in WholeChecks.nativeCases + ["r4k", "cancel"] { wholeCase("uikit", name, web: nil) }
         d.clearField()
         d.app.terminate()
         d.launch(arguments: ["-wholefills", "1"])
@@ -307,6 +312,7 @@ extension PhoneRun {
         d.mark(mark)
         let t0 = Date()
         d.tapKey(.protlyKey)
+        if s.cancel { return wholeCancel(r, since: t0, before: before, caretBefore: caretBefore, host: host, web: web) }
         // Reads take up to 20 s: poll the tree sparingly.
         let p = poll(WholeChecks.readTimeout, every: 1.5) { v in
             !v.panel.isEmpty || v.finished("Replace")
@@ -396,6 +402,35 @@ extension PhoneRun {
             return r
         }
         _ = writingEnded(since: t2, "kbundo", &r)
+        return r
+    }
+
+    /// The strip's second line after 2 s, then its Cancel while the read still runs: the strip goes, no panel or card
+    /// comes, the field is unchanged and the caret is back where it was (the keyboard log must say `cancelled`).
+    private func wholeCancel(_ r0: WholeTry, since t0: Date, before: WholeChecks.Shape, caretBefore: String?,
+                             host: String, web: ReadWeb?) -> WholeTry {
+        var r = r0
+        let shown = poll(8, every: 0.3) { v in v.stripText.contains(WholeChecks.progress) }
+        guard let v = shown.view, shown.met else {
+            r.check(false, "progress=none strip=\(q(shown.view?.stripText))")
+            closeCall(shown.view)
+            return r
+        }
+        r.add(String(format: "progress=%.1f", Date().timeIntervalSince(t0)))
+        guard let cancel = v.button("Cancel", in: v.strip) else {
+            r.check(false, "cancel=none strip=\(q(v.stripText))")
+            return r
+        }
+        d.point(cancel.frame.midX, cancel.frame.midY).tap()
+        r.add(String(format: "cancelled=%.1f", Date().timeIntervalSince(t0)))
+        d.pause(2.5)  // a step on its way settles (at most about 1 s), then the cursor goes back
+        let after = d.callView()
+        r.check(after.map { $0.strip.isEmpty && $0.panel.isEmpty && $0.card.isEmpty } ?? false,
+                "closed=\(after.map { "\($0.strip.count)/\($0.panel.count)/\($0.card.count)" } ?? "unreadable")")
+        let left = wholeShape(host, web)
+        r.check(left == before, "left=\(left?.text ?? "unreadable")")
+        let c = wholeCaret(host, web)
+        r.check(c == caretBefore, "caret-left=\(c ?? "unreadable") want \(caretBefore ?? "unreadable")")
         return r
     }
 

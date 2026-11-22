@@ -62,16 +62,18 @@ WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k")
 WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji")
 WHOLE_WEB_HOSTS = ("textarea", "lexical")
 WHOLE_TRIES = {"win": 2, "long": 2}
-WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r4k"]
+WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r4k", "wr-uikit-cancel"]
                     + [f"wr-swiftui-{c}" for c in WHOLE_NATIVE_CASES])
 WHOLE_WEB_IDS = [f"wr-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in WHOLE_WEB_CASES]
 # What the keyboard's own log (keyboard-log.txt, category `read`) must say for each wr- try, between the try's MARK
 # (wr-<host>-<case>-t<n> in ui-log.txt) and the next MARK: a refusal case its refusal reason (`<walk>:<why>`; the web
 # drafts with emoji are refused for the emoji, the native 14 055-unit one at the read's 4000-unit cap), an accepted
 # case the read accepted and Replace and Undo both proven by the keyboard (`replace ... held=1`, twice).
+# wr-uikit-cancel (Cancel on the strip mid-read) needs `outcome=cancelled`.
 WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong",),
                   ("web", "x14k"): ("b1:characters", "b1:badStep"),
                   ("web", "emoji"): ("b1:characters", "b1:badStep")}
+WHOLE_CANCELLED = {("native", "cancel")}
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
                 + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
@@ -1309,6 +1311,11 @@ def resolve_whole_log(check, marks, kb_text):
                 problems.append(f"t{t}:no read done" if not done else f"t{t}:{len(done)} reads")
                 continue
             outcome, reason, took = kv(done[0], "outcome"), kv(done[0], "reason"), kv(done[0], "ms")
+            if (kind, case) in WHOLE_CANCELLED:
+                notes.append(f"t{t}:{outcome}/{took}ms")
+                if outcome != "cancelled":
+                    problems.append(f"t{t}:{outcome}/{reason} want cancelled")
+                continue
             if refusal:
                 notes.append(f"t{t}:{outcome}/{reason}")
                 if outcome != "refused" or reason not in refusal:

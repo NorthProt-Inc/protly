@@ -298,7 +298,9 @@ units). The test writes PASS or FAIL itself; checks.py then holds each try again
   cursor in paragraph 2: the fill's offset, on the page set again by `rcaret` after the tap), `sel` (select all: `rselall`,
   in code; on the SwiftUI field through its bound `TextSelection`, iOS 18, read back by HostView's `sel` probe), `long` (3247), `x14k` (14 055, with emoji:
   the refusal), `emoji` (web only, 460 with 10 emoji: the refusal), `wr-uikit-r4k` (3975, under the read's 4000-unit
-  cap). `win` and `long` run twice; every try must pass.
+  cap), `wr-uikit-cancel` (the `mid` draft: once the strip says "Reading the whole text…", its Cancel; the strip goes,
+  no panel or card comes, the field and the caret are as before, and the keyboard log says `outcome=cancelled`). `win`
+  and `long` run twice; every try must pass.
 - **Accept**: the reply's shape equals the field's, the cursor is at the end after the read (UITextView `sel` probe, the
   page's caret), Replace leaves the field exactly the reply (native: the XCUITest value; web: the page's length, line
   feeds and hash) within 40 s of the tap (`replace=<s>`, recorded: the host applies one delete per character, 7-12 s

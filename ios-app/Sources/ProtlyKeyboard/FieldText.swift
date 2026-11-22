@@ -70,8 +70,13 @@ enum FieldText {
     /// in a row agree (the host's update can come in two parts: probe run 7f2f443-135).
     private static func step(_ p: UITextDocumentProxy, by k: Int, wait: TimeInterval) async -> (changed: Bool, c: Ctx) {
         let c0 = ctx(p)
-        let sent = uptime()
         p.adjustTextPosition(byCharacterOffset: k)  // UTF-16 units on native hosts; characters on the web
+        return await watch(p, from: c0, wait: wait)
+    }
+
+    /// Polls until the contexts differ from `c0` and settle, or `wait` passes.
+    private static func watch(_ p: UITextDocumentProxy, from c0: Ctx, wait: TimeInterval) async -> (changed: Bool, c: Ctx) {
+        let sent = uptime()
         while uptime() - sent < wait {
             await pause()
             var c1 = ctx(p)
@@ -107,7 +112,7 @@ enum FieldText {
         var bw = BackWalk(cap: cap)
         // Only the walk from the user's cursor may start from contexts the host never refreshed (run 163 web `mid`).
         var fw = ForwardWalk(cap: cap, resyncFirst: tag == "f")
-        var steps = 0
+        var steps = 0, late = 0
         let w0 = uptime()
         func end(_ e: WalkEnd) -> WalkEnd {
             let units: [UInt16], reason: String
@@ -118,7 +123,7 @@ enum FieldText {
             }
             let count = units.count, lf = WholeRead.lineFeeds(units), hash = WholeRead.fnv(units), took = ms(since: w0)
             let retries = bw.retries, resyncs = fw.resyncs
-            log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) h=\(hash, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) retries=\(retries, privacy: .public) resyncs=\(resyncs, privacy: .public)")
+            log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) h=\(hash, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) retries=\(retries, privacy: .public) resyncs=\(resyncs, privacy: .public) late=\(late, privacy: .public)")
             return e
         }
         /// A step that fit nothing: the contexts' lengths and which of them fit, never their text.
@@ -151,6 +156,12 @@ enum FieldText {
             track.sending()
             let s0 = uptime()
             var s = await step(p, by: back ? -k : k, wait: wait)
+            if !s.changed, !probing, WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait)) {
+                // A move that has not shown after 1 s may still come (run 163 textarea: the first step back; steps
+                // take 26-33 ms at the median, 286 ms at most in probe runs 154-155): one more look before "stuck".
+                late += 1
+                s = await watch(p, from: c, wait: WholeRead.moveWait)
+            }
             if !back, s.changed, s.c.before.isEmpty {
                 // An empty before-context after a step forward is a window on its way, not the field: wait for it.
                 let e0 = uptime()

@@ -1118,7 +1118,7 @@ class WholeReadTests(unittest.TestCase):
         return re.findall(r'"(\w+)"', m.group(1))
 
     def test_every_id_is_expected_and_has_its_method(self):
-        native = [f"wr-uikit-{c}" for c in ("win", "mid", "sel", "long", "x14k")] + ["wr-uikit-r4k"] + [
+        native = [f"wr-uikit-{c}" for c in ("win", "mid", "sel", "long", "x14k")] + ["wr-uikit-r4k", "wr-uikit-cancel"] + [
             f"wr-swiftui-{c}" for c in ("win", "mid", "sel", "long", "x14k")]
         web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji")]
         self.assertEqual(checks.METHOD_IDS["test5g_wholenative"], native)
@@ -1142,7 +1142,8 @@ class WholeReadTests(unittest.TestCase):
         self.assertEqual(checks.WHOLE_TRIES, {"win": 2, "long": 2})
         native = re.search(r"static var nativeIDs: \[String\] \{\n(.*?)\n    \}", self.swift(), re.S).group(1)
         self.assertEqual(" ".join(native.split()),
-                         'nativeCases.map { "wr-uikit-\\($0)" } + ["wr-uikit-r4k"] + nativeCases.map { "wr-swiftui-\\($0)" }')
+                         'nativeCases.map { "wr-uikit-\\($0)" } + ["wr-uikit-r4k", "wr-uikit-cancel"] + '
+                         'nativeCases.map { "wr-swiftui-\\($0)" }')
         self.assertIn('webHosts.flatMap { h in webCases.map { "wr-\\(h)-\\($0)" } }', self.swift())
 
     def specs(self):
@@ -1154,7 +1155,8 @@ class WholeReadTests(unittest.TestCase):
 
     def test_every_case_has_a_spec_and_the_refusals_are_the_long_and_emoji_drafts(self):
         specs = self.specs()
-        self.assertEqual(set(specs), set(checks.WHOLE_WEB_CASES) | {"r4k"})
+        self.assertEqual(set(specs), set(checks.WHOLE_WEB_CASES) | {"r4k", "cancel"})
+        self.assertEqual({k for k, v in specs.items() if "cancel: true" in v[3]}, {"cancel"})
         self.assertEqual({k for k, v in specs.items() if "refusal: true" in v[3]}, {"x14k", "emoji"})
         self.assertEqual({k for k, v in specs.items() if "selectAll: true" in v[3]}, {"sel"})
         # The read's cap is 4000 UTF-16 units: every accepted draft stays under it, marker line included.
@@ -1323,6 +1325,17 @@ class WholeReadTests(unittest.TestCase):
         self.assertEqual(final["wr-uikit-x14k"].status, "FAIL")
         self.assertIn("f:badStep", final["wr-uikit-x14k"].evidence)
         self.assertEqual(final["wr-textarea-x14k"].status, "PASS")
+
+    def test_the_cancel_try_needs_a_cancelled_read(self):
+        line = "CHECK wr-uikit-cancel PASS t1={real=335/9/h49b6f226 caret=112,0 progress=2.4 cancelled=2.9 caret-left=112,0}\n"
+        ui = self.marks(("wr-uikit-cancel-t1", 10, 0))
+        done = "read done outcome={} reason={} units=0 lf=0 h=811c9dc5 ms=3010 known=1"
+        final = self.assemble_with_logs(line, ui, self.kb(("10", "03.000", done.format("cancelled", "cancelled"))))
+        self.assertEqual(final["wr-uikit-cancel"].status, "PASS", final["wr-uikit-cancel"].evidence)
+        self.assertIn("log=t1:cancelled/3010ms", final["wr-uikit-cancel"].evidence)
+        # The read ended before the tap: Cancel then closed the card, which proves nothing about a read in progress.
+        final = self.assemble_with_logs(line, ui, self.kb(("10", "06.000", done.format("accepted", "-"))))
+        self.assertEqual(final["wr-uikit-cancel"].status, "FAIL")
 
     def test_no_keyboard_log_fails_a_pass(self):
         line = "CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 read=4871 replace=3.40}\n"
