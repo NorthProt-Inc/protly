@@ -1,0 +1,303 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5f_period
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK dsp-uikit-en 1795321381.805
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 7.65 s
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.98 s
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 1.10 s
+CHECK dsp-uikit-en PENDING kind=en tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=7.65,0.98,1.10
+typing: keyboard top 495.00, row 1 564.00
+typed "world"
+MARK dsp-uikit-word 1795321438.875
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 1.03 s
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.89 s
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.92 s
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.95 s
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.88 s
+typing: keyboard top 495.00, row 1 564.00
+typed "hello  ", last gap 0.92 s
+CHECK dsp-uikit-word PENDING kind=word tries=6 t0="world" t1="hello. world" t2="hello. hello. world" t3="hello. hello. hello. world" t4="hello. hello. hello. hello. world" t5="hello. hello. hello. hello. hello. world" t6="hello. hello. hello. hello. hello. hello. world" gaps=1.03,0.89,0.92,0.95,0.88,0.92 sel0="0,0"
+MARK dsp-uikit-ko 1795321508.787
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.88 s
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.89 s
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕  ", last gap 0.98 s
+CHECK dsp-uikit-ko PENDING kind=ko tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.88,0.89,0.98
+MARK dsp-uikit-pick2 1795321543.138
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.91 s
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.89 s
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 0.92 s
+CHECK dsp-uikit-pick2 PENDING kind=pick2 tries=3 t0="" t1="the. " t2="the. the. " t3="the. the. the. " gaps=0.91,0.89,0.92
+MARK dsp-uikit-pick1 1795321575.053
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+CHECK dsp-uikit-pick1 PENDING kind=pick1 tries=4 t0="" t1="the " t2="the the " t3="the the the " t4="the the the the " gaps=4.49,4.35,3.73,4.24 p1="the " p2="the the " p3="the the the " p4="the the the the "
+MARK dsp-uikit-fast 1795321618.236
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+typing: keyboard top 495.00, row 1 564.00
+typed "hello"
+CHECK dsp-uikit-fast PENDING kind=fast tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.175,0.166,0.158 edits=0/175/182,0/166/178,0/158/170 calls=0.85,0.97,0.88
+MARK dsp-uikit-kofast 1795321665.783
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+typing: keyboard top 495.00, row 1 564.00
+typed "안녕"
+CHECK dsp-uikit-kofast PENDING kind=kofast tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.124,0.195,0.128 edits=0/124/130,0/195/204,0/128/137 calls=0.80,0.91,0.72
+MARK dsp-uikit-kopick2 1795321718.055
+typing: keyboard top 495.00, row 1 564.00
+typed "안녀"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 1.10 s
+typing: keyboard top 495.00, row 1 564.00
+typed "안녀"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 1.18 s
+typing: keyboard top 495.00, row 1 564.00
+typed "안녀"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed "  ", last gap 1.08 s
+CHECK dsp-uikit-kopick2 PENDING kind=kopick2 tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=1.10,1.18,1.08
+typing: keyboard top 495.00, row 1 564.00
+typed "world"
+MARK dsp-uikit-pickmid 1795321770.505
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 495.00, row 1 564.00
+typed " "
+CHECK dsp-uikit-pickmid PENDING kind=pickmid tries=4 t0="world" t1="the  world" t2="the  the  world" t3="the  the  the  world" t4="the  the  the  the  world" gaps=4.13,4.77,4.40,4.10 p1="the world" p2="the  the world" p3="the  the  the world" p4="the  the  the  the world" sel0="0,0"
+MARK dsp-uikit-pickmove 1795321816.642
+typing: keyboard top 495.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 302.00, row 1 342.33
+typed " "
+typing: keyboard top 302.00, row 1 342.33
+typed "teh"
+tapped the right slot
+typing: keyboard top 301.33, row 1 341.00
+typed " "
+typing: keyboard top 301.33, row 1 341.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 301.33, row 1 341.33
+typed " "
+CHECK dsp-uikit-pickmove PENDING kind=pickmove tries=3 t0="" t1="the " t2="the " t3="the " gaps=14.23,14.02,14.15 p1="the " away1="0,0" back1="0,0" p2="the " away2="0,0" back2="0,0" p3="the " away3="0,0" back3="0,0"
+MARK dsp-composer-en 1795321917.160
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 1.03 s
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 1.28 s
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.99 s
+CHECK dsp-composer-en PENDING kind=en tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=1.03,1.28,0.99
+typing: keyboard top 454.67, row 1 564.00
+typed "world"
+MARK dsp-composer-word 1795321964.013
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 1.07 s
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 1.00 s
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 1.02 s
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 1.05 s
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.99 s
+typing: keyboard top 454.00, row 1 564.00
+typed "hello  ", last gap 0.99 s
+CHECK dsp-composer-word PENDING kind=word tries=6 t0="world" t1="hello. world" t2="hello. hello. world" t3="hello. hello. hello. world" t4="hello. hello. hello. hello. world" t5="hello. hello. hello. hello. hello. world" t6="hello. hello. hello. hello. hello. hello. world" gaps=1.07,1.00,1.02,1.05,0.99,0.99 sel0="0"
+MARK dsp-composer-ko 1795322025.215
+typing: keyboard top 454.67, row 1 564.00
+typed "안녕  ", last gap 0.90 s
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 0.92 s
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕  ", last gap 1.26 s
+CHECK dsp-composer-ko PENDING kind=ko tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.90,0.92,1.26
+MARK dsp-composer-pick2 1795322064.826
+typing: keyboard top 454.67, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 1.07 s
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 1.05 s
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 1.02 s
+CHECK dsp-composer-pick2 PENDING kind=pick2 tries=3 t0="" t1="the. " t2="the. the. " t3="the. the. the. " gaps=1.07,1.05,1.02
+MARK dsp-composer-pick1 1795322099.195
+typing: keyboard top 454.67, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+CHECK dsp-composer-pick1 PENDING kind=pick1 tries=4 t0="" t1="the " t2="the the " t3="the the the " t4="the the the the " gaps=3.97,5.99,4.48,3.75 p1="the " p2="the the " p3="the the the " p4="the the the the "
+MARK dsp-composer-fast 1795322146.828
+typing: keyboard top 454.67, row 1 564.00
+typed "hello"
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+typing: keyboard top 454.00, row 1 564.00
+typed "hello"
+CHECK dsp-composer-fast PENDING kind=fast tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.107,0.119,0.121 edits=0/107/127/131/142,0/119/133/137/177,0/121/143/145/170 calls=0.68,0.90,0.80
+MARK dsp-composer-kofast 1795322189.127
+typing: keyboard top 454.67, row 1 564.00
+typed "안녕"
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕"
+typing: keyboard top 454.00, row 1 564.00
+typed "안녕"
+CHECK dsp-composer-kofast PENDING kind=kofast tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.063,0.115,0.129 edits=0/63/85/86/119,0/115/127/128/141,0/129/139/144/176 calls=0.71,0.85,0.79
+MARK dsp-composer-kopick2 1795322234.127
+typing: keyboard top 454.67, row 1 564.00
+typed "안녀"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 1.10 s
+typing: keyboard top 454.00, row 1 564.00
+typed "안녀"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 0.97 s
+typing: keyboard top 454.00, row 1 564.00
+typed "안녀"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed "  ", last gap 0.95 s
+CHECK dsp-composer-kopick2 PENDING kind=kopick2 tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=1.10,0.97,0.95
+typing: keyboard top 454.67, row 1 564.00
+typed "world"
+MARK dsp-composer-pickmid 1795322284.880
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+CHECK dsp-composer-pickmid PENDING kind=pickmid tries=4 t0="world" t1="the  world" t2="the  the  world" t3="the  the  the  world" t4="the  the  the  the  world" gaps=3.56,3.93,3.92,3.49 p1="the world" p2="the  the world" p3="the  the  the world" p4="the  the  the  the world" sel0="0"
+MARK dsp-composer-pickmove 1795322326.844
+typing: keyboard top 454.67, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+typing: keyboard top 454.00, row 1 564.00
+typed "teh"
+tapped the right slot
+typing: keyboard top 454.00, row 1 564.00
+typed " "
+CHECK dsp-composer-pickmove PENDING kind=pickmove tries=3 t0="" t1="the  " t2="the  the  " t3="the  the  the  " gaps=11.46,11.32,12.16 p1="the " away1="0" back1="4" p2="the  the " away2="0" back2="9" p3="the  the  the " away3="0" back3="14"
