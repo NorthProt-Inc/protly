@@ -36,7 +36,8 @@ extension StubActionClient {
     static func probe(_ text: String) -> AsyncStream<ActionUpdate> {
         let lf = text.utf16.reduce(0) { $1 == 10 ? $0 + 1 : $0 }
         let tokens = (1...12).filter { text.contains("\u{00A7}\($0) ") }.map { String($0) }.joined(separator: ".")
-        let reply = "read \(text.utf16.count) \(lf) \(tokens.isEmpty ? "none" : tokens)"
+        // diag/p1-walk-back: the text's hash, then the walk's numbers (FieldText.walkRead), for WalkChecks.swift.
+        let reply = "read \(text.utf16.count) \(lf) \(tokens.isEmpty ? "none" : tokens) h\(FieldText.fnv(text)) | \(WalkNote.shared.get())"
         let script = StubScript.probe(reply)
         return ActionAPI.updates {
             (status: script.status, bytes: StubBytes(chunks: script.chunks), stop: {})

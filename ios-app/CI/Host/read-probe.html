@@ -61,6 +61,16 @@ function text(name) {
   return loose + blocks.map((b) => b.textContent).join("\n");
 }
 
+// diag/p1-walk-back: FNV-1a (32 bit) over UTF-16 units, 8 hex digits, as FieldText.fnv and WalkChecks.swift.
+function fnv(t) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < t.length; i++) {
+    h ^= t.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return (h >>> 0).toString(16).padStart(8, "0");
+}
+
 function shape(name) {
   const t = text(name);
   let lf = 0;
@@ -69,7 +79,7 @@ function shape(name) {
   for (let k = 1; k <= 12; k++) if (t.includes("§" + k + " ")) tok.push(k);
   const f = fields[name];
   return {
-    len: t.length, lf, tok: tok.join(".") || "none", read: t.startsWith("read ") ? 1 : 0,
+    len: t.length, lf, h: fnv(t), tok: tok.join(".") || "none", read: t.startsWith("read ") ? 1 : 0,
     blocks: name === "textarea" ? 0 : f.children.length,
     inner: name === "textarea" ? t.length : f.innerText.length,
   };
