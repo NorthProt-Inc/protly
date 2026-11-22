@@ -116,6 +116,36 @@ test('Alt+Z when the restore is refused: the card says so and the box keeps what
   assert.equal(composer.innerHTML, EDITED);
 });
 
+test('Alt+Z while translating, on the untouched draft: nothing is pasted back', async () => {
+  const log = freshComposer(TYPED);
+  assert.equal(enter().defaultPrevented, true);
+  await until(() => pending.length === 1);
+  assert.equal(altZ().defaultPrevented, true);
+  await sleep(SETTLED);
+  assert.equal(doc.querySelector('.pl-card'), null);
+  assert.deepEqual(log.pastes, []); // a re-paste would also turn mention decorators into plain text
+  assert.equal(composer.innerHTML, TYPED);
+  answer(EN);
+  await sleep(SETTLED);
+  assert.deepEqual(log.pastes, []);
+});
+
+test('Alt+Z while translating, on a draft that only gained a line break: nothing to restore, no message', async () => {
+  const log = freshComposer(TYPED);
+  assert.equal(enter().defaultPrevented, true);
+  await until(() => pending.length === 1);
+  composer.innerHTML = TRAILING; // Shift+Enter while it translates: the draft by norm(), but a write would be refused
+  assert.equal(altZ().defaultPrevented, true); // cancels the request and restores the draft
+  await sleep(SETTLED);
+  assert.equal(doc.querySelector('.pl-card'), null); // no "Could not restore" card
+  assert.deepEqual(log.pastes, []);
+  assert.equal(composer.innerHTML, TRAILING);
+  answer(EN); // the cancelled result lands and is dropped
+  await sleep(SETTLED);
+  assert.deepEqual(log.pastes, []);
+  assert.equal(composer.innerHTML, TRAILING);
+});
+
 test('a write that fails its check: the Korean is pasted back line for line and the failure is shown', async () => {
   const log = freshComposer(TYPED, { paste: (t) => (t === EN ? 'A1' : t) }); // the translation lands short
   assert.equal(enter().defaultPrevented, true);

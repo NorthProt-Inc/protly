@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "npm run build && node --test \"tests/*.test.js\" && python3 -I host/test_host.py"
+    "test": "npm run build && node --test \"tests/*.test.js\" && python3 -I host/test_host.py && python3 -I host/test_edit.py"
   },
   "devDependencies": {
     "esbuild": "0.28.2",
