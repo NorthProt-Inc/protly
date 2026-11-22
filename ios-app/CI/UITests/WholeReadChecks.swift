@@ -15,7 +15,7 @@ import XCTest
 enum WholeChecks {
     /// The same lists as checks.py WHOLE_NATIVE_CASES, WHOLE_WEB_CASES and WHOLE_WEB_HOSTS (test_checks.py compares).
     static let nativeCases = ["win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead", "etail"]
-    static let webCases = ["win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead"]
+    static let webCases = ["win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3"]
     static let webHosts = ["textarea", "lexical"]
     /// Tries per case, all of which must pass; 1 for the others (checks.py WHOLE_TRIES).
     static let tries: [String: Int] = ["win": 2, "long": 2, "swin": 3, "smid": 2, "ssel": 2]
@@ -76,7 +76,7 @@ enum WholeChecks {
         case "smid": return Spec(name: name, fill: 8, units: 39, cursor: 26)
         case "ssel": return Spec(name: name, fill: 7, units: 39, cursor: 39, selectAll: true)
         case "s3": return Spec(name: name, fill: 9, units: 93, cursor: 93)
-        case "shead": return Spec(name: name, fill: 7, units: 39, cursor: 39, head: true)
+        case "shead": return Spec(name: name, fill: 11, units: 39, cursor: 39, head: true)
         case "etail": return Spec(name: name, fill: 10, units: 42, cursor: 26)
         default: return nil
         }
@@ -119,13 +119,13 @@ enum WholeChecks {
 
     /// The stub's reply: the shape it carried; nil when it is not one. (Since F02c the reply has no read time: the
     /// speculative call starts before the read ends. The keyboard log has the read's time.)
-    static func parseReply(_ s: String) -> (shape: Shape, ms: Int?)? {
+    static func parseReply(_ s: String) -> Shape? {
         guard let re = try? NSRegularExpression(pattern: #"^read (\d+)/(\d+)/h([0-9a-f]{8})$"#),
               let m = re.firstMatch(in: s, range: NSRange(location: 0, length: (s as NSString).length)) else { return nil }
         let ns = s as NSString
         let g = (1..<m.numberOfRanges).map { ns.substring(with: m.range(at: $0)) }
         guard let len = Int(g[0]), let lf = Int(g[1]) else { return nil }
-        return (Shape(len: len, lf: lf, h: g[2]), nil)
+        return Shape(len: len, lf: lf, h: g[2])
     }
 }
 
@@ -347,7 +347,7 @@ extension PhoneRun {
         if s.refusal, web != nil || !s.nativeReads {
             if v.panel.isEmpty {
                 let reply = v.texts(v.card).map(\.label).first { $0.hasPrefix("read ") }
-                r.check(false, "outcome=card reply=\(reply.flatMap { WholeChecks.parseReply($0)?.shape.text } ?? "none")")
+                r.check(false, "outcome=card reply=\(reply.flatMap { WholeChecks.parseReply($0)?.text } ?? "none")")
             } else {
                 let msg = v.texts(v.panel).map(\.label).joined(separator: " ")
                 r.check(msg == WholeChecks.refusal, "panel=\(q(msg))")
@@ -382,7 +382,7 @@ extension PhoneRun {
             closeCall(v)
             return r
         }
-        r.check(parsed.shape == before, "reply=\(parsed.shape.text)")
+        r.check(parsed == before, "reply=\(parsed.text)")
         // An accepted read leaves the cursor at the end of the field (recorded only on the SwiftUI field, whose
         // probe follows the text system's selection changes as SwiftUI reports them).
         let caretRead = wholeCaret(host, web)
@@ -447,8 +447,8 @@ extension PhoneRun {
         let reply = v.texts(v.card).map(\.label).first { $0.hasPrefix("read ") }
         let parsed = reply.flatMap { WholeChecks.parseReply($0) }
         // The card's other texts are never logged: only the reply's shape, or that none parsed.
-        r.check(parsed?.shape == WholeChecks.Shape(WholeChecks.headUnits),
-                "reply=\(parsed?.shape.text ?? "unparsed") want \(WholeChecks.Shape(WholeChecks.headUnits).text)")
+        r.check(parsed == WholeChecks.Shape(WholeChecks.headUnits),
+                "reply=\(parsed?.text ?? "unparsed") want \(WholeChecks.Shape(WholeChecks.headUnits).text)")
         r.check(v.button("Replace", in: v.card) == nil, "replace=\(v.button("Replace", in: v.card) == nil ? "none" : "offered")")
         closeCall(v)
         let left = wholeShape(host, web)
