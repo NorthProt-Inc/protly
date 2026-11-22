@@ -37,17 +37,63 @@ final class CursorReturnTests: XCTestCase {
         step(&c, nil, before: "y")
         step(&c, 5, before: "z")
         XCTAssertEqual(c.back(before: "z"), 0)
+        XCTAssertFalse(c.isKnown)
     }
 
-    /// An accepted read ends at the field's end, which the walks confirmed: the cursor is then the first forward walk's
-    /// length past where the user had it, whatever happened in between (a phantom at the start included).
-    func testAConfirmedEndMakesThePositionKnownAgain() {
+    /// The first walk to the end (every step of which fit the contexts) fixes where the end is. A later walk that
+    /// reaches the end makes the position known again, whatever happened in between (a phantom at the start, a return
+    /// move that landed short).
+    func testTheEndMakesThePositionKnownAgain() {
         var c = CursorReturn()
         c.begin()
         step(&c, 30, before: "end")
-        step(&c, nil, before: "")
-        c.confirmEnd(fromOrigin: 30, before: "end")
+        c.reachedEnd(before: "end")
         XCTAssertEqual(c.back(before: "end"), -30)
+        step(&c, -50, before: "")
+        step(&c, nil, before: "")
+        XCTAssertFalse(c.isKnown)
+        step(&c, 48, before: "nd")
+        XCTAssertEqual(c.back(before: "nd"), 0)
+        c.reachedEnd(before: "end")
+        XCTAssertTrue(c.isKnown)
+        XCTAssertEqual(c.back(before: "end"), -30)
+    }
+
+    /// The end is where the field ends: a known offset that disagrees with it (a step the host applied short) gives way.
+    func testTheEndWinsOverTheSummedSteps() {
+        var c = CursorReturn()
+        c.begin()
+        step(&c, 20, before: "end")
+        c.reachedEnd(before: "end")
+        step(&c, -40, before: "")
+        step(&c, 38, before: "en")
+        c.reachedEnd(before: "end")
+        XCTAssertEqual(c.back(before: "end"), -20)
+    }
+
+    /// Lost before the first end: no end can bring the position back.
+    func testNoEndBeforeTheFirstWalkEnded() {
+        var c = CursorReturn()
+        c.begin()
+        step(&c, nil, before: "x")
+        c.reachedEnd(before: "end")
+        XCTAssertFalse(c.isKnown)
+        XCTAssertFalse(c.hasEnd)
+        XCTAssertEqual(c.back(before: "end"), 0)
+    }
+
+    /// The end of a read is not the end of the next one.
+    func testBeginForgetsTheEnd() {
+        var c = CursorReturn()
+        c.begin()
+        step(&c, 9, before: "end")
+        c.reachedEnd(before: "end")
+        XCTAssertTrue(c.hasEnd)
+        c.begin()
+        XCTAssertFalse(c.hasEnd)
+        step(&c, nil, before: "x")
+        c.reachedEnd(before: "end")
+        XCTAssertFalse(c.isKnown)
     }
 
     /// The field changed after the read: typed at the end, or the window no longer agrees with where the read left

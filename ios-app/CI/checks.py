@@ -25,6 +25,7 @@ checks-raw.txt and rewrites checks.txt with the final lines. Prints `CHECKS`, th
 `CHECKS pass N fail N record N skip N` (plus ` not-run N` when any ID is NOT-RUN). Exit 1 when any line is FAIL.
 """
 
+import datetime
 import os
 import re
 import sys
@@ -64,6 +65,13 @@ WHOLE_TRIES = {"win": 2, "long": 2}
 WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r4k"]
                     + [f"wr-swiftui-{c}" for c in WHOLE_NATIVE_CASES])
 WHOLE_WEB_IDS = [f"wr-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in WHOLE_WEB_CASES]
+# What the keyboard's own log (keyboard-log.txt, category `read`) must say for each wr- try, between the try's MARK
+# (wr-<host>-<case>-t<n> in ui-log.txt) and the next MARK: a refusal case its refusal reason (`<walk>:<why>`; the web
+# drafts with emoji are refused for the emoji, the native 14 055-unit one at the read's 4000-unit cap), an accepted
+# case the read accepted and Replace and Undo both proven by the keyboard (`replace ... held=1`, twice).
+WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong",),
+                  ("web", "x14k"): ("b1:characters", "b1:badStep"),
+                  ("web", "emoji"): ("b1:characters", "b1:badStep")}
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
                 + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
@@ -1258,6 +1266,69 @@ RESOLVERS = {"6.8-9": resolve_relaunch, "6.8-10": resolve_memory, **{i: resolve_
 NO_KEY = "no network key"
 
 
+KB_READ_LINE = re.compile(r"^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d+) .*\[com\.northprot\.protly:read\] (.*)$")
+
+
+def parse_kb_read(text):
+    """(epoch seconds, line) for each keyboard `read` log line; `log show` prints UTC on the CI runner."""
+    out = []
+    for raw in (text or "").splitlines():
+        m = KB_READ_LINE.match(raw)
+        if not m:
+            continue
+        t = datetime.datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=datetime.timezone.utc)
+        out.append((t.timestamp(), m.group(2)))
+    return out
+
+
+def kv(line, name):
+    m = re.search(r"(?:^| )" + re.escape(name) + r"=(\S+)", line)
+    return m.group(1) if m else None
+
+
+def resolve_whole_log(check, marks, kb_text):
+    """K1b: the keyboard's log for each try of a wr- line the test wrote (see WHOLE_REFUSALS). A PASS without the log
+    lines it needs is a FAIL; a FAIL stays one and gains the log's words."""
+    host, case = check.id.split("-", 2)[1:]
+    kind = "web" if host in WHOLE_WEB_HOSTS else "native"
+    refusal = WHOLE_REFUSALS.get((kind, case))
+    if kb_text is None:
+        problems, notes = ["no keyboard-log.txt"], []
+    else:
+        events = parse_kb_read(kb_text)
+        problems, notes = [], []
+        for t in range(1, WHOLE_TRIES.get(case, 1) + 1):
+            start = marks.get(f"{check.id}-t{t}")
+            if start is None:
+                problems.append(f"t{t}:no MARK")
+                continue
+            end = min((m for m in marks.values() if m > start), default=float("inf"))
+            lines = [line for at, line in events if start - 0.5 <= at < end]
+            done = [line for line in lines if line.startswith("read done ")]
+            if len(done) != 1:
+                problems.append(f"t{t}:no read done" if not done else f"t{t}:{len(done)} reads")
+                continue
+            outcome, reason, took = kv(done[0], "outcome"), kv(done[0], "reason"), kv(done[0], "ms")
+            if refusal:
+                notes.append(f"t{t}:{outcome}/{reason}")
+                if outcome != "refused" or reason not in refusal:
+                    problems.append(f"t{t}:{outcome}/{reason} want refused/{'|'.join(refusal)}")
+                continue
+            held = [kv(line, "held") for line in lines if line.startswith("replace ")]
+            if outcome != "accepted":
+                notes.append(f"t{t}:{outcome}/{reason}")
+                problems.append(f"t{t}:{outcome}/{reason}")
+                continue
+            notes.append(f"t{t}:{outcome}/{took}ms/held={','.join(held)}")
+            if held != ["1", "1"]:
+                problems.append(f"t{t}:held={','.join(held) or 'none'} want 1,1 (Replace, Undo)")
+    evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
+    if problems:
+        evidence += " log-problems=" + ",".join(problems)
+    status = "FAIL" if problems or check.status != "PASS" else "PASS"
+    return Check(check.id, status, evidence)
+
+
 def guard_network(c, network_key):
     """A RULES item passes only through its model output; with the key a missing key is the CI's failure."""
     if c.id in RULES and c.status == "PASS":
@@ -1297,6 +1368,12 @@ def assemble(checks_text, log_text, mem_text, network_key=False, ran=None, run_d
         resolver = RESOLVERS.get(check_id)
         by_id[check_id] = (resolver(c, marks, samples, run_dir) if resolver
                            else unreadable(check_id, f"unresolved PENDING {c.evidence}"))
+    if run_dir is not None:
+        kb_text = read(os.path.join(run_dir, "keyboard-log.txt"))
+        for check_id, c in list(by_id.items()):
+            if check_id in WHOLE_NATIVE_IDS + WHOLE_WEB_IDS and c.status in ("PASS", "FAIL") \
+                    and not c.evidence.startswith("unreadable"):
+                by_id[check_id] = resolve_whole_log(c, marks, kb_text)
     for check_id, c in list(by_id.items()):
         if c.evidence.startswith("unreadable") or c.status not in ("PASS", "SKIP"):
             continue

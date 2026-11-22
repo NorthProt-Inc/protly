@@ -43,12 +43,15 @@ struct HostView: View {
     @FocusState private var focused: Bool
     /// K1b (`-wholefills 1`): a UTF-16 selection the host asks the field for (a fill's cursor, select all).
     @State private var selectRequest: NSRange?
+    /// K1b: the SwiftUI field's selection as `location,length` in UTF-16 units (SelectingField), as the UITextView
+    /// screen's `sel` probe; empty before iOS 18 or without a selection.
+    @State private var selection = ""
     private let fills = (UserDefaults.standard.string(forKey: "fills") ?? "").split(separator: "|").map(String.init)
 
     /// With `-wholefills 1` on iOS 18 and later the field's selection is bound (SelectingField); else as always.
     private var field: AnyView {
         if #available(iOS 18.0, *), WholeDrafts.enabled {
-            return AnyView(styled(SelectingField(text: $text, request: $selectRequest)))
+            return AnyView(styled(SelectingField(text: $text, request: $selectRequest, probe: $selection)))
         }
         return AnyView(styled(TextField("", text: $text, axis: .vertical)))
     }
@@ -104,6 +107,7 @@ struct HostView: View {
                             .accessibilityIdentifier("rfocus")
                     }
                     WholeFillButtons { i in fill(i) }
+                    Probe(id: "sel", value: selection)
                 }
             }
             .tint(.white)
@@ -574,15 +578,38 @@ struct WholeFillButtons: View {
 
 /// K1b (`-wholefills 1`, iOS 18 and later): the default screen's SwiftUI field with its selection bound, so the host
 /// can put the cursor inside a fill (wr-swiftui-mid) or select the whole text (wr-swiftui-sel). A request is applied
-/// once and then cleared.
+/// once and then cleared. `probe` is the selection as `location,length` in UTF-16 units, whoever set it (the host or
+/// the text system), for HostView's `sel` probe.
 @available(iOS 18.0, *)
 struct SelectingField: View {
     @Binding var text: String
     @Binding var request: NSRange?
-    @State private var selection: TextSelection?
+    @Binding var probe: String
+    @State private var stored: TextSelection?
+
+    /// Every change of the selection updates the probe on its way in.
+    private var selection: Binding<TextSelection?> {
+        Binding(get: { stored }, set: { new in
+            stored = new
+            probe = Self.offsets(new, in: text)
+        })
+    }
+
+    /// `location,length` in UTF-16 units; `multi` for several ranges, "" for none or indices outside the text.
+    static func offsets(_ s: TextSelection?, in text: String) -> String {
+        guard let s else { return "" }
+        switch s.indices {
+        case .selection(let r):
+            guard r.lowerBound >= text.startIndex, r.upperBound <= text.endIndex else { return "" }
+            let u = text.utf16
+            return "\(u.distance(from: u.startIndex, to: r.lowerBound)),\(u.distance(from: r.lowerBound, to: r.upperBound))"
+        default:
+            return "multi"
+        }
+    }
 
     var body: some View {
-        TextField("", text: $text, selection: $selection, axis: .vertical)
+        TextField("", text: $text, selection: selection, axis: .vertical)
             .onChange(of: request) { _, wanted in
                 guard let wanted else { return }
                 request = nil
@@ -590,7 +617,8 @@ struct SelectingField: View {
                 guard wanted.location >= 0, wanted.length >= 0, wanted.location + wanted.length <= u.count else { return }
                 let start = u.index(u.startIndex, offsetBy: wanted.location)
                 let end = u.index(start, offsetBy: wanted.length)
-                selection = wanted.length == 0 ? TextSelection(insertionPoint: start) : TextSelection(range: start..<end)
+                selection.wrappedValue = wanted.length == 0 ? TextSelection(insertionPoint: start)
+                    : TextSelection(range: start..<end)
             }
     }
 }

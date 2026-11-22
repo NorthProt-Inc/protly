@@ -70,8 +70,11 @@ final class KeyboardSourceRulesTests: XCTestCase {
         let ns = text as NSString
         let calls = matches(#"\blog\.(debug|info|notice|error|fault|log)\("#, in: text)
         XCTAssertGreaterThanOrEqual(calls.count, 4)
+        // Numbers, 0/1 flags and fixed words (tags, outcomes, reasons) only.
         let values = Set(["tag", "count", "lf", "hash", "reason", "steps", "took", "outcome", "units", "deleted",
-                          "inserted", "sent", "emptyMS", "empty", "heldMS", "ok"])
+                          "inserted", "sent", "heldMS", "ok", "position", "known", "retries", "resyncs", "why", "k",
+                          "b0", "a0", "b1", "a1", "fb", "fa", "ch", "sb", "sa", "ss", "quietMS", "gate", "changes",
+                          "seen", "lb", "la", "ends"])
         for range in calls {
             let line = lineText(ns, range)
             for m in matches(#"\\\(([A-Za-z_][A-Za-z0-9_.]*)"#, in: line) {

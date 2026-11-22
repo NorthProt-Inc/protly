@@ -71,6 +71,16 @@ final class WholeReadTests: XCTestCase {
         XCTAssertGreaterThan(WholeRead.total, 5 * WholeRead.probeWait)
     }
 
+    /// Replace waits for the host, which applies the deletes one by one (run 162: 3247 deletes took the host 7-12 s,
+    /// 2-3.6 ms each, while the proxy showed an empty field after 0.36 s), until the field has been quiet this long.
+    func testReplaceWaitsForTheHostInProportion() {
+        XCTAssertEqual(WholeRead.quiet, 0.5)
+        XCTAssertEqual(WholeRead.replaceLimit(deletes: 0), 3)
+        XCTAssertEqual(WholeRead.replaceLimit(deletes: 4000), 23, accuracy: 0.001)
+        // At the slowest rate measured (3.6 ms a delete, SwiftUI) a 4000-unit field still fits, with the quiet wait.
+        XCTAssertGreaterThan(WholeRead.replaceLimit(deletes: 4000), 4000 * 0.0036 + WholeRead.quiet)
+    }
+
     // MARK: Walks on a fake field
 
     /// The host: `text` with the cursor at `pos` (UTF-16), a before-context of at most `window` units and an
@@ -80,8 +90,11 @@ final class WholeReadTests: XCTestCase {
         var pos: Int
         var window = 60
         var byCharacters = false
+        /// Positions where the before-context shows empty (a window on its way, run 162 swiftui long t2) until the
+        /// cursor has left them once.
+        var blanks: Set<Int> = []
 
-        var before: [UInt16] { Array(text[max(0, pos - window)..<pos]) }
+        var before: [UInt16] { blanks.contains(pos) ? [] : Array(text[max(0, pos - window)..<pos]) }
         var after: [UInt16] { Array(text[pos...].prefix { $0 != 10 }) }
 
         mutating func move(_ k: Int) -> Bool {
@@ -112,13 +125,24 @@ final class WholeReadTests: XCTestCase {
         for _ in 0..<10_000 {
             let k = w.plan(before: f.before, after: f.after)
             let b0 = f.before, a0 = f.after
+            let from = f.pos
             let changed = f.move(-k)
             let changedContexts = changed && (f.before != b0 || f.after != a0)
-            let s = w.landed(changed: changedContexts, before: f.before, after: f.after)
+            var s = w.landed(changed: changedContexts, before: f.before, after: f.after)
+            if case .retry(let m) = s {
+                // The driver undoes the probe; the blank it stood on has caught up by then.
+                net = net.map { $0 - 1 }
+                f.blanks.remove(from)
+                let b1 = f.before, a1 = f.after
+                let moved = f.move(m)
+                s = w.undone(changed: moved && (f.before != b1 || f.after != a1), before: f.before, after: f.after)
+                if case .moved = s {} else { return (s, w.units, net) }
+            }
             switch s {
             case .moved(let d): net = net.map { $0 + d }
             case .phantom: net = nil
             case .done: return (s, w.units, net)
+            case .retry: return (s, w.units, net)
             case .failed(_, let moved):
                 net = net.flatMap { n in moved.map { n + $0 } }
                 return (s, w.units, net)
@@ -128,17 +152,21 @@ final class WholeReadTests: XCTestCase {
         return (.failed("loop", moved: nil), w.units, nil)
     }
 
-    private func walkForward(_ f: inout Field, cap: Int = WholeRead.cap) -> (step: WalkStep, units: [UInt16], net: Int?) {
-        var w = ForwardWalk(cap: cap)
+    private func walkForward(_ f: inout Field, cap: Int = WholeRead.cap, resync: Bool = false,
+                             stale: (before: [UInt16], after: [UInt16])? = nil) -> (step: WalkStep, units: [UInt16], net: Int?) {
+        var w = ForwardWalk(cap: cap, resyncFirst: resync)
         var net: Int? = 0
+        var shown = stale
         for _ in 0..<10_000 {
-            let k = w.plan(after: f.after)
-            let b0 = f.before, a0 = f.after
+            // `stale`: what the keyboard was shown before the first step (the host moved the caret without telling it).
+            let b0 = shown?.before ?? f.before, a0 = shown?.after ?? f.after
+            shown = nil
+            let k = w.plan(after: a0)
             let changed = f.move(k)
             let s = w.landed(changed: changed && (f.before != b0 || f.after != a0), before: f.before, after: f.after)
             switch s {
             case .moved(let d): net = net.map { $0 + d }
-            case .phantom: net = nil
+            case .phantom, .retry: net = nil
             case .done: return (s, w.units, net)
             case .failed(_, let moved):
                 net = net.flatMap { n in moved.map { n + $0 } }
@@ -251,15 +279,61 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(w.units, [])
     }
 
-    /// A probe that shows text before the cursor (a false start: the before-context was empty mid-field) would put a
-    /// guessed unit in the text; and one that gains a unit at the after-context's front crossed text.
-    func testAFalseStartIsBad() {
+    /// A probe that shows text before the cursor (a false start: the before-context was empty mid-field), or gains a
+    /// unit at the after-context's front, crossed a unit it cannot name (guessing it corrupted texts: run
+    /// 3293a10-138). The walk asks to undo the probe and look again, up to `maxRetries` times; then it is bad.
+    func testAFalseStartIsUndoneAndLookedAtAgain() {
         var w = BackWalk(cap: 100)
-        _ = w.plan(before: [])
-        XCTAssertEqual(w.landed(changed: true, before: u("ab"), after: u("cd")), .failed("falseStart", moved: -1))
+        _ = w.plan(before: [], after: u("cd"))
+        XCTAssertEqual(w.landed(changed: true, before: u("ab"), after: u("bcd")), .retry(1))
+        // The undo lands where the probe started: the after-context is the one the probe saw.
+        XCTAssertEqual(w.undone(changed: true, before: u("ab"), after: u("cd")), .moved(1))
+        XCTAssertEqual(w.units, [], "nothing guessed")
         var v = BackWalk(cap: 100)
-        _ = v.plan(before: [])
-        XCTAssertEqual(v.landed(changed: true, before: [], after: u("xcd")), .failed("falseStart", moved: -1))
+        _ = v.plan(before: [], after: u("cd"))
+        XCTAssertEqual(v.landed(changed: true, before: [], after: u("xcd")), .retry(1))
+        // An undo that changed nothing, or landed elsewhere, cannot be named: the walk stops.
+        XCTAssertEqual(v.undone(changed: false, before: [], after: u("xcd")), .failed("badUndo", moved: nil))
+        var x = BackWalk(cap: 100)
+        _ = x.plan(before: [], after: u("cd"))
+        _ = x.landed(changed: true, before: u("ab"), after: u("bcd"))
+        XCTAssertEqual(x.undone(changed: true, before: u("ab"), after: u("zz")), .failed("badUndo", moved: nil))
+    }
+
+    func testFalseStartsStopTheWalkAfterTheRetries() {
+        var w = BackWalk(cap: 100)
+        for _ in 0..<BackWalk.maxRetries {
+            _ = w.plan(before: [], after: u("cd"))
+            XCTAssertEqual(w.landed(changed: true, before: u("ab"), after: u("bcd")), .retry(1))
+            XCTAssertEqual(w.undone(changed: true, before: [], after: u("cd")), .moved(1))
+        }
+        _ = w.plan(before: [], after: u("cd"))
+        XCTAssertEqual(w.landed(changed: true, before: u("ab"), after: u("bcd")), .failed("falseStart", moved: -1))
+    }
+
+    /// Run 162 swiftui long t2: an empty before-context mid-field outlived the 0.3 s wait. Undone and looked at again
+    /// once it caught up, the walk reads the field exactly.
+    func testAWalkThroughBlanksReadsExactly() {
+        let t = u(draft)
+        var f = Field(text: t, pos: t.count, window: 25)
+        f.blanks = [t.count - 30, t.count - 90, 40]
+        // Blanks only where a step lands (so the walk sees them): plant them on the walk's own path.
+        var probe = f
+        probe.blanks = []
+        var path: [Int] = []
+        var w = BackWalk(cap: 4000)
+        while probe.pos > 0 {
+            let k = w.plan(before: probe.before, after: probe.after)
+            _ = probe.move(-k)
+            path.append(probe.pos)
+            _ = w.landed(changed: true, before: probe.before, after: probe.after)
+        }
+        f.blanks = Set([path[1], path[3], path[path.count / 2]].filter { $0 > 0 })
+        XCTAssertEqual(f.blanks.count, 3)
+        let bw = walkBack(&f)
+        XCTAssertEqual(bw.step, .done)
+        XCTAssertEqual(bw.units, t)
+        XCTAssertEqual(bw.net, -t.count)
     }
 
     func testAForwardStepMustShowThePieceBeforeTheCursor() {
@@ -285,17 +359,48 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(x.landed(changed: true, before: u("bc"), after: []), .failed("badStep", moved: 1))
     }
 
+    /// Runs 163 textarea and lexical `mid`, `sel`: the page moved the caret without telling the keyboard, so the
+    /// first step forward from the contexts it was shown fits nothing. The first walk may count that one step as a
+    /// resync: the requested move, no units (the walk only has to reach the end); a later bad step still stops it.
+    func testTheFirstForwardStepMayResync() {
+        let t = u(draft)
+        var f = Field(text: t, pos: 30)
+        let stale = (before: Array(t[0..<10]), after: Array(t[10...].prefix { $0 != 10 }))
+        let fw = walkForward(&f, resync: true, stale: stale)
+        XCTAssertEqual(fw.step, .done)
+        XCTAssertEqual(f.pos, t.count)
+        XCTAssertEqual(fw.net, t.count - 30, "the resync step counts its requested move")
+        XCTAssertTrue(t.elementsEqual(t.prefix(t.count - fw.units.count) + fw.units), "the rest is the field's end")
+        var g = Field(text: t, pos: 30)
+        let gw = walkForward(&g, resync: false, stale: stale)
+        guard case .failed(let why, _) = gw.step else { return XCTFail("\(gw.step)") }
+        XCTAssertEqual(why, "badStep")
+        // Only the first step: a later one that fits nothing stops the walk.
+        var w = ForwardWalk(cap: 100, resyncFirst: true)
+        XCTAssertEqual(w.plan(after: u("abcdef")), 5)
+        XCTAssertEqual(w.landed(changed: true, before: u("qq"), after: u("zz")), .moved(5))
+        XCTAssertEqual(w.resyncs, 1)
+        XCTAssertEqual(w.plan(after: u("abcdef")), 5)
+        XCTAssertEqual(w.landed(changed: true, before: u("qq"), after: u("zz")), .failed("badStep", moved: 5))
+    }
+
     // MARK: Acceptance
 
     func testAcceptOnlyAgreeingWalksAndConfirmedEnds() {
         let text = u("the whole field\nsecond line")
-        XCTAssertNil(WholeRead.refusal(back1: text, mid: [], back2: text, last: []))
+        XCTAssertNil(WholeRead.refusal(first: [], back1: text, mid: [], back2: text, last: []))
         // A return that landed 2 units short: the confirming walk crossed the text's last 2 units.
-        XCTAssertNil(WholeRead.refusal(back1: text, mid: Array(text.suffix(2)), back2: text, last: Array(text.suffix(1))))
-        XCTAssertEqual(WholeRead.refusal(back1: text, mid: [], back2: Array(text.dropFirst()), last: []), "disagree")
+        XCTAssertNil(WholeRead.refusal(first: [], back1: text, mid: Array(text.suffix(2)), back2: text, last: Array(text.suffix(1))))
+        XCTAssertEqual(WholeRead.refusal(first: [], back1: text, mid: [], back2: Array(text.dropFirst()), last: []), "disagree")
         // The second walk started from a false end, and the last walk went on past it: never the text's end.
-        XCTAssertEqual(WholeRead.refusal(back1: text, mid: [], back2: text, last: u(" more")), "lastEnd")
-        XCTAssertEqual(WholeRead.refusal(back1: text, mid: u("extra"), back2: text, last: []), "midEnd")
-        XCTAssertEqual(WholeRead.refusal(back1: [], mid: [], back2: [], last: u("x")), "lastEnd")
+        XCTAssertEqual(WholeRead.refusal(first: [], back1: text, mid: [], back2: text, last: u(" more")), "lastEnd")
+        XCTAssertEqual(WholeRead.refusal(first: [], back1: text, mid: u("extra"), back2: text, last: []), "midEnd")
+        XCTAssertEqual(WholeRead.refusal(first: [], back1: [], mid: [], back2: [], last: u("x")), "lastEnd")
+        // Both walks back stopped at the same false start between the user's cursor and the end: the first walk to
+        // the end crossed more than they read.
+        XCTAssertNil(WholeRead.refusal(first: Array(text.suffix(6)), back1: text, mid: [], back2: text, last: []))
+        XCTAssertEqual(WholeRead.refusal(first: u("x") + Array(text.suffix(6)), back1: text, mid: [], back2: text, last: []),
+                       "firstEnd")
+        XCTAssertEqual(WholeRead.refusal(first: u("more text") + text, back1: text, mid: [], back2: text, last: []), "firstEnd")
     }
 }

@@ -23,6 +23,12 @@ public enum FieldGuard {
         offersUndo(true, selected: selected) && !inserted.isEmpty && (before.hasSuffix(inserted) || isEnd(of: inserted, before))
     }
 
+    /// Undo of a whole-field Replace (K1b): as canUndo, and nothing after the cursor, where Replace left it. A cursor
+    /// moved into the result since would make the deletes take the wrong characters.
+    public static func canUndoReplace(_ inserted: String, before: String, after: String, selected: String) -> Bool {
+        after.isEmpty && canUndo(inserted, before: before, selected: selected)
+    }
+
     /// `window` is non-empty and is `text`'s end: by whole characters (canonical equivalence counts), or by UTF-16
     /// units when the window starts inside a character.
     static func isEnd(of text: String, _ window: String) -> Bool {

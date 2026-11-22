@@ -19,6 +19,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 FAKE_KEY = "sk-" + "ant-test"
 
 
+WHOLE_IDS = checks.WHOLE_NATIVE_IDS + checks.WHOLE_WEB_IDS
+
+
 def every_id_but(*skip, status="PASS"):
     """A line per expected ID; the IDs checks.py judges by model output (RULES) as a key-less run writes them."""
     return "".join(f"CHECK {i} SKIP no network key\n" if i in checks.RULES else f"CHECK {i} {status} ok\n"
@@ -218,14 +221,16 @@ class MainTests(unittest.TestCase):
     def test_writes_final_checks_and_keeps_the_raw(self):
         with tempfile.TemporaryDirectory() as d:
             with open(os.path.join(d, "checks.txt"), "w", encoding="utf-8") as f:
-                f.write(every_id_but("icon") + "CHECK icon RECORD found\n")
+                # wr- lines need the keyboard's log (WholeReadTests); a full run never has them (FILTERED_ONLY).
+                f.write(every_id_but("icon", *WHOLE_IDS) + "CHECK icon RECORD found\n")
             out = subprocess.run([sys.executable, os.path.join(HERE, "checks.py"), d],
                                  capture_output=True, text=True)
             self.assertEqual(out.returncode, 0, out.stderr)
             lines = out.stdout.splitlines()
             self.assertEqual(lines[0], "CHECKS")
-            ruled = len(checks.RULES)
-            self.assertEqual(lines[-1], f"CHECKS pass {len(checks.EXPECTED_IDS) - 1 - ruled} fail 0 record 1 skip {ruled}")
+            ruled, whole = len(checks.RULES), len(WHOLE_IDS)
+            self.assertEqual(lines[-1], f"CHECKS pass {len(checks.EXPECTED_IDS) - 1 - ruled - whole} fail 0 record 1 "
+                                        f"skip {ruled} not-run {whole}")
             with open(os.path.join(d, "checks.txt"), encoding="utf-8") as f:
                 self.assertEqual(f.read().splitlines(), lines[1:-1])
             self.assertTrue(os.path.exists(os.path.join(d, "checks-raw.txt")))
@@ -879,10 +884,11 @@ class PeriodTests(unittest.TestCase):
     def test_main_without_a_filter_counts_the_period_ids_not_run(self):
         with tempfile.TemporaryDirectory() as d:
             with open(os.path.join(d, "checks.txt"), "w", encoding="utf-8") as f:
-                f.write(every_id_but(*checks.PERIOD_IDS))
+                f.write(every_id_but(*checks.PERIOD_IDS, *WHOLE_IDS))
             out = subprocess.run([sys.executable, os.path.join(HERE, "checks.py"), d], capture_output=True, text=True)
             self.assertEqual(out.returncode, 0, out.stdout)
-            self.assertTrue(out.stdout.splitlines()[-1].endswith(f" not-run {len(checks.PERIOD_IDS)}"), out.stdout)
+            n = len(checks.PERIOD_IDS) + len(WHOLE_IDS)
+            self.assertTrue(out.stdout.splitlines()[-1].endswith(f" not-run {n}"), out.stdout)
 
     def test_word_after_the_cursor_gets_the_period(self):
         for check_id, sel in [("dsp-uikit-word", self.UIKIT_SEL), ("dsp-composer-word", self.WEB_SEL)]:
@@ -1259,6 +1265,83 @@ class WholeReadTests(unittest.TestCase):
         self.assertEqual(final["wr-uikit-long"].status, "FAIL")
         self.assertEqual(final["wr-textarea-win"].status, "FAIL")
         self.assertEqual(final["wr-lexical-emoji"].status, "FAIL")  # selected, no line
+
+    # The keyboard's own log for each try (keyboard-log.txt, category `read`, in UTC), after the try's MARK.
+    KB = "2026-11-22 08:{m}:{s} Db ProtlyCIKeyboard[1:2] [com.northprot.protly:read] {line}\n"
+
+    def kb(self, *events):
+        return "".join(self.KB.format(m=m, s=s, line=line) for m, s, line in events)
+
+    def marks(self, *pairs):
+        # MARK times in epoch seconds: 2026-11-22 08:00:00 UTC is 1795334400.
+        return "".join(f"MARK {name} {1795334400 + minute * 60 + sec}\n" for name, minute, sec in pairs)
+
+    def assemble_with_logs(self, lines, ui, kb):
+        ran = checks.covered_ids(["PhoneChecksUITests/test5g_wholenative", "PhoneChecksUITests/test5h_wholeweb"])
+        with tempfile.TemporaryDirectory() as d:
+            if kb is not None:
+                with open(os.path.join(d, "keyboard-log.txt"), "w", encoding="utf-8") as f:
+                    f.write(kb)
+            return {c.id: c for c in checks.assemble(lines, ui, "", ran=ran, run_dir=d)}
+
+    ACCEPTED = "read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=4871 known=1"
+    HELD = "replace deleted=335 inserted=26 sentms=0 quietms=900 quiet=1 changes=3 events=4 b=26 a=0 ends=1 heldms=2100 held=1"
+    UNSURE = HELD.replace("held=1", "held=0")
+
+    def test_an_accepted_try_needs_the_read_and_both_writes_proven_in_the_keyboard_log(self):
+        line = "CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 read=4871 replace=3.40 kb=5.10 undo=3.10 kbundo=6.00}\n"
+        ui = self.marks(("wr-uikit-mid-t1", 10, 0), ("wr-uikit-sel-t1", 11, 0))
+        good = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("10", "20.000", self.HELD))
+        final = self.assemble_with_logs(line, ui, good)
+        self.assertEqual(final["wr-uikit-mid"].status, "PASS", final["wr-uikit-mid"].evidence)
+        self.assertIn("log=t1:accepted/4871ms/held=1,1", final["wr-uikit-mid"].evidence)
+        # Undo not proven by the keyboard (held=0): FAIL although the UI test saw the draft back.
+        bad = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("10", "20.000", self.UNSURE))
+        final = self.assemble_with_logs(line, ui, bad)
+        self.assertEqual(final["wr-uikit-mid"].status, "FAIL")
+        self.assertIn("held=1,0", final["wr-uikit-mid"].evidence)
+        # Lines after the next MARK belong to the next try.
+        late = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("11", "02.000", self.HELD))
+        self.assertEqual(self.assemble_with_logs(line, ui, late)["wr-uikit-mid"].status, "FAIL")
+
+    def test_a_refusal_try_needs_its_reason(self):
+        ui = self.marks(("wr-uikit-x14k-t1", 10, 0), ("wr-textarea-emoji-t1", 20, 0), ("wr-textarea-x14k-t1", 30, 0))
+        lines = ('CHECK wr-uikit-x14k PASS t1={real=14055/15/h0c02b8be panel="x" left=14055/15/h0c02b8be}\n'
+                 'CHECK wr-textarea-emoji PASS t1={real=460/9/h0755cc33 panel="x" left=460/9/h0755cc33}\n'
+                 'CHECK wr-textarea-x14k PASS t1={real=14055/15/h0c02b8be panel="x" left=14055/15/h0c02b8be}\n')
+        refused = "read done outcome=refused reason={} units=0 lf=0 h=811c9dc5 ms=3100 known=1"
+        kb = self.kb(("10", "04.000", refused.format("b1:tooLong")), ("20", "02.000", refused.format("b1:characters")),
+                     ("30", "02.000", refused.format("b1:badStep")))
+        final = self.assemble_with_logs(lines, ui, kb)
+        for i in ("wr-uikit-x14k", "wr-textarea-emoji", "wr-textarea-x14k"):
+            self.assertEqual(final[i].status, "PASS", final[i].evidence)
+        self.assertIn("log=t1:refused/b1:tooLong", final["wr-uikit-x14k"].evidence)
+        # Refused, but for another reason than the case is about: FAIL, with the reason.
+        kb = self.kb(("10", "04.000", refused.format("f:badStep")), ("20", "02.000", refused.format("b1:characters")),
+                     ("30", "02.000", refused.format("b1:characters")))
+        final = self.assemble_with_logs(lines, ui, kb)
+        self.assertEqual(final["wr-uikit-x14k"].status, "FAIL")
+        self.assertIn("f:badStep", final["wr-uikit-x14k"].evidence)
+        self.assertEqual(final["wr-textarea-x14k"].status, "PASS")
+
+    def test_no_keyboard_log_fails_a_pass(self):
+        line = "CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 read=4871 replace=3.40}\n"
+        ui = self.marks(("wr-uikit-mid-t1", 10, 0))
+        final = self.assemble_with_logs(line, ui, None)
+        self.assertEqual(final["wr-uikit-mid"].status, "FAIL")
+        self.assertIn("no keyboard-log.txt", final["wr-uikit-mid"].evidence)
+        # Nothing logged after the MARK (the log show window ended before it): FAIL too.
+        final = self.assemble_with_logs(line, ui, self.kb(("09", "59.000", self.ACCEPTED)))
+        self.assertEqual(final["wr-uikit-mid"].status, "FAIL")
+        self.assertIn("t1:no read done", final["wr-uikit-mid"].evidence)
+
+    def test_a_failed_try_keeps_its_fail_and_gains_the_log(self):
+        line = "CHECK wr-swiftui-long FAIL t1={s=6.3 outcome=panel} t1=outcome=panel (not as expected)\n"
+        ui = self.marks(("wr-swiftui-long-t1", 10, 0))
+        kb = self.kb(("10", "02.000", "read done outcome=refused reason=b1:falseStart units=0 lf=0 h=811c9dc5 ms=2291 known=1"))
+        final = self.assemble_with_logs(line, ui, kb)
+        self.assertEqual(final["wr-swiftui-long"].status, "FAIL")
+        self.assertIn("log=t1:refused/b1:falseStart", final["wr-swiftui-long"].evidence)
 
     def test_main_without_a_filter_counts_every_filtered_only_id_not_run(self):
         ids = [i for m in checks.FILTERED_ONLY for i in checks.METHOD_IDS[m]]

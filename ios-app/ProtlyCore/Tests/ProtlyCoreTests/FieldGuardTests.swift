@@ -57,6 +57,19 @@ final class FieldGuardTests: XCTestCase {
 
     /// Replace left "Hi|", then the user added " there" and selected it: Undo's first delete would take the selection,
     /// the next ones the user's text before it. With text selected Undo is refused, and the bar does not offer it.
+    /// K1b: Undo of a whole-field Replace puts the read text back with the cursor at the end; text after the cursor
+    /// (moved since) means the deletes would take the wrong characters.
+    func testUndoOfAReplaceNeedsTheCursorAtTheEnd() {
+        XCTAssertTrue(FieldGuard.canUndoReplace("Hello there.", before: "Hello there.", after: "", selected: ""))
+        XCTAssertTrue(FieldGuard.canUndoReplace("Hello there.", before: "there.", after: "", selected: ""),
+                      "a window of the result's end")
+        XCTAssertFalse(FieldGuard.canUndoReplace("Hello there.", before: "Hello there.", after: " more", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndoReplace("Hello there.", before: "Hello", after: " there.", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndoReplace("Hello there.", before: "Hello there.", after: "", selected: "there"))
+        XCTAssertFalse(FieldGuard.canUndoReplace("Hello there.", before: "Hello there.x", after: "", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndoReplace("", before: "", after: "", selected: ""))
+    }
+
     func testNoUndoOverASelection() {
         XCTAssertTrue(FieldGuard.canUndo("Hi", before: "Hi", selected: ""))
         XCTAssertFalse(FieldGuard.canUndo("Hi", before: "Hi", selected: " there"))

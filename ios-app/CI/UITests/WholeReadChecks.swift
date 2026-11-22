@@ -6,8 +6,9 @@ import XCTest
 /// `read` marker line, so the stub answers with the shape of the text the request carried,
 /// `read <utf16>/<lf>/h<fnv> t<read ms>` (StubActionClient). The check hashes the host's field the same way (FNV-1a
 /// 32 over UTF-16 units; read-probe.html posts it for the web fields) and wants that shape, the field exactly equal to
-/// the reply after Replace within 5 s, and the draft back exactly after Undo. A refusal case wants the refusal panel
-/// and the field unchanged after Cancel. Lengths, line-feed counts, hashes, offsets and timings only, never text. Each
+/// the reply after Replace, the keyboard's own check of it ended with no notice, and the draft back exactly after Undo
+/// (times recorded). checks.py then wants the keyboard's log to agree (`resolve_whole_log`). A refusal case wants the
+/// refusal panel and the field unchanged after Cancel. Lengths, line-feed counts, hashes, offsets and timings only, never text. Each
 /// try is a MARK line in ui-log.txt (`wr-<host>-<case>-t<n>`), for the keyboard's `read` log lines.
 ///
 /// Ported from the walk-back probe (diag/p1-walk-back-strict: WalkChecks.swift, ReadChecks.swift) without its logging.
@@ -29,8 +30,10 @@ enum WholeChecks {
     /// KeyboardViewController refusedText and replaceUnsureText.
     static let refusal = "Could not read the whole text. Copy it, then use Read clipboard."
     static let notice = "Replace may not have finished. Check the text."
-    /// Replace must leave the reply in the field within this long after the tap.
-    static let replaceLimit: TimeInterval = 5
+    /// Replace must leave the reply in the field, and Undo the draft, within this long after the tap; the keyboard
+    /// then checks the field (its strip says "Replacing the text…" until it is done). The host applies one delete per
+    /// character: run 162 took 7-12 s for 3247 units on native hosts. The times are recorded, not judged.
+    static let writeTimeout: TimeInterval = 40
     /// A read takes up to 20 s (the keyboard's cap), then the stub's call about 0.5 s.
     static let readTimeout: TimeInterval = 40
 
@@ -293,15 +296,12 @@ extension PhoneRun {
             return r
         }
         let want = s.selectAll ? "0,\(s.units)" : "\(s.cursor),0"
+        // Every host's probe must show the case's caret or selection, so a no-op set-up cannot pass as `win`.
         let caretBefore = wholeCaret(host, web)
-        if host == "swiftui" {
-            r.add("caret=unprobed")
-        } else {
-            r.add("caret=\(caretBefore ?? "unreadable")")
-            guard caretBefore == want else {
-                r.unreadable = "the caret is \(caretBefore ?? "unreadable"), want \(want)"
-                return r
-            }
+        r.add("caret=\(caretBefore ?? "unreadable")")
+        guard caretBefore == want else {
+            r.unreadable = "the caret is \(caretBefore ?? "unreadable"), want \(want)"
+            return r
         }
 
         d.mark(mark)
@@ -330,11 +330,12 @@ extension PhoneRun {
             closeCall(v)
             let left = wholeShape(host, web)
             r.check(left == before, "left=\(left?.text ?? "unreadable")")
-            if host == "uikit" {
+            if host == "uikit" || web != nil {
+                // The cursor goes back where it was (the UITextView `sel` probe, the page's posted caret).
                 let c = wholeCaret(host, web)
-                r.check(c == caretBefore, "caret-left=\(c ?? "unreadable")")
-            } else if web != nil {
-                r.add("caret-left=\(wholeCaret(host, web) ?? "none")")
+                r.check(c == caretBefore, "caret-left=\(c ?? "unreadable") want \(caretBefore ?? "unreadable")")
+            } else {
+                r.add("caret-left=\(wholeCaret(host, web) ?? "unreadable")")
             }
             return r
         }
@@ -357,10 +358,13 @@ extension PhoneRun {
         }
         r.add("read=\(parsed.ms)")
         r.check(parsed.shape == before, "reply=\(parsed.shape.text)")
-        if host != "swiftui" {
-            // An accepted read leaves the cursor at the end of the field.
-            let c = wholeCaret(host, web)
-            r.check(c == "\(s.units),0", "caret-read=\(c ?? "unreadable")")
+        // An accepted read leaves the cursor at the end of the field (recorded only on the SwiftUI field, whose
+        // probe follows the text system's selection changes as SwiftUI reports them).
+        let caretRead = wholeCaret(host, web)
+        if host == "swiftui" {
+            r.add("caret-read=\(caretRead ?? "unreadable")")
+        } else {
+            r.check(caretRead == "\(s.units),0", "caret-read=\(caretRead ?? "unreadable")")
         }
         guard let replace = v.button("Replace", in: v.card), replace.enabled else {
             r.check(false, "replace=none buttons=\(q(v.buttons(v.card)))")
@@ -372,30 +376,45 @@ extension PhoneRun {
         d.pause(0.6)  // the card ignores taps for 0.5 s after it appears
         let t1 = Date()
         d.point(replace.frame.midX, replace.frame.midY).tap()
-        if let secs = waitField(host, web, since: t1, timeout: 15, exact: target, shape: WholeChecks.Shape(target)) {
-            r.check(secs <= WholeChecks.replaceLimit, String(format: "replace=%.2f", secs))
+        if let secs = waitField(host, web, since: t1, timeout: WholeChecks.writeTimeout, exact: target,
+                                shape: WholeChecks.Shape(target)) {
+            r.add(String(format: "replace=%.2f", secs))
         } else {
             r.check(false, "replace=timeout field=\(wholeShape(host, web)?.text ?? "unreadable")")
             closeCall(d.callView())
             return r
         }
-        d.pause(1.0)
-        if let after = d.callView(), !after.panel.isEmpty {
-            let msg = after.texts(after.panel).map(\.label).joined(separator: " ")
-            r.check(false, "notice=\(q(msg))" + (msg == WholeChecks.notice ? "" : " (not the Replace notice)"))
-            closeCall(after)
-            return r
-        }
+        guard writingEnded(since: t1, "kb", &r) else { return r }
 
         // The protly key is Undo now.
         let t2 = Date()
         d.tapKey(.protlyKey)
-        if let secs = waitField(host, web, since: t2, timeout: 30, exact: original, shape: before) {
+        if let secs = waitField(host, web, since: t2, timeout: WholeChecks.writeTimeout, exact: original, shape: before) {
             r.add(String(format: "undo=%.2f", secs))
         } else {
             r.check(false, "undo=timeout field=\(wholeShape(host, web)?.text ?? "unreadable")")
+            return r
         }
+        _ = writingEnded(since: t2, "kbundo", &r)
         return r
+    }
+
+    /// Replace and its Undo end with the keyboard's own check of the field (the strip says "Replacing the text…"
+    /// meanwhile). true when the strip went away without a notice; the seconds since `since` are recorded as `name`.
+    private func writingEnded(since: Date, _ name: String, _ r: inout WholeTry) -> Bool {
+        let p = poll(WholeChecks.writeTimeout, every: 0.5) { v in v.strip.isEmpty }
+        guard let v = p.view, p.met else {
+            r.check(false, "\(name)=timeout strip=\(q(p.view?.stripText))")
+            return false
+        }
+        r.add(String(format: "\(name)=%.2f", Date().timeIntervalSince(since)))
+        guard v.panel.isEmpty else {
+            let msg = v.texts(v.panel).map(\.label).joined(separator: " ")
+            r.check(false, "\(name)-notice=\(q(msg))" + (msg == WholeChecks.notice ? "" : " (not the Replace notice)"))
+            closeCall(v)
+            return false
+        }
+        return true
     }
 
     /// Puts the case's draft in the field with its cursor or selection; nil when done, else why not.
@@ -455,10 +474,11 @@ extension PhoneRun {
         return field().map { WholeChecks.Shape(Array($0.utf16)) }
     }
 
-    /// `location,length` of the selection: the UITextView's `sel` probe or the page's caret; nil on the SwiftUI field.
+    /// `location,length` of the selection: the `sel` probe (the UITextView's, or HostView's for the SwiftUI field's
+    /// bound selection; empty there before iOS 18) or the page's caret.
     private func wholeCaret(_ host: String, _ web: ReadWeb?) -> String? {
         if let web { return web.caret(host) }
-        return host == "uikit" ? d.probeValue("sel") : nil
+        return d.probeValue("sel")
     }
 
     /// Seconds from `since` until the field equals `exact` (native, UTF-16 units) or has `shape` (web, or no exact

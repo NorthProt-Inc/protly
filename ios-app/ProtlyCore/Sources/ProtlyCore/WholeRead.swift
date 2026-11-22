@@ -26,6 +26,16 @@ public enum WholeRead {
     public static let poll: TimeInterval = 0.02
     public static let settlePolls = 5
 
+    /// Replace: the host applies the deletes one by one (run 162: 7-12 s for 3247 on native hosts, 2-3.6 ms each)
+    /// while the proxy shows the keyboard's own edits at once, so the keyboard waits until the field and the host's
+    /// callbacks have been still this long, and the result shows.
+    public static let quiet: TimeInterval = 0.5
+
+    /// How long Replace may wait for that: 3 s and 5 ms a delete (23 s for 4000).
+    public static func replaceLimit(deletes: Int) -> TimeInterval {
+        3 + 0.005 * Double(deletes)
+    }
+
     /// A step that may wait `wait` s still ends within `total`: the cap stops a read only between steps, so a step
     /// on its way always settles (Cancel's record, CursorReturn, never guesses about it).
     public static func canStart(elapsed: TimeInterval, wait: TimeInterval) -> Bool {
@@ -88,8 +98,11 @@ public enum WholeRead {
     /// the start): nil = accept, else why not. `mid` and `last` are what the walks that confirmed the end crossed
     /// after each return move: a return that landed a few units short (probe runs 154, 155) walks the text's last
     /// units again; anything else means a walk back began short of the end (a false end), so the read is refused.
-    public static func refusal(back1: [UInt16], mid: [UInt16], back2: [UInt16], last: [UInt16]) -> String? {
+    /// `first` (the walk from the user's cursor to the end) must be the read's end too: two walks back that stopped at
+    /// the same false start after the cursor would agree with each other, never with it.
+    public static func refusal(first: [UInt16], back1: [UInt16], mid: [UInt16], back2: [UInt16], last: [UInt16]) -> String? {
         if back1 != back2 { return "disagree" }
+        if !hasSuffix(back1, first) { return "firstEnd" }
         if !hasSuffix(back1, mid) { return "midEnd" }
         if !hasSuffix(back2, last) { return "lastEnd" }
         return nil
@@ -105,6 +118,9 @@ public enum WalkStep: Equatable, Sendable {
     case phantom
     /// The walk reached its end (forward) or the start (back).
     case done
+    /// A probe at an empty before-context crossed a unit it cannot name (a false start: the window was on its way).
+    /// The driver moves by this many units to undo it, then asks BackWalk.undone, then plans again.
+    case retry(Int)
     /// The walk stopped short. `moved`: the move the walk asked for (the host applies the requested offset; only the
     /// contexts were not as expected), nil when not even that is known.
     case failed(String, moved: Int?)
@@ -112,13 +128,19 @@ public enum WalkStep: Equatable, Sendable {
 
 /// One walk back to the start. `plan` gives the next step, `landed` judges it from the contexts once it settled.
 public struct BackWalk: Sendable {
+    /// False starts a walk may undo and look at again (run 162: one in 9 native reads of 3247 units, on SwiftUI; the
+    /// probe saw up to 3 a walk at 3958 units without the 0.3 s wait). Each costs under 1 s.
+    public static let maxRetries = 5
     public let cap: Int
     /// The pieces moved over, nearest the end first.
     private var pieces: [[UInt16]] = []
     public private(set) var count = 0
+    public private(set) var retries = 0
     private var b0: [UInt16] = []
     private var a0: [UInt16] = []
     private var k = 0
+    /// For the log after a step that fits nothing: did the before- and after-context fit the planned move?
+    public private(set) var fit = (before: true, after: true)
 
     public init(cap: Int) { self.cap = cap }
 
@@ -140,7 +162,11 @@ public struct BackWalk: Sendable {
             // Text before the cursor although the context was empty, or a unit gained at the after-context's front:
             // the probe crossed text it cannot name (a false start mid-field; run 3293a10-138 put a guessed unit in).
             let gained = !a1.isEmpty && a1 != a0 && WholeRead.agree(Array(a1.dropFirst()), a0, atEnd: false)
-            if !b1.isEmpty || gained { return .failed("falseStart", moved: -1) }
+            if !b1.isEmpty || gained {
+                guard retries < Self.maxRetries else { return .failed("falseStart", moved: -1) }
+                retries += 1
+                return .retry(1)
+            }
             return .phantom
         }
         guard changed else { return .failed("stuck", moved: 0) }
@@ -148,6 +174,8 @@ public struct BackWalk: Sendable {
             WholeRead.agree(b1, Array(b0.prefix(b0.count - c)), atEnd: true)
                 && WholeRead.agree(a1, Array(b0.suffix(c).prefix { $0 != 10 }), atEnd: false)
         }
+        fit = (WholeRead.agree(b1, Array(b0.prefix(b0.count - k)), atEnd: true),
+               WholeRead.agree(a1, Array(b0.suffix(k).prefix { $0 != 10 }), atEnd: false))
         guard fits(k) else {
             // A web view moves by characters (run 4a2110a-150): the contexts fit k plus the pairs crossed. Refused,
             // never corrected (owner decision). Either way the requested move is what the host applied, and it
@@ -161,6 +189,15 @@ public struct BackWalk: Sendable {
         if count > cap { return .failed("tooLong", moved: -k) }
         return .moved(-k)
     }
+
+    /// After `.retry`: the undo moved forward by one unit and must land where the probe started, which the
+    /// after-context shows (the before-context may still be on its way). nil `moved`: neither move can be named then.
+    public mutating func undone(changed: Bool, before b1: [UInt16], after a1: [UInt16]) -> WalkStep {
+        guard changed, WholeRead.agree(a1, a0, atEnd: false), a1.isEmpty == a0.isEmpty else {
+            return .failed("badUndo", moved: nil)
+        }
+        return .moved(1)
+    }
 }
 
 /// One walk forward to the end of the field.
@@ -169,8 +206,18 @@ public struct ForwardWalk: Sendable {
     public private(set) var units: [UInt16] = []
     private var a0: [UInt16] = []
     private var k = 0
+    /// The first step may count as a resync (the walk from the user's cursor only: the host can move the caret
+    /// without telling the keyboard, run 163 web `mid` and `sel`).
+    private let resyncFirst: Bool
+    private var steps = 0
+    public private(set) var resyncs = 0
+    /// For the log after a step that fits nothing: did the before- and after-context fit the planned move?
+    public private(set) var fit = (before: true, after: true)
 
-    public init(cap: Int) { self.cap = cap }
+    public init(cap: Int, resyncFirst: Bool = false) {
+        self.cap = cap
+        self.resyncFirst = resyncFirst
+    }
 
     /// Units to move forward: a jump, or one unit over the line feed an empty after-context stops at.
     public mutating func plan(after: [UInt16]) -> Int {
@@ -180,21 +227,32 @@ public struct ForwardWalk: Sendable {
     }
 
     public mutating func landed(changed: Bool, before b1: [UInt16], after a1: [UInt16]) -> WalkStep {
+        steps += 1
         if a0.isEmpty {
             guard changed else { return .done }
             // The after-context stops at a line feed, so the probe crossed one; any other change is not a move this
             // walk can name (a window that changed by itself, or a lagging context).
-            guard b1.last == 10 else { return .failed("badStep", moved: 1) }
+            fit = (b1.last == 10, true)
+            guard b1.last == 10 else { return resync() ?? .failed("badStep", moved: 1) }
             units.append(10)
         } else {
             guard changed else { return .failed("stuck", moved: 0) }
             // The before-context window can be shorter than the piece: they agree where both have units.
             let piece = Array(a0.prefix(k))
-            guard !b1.isEmpty, WholeRead.agree(b1, piece, atEnd: true),
-                  WholeRead.agree(a1, Array(a0.dropFirst(k)), atEnd: false) else { return .failed("badStep", moved: k) }
+            fit = (!b1.isEmpty && WholeRead.agree(b1, piece, atEnd: true), WholeRead.agree(a1, Array(a0.dropFirst(k)), atEnd: false))
+            guard fit.before, fit.after else { return resync() ?? .failed("badStep", moved: k) }
             units += piece
         }
         if units.count > cap { return .failed("tooLong", moved: k) }
+        return .moved(k)
+    }
+
+    /// The first step of a walk from the user's cursor fit nothing: the contexts it planned from were stale. The host
+    /// applied the requested move (native hosts in UTF-16 units), so the position stays known; the units it crossed
+    /// are not named, and the walk goes on from the contexts it shows now.
+    private mutating func resync() -> WalkStep? {
+        guard resyncFirst, steps == 1 else { return nil }
+        resyncs += 1
         return .moved(k)
     }
 }
