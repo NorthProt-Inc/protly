@@ -14,6 +14,10 @@ import WebKit
 ///   from the bundled web-composer.html. Its state is published as an accessibility value and every DOM event is
 ///   appended to Documents/web-events.txt, which run-shots.sh copies into the run folder. `-caret 1` loads the page
 ///   with `?caret=1`, which also posts the state when the caret moves (fix/double-space-period, test5f_period only).
+/// - `readweb`: the whole-field read page (K1b, test5h_wholeweb): a textarea and a Lexical-shaped field, from the
+///   bundled read-probe.html, with the whole-read draft buttons (WholeDrafts).
+/// `-wholefills 1` adds the whole-read draft buttons (`rfill-1` ... , WholeDrafts) and their select-all and resync
+/// buttons to the default screen and the `uikit` screen (K1b, test5g_wholenative).
 /// Every screen has `Clear` (empties the field without keys) and `Dismiss` (the field loses focus, which hides the
 /// keyboard) in the top-right corner, away from the field and the center column measure.py samples.
 @main
@@ -23,6 +27,7 @@ struct HostApp: App {
             switch UserDefaults.standard.string(forKey: "screen") ?? "" {
             case "web": WebComposerScreen()
             case "uikit": TextViewScreen()
+            case "readweb": ReadWebScreen()
             default: HostView()
             }
         }
@@ -36,20 +41,48 @@ let hostBackground = Color(red: 32 / 255, green: 160 / 255, blue: 96 / 255)
 struct HostView: View {
     @State private var text = UserDefaults.standard.string(forKey: "prefill") ?? ""
     @FocusState private var focused: Bool
+    /// K1b (`-wholefills 1`): a UTF-16 selection the host asks the field for (a fill's cursor, select all).
+    @State private var selectRequest: NSRange?
+    /// K1b: the SwiftUI field's selection as `location,length` in UTF-16 units (SelectingField), as the UITextView
+    /// screen's `sel` probe; empty before iOS 18 or without a selection.
+    @State private var selection = ""
     private let fills = (UserDefaults.standard.string(forKey: "fills") ?? "").split(separator: "|").map(String.init)
+
+    /// With `-wholefills 1` on iOS 18 and later the field's selection is bound (SelectingField); else as always.
+    private var field: AnyView {
+        if #available(iOS 18.0, *), WholeDrafts.enabled {
+            return AnyView(styled(SelectingField(text: $text, request: $selectRequest, probe: $selection)))
+        }
+        return AnyView(styled(TextField("", text: $text, axis: .vertical)))
+    }
+
+    private func styled(_ f: some View) -> some View {
+        f.lineLimit(1...3)
+            .focused($focused)
+            .accessibilityIdentifier("field")
+            .foregroundStyle(.white)
+            .frame(width: 200, alignment: .leading)
+            .padding(.leading, 16)
+            .padding(.top, 24)
+    }
+
+    /// A whole-read draft; its cursor (or, for select all, the whole text) is asked for once the field has the text.
+    private func fill(_ i: Int, selectAll: Bool = false) {
+        let draft = WholeDrafts.all[i]
+        if text != draft.text { text = draft.text }
+        let range = selectAll ? NSRange(location: 0, length: draft.text.utf16.count)
+            : NSRange(location: draft.cursor, length: 0)
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            selectRequest = range
+        }
+    }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             hostBackground.ignoresSafeArea()
             // The field stays in the top-left so the center column below it is only background.
-            TextField("", text: $text, axis: .vertical)
-                .lineLimit(1...3)
-                .focused($focused)
-                .accessibilityIdentifier("field")
-                .foregroundStyle(.white)
-                .frame(width: 200, alignment: .leading)
-                .padding(.leading, 16)
-                .padding(.top, 24)
+            field
             VStack(alignment: .trailing, spacing: 16) {
                 Button("Clear") { text = "" }
                     .accessibilityIdentifier("clear")
@@ -61,6 +94,20 @@ struct HostView: View {
                         Button("F\(i + 1)") { text = draft }
                             .accessibilityIdentifier("fill-\(i + 1)")
                     }
+                }
+                if WholeDrafts.enabled {
+                    HStack(spacing: 10) {
+                        // Select all on the first draft's text (wr-swiftui-sel), as Select All in the edit menu would.
+                        Button("SelAll") { fill(0, selectAll: true) }
+                            .font(.caption)
+                            .accessibilityIdentifier("rselall")
+                        // After Dismiss: the field takes the focus again without a tap (the cursor stays).
+                        Button("Focus") { focused = true }
+                            .font(.caption)
+                            .accessibilityIdentifier("rfocus")
+                    }
+                    WholeFillButtons { i in fill(i) }
+                    Probe(id: "sel", value: selection)
                 }
             }
             .tint(.white)
@@ -136,6 +183,37 @@ final class TextViewModel: ObservableObject {
 
     func focus() {
         textView?.becomeFirstResponder()
+    }
+
+    /// K1b: a whole-read draft in the text view, the cursor at its offset, with the input delegate told (as the text
+    /// system does for an edit).
+    func fill(_ i: Int) {
+        guard let tv = textView else { return }
+        let draft = WholeDrafts.all[i]
+        tv.inputDelegate?.textWillChange(tv)
+        tv.text = draft.text
+        tv.inputDelegate?.textDidChange(tv)
+        select(NSRange(location: draft.cursor, length: 0))
+    }
+
+    /// K1b: the whole text selected, as Select All in the edit menu would.
+    func selectAll() {
+        select(NSRange(location: 0, length: (textView?.text ?? "").utf16.count))
+    }
+
+    /// K1b: the selection set again where it is, with the input delegate told, as when the host moves the caret: the
+    /// keyboard's context is the host's again (the resync before a read).
+    func resync() {
+        guard let tv = textView else { return }
+        select(tv.selectedRange)
+    }
+
+    private func select(_ range: NSRange) {
+        guard let tv = textView else { return }
+        tv.inputDelegate?.selectionWillChange(tv)
+        tv.selectedRange = range
+        tv.inputDelegate?.selectionDidChange(tv)
+        refresh()
     }
 
     /// Polled (5 times a second): the keyboard moves the caret through the text input system, which does not always
@@ -229,6 +307,17 @@ struct TextViewScreen: View {
                 Probe(id: "first-word", value: model.firstWord)
                 Probe(id: "last-word", value: model.lastWord)
                 Probe(id: "edits", value: model.edits)
+                if WholeDrafts.enabled {
+                    HStack(spacing: 10) {
+                        Button("SelAll") { model.selectAll() }
+                            .font(.caption)
+                            .accessibilityIdentifier("rselall")
+                        Button("Sync") { model.resync() }
+                            .font(.caption)
+                            .accessibilityIdentifier("rsync")
+                    }
+                    WholeFillButtons { i in model.fill(i) }
+                }
             }
             .tint(.white)
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -282,6 +371,33 @@ final class WebModel: NSObject, ObservableObject, WKScriptMessageHandler {
         webView?.endEditing(true)
     }
 
+    /// K1b (read-probe.html fill()): a whole-read draft in the page's field that last had focus, the caret at the
+    /// draft's cursor.
+    func fill(_ i: Int) {
+        let draft = WholeDrafts.all[i]
+        guard let data = try? JSONEncoder().encode(draft.text), let json = String(data: data, encoding: .utf8) else {
+            append("host: fill \(i) not encoded")
+            return
+        }
+        run("fill(\(json), \(draft.cursor))", name: "fill()")
+    }
+
+    /// K1b (read-probe.html): the caret back at the last fill's cursor, or the whole field selected.
+    func restoreCaret() {
+        run("restoreCaret()", name: "restoreCaret()")
+    }
+
+    func selectAll() {
+        run("selectAllIn()", name: "selectAllIn()")
+    }
+
+    /// The page's text never goes to the log, only the function's name.
+    private func run(_ script: String, name: String) {
+        webView?.evaluateJavaScript(script) { [weak self] _, error in
+            if let error { self?.append("host: \(name) failed: \(error)") }
+        }
+    }
+
     func fail(_ why: String) {
         state = "{\"error\":\"\(why)\"}"
     }
@@ -315,6 +431,8 @@ final class WebModel: NSObject, ObservableObject, WKScriptMessageHandler {
 
 struct WebComposer: UIViewRepresentable {
     let model: WebModel
+    /// The bundled page: web-composer, or read-probe (`-screen readweb`).
+    var page = "web-composer"
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -327,18 +445,19 @@ struct WebComposer: UIViewRepresentable {
         web.scrollView.contentInsetAdjustmentBehavior = .never
         web.accessibilityIdentifier = "web"
         model.webView = web
-        if let url = Bundle.main.url(forResource: "web-composer", withExtension: "html") {
+        if let url = Bundle.main.url(forResource: page, withExtension: "html") {
             // `-caret 1` (the period check only): the page also posts its state when the caret moves.
-            var page = url
+            var target = url
             if UserDefaults.standard.string(forKey: "caret") == "1",
                var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
                 parts.queryItems = [URLQueryItem(name: "caret", value: "1")]
-                page = parts.url ?? url
+                target = parts.url ?? url
             }
-            web.loadFileURL(page, allowingReadAccessTo: url.deletingLastPathComponent())
+            web.loadFileURL(target, allowingReadAccessTo: url.deletingLastPathComponent())
         } else {
             let model = model
-            Task { @MainActor in model.fail("web-composer.html is not in the bundle") }
+            let name = page
+            Task { @MainActor in model.fail("\(name).html is not in the bundle") }
         }
         return web
     }
@@ -367,6 +486,174 @@ struct WebComposerScreen: View {
             .tint(.white)
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.trailing, 16)
+            .padding(.top, 24)
+        }
+    }
+}
+
+// MARK: - K1b: the whole-field read (`-wholefills 1`, `-screen readweb`)
+
+/// The whole-read drafts (ios-app/CI/UITests/WholeReadChecks.swift WholeChecks.spec names them by `rfill-<n>`). Every
+/// draft starts with the CI stub's `read` marker line, so the stub answers with the shape of the text the request
+/// carried (StubActionClient: `read <utf16>/<lf>/h<fnv> t<ms>`). The paragraphs are those of the walk-back probe
+/// (docs/research/2026-11-21-walk-back-probe.md on diag/p1-walk-back): `\u{00A7}<n> ` and sentences, joined by blank
+/// lines. `cursor` is a UTF-16 offset: the end, or the middle of the second paragraph.
+enum WholeDrafts {
+    struct Draft {
+        let name: String
+        let text: String
+        let cursor: Int
+    }
+
+    static var enabled: Bool { UserDefaults.standard.string(forKey: "wholefills") == "1" }
+
+    /// StubActionClient.marker + `read`, on its own line.
+    static let marker = "protly-stub read\n"
+
+    static let sentence = "\u{C624}\u{B298} \u{D68C}\u{C758} \u{B0B4}\u{C6A9} \u{C815}\u{B9AC}\u{D574}\u{C11C} \u{BCF4}\u{B0B4}\u{C904}\u{AC8C}."
+    /// The mixed sentences take turns: the Korean one, an English one with an emoji (a surrogate pair), a Korean one
+    /// with an emoji.
+    static let mixed = [sentence, "Send me the notes after the call \u{1F44D}.", "\u{D68C}\u{C758} \u{B05D}\u{B098}\u{ACE0} \u{C804}\u{D654}\u{D560}\u{AC8C} \u{1F642}."]
+
+    enum Kind {
+        /// The one sentence repeated (the probe's default drafts).
+        case plain
+        /// Each sentence numbered `<paragraph>-<sentence> ` (no two stretches read the same).
+        case numbered
+        /// Numbered, the mixed sentences in turn.
+        case mixed
+    }
+
+    static func paragraphs(_ count: Int, sentences: Int, _ kind: Kind) -> [String] {
+        (1...count).map { k in
+            "\u{00A7}\(k) " + (1...sentences).map { j -> String in
+                switch kind {
+                case .plain: return sentence
+                case .numbered: return "\(k)-\(j) " + sentence
+                case .mixed: return "\(k)-\(j) " + mixed[(k + j) % 3]
+                }
+            }.joined(separator: " ")
+        }
+    }
+
+    static func make(_ name: String, _ paras: [String], mid: Bool = false) -> Draft {
+        let text = marker + paras.joined(separator: "\n\n")
+        let second = (marker + paras[0] + "\n\n").utf16.count
+        return Draft(name: name, text: text, cursor: mid ? second + paras[1].utf16.count / 2 : text.utf16.count)
+    }
+
+    /// rfill-1 ... rfill-6. UTF-16 units / line feeds with the marker line (without it: 318, 3230, 14 038, 443, 3958).
+    static let all: [Draft] = [
+        make("p5", paragraphs(5, sentences: 3, .plain)),  // 335/9
+        make("p5mid", paragraphs(5, sentences: 3, .plain), mid: true),  // 335/9, the cursor at 112
+        make("xlong", paragraphs(8, sentences: 20, .plain)),  // 3247/15
+        make("x14k", paragraphs(8, sentences: 60, .mixed)),  // 14 055/15, 320 emoji
+        make("emoji", paragraphs(5, sentences: 3, .mixed)),  // 460/9, 10 emoji
+        make("r4k", paragraphs(8, sentences: 20, .numbered)),  // 3975/15: under the read's 4000-unit cap
+    ]
+}
+
+/// Buttons `rfill-1` ... `rfill-6` in rows of three, top right (short labels, so a row stays right of the read page).
+struct WholeFillButtons: View {
+    let fill: (Int) -> Void
+
+    var body: some View {
+        let count = WholeDrafts.all.count
+        VStack(alignment: .trailing, spacing: 8) {
+            ForEach(0..<((count + 2) / 3), id: \.self) { row in
+                HStack(spacing: 10) {
+                    ForEach(0..<3, id: \.self) { col in
+                        let i = row * 3 + col
+                        if i < count {
+                            Button("R\(i + 1)") { fill(i) }
+                                .font(.caption)
+                                .accessibilityIdentifier("rfill-\(i + 1)")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// K1b (`-wholefills 1`, iOS 18 and later): the default screen's SwiftUI field with its selection bound, so the host
+/// can put the cursor inside a fill (wr-swiftui-mid) or select the whole text (wr-swiftui-sel). A request is applied
+/// once and then cleared. `probe` is the selection as `location,length` in UTF-16 units, whoever set it (the host or
+/// the text system), for HostView's `sel` probe.
+@available(iOS 18.0, *)
+struct SelectingField: View {
+    @Binding var text: String
+    @Binding var request: NSRange?
+    @Binding var probe: String
+    @State private var stored: TextSelection?
+
+    /// Every change of the selection updates the probe on its way in.
+    private var selection: Binding<TextSelection?> {
+        Binding(get: { stored }, set: { new in
+            stored = new
+            probe = Self.offsets(new, in: text)
+        })
+    }
+
+    /// `location,length` in UTF-16 units; `multi` for several ranges, "" for none or indices outside the text.
+    static func offsets(_ s: TextSelection?, in text: String) -> String {
+        guard let s else { return "" }
+        switch s.indices {
+        case .selection(let r):
+            guard r.lowerBound >= text.startIndex, r.upperBound <= text.endIndex else { return "" }
+            let u = text.utf16
+            return "\(u.distance(from: u.startIndex, to: r.lowerBound)),\(u.distance(from: r.lowerBound, to: r.upperBound))"
+        default:
+            return "multi"
+        }
+    }
+
+    var body: some View {
+        TextField("", text: $text, selection: selection, axis: .vertical)
+            .onChange(of: request) { _, wanted in
+                guard let wanted else { return }
+                request = nil
+                let u = text.utf16
+                guard wanted.location >= 0, wanted.length >= 0, wanted.location + wanted.length <= u.count else { return }
+                let start = u.index(u.startIndex, offsetBy: wanted.location)
+                let end = u.index(start, offsetBy: wanted.length)
+                selection.wrappedValue = wanted.length == 0 ? TextSelection(insertionPoint: start)
+                    : TextSelection(range: start..<end)
+            }
+    }
+}
+
+/// `-screen readweb`: read-probe.html (a textarea and a Lexical-shaped contenteditable). The page posts each field's
+/// length, line-feed count, hash and caret, never its text.
+struct ReadWebScreen: View {
+    @StateObject private var model = WebModel()
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            hostBackground.ignoresSafeArea()
+            WebComposer(model: model, page: "read-probe")
+                .frame(width: 250, height: 200)
+                .padding(.top, 8)
+            VStack(alignment: .trailing, spacing: 10) {
+                Button("Clear") { model.clear() }
+                    .accessibilityIdentifier("clear")
+                Button("Dismiss") { model.dismiss() }
+                    .accessibilityIdentifier("dismiss")
+                Probe(id: "web-state", value: model.state)
+                Probe(id: "web-rects", value: model.rects)
+                HStack(spacing: 10) {
+                    Button("SelAll") { model.selectAll() }
+                        .font(.caption)
+                        .accessibilityIdentifier("rselall")
+                    Button("Caret") { model.restoreCaret() }
+                        .font(.caption)
+                        .accessibilityIdentifier("rcaret")
+                }
+                WholeFillButtons { i in model.fill(i) }
+            }
+            .tint(.white)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .padding(.trailing, 8)
             .padding(.top, 24)
         }
     }
