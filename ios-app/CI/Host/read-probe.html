@@ -220,6 +220,18 @@ function selectAllIn() {
   return true;
 }
 
+// F02c: the field's start up to its first line feed selected (a partial selection with no context on either side).
+function selectHeadIn() {
+  const name = last || "textarea";
+  const f = fields[name];
+  f.focus();
+  const t = text(name);
+  const end = t.indexOf("\n") < 0 ? t.length : t.indexOf("\n");
+  placeCaret(name, 0, end);
+  state();
+  return true;
+}
+
 function clearAll() {
   fields.textarea.value = "";
   fields.lexical.innerHTML = "<p><br></p>";

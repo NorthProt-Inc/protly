@@ -68,30 +68,32 @@ enum FieldText {
 
     /// One move, then a poll every 20 ms until a context changes or `wait` passes; once changed, more polls until two
     /// in a row agree (the host's update can come in two parts: probe run 7f2f443-135).
-    private static func step(_ p: UITextDocumentProxy, by k: Int, wait: TimeInterval) async -> (changed: Bool, c: Ctx) {
+    private static func step(_ p: UITextDocumentProxy, by k: Int, wait: TimeInterval) async -> (changed: Bool, c: Ctx, seen: Int) {
         let c0 = ctx(p)
         p.adjustTextPosition(byCharacterOffset: k)  // UTF-16 units on native hosts; characters on the web
         return await watch(p, from: c0, wait: wait)
     }
 
     /// Polls until the contexts differ from `c0` and settle, or `wait` passes.
-    private static func watch(_ p: UITextDocumentProxy, from c0: Ctx, wait: TimeInterval) async -> (changed: Bool, c: Ctx) {
+    /// `seen`: ms from the start of the watch to the first poll that saw a change, -1 for none.
+    private static func watch(_ p: UITextDocumentProxy, from c0: Ctx, wait: TimeInterval) async -> (changed: Bool, c: Ctx, seen: Int) {
         let sent = uptime()
         while uptime() - sent < wait {
             await pause()
             var c1 = ctx(p)
             guard c1 != c0 else { continue }
+            let seen = ms(since: sent)
             for _ in 0..<WholeRead.settlePolls {
                 await pause()
                 let c2 = ctx(p)
                 if c2 == c1 { break }
                 c1 = c2
             }
-            return (true, c1)
+            return (true, c1, seen)
         }
         // A last look: a stalled main thread can end the loop between two polls; never call that "no change".
         let last = ctx(p)
-        return (last != c0, last)
+        return (last != c0, last, last != c0 ? ms(since: sent) : -1)
     }
 
     private enum WalkEnd {
@@ -133,7 +135,7 @@ enum FieldText {
             return e
         }
         /// A step that fit nothing: the contexts' lengths and which of them fit, never their text.
-        func logStep(_ why: String, k: Int, from c: Ctx, to s: (changed: Bool, c: Ctx), ms took: Int) {
+        func logStep(_ why: String, k: Int, from c: Ctx, to s: (changed: Bool, c: Ctx, seen: Int), ms took: Int) {
             let fit = back ? bw.fit : fw.fit
             let b0 = c.before.count, a0 = c.after.count, b1 = s.c.before.count, a1 = s.c.after.count
             let fb = fit.before ? 1 : 0, fa = fit.after ? 1 : 0, ch = s.changed ? 1 : 0
@@ -201,6 +203,10 @@ enum FieldText {
                 }
             }
             if outOfTime { r = .failed("timeUp", moved: nil) }
+            // Every step's timing, for the probe waits (F02c): numbers only.
+            let pr = probing ? 1 : 0, ch = s.changed ? 1 : 0, lk = second && !outOfTime ? 1 : 0, tot = ms(since: s0)
+            let seenMS = s.seen
+            log.debug("read st \(tag, privacy: .public) s=\(steps, privacy: .public) k=\(k, privacy: .public) pr=\(pr, privacy: .public) ch=\(ch, privacy: .public) seen=\(seenMS, privacy: .public) tot=\(tot, privacy: .public) lk=\(lk, privacy: .public)")
             if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: ms(since: s0)) }
             if !back, case .moved = r, fw.resyncs > 0, steps == 1 {
                 logStep("resync", k: k, from: c, to: s, ms: ms(since: s0))

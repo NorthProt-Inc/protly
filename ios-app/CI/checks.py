@@ -66,8 +66,11 @@ HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-glo
 # the SwiftUI field (swiftui), plus a 3975-unit Replace and Undo (r4k) and Cancel mid-read (cancel) on the UITextView;
 # web hosts: the read page's textarea and Lexical-shaped field. Text with emoji (emoji) is read on native hosts and
 # refused on web hosts (they move by characters).
-WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k", "emoji")
-WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji")
+# F02c: short drafts the proxy window shows whole (swin 39 units at the end, smid in the middle, ssel select all, s3 93
+# units of three sentences on one line), a partial selection at the start up to a line feed (shead: a copy-only card
+# of the selection), and a lone emoji ending the line after a mid-text cursor (etail, native only).
+WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead", "etail")
+WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead")
 WHOLE_WEB_HOSTS = ("textarea", "lexical")
 WHOLE_TRIES = {"win": 2, "long": 2}
 WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r4k", "wr-uikit-cancel"]
@@ -87,6 +90,8 @@ WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong", "b1:characters", "b1:badSte
                   ("web", "x14k"): ("b1:characters", "b1:badStep"),
                   ("web", "emoji"): ("b1:characters", "b1:badStep")}
 WHOLE_CANCELLED = {("native", "cancel")}
+# A partial selection: the keyboard sends the selection (`reason=selection`) and writes nothing.
+WHOLE_SELECTION = {"shead"}
 # The test polls the field every 0.2 s, reading a long field takes a few hundred ms more, and the keyboard's clock starts
 # a little after the test's tap; the race this check is for opened the gate 6-11 s before the host was done (run 172).
 WHOLE_HOST_SLACK_MS = 2000
@@ -1333,6 +1338,12 @@ def resolve_whole_log(check, marks, kb_text):
                 notes.append(f"t{t}:{outcome}/{took}ms")
                 if outcome != "cancelled":
                     problems.append(f"t{t}:{outcome}/{reason} want cancelled")
+                continue
+            if case in WHOLE_SELECTION:
+                notes.append(f"t{t}:{outcome}/{reason}")
+                writes = [line for line in lines if line.startswith("replace ")]
+                if outcome != "accepted" or reason != "selection" or writes:
+                    problems.append(f"t{t}:{outcome}/{reason} writes={len(writes)} want accepted/selection, no write")
                 continue
             if refusal:
                 notes.append(f"t{t}:{outcome}/{reason}")

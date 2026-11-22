@@ -67,11 +67,10 @@ struct HostView: View {
     }
 
     /// A whole-read draft; its cursor (or, for select all, the whole text) is asked for once the field has the text.
-    private func fill(_ i: Int, selectAll: Bool = false) {
+    private func fill(_ i: Int) {
         let draft = WholeDrafts.all[i]
         if text != draft.text { text = draft.text }
-        let range = selectAll ? NSRange(location: 0, length: draft.text.utf16.count)
-            : NSRange(location: draft.cursor, length: 0)
+        let range = NSRange(location: draft.cursor, length: 0)
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 300_000_000)
             selectRequest = range
@@ -98,9 +97,12 @@ struct HostView: View {
                 if WholeDrafts.enabled {
                     HStack(spacing: 10) {
                         // Select all on the first draft's text (wr-swiftui-sel), as Select All in the edit menu would.
-                        Button("SelAll") { fill(0, selectAll: true) }
+                        Button("SelAll") { selectRequest = NSRange(location: 0, length: text.utf16.count) }
                             .font(.caption)
                             .accessibilityIdentifier("rselall")
+                        Button("SelHead") { selectRequest = WholeDrafts.headRange(text) }
+                            .font(.caption)
+                            .accessibilityIdentifier("rselhead")
                         // After Dismiss: the field takes the focus again without a tap (the cursor stays).
                         Button("Focus") { focused = true }
                             .font(.caption)
@@ -199,6 +201,11 @@ final class TextViewModel: ObservableObject {
     /// K1b: the whole text selected, as Select All in the edit menu would.
     func selectAll() {
         select(NSRange(location: 0, length: (textView?.text ?? "").utf16.count))
+    }
+
+    /// F02c: the field's start up to its first line feed selected (WholeDrafts.headRange).
+    func selectHead() {
+        select(WholeDrafts.headRange(textView?.text ?? ""))
     }
 
     /// K1b: the selection set again where it is, with the input delegate told, as when the host moves the caret: the
@@ -315,6 +322,9 @@ struct TextViewScreen: View {
                         Button("Sync") { model.resync() }
                             .font(.caption)
                             .accessibilityIdentifier("rsync")
+                        Button("SelHead") { model.selectHead() }
+                            .font(.caption)
+                            .accessibilityIdentifier("rselhead")
                     }
                     WholeFillButtons { i in model.fill(i) }
                 }
@@ -389,6 +399,11 @@ final class WebModel: NSObject, ObservableObject, WKScriptMessageHandler {
 
     func selectAll() {
         run("selectAllIn()", name: "selectAllIn()")
+    }
+
+    /// F02c: the field's start up to its first line feed selected.
+    func selectHead() {
+        run("selectHeadIn()", name: "selectHeadIn()")
     }
 
     /// The page's text never goes to the log, only the function's name.
@@ -550,7 +565,24 @@ enum WholeDrafts {
         make("x14k", paragraphs(8, sentences: 60, .mixed)),  // 14 055/15, 320 emoji
         make("emoji", paragraphs(5, sentences: 3, .mixed)),  // 460/9, 10 emoji
         make("r4k", paragraphs(8, sentences: 20, .numbered)),  // 3975/15: under the read's 4000-unit cap
+        // F02c: short drafts the proxy window shows whole (the latency target), and the bug cases.
+        Draft(name: "s1", text: short, cursor: short.utf16.count),  // 39/1, under select all's 43-unit selectedText
+        Draft(name: "s1mid", text: short, cursor: (marker + "\u{00A7}1 \u{C624}\u{B298} \u{D68C}\u{C758} ").utf16.count),  // 39/1 at 26
+        Draft(name: "s3", text: short3, cursor: short3.utf16.count),  // 93/1: three sentences on one line
+        // A lone emoji ends the line after a mid-text cursor: the forward walk's last jump leaves exactly one pair.
+        Draft(name: "etail", text: short + " \u{1F600}", cursor: (marker + "\u{00A7}1 \u{C624}\u{B298} \u{D68C}\u{C758} ").utf16.count),  // 42/1 at 26
     ]
+
+    /// The marker line and one numbered sentence.
+    static let short = marker + "\u{00A7}1 " + sentence
+    /// The marker line and three sentences on one line, as a chat message.
+    static let short3 = short + " Send me the notes after the call. " + sentence
+
+    /// `rselhead`: the field's start up to its first line feed (the marker line) selected, a partial selection that
+    /// shows no context on either side.
+    static func headRange(_ text: String) -> NSRange {
+        NSRange(location: 0, length: Array(text.utf16).firstIndex(of: 10) ?? text.utf16.count)
+    }
 }
 
 /// Buttons `rfill-1` ... `rfill-6` in rows of three, top right (short labels, so a row stays right of the read page).
@@ -648,6 +680,9 @@ struct ReadWebScreen: View {
                     Button("Caret") { model.restoreCaret() }
                         .font(.caption)
                         .accessibilityIdentifier("rcaret")
+                    Button("SelHead") { model.selectHead() }
+                        .font(.caption)
+                        .accessibilityIdentifier("rselhead")
                 }
                 WholeFillButtons { i in model.fill(i) }
             }

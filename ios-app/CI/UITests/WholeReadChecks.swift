@@ -14,8 +14,8 @@ import XCTest
 /// Ported from the walk-back probe (diag/p1-walk-back-strict: WalkChecks.swift, ReadChecks.swift) without its logging.
 enum WholeChecks {
     /// The same lists as checks.py WHOLE_NATIVE_CASES, WHOLE_WEB_CASES and WHOLE_WEB_HOSTS (test_checks.py compares).
-    static let nativeCases = ["win", "mid", "sel", "long", "x14k", "emoji"]
-    static let webCases = ["win", "mid", "sel", "long", "x14k", "emoji"]
+    static let nativeCases = ["win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead", "etail"]
+    static let webCases = ["win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead"]
     static let webHosts = ["textarea", "lexical"]
     /// Tries per case, all of which must pass; 1 for the others (checks.py WHOLE_TRIES).
     static let tries: [String: Int] = ["win": 2, "long": 2]
@@ -54,7 +54,13 @@ enum WholeChecks {
         var nativeReads = false
         /// Cancel on the strip once it says the read is still going: the caret goes back, the field stays.
         var cancel = false
+        /// F02c: the field's start up to its first line feed selected (`rselhead`): a partial selection, so a
+        /// copy-only card of exactly the selection (the marker line), and the field unchanged.
+        var head = false
     }
+
+    /// The marker line without its line feed: what `rselhead` selects.
+    static let headUnits = Array("protly-stub read".utf16)
 
     static func spec(_ name: String) -> Spec? {
         switch name {
@@ -66,6 +72,12 @@ enum WholeChecks {
         case "emoji": return Spec(name: name, fill: 5, units: 460, cursor: 460, refusal: true, nativeReads: true)
         case "r4k": return Spec(name: name, fill: 6, units: 3975, cursor: 3975)
         case "cancel": return Spec(name: name, fill: 2, units: 335, cursor: 112, cancel: true)
+        case "swin": return Spec(name: name, fill: 7, units: 39, cursor: 39)
+        case "smid": return Spec(name: name, fill: 8, units: 39, cursor: 26)
+        case "ssel": return Spec(name: name, fill: 7, units: 39, cursor: 39, selectAll: true)
+        case "s3": return Spec(name: name, fill: 9, units: 93, cursor: 93)
+        case "shead": return Spec(name: name, fill: 7, units: 39, cursor: 39, head: true)
+        case "etail": return Spec(name: name, fill: 10, units: 42, cursor: 26)
         default: return nil
         }
     }
@@ -302,7 +314,7 @@ extension PhoneRun {
             r.unreadable = "the fill gave \(before.len) units, want \(s.units)"
             return r
         }
-        let want = s.selectAll ? "0,\(s.units)" : "\(s.cursor),0"
+        let want = s.selectAll ? "0,\(s.units)" : s.head ? "0,\(WholeChecks.headUnits.count)" : "\(s.cursor),0"
         // Every host's probe must show the case's caret or selection, so a no-op set-up cannot pass as `win`.
         let caretBefore = wholeCaret(host, web)
         r.add("caret=\(caretBefore ?? "unreadable")")
@@ -327,6 +339,7 @@ extension PhoneRun {
             return r
         }
 
+        if s.head { return wholeHead(r, v, before: before, host: host, web: web) }
         if s.refusal, web != nil || !s.nativeReads {
             if v.panel.isEmpty {
                 let reply = v.texts(v.card).map(\.label).first { $0.hasPrefix("read ") }
@@ -412,6 +425,35 @@ extension PhoneRun {
         return r
     }
 
+    /// F02c bug 2: a partial selection at the field's start, up to a line feed, shows no context on either side, as
+    /// select all does. It must stay a selection: a copy-only card (no Replace) of exactly the selected units, and the
+    /// field unchanged.
+    private func wholeHead(_ r0: WholeTry, _ v0: CallView, before: WholeChecks.Shape, host: String,
+                           web: ReadWeb?) -> WholeTry {
+        var r = r0
+        var v = v0
+        guard v.panel.isEmpty else {
+            r.check(false, "outcome=panel msg=\(q(v.texts(v.panel).map(\.label).joined(separator: " ")))")
+            closeCall(v)
+            return r
+        }
+        if !v.texts(v.card).contains(where: { $0.label.hasPrefix("read ") }) {
+            let again = poll(5, every: 0.5) { w in w.texts(w.card).contains { $0.label.hasPrefix("read ") } }
+            if let w = again.view, again.met { v = w }
+        }
+        let reply = v.texts(v.card).map(\.label).first { $0.hasPrefix("read ") }
+        let parsed = reply.flatMap { WholeChecks.parseReply($0) }
+        // The card's other texts are never logged: only the reply's shape, or that none parsed.
+        r.check(parsed?.shape == WholeChecks.Shape(WholeChecks.headUnits),
+                "reply=\(parsed?.shape.text ?? "unparsed") want \(WholeChecks.Shape(WholeChecks.headUnits).text)")
+        r.check(v.button("Replace", in: v.card) == nil, "replace=\(v.button("Replace", in: v.card) == nil ? "none" : "offered")")
+        closeCall(v)
+        let left = wholeShape(host, web)
+        r.check(left == before, "left=\(left?.text ?? "unreadable")")
+        r.add("caret-left=\(wholeCaret(host, web) ?? "unreadable")")
+        return r
+    }
+
     /// The strip's second line after 2 s, then its Cancel while the read still runs: the strip goes, no panel or card
     /// comes, the field is unchanged and the caret is back where it was (the keyboard log must say `cancelled`).
     private func wholeCancel(_ r0: WholeTry, since t0: Date, before: WholeChecks.Shape, caretBefore: String?,
@@ -472,8 +514,8 @@ extension PhoneRun {
             guard web.focusEnd(host) else { return "no \(host) frame on the read page" }
             guard protlyUp() else { return "protly keyboard not up after the tap at the field's end" }
             d.pause(0.5)
-            if s.selectAll {
-                guard tapHost("rselall") else { return "no rselall button" }
+            if s.selectAll || s.head {
+                guard tapHost(s.head ? "rselhead" : "rselall") else { return "no rselall or rselhead button" }
             } else if web.caret(host) != "\(s.cursor),0" {
                 // The tap left the caret elsewhere, or the case wants it inside the text: the page puts it at the
                 // fill's cursor.
@@ -486,12 +528,14 @@ extension PhoneRun {
         guard tapHost("rfill-\(s.fill)") else { return "no rfill-\(s.fill) button" }
         if host == "uikit" {
             // Select all, or the selection set again where the fill put it, with the input delegate told (resync).
-            guard tapHost(s.selectAll ? "rselall" : "rsync") else { return "no rselall or rsync button" }
-        } else if s.selectAll || s.cursor != s.units {
+            guard tapHost(s.selectAll ? "rselall" : s.head ? "rselhead" : "rsync") else {
+                return "no rselall, rselhead or rsync button"
+            }
+        } else if s.selectAll || s.head || s.cursor != s.units {
             // The fill asks the field for its cursor (HostApp.swift HostView.fill); rselall for the whole text.
             guard WholeChecks.hasTextSelection else { return "the SwiftUI field's selection needs iOS 18" }
-            if s.selectAll {
-                guard tapHost("rselall") else { return "no rselall button" }
+            if s.selectAll || s.head {
+                guard tapHost(s.head ? "rselhead" : "rselall") else { return "no rselall or rselhead button" }
             }
         } else {
             // The resync: Dismiss, then the field takes the focus again without a tap (the cursor stays at the end).

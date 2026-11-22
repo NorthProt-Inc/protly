@@ -1118,9 +1118,10 @@ class WholeReadTests(unittest.TestCase):
         return re.findall(r'"(\w+)"', m.group(1))
 
     def test_every_id_is_expected_and_has_its_method(self):
-        cases = ("win", "mid", "sel", "long", "x14k", "emoji")
+        short = ("swin", "smid", "ssel", "s3", "shead")
+        cases = ("win", "mid", "sel", "long", "x14k", "emoji") + short + ("etail",)
         native = [f"wr-uikit-{c}" for c in cases] + ["wr-uikit-r4k", "wr-uikit-cancel"] + [f"wr-swiftui-{c}" for c in cases]
-        web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji")]
+        web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji") + short]
         self.assertEqual(checks.METHOD_IDS["test5g_wholenative"], native)
         self.assertEqual(checks.METHOD_IDS["test5h_wholeweb"], web)
         for i in native + web:
@@ -1155,10 +1156,13 @@ class WholeReadTests(unittest.TestCase):
 
     def test_every_case_has_a_spec_and_the_refusals_are_the_long_and_emoji_drafts(self):
         specs = self.specs()
-        self.assertEqual(set(specs), set(checks.WHOLE_WEB_CASES) | {"r4k", "cancel"})
+        self.assertEqual(set(specs), set(checks.WHOLE_NATIVE_CASES) | set(checks.WHOLE_WEB_CASES) | {"r4k", "cancel"})
+        # Web hosts refuse text with emoji: etail (a lone emoji at the end) is a native case only.
+        self.assertEqual(set(checks.WHOLE_NATIVE_CASES) - set(checks.WHOLE_WEB_CASES), {"etail"})
         self.assertEqual({k for k, v in specs.items() if "cancel: true" in v[3]}, {"cancel"})
         self.assertEqual({k for k, v in specs.items() if "refusal: true" in v[3]}, {"x14k", "emoji"})
-        self.assertEqual({k for k, v in specs.items() if "selectAll: true" in v[3]}, {"sel"})
+        self.assertEqual({k for k, v in specs.items() if "selectAll: true" in v[3]}, {"sel", "ssel"})
+        self.assertEqual({k for k, v in specs.items() if "head: true" in v[3]}, set(checks.WHOLE_SELECTION))
         # The read's cap is 4000 UTF-16 units: every accepted draft stays under it, marker line included.
         for name, (_, units, cursor, extra) in specs.items():
             self.assertLessEqual(cursor, units, name)
@@ -1196,11 +1200,22 @@ class WholeReadTests(unittest.TestCase):
             second = utf16(marker + paras[0] + "\n\n")
             cursor = second + utf16(paras[1]) // 2 if m.group(5) else utf16(text)
             drafts.append((m.group(1), text, cursor))
+        # F02c's short and bug drafts, rebuilt from their definitions (HostApp.swift WholeDrafts.short, short3).
+        short = marker + "\u00a71 " + sentence
+        short3 = short + " Send me the notes after the call. " + sentence
+        at26 = utf16(marker + "\u00a71 " + sentence[:6])
+        self.assertIn('static let short = marker + "\\u{00A7}1 " + sentence', block)
+        self.assertIn('static let short3 = short + " Send me the notes after the call. " + sentence', block)
+        listed = re.findall(r'Draft\(name: "(\w+)"', all_block)
+        self.assertEqual(listed, ["s1", "s1mid", "s3", "etail"])
+        drafts += [("s1", short, utf16(short)), ("s1mid", short, at26), ("s3", short3, utf16(short3)),
+                   ("etail", short + " \U0001F600", at26)]
         return drafts
 
     def test_the_specs_match_the_host_drafts(self):
         drafts = self.host_drafts()
-        self.assertEqual([d[0] for d in drafts], ["p5", "p5mid", "xlong", "x14k", "emoji", "r4k"])
+        self.assertEqual([d[0] for d in drafts], ["p5", "p5mid", "xlong", "x14k", "emoji", "r4k", "s1", "s1mid", "s3",
+                                                  "etail"])
         for name, (fill, units, cursor, _) in self.specs().items():
             _, text, at = drafts[fill - 1]
             self.assertTrue(text.startswith("protly-stub read\n"), name)
@@ -1209,7 +1224,8 @@ class WholeReadTests(unittest.TestCase):
         shapes = {d[0]: (utf16(d[1][len("protly-stub read\n"):]), sum(1 for c in d[1][len("protly-stub read\n"):]
                                                                        if ord(c) > 0xFFFF)) for d in drafts}
         self.assertEqual(shapes, {"p5": (318, 0), "p5mid": (318, 0), "xlong": (3230, 0), "x14k": (14038, 320),
-                                  "emoji": (443, 10), "r4k": (3958, 0)})
+                                  "emoji": (443, 10), "r4k": (3958, 0), "s1": (22, 0), "s1mid": (22, 0),
+                                  "s3": (76, 0), "etail": (25, 1)})
 
     def test_the_hash_matches_the_page_and_the_probe(self):
         # p5 318/8/h6d75860b (walk-back probe); the Swift and the page hash the same way (FNV-1a 32 over UTF-16).
