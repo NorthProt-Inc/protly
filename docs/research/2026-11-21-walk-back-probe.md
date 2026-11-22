@@ -1,8 +1,8 @@
 # Walk-back probe (P1a follow-up for K1b)
 
-> **STATUS: MEASURED (9 CI runs, 2026-11-22). Verdict: partly.** Walking back works on native fields (UITextView,
-> SwiftUI) up to a few thousand UTF-16 units with the np step and two walks compared, and on web fields without
-> emoji. Web fields with emoji (the host moves by characters) and 14 000-unit fields were not read exactly; the strict
+> **STATUS: MEASURED (11 CI runs, 2026-11-22). Verdict: partly.** Walking back works on native fields (UITextView,
+> SwiftUI) up to about 4000 UTF-16 units with the strict read (runs 154 and 155: 48 of 58 reads kept, all exact, the
+> 2 wrong ones rejected), and on web fields without emoji. Web fields with emoji (the host moves by characters) and 14 000-unit fields were not read exactly; the strict
 > read refuses them instead of returning a wrong text. See "Answers" and "Recommended K1b read".
 
 Branch `diag/p1-walk-back`, started from `origin/diag/p1-phone-read` (28771e2), not rebased on main: the CI build of
@@ -109,13 +109,15 @@ offline from `HostApp.swift` `ReadDrafts` (p5 318/8/h6d75860b, l5 114/4/h377e638
 | Run folder | Branch @ head | Question | Answer | Status |
 |---|---|---|---|---|
 | `7f2f443-135` | `diag/p1-walk-back` @ 7f2f443 | unit, jump and jump1 walks on the P1a drafts | jumps exact wherever they reached the start; stuck on repeated sentences; unit walks: right length, wrong text | passed (RECORD unparsed, fixed in cae21c5) |
-| `f3f2623-140` | `-unit` @ f3f2623 | does settling every unit step make the unit walk exact? | no: 2 of 18 native/textarea unit walks still wrong; 61-67 ms a step | passed |
+| `f3f2623-140` | `-unit` @ f3f2623 | does settling every unit step make the unit walk exact? | no: 2 of 18 native/textarea unit walks still wrong; 56.6-82.0 ms a step | passed |
 | `1233d72-139` | `-unique` @ 1233d72 | unique sentences: do the plain jump walks reach the start of the long draft? | yes, 3958 units exact in 4.6-8.0 s a walk | passed |
 | `3293a10-138` | `-np` @ 3293a10 | the np step (never a period of the context) on the repeated drafts | 28 of 29 walks back exact, 3230 units in 5.4-6.7 s; forward walks about 4x slower | passed |
-| `71f21ff-146` | `-k1b` @ 71f21ff | a +1 000 000 move to the end; two np walks back compared | big move unreliable; 25 of 29 reads kept, all exact; every wrong read rejected | passed |
-| `3182f20-145` | `-mix` @ 3182f20 | np read on Korean + English + emoji drafts, xlong 14 038 units | breaks: web 433 of 443 (10 emoji), native 14 038 texts wrong | passed |
+| `71f21ff-146` | `-k1b` @ 71f21ff | a +1 000 000 move to the end; two np walks back compared | big move unreliable; 25 of 29 reads kept, all exact; every wrong read rejected; 3230 units 14.0-15.1 s a read (native) | passed |
+| `3182f20-145` | `-mix` @ 3182f20 | np read on Korean + English + emoji drafts, xlong 14 038 units | breaks: web 433 of 443 and 13 718 of 14 038 (one unit per emoji), native 14 038 texts wrong | passed |
 | `340f403-149` | `-safe` @ 340f403 | never land inside a surrogate pair; two np walks back | native up to 2173 units: 16 of 16 exact; web still 433 (and one such read kept: a wrong accept) | passed |
 | `4a2110a-150` | `-units` @ 4a2110a | does the web move by characters? fit the move from the contexts | yes: m - k = pairs crossed in 674 of 827 adjusted steps; web 439 of 443 | test-failed (test5j: "Failed to get screenshot", after 4 tries) |
+| `57c5539-154` | `-strictlong` @ 57c5539 | the strict read on the default drafts (3230 repeated units) | 58 of 58 walks exact; 26 of 29 kept, all exact; 3 exact Lexical reads rejected; native 3230 in 12.5-15.4 s | passed |
+| `abe62c8-155` | `-strictlong-unique` @ abe62c8 | the strict read on the unique Korean drafts (3958 units) | 55 of 58 walks exact; 22 of 29 kept, all exact; 2 wrong reads rejected, 5 exact ones too; native 3958 in 10.8-14.1 s | passed |
 | `471e282-153` | `-strict` @ 471e282 | wait out empty before-contexts, distrust unfit steps; keep only clean agreeing walks | no wrong read kept (14 kept, all exact); every web and 14 038-unit read rejected | passed |
 
 ### Run 7f2f443-135 (the parked run)
@@ -141,7 +143,8 @@ commit cae21c5; runs 139 on show the parsed judge). The analysis below uses the 
   (one unit per step, the start found at the right count), the units are wrong: the walk read a context that did
   not belong to the cursor's position (bursts of `cons=0` with `front` jumping, e.g. +4 then -4). Unit steps took
   no settle poll. Run 140 settled every unit step (two equal polls): still 3 walks with `incons>0`, 2 of them wrong
-  (uikit p5 t2 318/8/h6006b4e3, swiftui p5 t1 318/8/h8458b943), at 61-67 ms a step instead of 28-61. The jump
+  (uikit p5 t2 318/8/h6006b4e3, swiftui p5 t1 318/8/h8458b943), at 56.6-82.0 ms a step instead of 28-61
+  (`wb unit done` ms / steps). The jump
   steps (one settle poll) had `incons=0` in all 252 logged steps of run 135 and all of runs 139 and 140.
 - **Repeated sentences explain the jump `stuck`**: the drafts repeat one 19-unit sentence plus a space (period 20).
   On xlong a jump of 60 (3 periods) and jump1's second step of 40 (2 periods) gave the same before- and after-context,
@@ -149,7 +152,8 @@ commit cae21c5; runs 139 on show the parsed judge). The analysis below uses the 
 - **What stops the 3230-unit draft**: the probe's own cap. The unit walk ended `step-cap` at 1700 steps
   (`unitShortCap`) in 6 reads, after 47.6-72.9 s (`wb unit done 1700/8/... step-cap steps=1700`); the one uncapped
   walk (uikit xlong t1) reached the start after 3231 steps and 117.9 s, with the right length and a wrong text
-  (`incons=16`). The jumps stopped after 2 steps (1.05-1.15 s) on the repeated sentences. No host limit and no time
+  (`incons=16`). The jumps stopped after 2 steps (1.05-1.10 s), once after 3 (uikit xlong t2 jump: 119 units,
+  1154 ms), on the repeated sentences. No host limit and no time
   budget stopped anything. Faster: np walks (run 138) read the same draft in 5.4-6.7 s.
 - **Web lengths 102, 321, 64 are not the "only what the keyboard typed" limit**: the walks read text the keyboard
   never typed. textarea p5: jump and jump1 exact, 318 in both tries. textarea xlong 102 = jump1's exact first 102
@@ -168,8 +172,9 @@ commit cae21c5; runs 139 on show the parsed judge). The analysis below uses the 
 - **Start detection**: in native hosts every walk that reached the start ended with a -1 probe at an empty
   before-context that changed nothing for 0.5 s (`wb <policy> start s=.. polls=2x ms=5xx before=nil`); no false
   start in run 135's native walks. Empty before-contexts mid-field did appear later (runs 139, 145, 149, below).
-- **Line feeds**: 144 logged unit steps over a line feed were seen at the first poll with consistent contexts
-  (analyzer `lf=1 polls=1 cons=1 aok=1`), as in the forward case.
+- **Line feeds**: 149 unit steps over a line feed were logged (`wb unit s=... lf=1`). 144 were seen at the first
+  poll with consistent contexts (`polls=1 cons=1 aok=1`), as in the forward case; 2 were seen at the first poll with
+  `cons=0`; 3 were start probes (`fs=1`, the Lexical phantom) that needed 3-7 polls.
 - **Return** (`wr`): `r1` after every jump walk that reached the start in native hosts; `rx` after lexical walks
   (the phantom step); `rs`/`rx` after stuck jumps.
 - **Cursor after the read**: `selafter` at the field's end in all 17 uikit tries; `left=` equal to `real=` in all 29
@@ -204,7 +209,9 @@ both whole walks agree. On the default (repeated) drafts:
 - Two np walks back from the end, each followed by one move forward by what it read (`wr npN ... r1`) and a forward
   walk that confirms the end: 58 walks, 56 exact. Kept 25 of 29 reads, all exact. Rejected 4: textarea p5 t1 (the
   false end: walks of 39 and 318 disagree) and the 3 lexical reads (returns `rx` after the phantom step).
-- Time on 3230 units: 14.0-15.5 s a read, of which 1 s was the useless big move and 2 x 5-6 s the walks back.
+- Time on 3230 units: native 14.0-15.1 s a read, of which 1 s was the useless big move and 2 x 5-6 s the walks
+  back; longmid 1518 15.5 s (115 forward steps first); web textarea and lexical xlong 37.7-39.0 s (323-324 forward
+  steps first). Short two-walk reads (71-318 units): 4.2-7.9 s.
 
 ### Run 3182f20-145: Korean + English + emoji
 
@@ -212,10 +219,12 @@ Drafts: numbered sentences taking turns: the Korean one, `Send me the notes afte
 🙂; xlong 8 x 60 sentences = 14 038 units (rebuilt offline: p5 443/8/h442c6280 with 10 emoji, l5 143/4/h73806425 with 3,
 xlong 14 038/14/hef7a2fcb with 320). Read as in run 138.
 - Native up to 2173 units: 15 of 16 exact; uikit l5 t2 read 142 of 143 (a jump of 51 from 52 moved to the start).
-- Web: every walk 433 of 443: one unit lost per emoji.
+- Web: every p5 walk 433 of 443 and the xlong walks 13 718 of 14 038 (320 emoji): one unit lost per emoji.
 - 14 038 units: 7 reads, every walk back wrong (right length or 1 short), `incons` 3-34, `falsestarts` 5-37 per walk,
-  19.1-29.0 s per walk back; the forward walk hit its 800-step cap, so each read ended on the cut-short panel after
-  69-92 s.
+  19.1-29.0 s per walk back. The second forward walk then failed: 4 of 7 hit the 800-step cap (selxlong x3, swiftui
+  xlong t1), uikit xlong t1 and t2 hit the 60 s time cap (781 and 757 steps), and swiftui xlong t2 stopped at a false
+  end 8772 units in (`wf fa done 8772/8/... end`; that try got a card, `whole=0`). Reads took 69-92 s; 6 ended on the
+  cut-short panel.
 
 ### Run 340f403-149: surrogate-safe k
 
@@ -224,16 +233,18 @@ safeJump also refuses a k that lands the cursor before a low surrogate. Two np w
   swiftui p5, l5).
 - Web: still 433/8/h627e53ea for p5 in textarea and lexical. textarea p5 t1 was **kept although wrong**: both walks
   lost the same 10 units, so comparing two walks does not catch it.
-- 14 038 units native: 7 reads, all rejected (the two walks disagree); walks had 9-53 false starts each; 21-33 s a
-  walk back.
+- 14 038 units native: 7 reads, all rejected (the two walks disagree); false starts 2-53 a walk (9-53 in the walks
+  that read 14 038 units); 21-33 s a walk back. Two walks ended early at a false start: uikit xlong t1 walk 1 at 279
+  units, swiftui xlong t1 walk 2 at 5963. Returns: uikit xlong t1 `rx,r1`, swiftui xlong t1 `rx,rs`.
 
 ### Run 4a2110a-150: the web moves by characters
 
 When a step's contexts do not fit a move of k, the walk tried k plus the surrogate pairs crossed, then k +- 1..8.
-827 adjusted steps: 674 fit exactly k + pairs (one more unit per emoji crossed), 147 fit nothing (2 pairs crossed),
-6 others. So the web host moves `byCharacterOffset` in characters (here a single-scalar emoji counts 1), while the
-native hosts move in UTF-16 units (no adjust needed there; the +-d search made swiftui xlong walks 3-5 units too
-long). Web p5 then read 439 of 443. test5j failed after 141 s on an XCUITest "Failed to get screenshot" (an
+827 adjusted steps: 674 fit exactly k + pairs (one more unit per emoji crossed; 663 of them in web walks, 11 in
+swiftui xlong walks), 153 fit nothing (147 with 2 pairs crossed, 6 with none). The +-d search never chose a value. So
+the web host moves `byCharacterOffset` in characters (here a single-scalar emoji counts 1). The 11 native k + pairs
+fits made the swiftui xlong walks 3-5 units too long (14 043, 14 041), and their second walks ended early at a false
+start (7873, 7962 units). Web p5 then read 439 of 443. test5j failed after 141 s on an XCUITest "Failed to get screenshot" (an
 infrastructure timeout, not the probe), so uikit has only 2 tries.
 
 ### Run 471e282-153: strict walks
@@ -243,15 +254,45 @@ taken as k + the pairs crossed only when that fits, else counted bad; a read is 
 start, agree, and had no bad step.
 - **Kept 14 of 29, all exact** (uikit p5 t2, l5 x2, p5mid x2, l5mid, trail, selp5 x3; swiftui p5 x2, l5 x2). No
   wrong read was kept (run 149 kept one).
-- Rejected: uikit p5 t1 (exact, but the second return landed `rx`), longmid (2176 of 2173), all 7 native 14 038-unit
-  reads, all 6 web reads.
-- Web p5: 439 of 443 in every walk (the characters correction fixed 6 of the 10 lost units; 2 steps a walk fit
-  nothing and were counted bad, so the reads were rejected).
-- Native 14 038 units: the empty before-context came back within 0.3 s 41-70 times a walk (`waited`), and 35-61 steps
-  a walk were bad; the walks came out 78-121 units too long (14 116-14 159). In native long fields the k + pairs fit
-  was taken 100-224 times a walk although run 149 shows native hosts move in UTF-16 units on short fields: there the
-  contexts lag the cursor, so the correction must not run on native hosts.
+- Rejected: uikit p5 t1 (walk 1 exact; walk 2 read 444/8 with one bad step, so the walks disagree), longmid (2176
+  of 2173), all 7 native 14 038-unit reads, all 6 web reads. The keep rule does not look at the returns: uikit l5 t2
+  was kept with returns `rx,r1` (exact); 3 native reads up to 2173 units had an `rx` return (p5 t1, l5 t2, longmid),
+  all 7 long reads `rx,rx`.
+- Web p5: 439 of 443 in every textarea walk and in Lexical's first walks (the characters correction fixed 6 of the
+  10 lost units; 2 steps a walk fit nothing and were counted bad, so the reads were rejected). Lexical's second walks
+  read 0 units (they started at the phantom position).
+- Native 14 038 units: in the first walks the empty before-context came back within 0.3 s 41-70 times (`waited`),
+  35-61 steps were bad, the k + pairs fit was taken 78-121 times, and the walks came out 78-121 units too long
+  (14 116-14 159). Every second walk ended at a false start 3757-4659 units in (k + pairs taken 20-37 times); only
+  the disagreement of the two walks caught it. (The 223 and 224 k + pairs counts are the web xlong walks.) Run 149
+  shows native hosts move in UTF-16 units on short fields; in long ones the contexts seem to lag the cursor (a
+  guess), so the correction must not run on native hosts.
+- Walks that ended early at a false start, over runs 149, 150 and 153: 11 (149: 279, 5963; 150: 7873, 7962; 153:
+  the 7 native second walks). None was kept: each disagreed with the other walk.
 - Time: native short drafts 3.8-6.6 s a read (two walks plus the end checks); 14 038 units 101-105 s a read.
+
+### Runs 57c5539-154 and abe62c8-155: the strict read at 3000-4000 units
+
+The strict read of 471e282 unchanged, on drafts without emoji: 154 on the default drafts (no `-uniquedrafts`: p5 318,
+l5 114, longmid 1518, xlong 3230 of repeated sentences), 155 on the unique Korean drafts of run 139 (p5 378, l5 134,
+longmid 1848, xlong 3958; `HostApp.swift` back to `sentence` only and 20 sentences a paragraph). Numbers from the
+`walk whole` lines (`pick`, `ms`, `steps`, `ret`) and the stub replies (`bad=`, `fm=`, `fe=`) in `checks.txt`.
+- **154**: 58 of 58 walks exact. Kept 26 of 29, all exact. Rejected 3, all exact: the Lexical reads (p5 x2, xlong),
+  whose returns land 2 units short after the phantom step (`fm=2/end fe=2/end`), which the keep rule (`fe` must walk
+  0 units) refuses.
+- **155**: 55 of 58 walks exact. Kept 22 of 29, all exact. Rejected 7: 2 wrong (uikit selxlong t1, t2: a bad step in
+  walk 1, `bad=1+1` and `bad=1+0`, the walks disagree) and 5 exact (the 3 Lexical reads as in 154; selp5 t1 and t3,
+  whose second return landed 1 short, `fe=1/end`).
+- Together: 48 of 58 reads kept, all exact; no wrong read kept; 8 exact reads refused. Native reads at 3230-3958
+  units: 12 of 14 kept, all exact, the other 2 the wrong ones.
+- **Time of a whole read** (two walks, the end checks, the forward walk first): native, cursor at the end: 3230 units
+  12.5-15.4 s (uikit xlong 12.5-12.7, selxlong 13.5-15.4, swiftui 13.1), 3958 units 10.8-14.1 s, 71-378 units 3.6-4.9
+  s; cursor in the middle: p5mid 5.5-6.2 s, longmid 1518 15.4 s and 1848 12.5 s (113-114 forward steps first). Web:
+  p5 6.0-7.7 s, xlong 3230 28.7-31.3 s and 3958 44.2-46.6 s, because the tap put the cursor 60 units in and the
+  forward walk to the end took 323 steps (15.9-23.1 s).
+- A looser keep rule (both walks reached the start, agree, no bad step; `fe` may walk to the end) would have kept the 8
+  exact refused reads and none of the wrong ones in 153, 154 and 155 (every wrong read there had `bad>0`). This is
+  worked out from the logged fields, not run.
 
 ## Answers
 
@@ -260,7 +301,7 @@ start, agree, and had no bad step.
   walk up to 2173 units on the mixed drafts (run 149). Partly in web fields: exact on Korean text (textarea and
   Lexical-shaped, once the phantom step is skipped), but WebKit moves by characters, so text with emoji loses one unit
   per emoji unless each step is corrected (runs 145, 149, 150).
-- **Step policy.** Unit steps: too slow (28-67 ms a unit, 118 s for 3230 units) and they read inconsistent contexts
+- **Step policy.** Unit steps: too slow (28-82 ms a unit, 118 s for 3230 units) and they read inconsistent contexts
   (runs 135, 140). Whole-context jumps: fast but stuck on repeated text (135). np (largest k below the context's
   length that is not a period of it and does not split a surrogate pair): never stuck, about 40 units a step, 5-7 s
   for 3230 units, 20-33 s for 14 038.
@@ -271,24 +312,28 @@ start, agree, and had no bad step.
   up to 53 at 14 038), and on the Lexical-shaped page the -1 at the start changes the after-context to empty without
   crossing text (phantom). There was no false *start* (a walk ending before the field's start) that the length check
   missed, but false starts that guessed a unit did corrupt texts (138 uikit p5 t1; 149 at 14 038).
-- **End detection**: an empty after-context, then a +1 step that changes nothing for 0.5 s. One false end in a web
-  textarea (146: at 39 of 318 units).
+- **End detection**: an empty after-context, then a +1 step that changes nothing for 0.5 s. False ends: two in 146
+  (textarea p5 t1 at 39 of 318 units; lexical p5 t2's last forward walk at the phantom position, before and after
+  both empty) and one in 145 (swiftui xlong t2 at 8772 of 14 038).
 - **Back where it began?** After a walk back that reached the start, one move forward by the walked length landed
-  exactly at the end in native hosts (`r1` in every native read of runs 146 and 149; 2 `rx` in run 153); not on the
-  Lexical-shaped page (`rx`, the phantom). So K1b confirms the end with a forward walk after the move.
+  exactly at the end in native hosts up to 3230 units (`r1` in every native read of run 146 and the short ones of
+  149); not always beyond that or in 153 (149: uikit xlong t1 `rx`, swiftui xlong t1 `rx,rs`; 153: `rx` in p5 t1,
+  l5 t2, longmid and `rx,rx` in all 7 long reads), and not on the Lexical-shaped page (`rx`, the phantom). So K1b
+  confirms the end with a forward walk after the move.
 - **Select all**: collapse with +1 (lands at the end) and walk; -1 lands one before the end, 0 does nothing for 1 s.
   `selectedText` during select all is a window (43 units), not the selection.
 - **Time on 3230 units**: unit walk 118 s (and capped at 1700 steps in the probe); np walk back 5.4-6.7 s; a read of
-  two np walks 14-15 s (146, with 1 s of a useless big move); forward walks to the end are about 4x slower per unit
+  two np walks 14.0-15.1 s native (146, with 1 s of a useless big move), 37.7-39.0 s web; forward walks to the end are about 4x slower per unit
   than walks back (138: 20-23 s for 3230), so a cursor near the start of a long text costs most.
 - **Mixed text (emoji)**: native hosts read it exactly up to 2173 units with the surrogate-safe np step (149: 16 of
   16; 153: 14 kept, all exact). Web hosts move by characters (150), and neither the correction nor the strict rule
   made a web read with emoji exact (153: all rejected, safely).
-- **Long fields**: 3230-3958 units work (5-8 s a walk); at 14 038 units every native read was wrong or rejected
-  (145, 149, 153): empty and lagging contexts pile up.
-- **Verdict: partly.** Works for native fields up to a few thousand units, and for web fields without emoji; does
-  not work for web fields with emoji or for fields of 14 000 units. A wrong read is caught when two walks with the
-  strict rule are compared (153: 0 wrong kept of 29), but such reads are then refused, not read.
+- **Long fields**: 3230-3958 units work with the strict read (154, 155: native 12 of 14 kept, all exact, 10.8-15.4 s a
+  read); at 14 038 units every native read was wrong or rejected (145, 149, 153): empty and lagging contexts pile up.
+- **Verdict: partly.** Works for native fields up to about 4000 units (proven for the strict read by 154 and 155,
+  without emoji; with emoji only up to 2173 units, 149 and 153), and for web fields without emoji (154, 155: every
+  kept web read exact). Does not work for web fields with emoji or for fields of 14 000 units. Over runs 153-155 the
+  strict read kept 62 of 87 reads, all exact, and refused every wrong one.
 
 ## Recommended K1b read (probe evidence, not shipped code)
 
@@ -305,13 +350,16 @@ start, agree, and had no bad step.
    An empty before-context: wait up to 0.3 s for it to come back; then -1; no change for 0.5 s = the start; a change
    that leaves the before-context empty = a phantom (skip it). After the first walk, move forward by its length and
    confirm the end; then walk back again.
-4. **Accept** only when both walks reached the start, read the same units, and had no bad step; the cursor is then
-   at the end for Replace. Otherwise show the cut-short message ("Could not read the whole text. Select all, then
+4. **Accept** only when both walks reached the start, read the same units, and had no bad step, and the last forward
+   walk found the end (the cursor is then at the end for Replace). Do not require that last walk to move 0 units:
+   that refused 8 exact reads in 154 and 155 and no wrong one (worked out from the logs, not run). Otherwise show the cut-short message ("Could not read the whole text. Select all, then
    tap again." or one that says the text is too long).
-5. **Caps**: stop at 4000 UTF-16 units read (or 12 s) with that message, showing progress after 2 s. Measured:
-   3230-3958 units take 5-7 s a walk, so 2 walks + the end fit in about 15 s; at 14 038 units every read failed
-   (false starts, 20-33 s a walk). The current FieldReadBudget of 2 s fits only fields up to about 500 units at the
-   end (p5: 1 s a walk). The 4000/12 s numbers are a proposal from these timings, not a user test.
+5. **Caps**: stop the first walk back when it has read 4000 UTF-16 units, and the whole read at 20 s, with that
+   message; show progress after 2 s. Measured (154, 155): native two-walk reads take 3.6-4.9 s at 71-378 units,
+   10.8-15.4 s at 3230-3958; web ones up to 46.6 s when the cursor starts far from the end (the forward walk is the
+   slow part), so the 20 s cap refuses such web reads; at 14 038 units every read failed. No two-walk read took less
+   than 3.0 s (149: 3.1 s for 143 units; 153-155: 3.6 s and up), so the current FieldReadBudget of 2 s fits none of them: K1b needs
+   its own budget. 4000 units and 20 s are a proposal from these timings, not a user test.
 6. **Web fields with emoji**: refuse (cut-short message) rather than correct: the characters correction fixed most
    but not all units (153). Native hosts: never apply it (153: it made long walks too long).
 
@@ -323,7 +371,9 @@ start, agree, and had no bad step.
   decomposed Hangul.
 - Why empty before-contexts appear mid-field and why they get frequent in long fields (a guess: the host resyncs its
   window while the cursor moves fast).
-- Whether a user accepts 15 s for 3000 units; the cap is a proposal.
+- Whether a user accepts 11-15 s for 3000-4000 units; the cap is a proposal.
+- The looser keep rule (4.) was not run.
+- The strict read at 3000-4000 units with emoji (149 and 153 only had 2173 units with emoji below 14 038).
 - Why web steps over 2 emoji fit neither k nor k + pairs (153: 2 bad steps a walk on p5).
 - Whether waiting longer than 0.3 s, or a smaller k, makes 14 000-unit native reads exact.
 
@@ -331,8 +381,9 @@ start, agree, and had no bad step.
 
 - Branches (each cut from `origin/diag/p1-walk-back` with the RECORD parse fix cae21c5, never merged, no PR):
   `diag/p1-walk-back-unit` f3f2623, `-unique` 1233d72, `-np` 3293a10, `-mix` 3182f20, `-k1b` 71f21ff, `-safe`
-  340f403, `-units` 4a2110a, `-strict` 471e282. The candidate read is `FieldText.walkRead` on `-strict` (on top of
-  `-safe`), probe code only.
+  340f403, `-units` 4a2110a, `-strict` 471e282, and cut from `-strict`: `-strictlong` 57c5539 (default drafts),
+  `-strictlong-unique` abe62c8 (unique Korean drafts). The candidate read is `FieldText.walkRead` on `-strict` (on
+  top of `-safe`), probe code only.
 - Read a folder: `git fetch origin ci-shots`, copy `report.txt checks.txt keyboard-log.txt ui-log.txt` from
   `runs/<folder>/` into a directory, run `python3 -I docs/research/2026-11-21-walk-back-analyze.py <dir>` (`--steps`
   for every step line).
