@@ -377,8 +377,10 @@ for test in manifest:
                 shutil.copy(os.path.join(src, a["exportedFileName"]), os.path.join(dst, scenario + ".png"))
 EOF
 fi
-# The keyboard's own height log (ProtlyHeight.swift), for what iOS did between the screenshots.
-xcrun simctl spawn "$udid" log show --last 30m --debug --info --style compact \
+# The keyboard's own height log (ProtlyHeight.swift), for what iOS did between the screenshots, and its read log
+# (FieldText.swift, K1b): the whole test step (at most 65 min of tests after the build), not its last 30 minutes (run
+# 28c1fef-164 lost the read lines of its first 45 minutes).
+xcrun simctl spawn "$udid" log show --last 100m --debug --info --style compact \
   --predicate 'subsystem == "com.northprot.protly"' > "$out/keyboard-log.txt" 2>&1
 # The web composer's DOM event log (typing-fixes 004, HostApp.swift `-screen web`): the host appends it in its
 # Documents folder; it goes into the run folder next to the ret-* lines.
