@@ -36,9 +36,9 @@ final class FieldGuardTests: XCTestCase {
         XCTAssertTrue(FieldGuard.holdsResult("read 335/9/h6d75860b t4210", before: "read 335/9/h6d75860b t4210", after: ""))
         XCTAssertFalse(FieldGuard.holdsResult("read 335/9/h6d75860b t4210", before: "x read 335/9/h6d75860b t4210", after: ""))
         XCTAssertFalse(FieldGuard.holdsResult("abc", before: "abc", after: "left over"))
-        // Undo of a long Replace: the window shows the result's end.
-        XCTAssertTrue(FieldGuard.canUndo(long, before: String(long.suffix(50)), selected: ""))
-        XCTAssertFalse(FieldGuard.canUndo(long, before: "", selected: ""))
+        // Undo of a long Replace (proven whole when it ended): the window shows the result's end.
+        XCTAssertTrue(FieldGuard.canUndoReplace(long, before: String(long.suffix(50)), after: "", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndoReplace(long, before: "", after: "", selected: ""))
     }
 
     func testNoInsertWithTextAfterTheCursorOrNothingRead() {
@@ -53,6 +53,17 @@ final class FieldGuardTests: XCTestCase {
         XCTAssertEqual(String(cut.suffix(40)), String(inserted.suffix(40)))
         XCTAssertFalse(FieldGuard.canUndo(inserted, before: "Earlier text. " + cut, selected: ""))
         XCTAssertFalse(FieldGuard.canUndo("", before: "x", selected: ""))
+    }
+
+    /// Tower review of f0533ae: Read's Insert into a field that took only part of it (a length limit) leaves text
+    /// that is a window of the insert's end; Undo then sent 8 deletes over 2 characters, into the user's own text.
+    /// Insert's Undo needs all of the inserted text before the cursor, as on main; only a Replace the keyboard
+    /// proved whole may be undone from a window of its end.
+    func testInsertUndoNeedsAllOfTheInsert() {
+        XCTAssertFalse(FieldGuard.canUndo("Looks OK", before: "OK", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndo("Looks OK", before: "Mine. OK", selected: ""))
+        XCTAssertTrue(FieldGuard.canUndo("Looks OK", before: "Mine. Looks OK", selected: ""))
+        XCTAssertTrue(FieldGuard.canUndoReplace("Looks OK", before: "OK", after: "", selected: ""))
     }
 
     /// Replace left "Hi|", then the user added " there" and selected it: Undo's first delete would take the selection,

@@ -60,8 +60,9 @@ final class ProtlyHeight: NSObject {
     }
 
     /// The field's document, nil while iOS gives none. Swift imports `documentIdentifier` as a non-optional UUID, and
-    /// reading it before iOS has a document traps (probe runs 170 and 173: the keyboard never logged a line).
-    private static func document(_ controller: KeyboardInputViewController) -> UUID? {
+    /// reading it before iOS has a document traps (probe runs 170 and 173: the keyboard never logged a line). K1b's
+    /// Replace reads it too: a field that changed between the deletes and the insert gets no insert.
+    static func document(_ controller: KeyboardInputViewController) -> UUID? {
         // UIKit's own proxy: KeyboardKit's textDocumentProxy is a preview stand-in with a random document until it
         // syncs.
         guard let proxy = controller.originalTextDocumentProxy as? NSObject else { return nil }

@@ -589,7 +589,9 @@ final class KeyboardViewController: KeyboardInputViewController {
         beginWriting(card.action)
         writeTask = Task { [weak self] in
             guard let self else { return }
-            let held = await FieldText.replace(original, with: result, textDocumentProxy)
+            let held = await FieldText.replace(original, with: result, textDocumentProxy) { [weak self] in
+                self.flatMap { ProtlyHeight.document($0) }
+            }
             endWriting()
             if held {
                 // Undo puts back exactly the text that was read.
@@ -693,7 +695,9 @@ final class KeyboardViewController: KeyboardInputViewController {
         beginWriting(.out)
         writeTask = Task { [weak self] in
             guard let self else { return }
-            let held = await FieldText.replace(l.inserted, with: l.original, textDocumentProxy)
+            let held = await FieldText.replace(l.inserted, with: l.original, textDocumentProxy) { [weak self] in
+                self.flatMap { ProtlyHeight.document($0) }
+            }
             endWriting()
             if !held { mode.panel = .unsure(Self.replaceUnsureText, original: l.original) }
             refreshField()
