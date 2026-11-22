@@ -86,6 +86,16 @@ test('a server error after a long wait is still retried: the API answered, nothi
   assert.equal(t.calls.length, 2);
 });
 
+test('the long-wait clock is per attempt: a quick network failure after a slow 529 is still retried', async () => {
+  let clock = 0;
+  const took = [31000, 1000, 1000];
+  const t = fakeTransport([{ status: 529, body: {} }, { status: 0, body: { error: { type: 'host_network', message: 'reset' } } },
+    { status: 200, body: { ok: 1 } }]);
+  const timed = (b) => { clock += took.shift(); return t(b); };
+  assert.deepEqual(await callClaude({}, { transport: timed, sleep: noSleep, now: () => clock }), { ok: 1 });
+  assert.equal(t.calls.length, 3);
+});
+
 test('callJson re-requests once on parse error', async () => {
   const t = fakeTransport([{ status: 200, body: { n: 1 } }, { status: 200, body: { n: 2 } }]);
   let seen = 0;

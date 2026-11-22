@@ -16,7 +16,11 @@ const BLOCKED = 'protly cannot reach this frame. Right-click inside the box inst
 // Below LIMITS.text on purpose: the box reply carries the translation plus a Korean back_translation, and both
 // (with thinking) must fit the 32000-token outgoing budget in src/lib/prompts.js.
 const MAX_CHARS = 12000;
-const FIELD = /^(INPUT|TEXTAREA|SELECT)$/;
+// A field the user types or picks in, editable or not (password, number, date, readonly), as opposed to a checkbox,
+// a button or a file picker: a click on those leaves the box free to be written.
+const NOT_TYPED = new Set(['button', 'checkbox', 'color', 'file', 'hidden', 'image', 'radio', 'range', 'reset', 'submit']);
+const typedField = (el) => el.tagName === 'TEXTAREA' || el.tagName === 'SELECT'
+  || (el.tagName === 'INPUT' && !NOT_TYPED.has((el.getAttribute('type') || '').toLowerCase()));
 const TOO_LONG = `Too long for protly (over ${MAX_CHARS} characters).`;
 const FOCUS_MOVED = 'Focus moved, so the translation was not written.';
 const CORNER = { top: 16, bottom: 16, left: 16, right: 16, width: 0, height: 0, x: 16, y: 16 };
@@ -200,13 +204,10 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
     // this one cannot see into): a long email can take a minute, and a click on the page, a scroll or the
     // editor's own autosave moves focus off the box without the user going anywhere else.
     const typingElsewhere = () => {
-      const { el, blocked } = deepActive(top);
+      const { el, blocked } = deepActive(top, { closed: true }); // a field in a web component's closed root counts
       if (blocked) return true;
       if (!el || el === cur.t.el || cur.t.el.contains(el)) return false;
-      // A focused custom element can hold a field in a closed shadow root deepActive cannot enter. The card's own
-      // host is a plain div, so its language chip still re-runs.
-      if (el !== cur.card.host && el.tagName.includes('-')) return true;
-      return FIELD.test(el.tagName) || classify(el) !== null; // any input (password, number), readonly or not
+      return typedField(el) || classify(el) !== null;
     };
     const focusOk = () => cur.t.kind === 'text' || !typingElsewhere();
     const focusMoved = () => { close(); toast(FOCUS_MOVED); };

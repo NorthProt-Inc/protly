@@ -46,6 +46,21 @@ test('deepActive follows same-origin iframes and stops at cross-origin ones', ()
   assert.equal(deepActive(crossThrows).blocked, true);
 });
 
+test('deepActive enters a closed shadow root through chrome.dom only when asked; findTarget never does', (t) => {
+  const d = docOf('<x-field id="x"></x-field>');
+  const x = d.getElementById('x');
+  const root = x.attachShadow({ mode: 'closed' });
+  root.innerHTML = '<input id="i">';
+  root.getElementById('i').focus();
+  globalThis.chrome = { dom: { openOrClosedShadowRoot: (el) => (el === x ? root : el.shadowRoot) } };
+  t.after(() => { delete globalThis.chrome; });
+  assert.equal(deepActive(d, { closed: true }).el, root.getElementById('i'));
+  assert.equal(deepActive(d).el, x);
+  assert.equal(findTarget(d), null);
+  globalThis.chrome.dom.openOrClosedShadowRoot = () => { throw new TypeError('not an element of this world'); };
+  assert.equal(deepActive(d, { closed: true }).el, x); // falls back to open roots
+});
+
 test('selectionInfo returns the selected text and its document', () => {
   const d = docOf('<p id="p">hello world</p>');
   const r = d.createRange();
