@@ -80,9 +80,9 @@ WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong", "b1:characters", "b1:badSte
                   ("web", "x14k"): ("b1:characters", "b1:badStep"),
                   ("web", "emoji"): ("b1:characters", "b1:badStep")}
 WHOLE_CANCELLED = {("native", "cancel")}
-# The test polls the field every 0.2 s, and reading a long field takes a few hundred ms more; the keyboard's clock
-# starts a little after the test's tap.
-WHOLE_HOST_SLACK_MS = 1000
+# The test polls the field every 0.2 s, reading a long field takes a few hundred ms more, and the keyboard's clock starts
+# a little after the test's tap; the race this check is for opened the gate 6-11 s before the host was done (run 172).
+WHOLE_HOST_SLACK_MS = 2000
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
                 + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
@@ -1343,11 +1343,12 @@ def resolve_whole_log(check, marks, kb_text):
             # (silent-failure review, round 2: a move sent while the host was still deleting left run 172's Lexical-
             # shaped page empty; `heldms`, the check's end, would hide that).
             starts = [kv(line, "quietms") for line in lines if line.startswith("replace ")]
+            host_ends = [kv(line, "lastev") for line in lines if line.startswith("replace ")]
             tries = [kv(line, "tries") for line in lines if line.startswith("replace ")]
             if any(n not in (None, "1") for n in tries):
                 notes.append(f"t{t}:tries={','.join(n or '?' for n in tries)}")
             ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
-            for name, ms_text in zip(("replace", "undo"), starts):
+            for name, ms_text, last_text in zip(("replace", "undo"), starts, host_ends):
                 seen = kv(ui.group(1), name) if ui else None
                 try:
                     host_ms, kb_ms = float(seen) * 1000, int(ms_text)
@@ -1356,7 +1357,19 @@ def resolve_whole_log(check, marks, kb_text):
                     # claim against, which is a FAIL, not a crash (silent-failure review).
                     problems.append(f"t{t}:{name}={seen} quietms={ms_text}: no time to hold the check against")
                     continue
-                if not kb_ms + WHOLE_HOST_SLACK_MS >= host_ms:  # also a NaN
+                if kb_ms + WHOLE_HOST_SLACK_MS >= host_ms:
+                    continue
+                # A native host's own callbacks follow its edits (runs 181, 185: the last one before the UI test saw
+                # the result). A check that began after the host had been quiet for the gate's 0.5 s is after the
+                # host, also when the UI test saw the field late (uikit sel, runs 185 and 189: 7.0-7.1 s, while the
+                # host's last callback came at 1.2-1.5 s, as in win and mid). Web hosts send none: the UI time rules.
+                try:
+                    last = int(last_text)
+                except (TypeError, ValueError):
+                    last = -1
+                if last >= 0 and kb_ms >= last + 500:
+                    notes.append(f"t{t}:{name} ui-late={seen}s host-last={last}ms began={ms_text}ms")
+                else:  # also a NaN
                     problems.append(f"t{t}:{name} check began at {ms_text}ms, the field held it at {seen}s")
     evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
     if problems:

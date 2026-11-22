@@ -315,9 +315,12 @@ units). The test writes PASS or FAIL itself; checks.py then holds each try again
   hashes, offsets and times, never text.
 - **The keyboard's log** (`keyboard-log.txt`, category `read`, lines between the try's MARK `wr-<host>-<case>-t<n>`
   in `ui-log.txt` and the next MARK): an accepted case needs `read done outcome=accepted` and two `replace ... held=1`
-  lines (Replace and Undo, each proven by the keyboard's walk over the field once the host was quiet), each `heldms`
-  no more than 1 s before the test saw the field hold it (`replace=`, `undo=`: a check that ends while the host is
-  still deleting proved only the proxy's own copy of the field); a refusal case needs `read done outcome=refused` with
+  lines (Replace and Undo, each proven by the keyboard's walk over the field once the host was quiet), each check
+  beginning (`quietms`, its first cursor move) no more than 2 s before the test saw the field hold the result
+  (`replace=`, `undo=`, timed from the tap: a move sent while the host is still deleting proves only the proxy's own
+  copy of the field, and emptied run 172's Lexical-shaped page), or, on a native host that sent callbacks, at least
+  0.5 s after its last one (`lastev`; the UI test can see a field late: uikit `sel`, runs 185 and 189); a second
+  attempt is shown as `tries=`; a refusal case needs `read done outcome=refused` with
   its reason (`WHOLE_REFUSALS`: native `x14k` `b1:tooLong`, or `b1:characters` / `b1:badStep` as in run 162; the web
   drafts with emoji `b1:characters` or `b1:badStep`). A PASS without those lines is a FAIL; the line gains
   `log=t<n>:<outcome>/...` either way.

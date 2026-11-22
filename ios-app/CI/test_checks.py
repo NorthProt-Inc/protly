@@ -1325,6 +1325,21 @@ class WholeReadTests(unittest.TestCase):
         final = self.assemble_with_logs(line2, ui, kb)["wr-uikit-long"]
         self.assertEqual(final.status, "PASS", final.evidence)
         self.assertIn("t1:tries=2,1", final.evidence)  # a second attempt is shown, not judged
+        # A native host whose last callback came long before the check began: the UI test saw the field late.
+        lagged = self.HELD.replace("events=40", "events=11 firstev=1200 lastev=1500")
+        kb3 = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", lagged), ("10", "20.000", self.HELD))
+        kb3 += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
+        late_ui = line.replace("replace=9.00", "replace=7.09").replace("}\n", "} t2={replace=1.0 undo=1.0}\n")
+        final = self.assemble_with_logs(late_ui, ui, kb3)["wr-uikit-long"]
+        self.assertEqual(final.status, "PASS", final.evidence)
+        self.assertIn("t1:replace ui-late=7.09s host-last=1500ms began=2900ms", final.evidence)
+        # A check that began before the host's last callback had settled: still a FAIL.
+        racing = self.HELD.replace("events=40", "events=11 firstev=1200 lastev=2600")
+        kb4 = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", racing), ("10", "20.000", self.HELD))
+        kb4 += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
+        final = self.assemble_with_logs(late_ui, ui, kb4)["wr-uikit-long"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:replace check began at 2900ms, the field held it at 7.09s", final.evidence)
         # No replace= time on the test's side: nothing to hold the keyboard against, which is a FAIL.
         bare = "CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec read=15457} t2={replace=1.0 undo=1.0}\n"
         final = self.assemble_with_logs(bare, ui, kb)["wr-uikit-long"]

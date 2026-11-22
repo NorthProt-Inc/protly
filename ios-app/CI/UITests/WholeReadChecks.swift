@@ -394,9 +394,13 @@ extension PhoneRun {
         }
         guard writingEnded(since: t1, "kb", &r) else { return r }
 
-        // The protly key is Undo now.
+        // The protly key is Undo now. Its row is found first (a screenshot: a second or two), so the timer starts at the
+        // tap, as Replace's does (runs 181-189: undo= was 3.7-6.6 s for a 335-unit insert, most of it this search).
+        let fixed = d.fixedRow1
+        d.fixedRow1 = fixed ?? d.rowOne()
         let t2 = Date()
         d.tapKey(.protlyKey)
+        d.fixedRow1 = fixed
         if let secs = waitField(host, web, since: t2, timeout: WholeChecks.writeTimeout, exact: original, shape: before) {
             r.add(String(format: "undo=%.2f", secs))
         } else {
