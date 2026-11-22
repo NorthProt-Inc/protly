@@ -16,8 +16,9 @@ import Foundation
 //    one is a fresh host.
 // 2. The host coming back with the keyboard up, after leaving with it up, shows the margin from then on. Its notice
 //    (NSExtensionHostDidBecomeActive) reaches a controller `freshWindow` or younger (0.22-0.41 s after loading), or
-//    comes up to `earlyWindow` before the controller loads (run 59: 32 ms). Without leaving first (Control Center, an
-//    alert, Face ID or a notification reply over a live keyboard, a cold launch) iOS keeps its look.
+//    comes up to `earlyWindow` before the controller loads (32 ms in run 59, 0.62 s in run 184). Without leaving first
+//    (Control Center, an alert, Face ID or a notification reply over a live keyboard, a cold launch) iOS keeps its
+//    look.
 // 3. Hide and show keep the look of the presentation before, while the host stays in the foreground.
 // 5. A hide of `hiddenExpiry` or longer shows no margin afterwards. iOS drops its margin when the host goes to the
 //    background with the keyboard hidden (run 183, 5/5) or is relaunched after that (5/5), and no notice reaches the
@@ -36,8 +37,9 @@ public struct HostLook: Sendable, Equatable {
     public static let hostTopMargin = 17.0
     /// How soon after loading a controller still counts as attached by the host's return.
     public static let freshWindow = 2.0
-    /// How soon before a controller loads the host's return still counts as meant for it.
-    public static let earlyWindow = 0.5
+    /// How soon before a controller loads the host's return still counts as meant for it (seen: 32 ms in run 59,
+    /// 0.62 s in run 184). Only a return after leaving counts, so it can be as wide as `freshWindow`.
+    public static let earlyWindow = 2.0
     /// How soon after the resign notice a disappearing controller counts as the host leaving with the keyboard up.
     public static let resignWindow = 3.0
     /// How long the keyboard can stay hidden before the margin look no longer counts (rule 5).

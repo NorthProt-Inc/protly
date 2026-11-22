@@ -305,7 +305,8 @@ Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis br
   hidden, 13 s away, then the field tapped), `hb-kill-up` and `hb-kill-hidden` (after an app switch with the keyboard
   up, the host left with the keyboard up, or hidden and 13 s away, terminated in the background and launched again), `hb-card` (a stub Translate's finished card in a fresh host, judged by the
   glass top only: it covers row 1; a card that did not finish FAILs) and `hb-cancel` (the keys after the card's
-  Cancel). Fewer than 5 shots, or no Apple band, is FAIL `unreadable`. One more card after an app switch is not judged:
+  Cancel). A shot that came up on another keyboard (a system stand-in, or English) is listed as `skipped`, not judged;
+  fewer than 5 shots on Protly, or no Apple band, is FAIL `unreadable`. One more card after an app switch is not judged:
   runs 159 and 178 could not read the bar's center at the 240 pt pin, and its tree goes to
   `tree-hb-card-after-switch.txt` when that happens.
 - A relaunch that comes up on another keyboard picks Protly and launches again (iOS brings back the keyboard last

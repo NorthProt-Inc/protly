@@ -156,8 +156,8 @@ extension PhoneRun {
         if let lo = bands.min(), let hi = bands.max() {
             item.note(String(format: "band=%.2f..%.2f", Double(lo), Double(hi)))
         }
-        if list.count < 5 { item.markUnreadable("\(list.count) shots, want 5 or more") }
         if id == "hb-apple" {
+            if list.count < 5 { item.markUnreadable("\(list.count) shots, want 5 or more") }
             // The reference: Apple's keyboard on every shot, the same band each time.
             let english = list.filter { $0.board == .english && $0.band != nil }
             item.require("apple", english.count == list.count, "\(english.count)/\(list.count) on English with a band")
@@ -173,20 +173,28 @@ extension PhoneRun {
             return
         }
         item.note(String(format: "apple=%.2f", Double(appleBand)))
+        // A shot that came up on another keyboard (a system stand-in, or iOS bringing back English) cannot show
+        // Protly's band: listed, not judged. Fewer than 5 judged shots is unreadable.
+        let skipped = list.indices.filter { list[$0].board != .protly }.map { $0 + 1 }
+        if !skipped.isEmpty { item.note("skipped=\(skipped.map(String.init).joined(separator: ",")) (not on Protly)") }
+        if list.count - skipped.count < 5 {
+            item.markUnreadable("\(list.count - skipped.count) shots on Protly, want 5 or more")
+        }
         var wrong: [Int] = []
-        for (i, s) in list.enumerated() {
+        for (i, s) in list.enumerated() where s.board == .protly {
             // The card covers row 1: its shot is judged by the glass top only (row 1 at 564 puts the top at
             // row1 - appleBand).
             let keys = !(id == "hb-card")
             let topWant = PhoneRun.row1 - appleBand
             let ok: Bool
             if keys {
-                ok = s.board == .protly && s.band.map { abs($0 - appleBand) <= tol } == true
+                ok = s.band.map { abs($0 - appleBand) <= tol } == true
                     && s.row1.map { abs($0 - PhoneRun.row1) <= tol } == true
                     && (id != "hb-cancel" || s.reached)  // Cancel was tapped on a finished card
             } else {
-                // A finished card, which covers row 1.
-                ok = s.board == .protly && s.reached && s.row1 == nil
+                // A finished card, which covers row 1: no row edge where the keys' row 1 would be (the card's own
+                // lines can show as one further down, run 184).
+                ok = s.reached && s.row1.map { abs($0 - PhoneRun.row1) > tol } != false
                     && s.top.map { abs($0 - topWant) <= tol } == true
             }
             if !ok { wrong.append(i + 1) }

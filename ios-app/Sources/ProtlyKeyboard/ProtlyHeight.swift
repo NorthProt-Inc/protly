@@ -104,7 +104,8 @@ final class ProtlyHeight: NSObject {
         let view: UIView = controller.view
         self.view = view
         // 999, not required: iOS's own constraints win during its transitions instead of breaking ours.
-        constraint = view.heightAnchor.constraint(equalToConstant: CGFloat(Self.look.pin(content: Double(Self.portrait))))
+        let height = CGFloat(Self.look.pin(content: Double(Self.portrait)))
+        constraint = view.heightAnchor.constraint(equalToConstant: height)
         constraint.priority = UILayoutPriority(999)
         super.init()
 

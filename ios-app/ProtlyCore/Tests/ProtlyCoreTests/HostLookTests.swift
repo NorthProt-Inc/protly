@@ -70,6 +70,17 @@ final class HostLookTests: XCTestCase {
         XCTAssertTrue(look.margin)
     }
 
+    func testAReturnSixHundredMillisecondsBeforeLoadingMeansTheMargin() {
+        // Run 184, hb-switch 15: the notice came 0.62 s before the new controller loaded.
+        var look = HostLook()
+        present(&look, at: 0, document: UUID())
+        look.hostWillResignActive(at: 10)
+        look.disappeared(document: nil, at: 11.9)
+        look.hostBecameActive(at: 15.18)
+        present(&look, at: 15.8, document: nil)
+        XCTAssertTrue(look.margin)
+    }
+
     func testAReturnLongBeforeLoadingDoesNotCount() {
         var look = HostLook()
         present(&look, at: 0, document: UUID())
