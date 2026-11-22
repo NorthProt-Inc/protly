@@ -23,7 +23,7 @@ enum StubActionClient {
     static func run(_ mode: ActionMode, text: String) -> AsyncStream<ActionUpdate>? {
         guard text.hasPrefix(marker) else { return nil }
         let word = String(text.dropFirst(marker.count).prefix { !$0.isWhitespace })
-        let script = StubScript.named(word)
+        let script = word == "read" ? StubScript.read(text) : StubScript.named(word)
         return ActionAPI.updates {
             (status: script.status, bytes: StubBytes(chunks: script.chunks), stop: {})
         }
@@ -58,6 +58,22 @@ struct StubScript: Sendable {
             let body = #"{"type":"error","error":{"type":"invalid_request_error","message":"unknown stub scenario"}}"#
             return StubScript(status: 400, chunks: [Chunk(delay: .milliseconds(500), bytes: Array(body.utf8))])
         }
+    }
+
+    /// K1b (F02c baseline, as on fix/whole-field-read): the shape of the text the request carried, never the text.
+    static func read(_ text: String) -> StubScript {
+        let u = Array(text.utf16)
+        var h: UInt32 = 0x811C_9DC5
+        for x in u {
+            h ^= UInt32(x)
+            h = h &* 0x0100_0193
+        }
+        let hex = String(h, radix: 16)
+        let fnv = String(repeating: "0", count: 8 - hex.count) + hex
+        let reply = "read \(u.count)/\(u.reduce(0) { $1 == 10 ? $0 + 1 : $0 })/h\(fnv)"
+        let body = #"{"translation": "# + json(reply) + #", "back_translation": "ok"}"#
+        let c = [chunk(0, start), chunk(200, textStart), chunk(200, textDelta(body)), chunk(100, end("end_turn"))]
+        return StubScript(status: 200, chunks: c)
     }
 
     private static var ok: StubScript {
