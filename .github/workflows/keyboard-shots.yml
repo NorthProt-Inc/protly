@@ -29,7 +29,7 @@ jobs:
       group: keyboard-shots-${{ github.ref }}
       cancel-in-progress: true
     runs-on: macos-26
-    timeout-minutes: 95  # the build step's 85 minutes, then publish and judge
+    timeout-minutes: 105  # the build step's 95 minutes, then publish and judge
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,9 +69,9 @@ jobs:
         run: bash ios-app/CI/write-secrets.sh
 
       # Under the job's limit: a step timeout fails the step (the publish steps still run), a job timeout cancels the
-      # job (run 36 published nothing). run-shots.sh stops the tests itself after 65 minutes.
+      # job (run 36 published nothing). run-shots.sh stops the tests itself after 75 minutes.
       - name: Build, run scenarios, measure
-        timeout-minutes: 85  # about 12 min to build and boot cold, 65 of tests, then measure
+        timeout-minutes: 95  # about 12 min to build and boot cold, 75 of tests (K1b reads), then measure
         env:
           SOURCE_SHA: ${{ github.sha }}
           PROBE: ${{ contains(github.event.head_commit.message, '[probe]') && '1' || '0' }}
