@@ -844,26 +844,51 @@ final class PhoneRun {
 /// - `pick2`: `teh`, the bar's right slot (`the` and its space), then two spaces. `kopick2`: the same with `안녀` and the
 ///   slot's `안녕`.
 /// K4E (P4 case E and the probe's timing cases), with Apple's keyboard as the reference:
-/// - `pick1`: `teh`, the bar's right slot, then one space: the pick's space takes the tap's place, so each try adds
-///   `the ` (Apple: 4/4; Protly before K4E: two spaces, 18/18).
-/// - `fast`, `kofast`: `hello` / `안녕`, then a double tap on space by coordinate (XCUICoordinate.doubleTap, its taps
-///   46-75 ms apart in the probe).
+/// - `pick1`: `teh`, the bar's right slot, the field read (`p<i>`: it must show the pick's `the `), then one space: the
+///   pick's space takes the tap's place, so each try adds `the ` (Apple: 4/4; Protly before K4E: two spaces, 18/18).
+/// - `pickmid`: `pick1` in front of a word, set up as `word`: each try adds `the ` before `world` (`the world`, one
+///   space). The pick waits with the text after the cursor; without it the tap types a second space.
+/// - `pickmove`: `pick1`, but between the pick and the tap the caret is tapped in front of the first word (`away<i>`,
+///   0) and back to the end (`back<i>`): the host's callback for the move ends the pick, so the tap types a space and
+///   each try adds `the  `. The try waits out KeyboardKit's 3 s double-space window first, so that space is plain.
+/// - `fast`, `kofast`: `hello` / `안녕`, then a double tap on space by coordinate (XCUICoordinate.doubleTap).
 /// The held space (the trackpad, no space by design) stays out: K4E leaves the 0.4 s hold and the 3.0 s window as they
 /// are.
 /// Each line is PENDING with the field before the first try (`t0`) and after each try (`t1`...); checks.py
 /// (resolve_period) wants every try to add exactly its unit in front of the text after the cursor. `gaps`: for the
-/// two-tap kinds the time between the two space taps, for `fast` and `kofast` the double tap's own duration as the
-/// test saw it, for `pick1` the slot tap's start to the end of typing the space (the driver's pause after it included).
+/// two-tap kinds the time between the two space taps as the driver typed them; for `fast` and `kofast` the spacing of
+/// the double tap's two taps as the host saw its edits (the longest wait between two edits in a row, `edits`: each
+/// edit's ms after the first; -1 when the host reported fewer than two), with `calls` the doubleTap call's own
+/// duration; for the pick kinds the slot tap's start to the end of typing the space (the field reads and the driver's
+/// pauses included).
 extension PhoneRun {
-    /// Kinds and tries per field (checks.py PERIOD_MIN_TRIES: case D at least 6, pick1 at least 4). `en` first: case
-    /// D's `world` then follows English words, as `hello` does.
+    /// Kinds and tries per field (checks.py PERIOD_MIN_TRIES: case D at least 6, pick1 and pickmid at least 4). `en`
+    /// first: case D's `world` then follows English words, as `hello` does.
     static let periodCases: [(kind: String, tries: Int)] = [
         ("en", 3), ("word", 6), ("ko", 3), ("pick2", 3), ("pick1", 4), ("fast", 3), ("kofast", 3), ("kopick2", 3),
+        ("pickmid", 4), ("pickmove", 3),
     ]
+    /// The kinds that start with `world` and the caret tapped in front of it (checks.py PERIOD_AFTER).
+    static let periodWordFirst: Set<String> = ["word", "pickmid"]
 
     /// The same list as checks.py PERIOD_IDS.
     static var periodIDs: [String] {
         ["uikit", "composer"].flatMap { f in periodCases.map { "dsp-\(f)-\($0.kind)" } }
+    }
+
+    /// One field of the period check.
+    struct PeriodField {
+        /// Empties the field and brings Protly up on it; false when Protly is not up.
+        let prepare: @MainActor () -> Bool
+        let read: @MainActor () -> String?
+        /// The caret as the host reports it: the UITextView's `location,length` (`sel`), the composer's offset.
+        let caret: @MainActor () -> String?
+        /// A tap in front of the first word (the caret goes to 0), and one right of or below the text (to the end).
+        /// false without a frame to tap (a driver problem, collected for the line).
+        let tapStart: @MainActor () -> Bool
+        let tapEnd: @MainActor () -> Bool
+        /// The host's count of text edits and the times of the last ones (ms, the host's clock); nil unreadable.
+        let edits: @MainActor () -> (count: Int, times: [Int])?
     }
 
     func checksPeriod() {
@@ -876,75 +901,127 @@ extension PhoneRun {
         }
 
         // The UITextView screen (PhoneRun launched it).
-        for c in Self.periodCases {
-            periodCase("dsp-uikit-\(c.kind)", kind: c.kind, tries: c.tries, read: { self.d.fieldText() }, setUp: {
+        let uikit = PeriodField(
+            prepare: {
                 self.d.clearField()
-                guard self.protlyUp() else { return nil }
-                guard c.kind == "word" else { return "" }
-                self.d.type("world")
-                self.d.pause(0.6)
+                return self.protlyUp()
+            },
+            read: { self.d.fieldText() },
+            caret: { self.d.probeValue("sel") },
+            tapStart: {
                 guard let r = Self.rect(self.d.probeValue("first-word")) else {
                     self.d.fail("no frame for the word")
-                    return ""
+                    return false
                 }
                 self.d.point(r.minX + 1, r.midY).tap()
                 self.d.pause(0.8)
-                return " sel0=\(q(self.d.probeValue("sel")))"
-            })
+                return true
+            },
+            tapEnd: {
+                let f = self.d.field.frame
+                guard f.width > 20, f.height > 20 else {
+                    self.d.fail("no frame for the field")
+                    return false
+                }
+                // Below the text (the view is 80 pt tall, the text one line): the caret goes to the end.
+                self.d.point(f.maxX - 8, f.maxY - 8).tap()
+                self.d.pause(0.8)
+                return true
+            },
+            edits: { Self.edits(self.d.probeValue("edits")) })
+        for c in Self.periodCases {
+            periodCase("dsp-uikit-\(c.kind)", kind: c.kind, tries: c.tries, on: uikit)
         }
 
-        // The web composer; `-caret 1` makes the page post its state when the caret moves (sel0 below).
+        // The web composer; `-caret 1` makes the page post its state when the caret moves (sel0 below) and count its
+        // edits.
         d.app.terminate()
         d.launch(arguments: ["-screen", "web", "-caret", "1"])
         d.fixedRow1 = row1
         defer { d.fixedRow1 = nil }
         let web = WebPage(d: d)
         let loaded = web.waitLoaded()
+        let composer = PeriodField(
+            prepare: {
+                web.clear()
+                return web.focus("composer") && self.protlyUp()
+            },
+            read: { web.text("composer") },
+            // The page's caret offset in the focused field (web-composer.html, posted on selectionchange with
+            // `-caret 1`).
+            caret: { (web.state()?["caret"] as? NSNumber).map { String($0.intValue) } },
+            tapStart: {
+                guard let r = web.rect("composer") else {
+                    self.d.fail("no composer frame")
+                    return false
+                }
+                // Left of the first letter, inside the padding (1 px border, 8 px padding): the caret goes before it.
+                self.d.point(r.minX + 5, r.midY).tap()
+                self.d.pause(0.8)
+                return true
+            },
+            tapEnd: {
+                guard let r = web.rect("composer") else {
+                    self.d.fail("no composer frame")
+                    return false
+                }
+                // Right of the text on its one line, inside the padding: the caret goes to the end.
+                self.d.point(r.maxX - 5, r.midY).tap()
+                self.d.pause(0.8)
+                return true
+            },
+            edits: {
+                guard let e = web.state()?["edits"] as? [String: Any], let n = (e["n"] as? NSNumber)?.intValue,
+                      let t = e["t"] as? [NSNumber] else { return nil }
+                return (n, t.map(\.intValue))
+            })
         for c in Self.periodCases {
             let id = "dsp-composer-\(c.kind)"
             guard loaded else {
                 unreadableLine(id, "the web page did not load (state \(q(web.raw())))")
                 continue
             }
-            periodCase(id, kind: c.kind, tries: c.tries, read: { web.text("composer") }, setUp: {
-                web.clear()
-                guard web.focus("composer"), self.protlyUp() else { return nil }
-                guard c.kind == "word" else { return "" }
-                self.d.type("world")
-                self.d.pause(0.6)
-                guard let r = web.rect("composer") else {
-                    self.d.fail("no composer frame")
-                    return ""
-                }
-                // Left of the first letter, inside the padding (1 px border, 8 px padding): the caret goes before it.
-                self.d.point(r.minX + 5, r.midY).tap()
-                self.d.pause(0.8)
-                // The page's caret offset in the focused field (web-composer.html, posted on selectionchange with
-                // `-caret 1`).
-                let caret = (web.state()?["caret"] as? NSNumber).map { String($0.intValue) }
-                return " sel0=\(q(caret))"
-            })
+            periodCase(id, kind: c.kind, tries: c.tries, on: composer)
         }
         if loaded { web.clear() }
     }
 
-    /// One case: `setUp` (nil when Protly is not up on the field, else extra evidence), then `tries` tries; the field
+    /// One case: set-up (`world` and the caret in front of it for `periodWordFirst`), then `tries` tries; the field
     /// is read before the first (t0) and after each.
-    private func periodCase(_ id: String, kind: String, tries: Int, read: () -> String?, setUp: () -> String?) {
-        guard let extra = setUp() else {
+    private func periodCase(_ id: String, kind: String, tries: Int, on f: PeriodField) {
+        guard f.prepare() else {
             unreadableLine(id, "Protly not up on the field")
             return
         }
+        var extra = ""
+        if Self.periodWordFirst.contains(kind) {
+            d.type("world")
+            d.pause(0.6)
+            if f.tapStart() { extra = " sel0=\(q(f.caret()))" }
+        }
         d.mark(id)
-        var ev = "kind=\(kind) tries=\(tries) t0=\(q(read()))"
+        var ev = "kind=\(kind) tries=\(tries) t0=\(q(f.read()))"
+        // Readings inside the tries: the field after the pick (p), the caret after each move (away, back).
+        var reads = ""
         var gaps: [String] = []
+        var calls: [String] = []
+        var edits: [String] = []
         for i in 1...tries {
             let gap: Double
             switch kind {
-            case "pick1":
+            case "pick1", "pickmid", "pickmove":
+                // pickmove: KeyboardKit's double-space window (3 s) from the last try's tap is over, so the tap after
+                // the move types a plain space.
+                if kind == "pickmove" { d.pause(3.2) }
                 d.type("teh")
                 let pick = Date()
                 d.tapSlot(.right, settle: 0.6)
+                reads += " p\(i)=\(q(f.read()))"
+                if kind == "pickmove" {
+                    let away = f.tapStart() ? f.caret() : nil
+                    let back = f.tapEnd() ? f.caret() : nil
+                    reads += " away\(i)=\(q(away)) back\(i)=\(q(back))"
+                }
                 d.type(" ")
                 gap = Date().timeIntervalSince(pick)
             case "pick2", "kopick2":
@@ -954,20 +1031,27 @@ extension PhoneRun {
                 gap = d.lastGap
             case "fast", "kofast":
                 d.type(kind == "kofast" ? "안녕" : "hello")
-                gap = doubleTapSpace()
+                let before = f.edits()
+                calls.append(String(format: "%.2f", doubleTapSpace()))
+                let times = Self.newEdits(before, f.edits())
+                edits.append(times.isEmpty ? "-" : times.map { String($0 - times[0]) }.joined(separator: "/"))
+                gap = Self.tapGap(times) ?? -1
             default:  // word, en, ko
                 d.type((kind == "ko" ? "안녕" : "hello") + "  ", lastGap: d.keyPause)
                 gap = d.lastGap
             }
-            gaps.append(String(format: "%.2f", gap))
+            gaps.append(String(format: calls.isEmpty ? "%.2f" : "%.3f", gap))
             d.pause(0.5)
-            ev += " t\(i)=\(q(read()))"
+            ev += " t\(i)=\(q(f.read()))"
         }
-        pending(id, ev + " gaps=\(gaps.joined(separator: ","))" + extra)
+        ev += " gaps=\(gaps.joined(separator: ","))"
+        if !calls.isEmpty { ev += " edits=\(edits.joined(separator: ",")) calls=\(calls.joined(separator: ","))" }
+        pending(id, ev + reads + extra)
     }
 
-    /// A double tap on space by coordinate, as the probe's `fast` cases. Returns the gesture's own duration in seconds
-    /// as the test saw it, -1 without a keyboard (a driver problem: the line is FAIL unreadable).
+    /// A double tap on space by coordinate, as the probe's `fast` cases. Returns the doubleTap call's own duration in
+    /// seconds as the test saw it (XCTest's time to make the gesture, not the spacing of its taps), -1 without a
+    /// keyboard (a driver problem: the line is FAIL unreadable).
     private func doubleTapSpace() -> Double {
         guard let row1 = d.rowOne() else {
             d.fail("no keyboard for a space double tap")
@@ -979,5 +1063,25 @@ extension PhoneRun {
         let took = Date().timeIntervalSince(start)
         d.pause(d.keyPause)
         return took
+    }
+
+    /// The host's `edits` probe on the UITextView screen: `<count>:<ms>,<ms>,...` (HostApp TextViewModel).
+    static func edits(_ s: String?) -> (count: Int, times: [Int])? {
+        guard let s, let colon = s.firstIndex(of: ":"), let n = Int(s[..<colon]) else { return nil }
+        return (n, s[s.index(after: colon)...].split(separator: ",").compactMap { Int($0) })
+    }
+
+    /// The times of the edits the host saw between two readings of its count, oldest first.
+    static func newEdits(_ before: (count: Int, times: [Int])?, _ after: (count: Int, times: [Int])?) -> [Int] {
+        guard let before, let after, after.count > before.count else { return [] }
+        return Array(after.times.suffix(after.count - before.count))
+    }
+
+    /// The spacing of a double tap's two taps as the host saw its edits: the longest wait between two edits in a row
+    /// (one tap's edits come within a few ms of each other: the second tap's space, then KeyboardKit's `. `). In
+    /// seconds; nil under two edits.
+    static func tapGap(_ times: [Int]) -> Double? {
+        guard times.count >= 2 else { return nil }
+        return Double(zip(times.dropFirst(), times).map { $0 - $1 }.max() ?? 0) / 1000
     }
 }

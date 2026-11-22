@@ -259,11 +259,22 @@ logging. Every line is `PENDING` with the field before the first try (`t0`) and 
   - `en`, `ko` (3 tries): `hello` / `안녕` and two spaces at the end of the text; each try adds `hello. ` / `안녕. `.
   - `pick2` (3 tries): `teh`, the bar's right slot, then two spaces; each try adds `the. `. `kopick2` (3 tries): the
     same with `안녀` and the slot's `안녕`; each try adds `안녕. `.
-  - `pick1` (4 tries, K4E, case E): `teh`, the bar's right slot, then one space. The pick's space takes the tap's
-    place, as on Apple's keyboard, so each try adds `the ` (two spaces, or a period, FAIL).
+  - `pick1` (4 tries, K4E, case E): `teh`, the bar's right slot, the field read (`p<i>`), then one space. The pick's
+    space takes the tap's place, as on Apple's keyboard, so each try adds `the ` (two spaces, or a period, FAIL).
+  - `pickmid` (4 tries, K4E): `pick1` in front of a word, set up as `word` (`world`, the caret in front of it,
+    `sel0`); each try adds `the ` before `world` (`the world`, one space). The pick waits with the text after the
+    cursor; a pick that kept none would let the tap type a second space.
+  - `pickmove` (3 tries, K4E): `pick1`, but between the pick and the tap the caret is tapped in front of the first
+    word (`away<i>`, must be 0) and back to the end (`back<i>`, the end of the pick). The host's callback for the move
+    ends the pick, so the tap types its space and each try adds `the  `. Each try first waits out KeyboardKit's 3 s
+    double-space window, so that space stays plain.
   - `fast`, `kofast` (3 tries, K4E): `hello` / `안녕`, then a double tap on space by coordinate
-    (`XCUICoordinate.doubleTap`, its taps 46-75 ms apart in the probe); each try adds `hello. ` / `안녕. `.
-  A field that did not start empty (or as `world`), a missing reading or fewer tries than these is FAIL `unreadable`.
+    (`XCUICoordinate.doubleTap`, its taps 46-75 ms apart in the probe); each try adds `hello. ` / `안녕. `. `gaps` is
+    the spacing of the two taps as the host saw its edits (the longest wait between two edits in a row; `edits` lists
+    each edit's ms after the first, from the UITextView screen's `edits` probe or the page's `edits` state, which it
+    posts only with `?caret=1`), and `calls` the doubleTap call's own duration as XCTest saw it. Not judged.
+  A field that did not start empty (or as `world`), a missing reading, a pick reading (`p<i>`) that does not show the
+  pick, a pickmove caret that did not go to 0 and back, or fewer tries than these is FAIL `unreadable`.
   `test_checks.py` also checks that `PhoneRun.periodCases` lists the same kinds as checks.py, with enough tries.
 - The probe's held space (the trackpad, which types nothing by design) stays out: K4E leaves the 0.4 s hold and the
   3.0 s window as they are.

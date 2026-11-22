@@ -46,10 +46,11 @@ CARD_STATES = ("wait", "mid", "done", "err0", "err1")
 CARD_IDS = [f"card-{s}-{look}" for look in CARD_LOOKS for s in CARD_STATES] + ["card-slow", "card-cancel", "mem-stream"]
 BAR_IDS = ["hit-1", "bar-dark", "bar-light", "bar-xxl", "app-dark", "app-light"]
 # fix/double-space-period (report P4): two space taps after a word end the sentence, also with a word right after the
-# cursor (case D); K4E (case E): one tap after a pick from the bar adds nothing, a fast double tap still ends the
-# sentence. The same list as PhoneRun.periodIDs in UITests/PhoneChecksUITests.swift.
+# cursor (case D); K4E (case E): one tap after a pick from the bar adds nothing, also in front of a word (pickmid), a
+# caret moved after the pick ends it (pickmove), a fast double tap still ends the sentence. The same list as
+# PhoneRun.periodIDs in UITests/PhoneChecksUITests.swift.
 PERIOD_FIELDS = ("uikit", "composer")
-PERIOD_KINDS = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2")
+PERIOD_KINDS = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2", "pickmid", "pickmove")
 PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
                 + PERIOD_IDS)
@@ -1153,13 +1154,21 @@ CARD_RESOLVERS = {
 
 # fix/double-space-period (docs/research/2026-11-17-keyboard-diagnosis.md, P4). UITests/PhoneChecksUITests.swift
 # (checksPeriod) writes dsp-<field>-<kind> PENDING with the field's text before the first try (t0) and after each try
-# (t1...). What each try must add, right before the text after the cursor (`world` for case D, else nothing). pick1
-# is K4E: one tap after a pick adds nothing to the pick's `the ` (Apple's keyboard, report P4 case E).
+# (t1...). What each try must add, right before the text after the cursor (`world` for case D and pickmid, else
+# nothing). pick1 and pickmid are K4E: one tap after a pick adds nothing to the pick's `the ` (Apple's keyboard, report
+# P4 case E); pickmove: a caret moved away and back between the pick and the tap ends the pick, so the tap types a
+# space.
 PERIOD_UNIT = {"word": "hello. ", "en": "hello. ", "ko": "안녕. ", "pick2": "the. ", "pick1": "the ",
-               "fast": "hello. ", "kofast": "안녕. ", "kopick2": "안녕. "}
-PERIOD_AFTER = {"word": "world"}
+               "fast": "hello. ", "kofast": "안녕. ", "kopick2": "안녕. ", "pickmid": "the ", "pickmove": "the  "}
+PERIOD_AFTER = {"word": "world", "pickmid": "world"}
+# The kinds whose tries read the field between the pick and the tap (p<i>): it must show the pick, `the ` added in
+# front of the text after the cursor.
+PERIOD_PICK = {"pick1": "the ", "pickmid": "the ", "pickmove": "the "}
+# The kinds whose tries move the caret between the pick and the tap: in front of the first word (away<i>, 0), then
+# back to the end of the pick (back<i>).
+PERIOD_MOVES = ("pickmove",)
 # The fewest tries that count (the fixes' done-when: case D at least 6 tries per field, one tap after a pick 4).
-PERIOD_MIN_TRIES = {"word": 6, "pick1": 4}
+PERIOD_MIN_TRIES = {"word": 6, "pick1": 4, "pickmid": 4}
 PERIOD_DEFAULT_TRIES = 3
 
 
@@ -1175,7 +1184,9 @@ def resolve_period(check, marks=None, samples=None, run_dir=None):
     pick) before the text after the cursor, which stays as it was (case D: `hello. world`, one space after the period
     and none lost before the word).
     FAIL unreadable when the set-up did not happen: a missing reading, a field that did not start as the case set it
-    up (`world`, or empty), or for case D a caret that was not at the start of `world` before the first try (sel0)."""
+    up (`world`, or empty), for case D and pickmid a caret that was not at the start of `world` before the first try
+    (sel0), for the pick kinds a field that did not show the pick before the tap (p<i>), and for pickmove a caret that
+    did not go to the start and back to the pick (away<i>, back<i>)."""
     kind = check.id.split("-", 2)[2]
     ev = check.evidence
     unit, after = PERIOD_UNIT[kind], PERIOD_AFTER.get(kind, "")
@@ -1194,6 +1205,22 @@ def resolve_period(check, marks=None, samples=None, run_dir=None):
         sel0 = quoted_field(ev, "sel0")
         if caret_at(sel0) != 0:
             return unreadable(check.id, f"caret not at word start before the first try (sel0={sel0!r}): {ev[:300]!r}")
+    pick = PERIOD_PICK.get(kind)
+    for i in range(1, n + 1):
+        prev = texts[i - 1]
+        if pick is None or not prev.endswith(after):
+            continue  # no pick reading, or the try before already broke the field (a FAIL below)
+        # The field between the pick and the tap: a pick that did not happen (no `the `) is no K4E try.
+        shown = prev[:len(prev) - len(after)] + pick + after
+        p = quoted_field(ev, f"p{i}")
+        if p is None or unicodedata.normalize("NFC", p) != shown:
+            return unreadable(check.id, f"try {i}: the field after the pick was {p!r}, not {shown!r}: {ev[:300]!r}")
+        end = len(shown) - len(after)  # the caret right after the pick
+        if kind in PERIOD_MOVES:
+            away, back = quoted_field(ev, f"away{i}"), quoted_field(ev, f"back{i}")
+            if caret_at(away) != 0 or caret_at(back) != end:
+                return unreadable(check.id, f"try {i}: the caret did not move to the start and back to the pick "
+                                            f"(away={away!r}, back={back!r}, want 0 and {end}): {ev[:300]!r}")
     problems = []
     for i in range(1, n + 1):
         prev, cur = texts[i - 1], texts[i]
@@ -1201,7 +1228,10 @@ def resolve_period(check, marks=None, samples=None, run_dir=None):
         if cur != want:
             problems.append(f"try {i}: {prev!r} became {cur!r}, want {want!r}")
     where = f" before {after!r}" if after else " at the end"
-    return verdict(check, problems, [f"{n - len(problems)}/{n} tries added {unit!r}{where}"])
+    notes = [f"{n - len(problems)}/{n} tries added {unit!r}{where}"]
+    if pick is not None:
+        notes.append(f"the field showed the pick {pick!r} before each tap")
+    return verdict(check, problems, notes)
 
 
 RESOLVERS = {"6.8-9": resolve_relaunch, "6.8-10": resolve_memory, **{i: resolve_rules for i in RULES},

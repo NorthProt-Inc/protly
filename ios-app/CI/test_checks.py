@@ -791,10 +791,28 @@ class PrefsDumpTests(unittest.TestCase):
             self.assertIn("~ x: 1 -> 2", f.read())
 
 
-def period(check_id, texts, extra=""):
+def pick_readings(kind, texts, picks=None, moves=None):
+    """The readings inside the tries of a pick kind: the field after each pick (p<i>, by default the try before's text
+    with `the ` in front of the text after the cursor) and for pickmove the caret after each move (away<i>, back<i>,
+    by default 0 and the end of the pick). `picks`/`moves` replace them; None entries leave a reading out."""
+    if kind not in checks.PERIOD_PICK:
+        return ""
+    after = checks.PERIOD_AFTER.get(kind, "")
+    if picks is None:
+        picks = [t[:len(t) - len(after)] + "the " + after for t in texts[:-1]]
+    out = "".join(f' p{i}="{p}"' for i, p in enumerate(picks, 1) if p is not None)
+    if kind in checks.PERIOD_MOVES:
+        if moves is None:
+            moves = [("0", str(len(p) - len(after))) for p in picks]
+        for i, (away, back) in enumerate(moves, 1):
+            out += f' away{i}="{away}" back{i}="{back}"'
+    return out
+
+
+def period(check_id, texts, extra="", picks=None, moves=None):
     """One dsp-* PENDING line as UITests/PhoneChecksUITests.swift writes it, resolved through assemble()."""
     kind = check_id.split("-", 2)[2]
-    readings = " ".join(f't{i}="{t}"' for i, t in enumerate(texts))
+    readings = " ".join(f't{i}="{t}"' for i, t in enumerate(texts)) + pick_readings(kind, texts, picks, moves)
     line = f"CHECK {check_id} PENDING kind={kind} tries={len(texts) - 1} {readings}{extra}\n"
     return {c.id: c for c in checks.assemble(line, "", "", ran=checks.covered_ids([PERIOD_METHOD]))}[check_id]
 
@@ -812,7 +830,7 @@ class PeriodTests(unittest.TestCase):
     WEB_SEL = ' sel0="0"'
 
     def test_every_id_is_expected_has_a_method_and_a_rule(self):
-        kinds = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2")
+        kinds = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2", "pickmid", "pickmove")
         ids = [f"dsp-{f}-{k}" for f in ("uikit", "composer") for k in kinds]
         self.assertEqual(checks.METHOD_IDS["test5f_period"], ids)
         for i in ids:
@@ -959,6 +977,70 @@ class PeriodTests(unittest.TestCase):
         self.assertIn("unreadable", c.evidence)
         self.assertIn("at least 4", c.evidence)
 
+    def test_a_pick_reading_that_does_not_show_the_pick_is_unreadable(self):
+        texts = ["the " * i for i in range(5)]
+        for picks in (["the ", "the ", "the the the ", "the the the the "], [None, "the the ", "the the the ", None]):
+            c = period("dsp-uikit-pick1", texts, picks=picks)
+            self.assertEqual(c.status, "FAIL", picks)
+            self.assertIn("unreadable", c.evidence)
+            self.assertIn("the field after the pick", c.evidence)
+
+    def test_the_pick_reading_is_named_in_the_verdict(self):
+        c = period("dsp-composer-pick1", ["the " * i for i in range(5)])
+        self.assertIn("the field showed the pick 'the ' before each tap", c.evidence)
+
+    # The pick in front of a word (pickmid): one tap after it adds nothing, so `world` gets `the ` and one space.
+    MID = ["world"] + ["the " * i + "world" for i in range(1, 5)]
+
+    def test_one_tap_after_a_pick_in_front_of_a_word_adds_nothing(self):
+        for check_id, sel in [("dsp-uikit-pickmid", self.UIKIT_SEL), ("dsp-composer-pickmid", self.WEB_SEL)]:
+            c = period(check_id, self.MID, sel)
+            self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
+            self.assertIn("4/4 tries added 'the ' before 'world'", c.evidence)
+
+    def test_a_pick_in_front_of_a_word_whose_tap_types_a_second_space_fails(self):
+        # The pick kept no text after the cursor (`after: ""`): the field never shows it, so the tap types.
+        texts = ["world"] + ["the  " * i + "world" for i in range(1, 5)]
+        c = period("dsp-uikit-pickmid", texts, self.UIKIT_SEL)
+        self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+        self.assertIn("try 1: 'world' became 'the  world', want 'the world'", c.evidence)
+
+    def test_a_pick_in_front_of_a_word_needs_the_caret_there_and_four_tries(self):
+        c = period("dsp-uikit-pickmid", self.MID, ' sel0="5,0"')
+        self.assertIn("caret not at word start", c.evidence)
+        c = period("dsp-uikit-pickmid", self.MID[:4], self.UIKIT_SEL)
+        self.assertIn("at least 4", c.evidence)
+        c = period("dsp-composer-pickmid", ["the " * i for i in range(5)], self.WEB_SEL)
+        self.assertIn("the field started as ''", c.evidence)
+
+    # A caret moved away and back between the pick and the tap (pickmove): the tap types its space.
+    MOVE = ["the  " * i for i in range(4)]
+
+    def test_a_tap_after_the_caret_moved_types_a_space(self):
+        for check_id in ("dsp-uikit-pickmove", "dsp-composer-pickmove"):
+            c = period(check_id, self.MOVE)
+            self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
+            self.assertIn("3/3 tries added 'the  ' at the end", c.evidence)
+
+    def test_a_pick_that_outlives_a_caret_move_fails(self):
+        # The host's callback for the move did not end the pick: the tap after the caret came back typed nothing.
+        c = period("dsp-uikit-pickmove", ["the " * i for i in range(4)])
+        self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+        self.assertIn("try 1: '' became 'the ', want 'the  '", c.evidence)
+
+    def test_a_caret_that_did_not_move_is_unreadable(self):
+        picks = ["the ", "the  the ", "the  the  the "]
+        for moves in ([("0", "4"), ("4", "9"), ("0", "14")],  # never left
+                      [("0", "4"), ("0", "0"), ("0", "14")],  # never came back
+                      [("0", "4"), ("0,0", "9,0"), ("<unreadable>", "14")]):
+            c = period("dsp-uikit-pickmove", self.MOVE, picks=picks, moves=moves)
+            self.assertEqual(c.status, "FAIL", moves)
+            self.assertIn("unreadable", c.evidence)
+        c = period("dsp-uikit-pickmove", self.MOVE, picks=picks, moves=[("0,0", "4,0"), ("0,0", "9,0"), ("0,0", "14,0")])
+        self.assertEqual(c.status, "PASS", c.evidence)
+
     def test_fast_double_taps_and_the_korean_pick_end_the_sentence(self):
         for field in ("uikit", "composer"):
             for kind, unit in [("fast", "hello. "), ("kofast", "안녕. "), ("kopick2", "안녕. ")]:
@@ -981,8 +1063,12 @@ class PeriodTests(unittest.TestCase):
         self.assertIn('const caretPosts = new URLSearchParams(location.search).get("caret") === "1";', code)
         listeners = [ln for ln in code if "selectionchange" in ln]
         self.assertEqual(listeners, ['if (caretPosts) document.addEventListener("selectionchange", state);'])
+        # The edit count and times (the double tap's spacing) are gated the same way.
         self.assertEqual([ln for ln in code if "caretPosts" in ln and "selectionchange" not in ln],
-                         ['const caretPosts = new URLSearchParams(location.search).get("caret") === "1";'])
+                         ['if (caretPosts) s.edits = { n: editCount, t: editTimes.slice() };',
+                          'if (!caretPosts || name !== "composer" || e.type !== "input") return;',
+                          'const caretPosts = new URLSearchParams(location.search).get("caret") === "1";'])
+        self.assertEqual([ln for ln in code if "editTimes.push(" in ln], ["editTimes.push(Math.round(performance.now()));"])
         host = read("Host", "HostApp.swift")
         gate = host.index('UserDefaults.standard.string(forKey: "caret") == "1"')
         self.assertLess(gate, host.index('URLQueryItem(name: "caret", value: "1")'))
