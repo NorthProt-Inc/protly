@@ -222,14 +222,15 @@ public struct BackWalk: Sendable {
             fit = (false, a1.isEmpty)
             return .failed("badStep", moved: -k)
         }
-        // The after-context stops at a line feed: when the piece crossed holds one, the after-context must be exactly
-        // the piece up to it, not only agree where both have units (tower review of f0533ae: a web view that counts
-        // characters overshot to the start of "😀😀😀\nA", and the after-context agreed with the piece only because the
-        // emoji repeat).
+        // The after-context stops at a line feed: when the piece crossed holds one, the after-context can show no more
+        // than the piece up to it (tower review of f0533ae: a web view that counts characters overshot to the start of
+        // "😀😀😀\nA", where the after-context showed more of that line and agreed only because the emoji repeat). It
+        // can show less: hosts also cut it after about 20 units (run 5a9d9be-200 refused every read when it had to be
+        // exactly the piece up to the line feed).
         func afterFits(_ c: Int) -> Bool {
             let piece = b0.suffix(c)
             let shown = Array(piece.prefix { $0 != 10 })
-            return shown.count < piece.count ? a1 == shown : WholeRead.agree(a1, shown, atEnd: false)
+            return WholeRead.agree(a1, shown, atEnd: false) && (shown.count == piece.count || a1.count <= shown.count)
         }
         func fits(_ c: Int) -> Bool {
             WholeRead.agree(b1, Array(b0.prefix(b0.count - c)), atEnd: true) && afterFits(c)

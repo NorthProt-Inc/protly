@@ -111,9 +111,14 @@ final class WholeReadTests: XCTestCase {
         /// Positions where the after-context shows empty mid-line (run 0f1bcd6-185 uikit cancel), until the cursor has
         /// left them once.
         var blankAfter: Set<Int> = []
+        /// The after-context's longest length: a host shows about 20 units after the cursor too, not only up to the
+        /// next line feed (run 5a9d9be-200: `a0=22`, `a1=21` mid-line).
+        var afterCap = Int.max
 
         var before: [UInt16] { blanks.contains(pos) ? [] : Array(text[max(0, pos - window)..<pos]) }
-        var after: [UInt16] { blankAfter.contains(pos) ? [] : Array(text[pos...].prefix { $0 != 10 }) }
+        var after: [UInt16] {
+            blankAfter.contains(pos) ? [] : Array(text[pos...].prefix { $0 != 10 }.prefix(afterCap))
+        }
 
         mutating func move(_ k: Int) -> Bool {
             let old = pos
@@ -341,6 +346,25 @@ final class WholeReadTests: XCTestCase {
                 }
             }
         }
+    }
+
+    /// F02c: run 5a9d9be-200 refused every native and web read of the 335-unit draft at its second step back
+    /// (`k=63 b0=65 a1=21 fita=0`): the host's after-context stops after about 20 units, so it is shorter than the
+    /// piece up to its line feed. Shorter is a window; only longer (the cursor went past where the step lands, as the
+    /// clamp above) is no fit.
+    func testAnAfterContextCutShortStillFitsAStepOverALineFeed() {
+        let t = u(draft)
+        for cap in [21, 8, 1] {
+            var f = Field(text: t, pos: t.count, window: 65, afterCap: cap)
+            let bw = walkBack(&f)
+            XCTAssertEqual(bw.step, .done, "cap \(cap)")
+            XCTAssertEqual(bw.units, t, "cap \(cap)")
+        }
+        // Forward too: the walk to the end reads past a capped after-context.
+        var f = Field(text: t, pos: 0, window: 65, afterCap: 21)
+        let fw = walkForward(&f)
+        XCTAssertEqual(fw.step, .done)
+        XCTAssertEqual(fw.units, t)
     }
 
     func testNativeTextWithEmojiIsReadExactly() {
