@@ -267,8 +267,10 @@ enum FieldText {
     /// end again (the probe saw returns land a few units short: runs 154, 155); the next walk confirms the end anyway.
     /// nil: no time left for the move. Else whether the contexts show the end again (F02c's window proof needs it).
     /// The contexts settled after a return can still be on their way (run 1b402b4-204 uikit smid: two polls agreed on
-    /// a before-context of the line before the end, then FM's probe saw the end's and called it a bad step): they get
-    /// up to WholeRead.emptyWait to show the end. A return that landed short never shows it.
+    /// a before-context of the line before the end, with nothing after the cursor, then FM's probe saw the end's and
+    /// called it a bad step): with nothing after the cursor they get up to WholeRead.emptyWait to show the end. Text
+    /// after the cursor is a return that landed short (the Lexical-shaped page, 2 units after its phantom): no wait
+    /// (run 52eeb7e-217: waiting there too put two Lexical long reads past the 20 s budget).
     private static func returnMove(_ p: UITextDocumentProxy, by n: Int, end: Ctx, start t0: TimeInterval,
                                    track: Track) async -> Bool? {
         guard n > 0 else { return false }
@@ -279,9 +281,9 @@ enum FieldText {
         let s = await step(p, by: n, wait: WholeRead.moveWait)
         func showsEnd(_ c: Ctx) -> Bool { c.a.isEmpty && !c.b.isEmpty && WholeRead.agreeAtEnd(c.before, end.before) }
         var c = s.c, atEnd = showsEnd(c)
-        lastReturnWaited = !atEnd
+        lastReturnWaited = !atEnd && c.a.isEmpty
         let e0 = uptime()
-        while !atEnd, uptime() - e0 < WholeRead.emptyWait {
+        while !atEnd, c.a.isEmpty, uptime() - e0 < WholeRead.emptyWait {
             await pause()
             c = ctx(p)
             atEnd = showsEnd(c)
