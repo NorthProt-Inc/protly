@@ -1,0 +1,47 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5g_wholenative
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wr-uikit-swin-t1 1795380803.144
+tapped protlyKey
+MARK wr-uikit-swin-t2 1795380831.173
+tapped protlyKey
+MARK wr-uikit-swin-t3 1795380859.163
+tapped protlyKey
+CHECK wr-uikit-swin FAIL t1={real=39/1/h2dea6b2a caret=39,0 s=5.8 reply=unparsed card-labels=4 units=99} t1=reply=unparsed card-labels=4 units=99 (not as expected) t2={real=39/1/h2dea6b2a caret=39,0 s=5.0 reply=unparsed card-labels=4 units=103} t2=reply=unparsed card-labels=4 units=103 (not as expected) t3={real=39/1/h2dea6b2a caret=39,0 s=5.5 reply=unparsed card-labels=4 units=99} t3=reply=unparsed card-labels=4 units=99 (not as expected)
+MARK wr-uikit-smid-t1 1795380886.423
+tapped protlyKey
+MARK wr-uikit-smid-t2 1795380912.459
+tapped protlyKey
+CHECK wr-uikit-smid FAIL t1={real=39/1/h2dea6b2a caret=26,0 s=4.8 reply=unparsed card-labels=4 units=90} t1=reply=unparsed card-labels=4 units=90 (not as expected) t2={real=39/1/h2dea6b2a caret=26,0 s=5.3 reply=unparsed card-labels=4 units=99} t2=reply=unparsed card-labels=4 units=99 (not as expected)
+MARK wr-uikit-ssel-t1 1795380939.721
+tapped protlyKey
+MARK wr-uikit-ssel-t2 1795380960.866
+tapped protlyKey
+CHECK wr-uikit-ssel FAIL t1={real=39/1/h2dea6b2a caret=0,39 s=2.3 reply=39/1/h2dea6b2a caret-read=0,39 replace=none buttons="Cancel 64.5x41.4,Deep 53.3x41.4,Copy 52.6x41.4"} t1=caret-read=0,39 replace=none buttons="Cancel 64.5x41.4,Deep 53.3x41.4,Copy 52.6x41.4" (not as expected) t2={real=39/1/h2dea6b2a caret=0,39 s=2.7 reply=39/1/h2dea6b2a caret-read=0,39 replace=none buttons="Cancel 65.2x41.8,Deep 53.8x41.8,Copy 53.1x41.8"} t2=caret-read=0,39 replace=none buttons="Cancel 65.2x41.8,Deep 53.8x41.8,Copy 53.1x41.8" (not as expected)
+MARK wr-swiftui-swin-t1 1795381005.387
+tapped protlyKey
+MARK wr-swiftui-swin-t2 1795381037.037
+tapped protlyKey
+MARK wr-swiftui-swin-t3 1795381067.809
+tapped protlyKey
+CHECK wr-swiftui-swin FAIL t1={real=39/1/h2dea6b2a caret=39,0 s=4.6 reply=unparsed card-labels=4 units=103} t1=reply=unparsed card-labels=4 units=103 (not as expected) t2={real=39/1/h2dea6b2a caret=39,0 s=5.4 reply=unparsed card-labels=4 units=90} t2=reply=unparsed card-labels=4 units=90 (not as expected) t3={real=39/1/h2dea6b2a caret=39,0 s=4.5 reply=unparsed card-labels=4 units=82} t3=reply=unparsed card-labels=4 units=82 (not as expected)
+MARK wr-swiftui-smid-t1 1795381091.403
+tapped protlyKey
+MARK wr-swiftui-smid-t2 1795381114.799
+tapped protlyKey
+CHECK wr-swiftui-smid FAIL t1={real=39/1/h2dea6b2a caret=26,0 s=4.6 reply=unparsed card-labels=4 units=103} t1=reply=unparsed card-labels=4 units=103 (not as expected) t2={real=39/1/h2dea6b2a caret=26,0 s=4.7 reply=unparsed card-labels=4 units=99} t2=reply=unparsed card-labels=4 units=99 (not as expected)
+MARK wr-swiftui-ssel-t1 1795381143.429
+tapped protlyKey
+MARK wr-swiftui-ssel-t2 1795381172.104
+tapped protlyKey
+CHECK wr-swiftui-ssel FAIL t1={real=39/1/h2dea6b2a caret=0,39 s=6.0 reply=unparsed card-labels=4 units=99} t1=reply=unparsed card-labels=4 units=99 (not as expected) t2={real=39/1/h2dea6b2a caret=0,39 s=4.8 reply=unparsed card-labels=4 units=99} t2=reply=unparsed card-labels=4 units=99 (not as expected)
