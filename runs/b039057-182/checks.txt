@@ -1,0 +1,123 @@
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-en NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-fast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-ko NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-kofast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-kopick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pickmid NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pickmove NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-word NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-en NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-fast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-ko NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-kofast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-kopick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pickmid NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pickmove NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-word NOT-RUN filtered run: its test method was not selected
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK wr-lexical-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=3.6 panel="Could not read the whole text. Copy it, then use Read clipboard." left=460/9/h0755cc33 caret-left=460,0 want 460,0} log=t1:refused/b1:badStep
+CHECK wr-lexical-long FAIL t1={real=3247/15/h3ca63fec caret=3247,0 s=22.6 read=18673 reply=3247/15/h3ca63fec caret-read=3247,0 replace=7.30 kb=19.26 undo=2.75 kbundo=5.68 kbundo-notice="Replace may not have finished. Check the text."} t1=kbundo-notice="Replace may not have finished. Check the text." (not as expected) t2={real=3247/15/h3ca63fec caret=3247,0 s=20.9 read=18027 reply=3247/15/h3ca63fec caret-read=3247,0 replace=5.84 kb=18.98 undo=5.34 kbundo=6.91 kbundo-notice="Replace may not have finished. Check the text."} t2=kbundo-notice="Replace may not have finished. Check the text." (not as expected) log=t1:accepted/18673ms/held=1,0 t2:accepted/18027ms/held=1,0 log-problems=t1:held=1,0 want 1,1 (Replace, Undo),t2:held=1,0 want 1,1 (Replace, Undo)
+CHECK wr-lexical-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=10.5 read=8081 reply=335/9/h49b6f226 caret-read=335,0 replace=2.65 kb=7.74 undo=3.40 kbundo=7.78} log=t1:accepted/8081ms/held=1,1
+CHECK wr-lexical-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=10.8 read=7245 reply=335/9/h49b6f226 caret-read=335,0 replace=2.33 kb=7.76 undo=2.48 kbundo=5.48} log=t1:accepted/7245ms/held=1,1
+CHECK wr-lexical-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=8.8 read=6067 reply=335/9/h49b6f226 caret-read=335,0 replace=2.44 kb=6.31 undo=2.33 kbundo=4.95} t2={real=335/9/h49b6f226 caret=335,0 s=11.2 read=6197 reply=335/9/h49b6f226 caret-read=335,0 replace=2.61 kb=6.81 undo=3.24 kbundo=6.46} log=t1:accepted/6067ms/held=1,1 t2:accepted/6197ms/held=1,1
+CHECK wr-lexical-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=2.5 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0} log=t1:refused/b1:badStep
+CHECK wr-swiftui-emoji NOT-RUN filtered run: its test method was not selected
+CHECK wr-swiftui-long NOT-RUN filtered run: its test method was not selected
+CHECK wr-swiftui-mid NOT-RUN filtered run: its test method was not selected
+CHECK wr-swiftui-sel NOT-RUN filtered run: its test method was not selected
+CHECK wr-swiftui-win NOT-RUN filtered run: its test method was not selected
+CHECK wr-swiftui-x14k NOT-RUN filtered run: its test method was not selected
+CHECK wr-textarea-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=2.1 panel="Could not read the whole text. Copy it, then use Read clipboard." left=460/9/h0755cc33 caret-left=460,0 want 460,0} log=t1:refused/b1:badStep
+CHECK wr-textarea-long FAIL t1={real=3247/15/h3ca63fec caret=3247,0 s=17.6 read=15250 reply=3247/15/h3ca63fec caret-read=3247,0 replace=10.11 kb=17.82 undo=2.28 kbundo=9.30} t2={real=3247/15/h3ca63fec caret=3247,0 s=18.4 read=15648 reply=3247/15/h3ca63fec caret-read=3247,0 replace=10.57 kb=17.56 undo=2.47 kbundo=5.19 kbundo-notice="Replace may not have finished. Check the text."} t2=kbundo-notice="Replace may not have finished. Check the text." (not as expected) log=t1:accepted/15250ms/held=1,1 t2:accepted/15648ms/held=1,0 log-problems=t2:held=1,0 want 1,1 (Replace, Undo)
+CHECK wr-textarea-mid FAIL t1={real=335/9/h49b6f226 caret=112,0 s=6.5 outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard."} t1=outcome=panel msg="Could not read the whole text. Copy it, then use Read clipboard." (not as expected) log=t1:refused/b1:badStep log-problems=t1:refused/b1:badStep
+CHECK wr-textarea-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=9.2 read=6315 reply=335/9/h49b6f226 caret-read=335,0 replace=4.14 kb=7.55 undo=3.14 kbundo=6.34} log=t1:accepted/6315ms/held=1,1
+CHECK wr-textarea-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=13.6 read=5041 reply=335/9/h49b6f226 caret-read=335,0 replace=2.65 kb=6.68 undo=2.73 kbundo=5.58} t2={real=335/9/h49b6f226 caret=335,0 s=7.9 read=5000 reply=335/9/h49b6f226 caret-read=335,0 replace=2.97 kb=8.05 undo=3.12 kbundo=6.26} log=t1:accepted/5041ms/held=1,1 t2:accepted/5000ms/held=1,1
+CHECK wr-textarea-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=2.4 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0} log=t1:refused/b1:badStep
+CHECK wr-uikit-cancel NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-emoji NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-long NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-mid NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-r4k NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-sel NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-win NOT-RUN filtered run: its test method was not selected
+CHECK wr-uikit-x14k NOT-RUN filtered run: its test method was not selected
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
