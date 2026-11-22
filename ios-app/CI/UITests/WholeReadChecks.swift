@@ -14,15 +14,15 @@ import XCTest
 /// Ported from the walk-back probe (diag/p1-walk-back-strict: WalkChecks.swift, ReadChecks.swift) without its logging.
 enum WholeChecks {
     /// The same lists as checks.py WHOLE_NATIVE_CASES, WHOLE_WEB_CASES and WHOLE_WEB_HOSTS (test_checks.py compares).
-    static let nativeCases = ["swin", "smid", "ssel"]
-    static let webCases = ["swin", "smid", "ssel"]
+    static let nativeCases = ["win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead", "etail"]
+    static let webCases = ["win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead"]
     static let webHosts = ["textarea", "lexical"]
     /// Tries per case, all of which must pass; 1 for the others (checks.py WHOLE_TRIES).
     static let tries: [String: Int] = ["win": 2, "long": 2, "swin": 3, "smid": 2, "ssel": 2]
 
     /// The same lists as checks.py WHOLE_NATIVE_IDS and WHOLE_WEB_IDS.
     static var nativeIDs: [String] {
-        nativeCases.map { "wr-uikit-\($0)" } + nativeCases.map { "wr-swiftui-\($0)" }
+        nativeCases.map { "wr-uikit-\($0)" } + ["wr-uikit-r4k", "wr-uikit-cancel"] + nativeCases.map { "wr-swiftui-\($0)" }
     }
 
     static var webIDs: [String] { webHosts.flatMap { h in webCases.map { "wr-\(h)-\($0)" } } }
@@ -213,10 +213,13 @@ final class ReadWeb {
 extension PhoneRun {
     // MARK: test5g_wholenative
 
+    static let baselineCases: Set<String> = ["swin", "smid", "ssel"]
+
     /// The UITextView screen (PhoneRun launched it with `-wholefills 1`), then the SwiftUI field of the default screen.
     func checksWholeNative() {
         if notReady(WholeChecks.nativeIDs) { return }
-        for name in WholeChecks.nativeCases { wholeCase("uikit", name, web: nil) }
+        // F02c baseline (diag only): main's path on the short cases.
+        for name in WholeChecks.nativeCases where Self.baselineCases.contains(name) { wholeCase("uikit", name, web: nil) }
         d.clearField()
         d.app.terminate()
         d.launch(arguments: ["-wholefills", "1"])
@@ -226,7 +229,7 @@ extension PhoneRun {
             }
             return
         }
-        for name in WholeChecks.nativeCases { wholeCase("swiftui", name, web: nil) }
+        for name in WholeChecks.nativeCases where Self.baselineCases.contains(name) { wholeCase("swiftui", name, web: nil) }
         d.clearField()
     }
 
@@ -251,7 +254,7 @@ extension PhoneRun {
             return
         }
         for host in WholeChecks.webHosts {
-            for name in WholeChecks.webCases { wholeCase(host, name, web: web) }
+            for name in WholeChecks.webCases where Self.baselineCases.contains(name) { wholeCase(host, name, web: web) }
         }
         web.clear()
     }
