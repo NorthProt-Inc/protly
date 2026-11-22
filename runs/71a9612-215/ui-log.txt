@@ -11,9 +11,48 @@ full access: on, turned on in Settings (switch tap 2, Allow in the alert)
 == PhoneChecksUITests.test5h_wholeweb
 ocr self-test: "Polish 안녕하세요"
 ocr self-test: works true, hangul true
-CHECK wr-textarea-swin FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39 t3={real=0/0/h811c9dc5} t3: the fill gave 0 units, want 39
-CHECK wr-textarea-smid FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
-CHECK wr-textarea-ssel FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
-CHECK wr-lexical-swin FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39 t3={real=0/0/h811c9dc5} t3: the fill gave 0 units, want 39
-CHECK wr-lexical-smid FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
-CHECK wr-lexical-ssel FAIL unreadable: t1={real=0/0/h811c9dc5} t1: the fill gave 0 units, want 39 t2={real=0/0/h811c9dc5} t2: the fill gave 0 units, want 39
+MARK wr-textarea-swin-t1 1795383074.002
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-swin-t2 1795383105.628
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-swin-t3 1795383134.444
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=5.0 reply=39/0/h84d73b78 caret-read=39,0 replace=2.03 kb=2.78 undo=2.40 kbundo=3.10} t2={real=39/0/h84d73b78 caret=39,0 s=1.8 reply=39/0/h84d73b78 caret-read=39,0 replace=1.86 kb=2.46 undo=2.11 kbundo=2.78} t3={real=39/0/h84d73b78 caret=39,0 s=2.2 reply=39/0/h84d73b78 caret-read=39,0 replace=2.13 kb=3.22 undo=2.43 kbundo=3.61}
+MARK wr-textarea-smid-t1 1795383168.639
+tapped protlyKey
+MARK wr-textarea-smid-t2 1795383239.782
+tapped protlyKey
+CHECK wr-textarea-smid FAIL t1={real=39/0/h84d73b78 caret=26,0 s=2.6 reply=39/0/h84d73b78 caret-read=26,0 replace=timeout field=32/0/hd33c7fb6} t1=caret-read=26,0 replace=timeout field=32/0/hd33c7fb6 (not as expected) t2={real=39/0/h84d73b78 caret=26,0 s=2.5 reply=39/0/h84d73b78 caret-read=26,0 replace=timeout field=32/0/hd33c7fb6} t2=caret-read=26,0 replace=timeout field=32/0/hd33c7fb6 (not as expected)
+MARK wr-textarea-ssel-t1 1795383308.220
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-ssel-t2 1795383341.098
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-ssel FAIL t1={real=39/0/h84d73b78 caret=0,39 s=2.5 reply=39/0/h84d73b78 caret-read=0,39 replace=2.24 kb=3.11 undo=2.41 kbundo=3.31} t1=caret-read=0,39 (not as expected) t2={real=39/0/h84d73b78 caret=0,39 s=2.6 reply=39/0/h84d73b78 caret-read=0,39 replace=2.12 kb=3.12 undo=2.40 kbundo=3.40} t2=caret-read=0,39 (not as expected)
+MARK wr-lexical-swin-t1 1795383372.888
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-swin-t2 1795383406.493
+tapped protlyKey
+tapped protlyKey
+problem: Clear did not empty the lexical field (39/0/h84d73b78)
+MARK wr-lexical-swin-t3 1795383439.275
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-swin FAIL unreadable: t1={real=39/0/h84d73b78 caret=39,0 s=2.8 reply=39/0/h84d73b78 caret-read=39,0 replace=2.57 kb=3.82 undo=2.60 kbundo=3.61} t2={real=39/0/h84d73b78 caret=39,0 s=2.8 reply=39/0/h84d73b78 caret-read=39,0 replace=2.23 kb=3.35 undo=2.53 kbundo=3.59} t3={real=39/0/h84d73b78 caret=39,0 s=1.9 reply=39/0/h84d73b78 caret-read=39,0 replace=2.00 kb=3.25 undo=2.37 kbundo=3.34} problem="Clear did not empty the lexical field (39/0/h84d73b78)"
+MARK wr-lexical-smid-t1 1795383473.332
+tapped protlyKey
+MARK wr-lexical-smid-t2 1795383542.788
+tapped protlyKey
+CHECK wr-lexical-smid FAIL t1={real=39/0/h84d73b78 caret=26,0 s=2.7 reply=39/0/h84d73b78 caret-read=26,0 replace=timeout field=32/0/hd33c7fb6} t1=caret-read=26,0 replace=timeout field=32/0/hd33c7fb6 (not as expected) t2={real=39/0/h84d73b78 caret=26,0 s=2.2 reply=39/0/h84d73b78 caret-read=26,0 replace=timeout field=32/0/hd33c7fb6} t2=caret-read=26,0 replace=timeout field=32/0/hd33c7fb6 (not as expected)
+MARK wr-lexical-ssel-t1 1795383610.061
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-ssel-t2 1795383643.852
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-ssel FAIL t1={real=39/0/h84d73b78 caret=0,39 s=2.3 reply=39/0/h84d73b78 caret-read=0,39 replace=1.93 kb=2.92 undo=2.40 kbundo=3.44} t1=caret-read=0,39 (not as expected) t2={real=39/0/h84d73b78 caret=0,39 s=2.5 reply=39/0/h84d73b78 caret-read=0,39 replace=2.33 kb=3.52 undo=2.37 kbundo=3.18} t2=caret-read=0,39 (not as expected)
