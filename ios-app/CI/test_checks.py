@@ -1145,6 +1145,14 @@ class LatencyTests(unittest.TestCase):
             self.assertEqual(c.status, "PASS", c.evidence)
             self.assertIn("main={first=1300 done=1400 replace=2700 undo=2400}", c.evidence)
 
+    def test_main_has_a_baseline_for_every_latency_case(self):
+        for host in ("uikit", "swiftui", "textarea", "lexical"):
+            for case in checks.LATENCY_CASES:
+                main_ms = checks.LATENCY_MAIN[(host, case)]
+                self.assertIn("first", main_ms)
+                self.assertIn("done", main_ms)
+            self.assertEqual(set(checks.LATENCY_MAIN[(host, "swin")]), set(checks.LATENCY_KEYS), host)
+
     def test_a_failed_wr_line_or_a_missing_time_fails_the_lat_line(self):
         main_ms = {("uikit", "ssel"): {"first": 5000, "done": 5000}, ("uikit", "swin"): {"replace": 2000, "undo": 9000}}
         wr = checks.Check("wr-uikit-ssel", "FAIL", "t1={real=39/1/h00000000}")
@@ -1403,8 +1411,17 @@ class WholeReadTests(unittest.TestCase):
 
     ACCEPTED = "read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=4871 known=1"
     HELD = ("replace deleted=335 inserted=26 sentms=0 quietms=2900 quiet=1 changes=3 events=40 b=26 a=0 ends=1 heldms=3600 "
-            "held=1 tries=1 why=- cancelled=0")
+            "held=1 tries=1 why=- focus=0 cancelled=0")
     UNSURE = HELD.replace("held=1", "held=0")
+
+    def test_replace_must_have_read_the_fields_document(self):
+        line = "CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 replace=3.40 kb=5.10 undo=3.10 kbundo=6.00}\n"
+        ui = self.marks(("wr-uikit-mid-t1", 10, 0), ("wr-uikit-sel-t1", 11, 0))
+        blind = self.HELD.replace("focus=0", "focus=-1")
+        kb = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("10", "20.000", blind))
+        final = self.assemble_with_logs(line, ui, kb)
+        self.assertEqual(final["wr-uikit-mid"].status, "FAIL")
+        self.assertIn("t1:focus=0,-1 want 0,0", final["wr-uikit-mid"].evidence)
 
     def test_an_accepted_try_needs_the_read_and_both_writes_proven_in_the_keyboard_log(self):
         line = "CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 read=4871 replace=3.40 kb=5.10 undo=3.10 kbundo=6.00}\n"
