@@ -1129,7 +1129,8 @@ class LatencyTests(unittest.TestCase):
         with mock.patch.dict(checks.LATENCY_MAIN, {}, clear=True):
             c = checks.resolve_latency("lat-uikit-smid", self.wr(), self.marks("wr-uikit-smid", 2), self.KB)
         self.assertEqual(c.status, "RECORD")
-        self.assertIn("t1={first=1700 done=1800 api=410 spec=used replace=3100 undo=2900}", c.evidence)
+        self.assertIn("t1={first=1700 done=1800 api=410 spec=used replace=3100 undo=2900 reason=none read=none}",
+                      c.evidence)
         self.assertIn("t2={first=none", c.evidence)
 
     def test_each_try_is_held_to_main_plus_the_slack(self):
@@ -1144,6 +1145,19 @@ class LatencyTests(unittest.TestCase):
             self.assertEqual(c.status, "PASS", c.evidence)
             self.assertIn("main={first=1300 done=1400 replace=2700 undo=2400}", c.evidence)
 
+    def test_a_failed_wr_line_or_a_missing_time_fails_the_lat_line(self):
+        main_ms = {("uikit", "ssel"): {"first": 5000, "done": 5000}, ("uikit", "swin"): {"replace": 2000, "undo": 9000}}
+        wr = checks.Check("wr-uikit-ssel", "FAIL", "t1={real=39/1/h00000000}")
+        kb = self.KB.replace("first=1700", "first=-1")
+        with mock.patch.dict(checks.LATENCY_MAIN, main_ms, clear=True), \
+                mock.patch.dict(checks.WHOLE_TRIES, {"ssel": 1}):
+            c = checks.resolve_latency("lat-uikit-ssel", wr, self.marks("wr-uikit-ssel", 1), kb)
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("wr-uikit-ssel FAIL", c.evidence)
+        self.assertIn("t1:first=-1", c.evidence)
+        # Select all's Replace and Undo are held to swin's: 3100 > 2000 + 500.
+        self.assertIn("t1:replace=3100ms over main 2000+500", c.evidence)
+
     def test_a_try_without_the_speculative_call_or_a_time_fails(self):
         main_ms = {("uikit", "smid"): {"first": 5000, "done": 5000, "replace": 9000, "undo": 9000}}
         kb = self.KB.replace("spec=used", "spec=cancelled:longer").replace("write undo keys=2900 held=1\n", "")
@@ -1153,6 +1167,17 @@ class LatencyTests(unittest.TestCase):
         self.assertEqual(c.status, "FAIL")
         self.assertIn("t1:spec=cancelled:longer want used", c.evidence)
         self.assertIn("t1:undo=None", c.evidence)
+
+    def test_a_card_after_a_refused_read_fails_the_wr_line(self):
+        kb = ("2026-11-22 12:00:01.000 Db K[1:2] [com.northprot.protly:read] read done outcome=refused reason=b1:tooLong "
+              "units=0 lf=0 h=811c9dc5 ms=7900 known=1\n"
+              "2026-11-22 12:00:02.000 Db K[1:2] [com.northprot.protly:read] call done first=8000 done=8100 api=400 "
+              "spec=used\n")
+        wr = checks.Check("wr-uikit-x14k", "PASS", "t1={real=14055/15/h00000000 panel=...}")
+        c = checks.resolve_whole_log(wr, self.marks("wr-uikit-x14k", 1), kb)
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("t1:a card after a read that was refused", c.evidence)
+        self.assertIn("t1:spec=used", c.evidence)
 
     def test_assemble_derives_a_lat_line_for_each_short_wr_line(self):
         raw = "CHECK wr-uikit-smid PASS t1={real=39/1/h00000000} t2={real=39/1/h00000000}\n"
@@ -1180,8 +1205,8 @@ class WholeReadTests(unittest.TestCase):
         return re.findall(r'"(\w+)"', m.group(1))
 
     def test_every_id_is_expected_and_has_its_method(self):
-        short = ("swin", "smid", "ssel", "s3", "shead")
-        cases = ("win", "mid", "sel", "long", "x14k", "emoji") + short + ("etail",)
+        short = ("swin", "smid", "ssel", "s3")
+        cases = ("win", "mid", "sel", "long", "x14k", "emoji") + short + ("shead", "etail")
         native = [f"wr-uikit-{c}" for c in cases] + ["wr-uikit-r4k", "wr-uikit-cancel"] + [f"wr-swiftui-{c}" for c in cases]
         web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji") + short]
         lat_native = [f"lat-{h}-{c}" for h in ("uikit", "swiftui") for c in ("swin", "smid", "ssel")]
@@ -1224,8 +1249,9 @@ class WholeReadTests(unittest.TestCase):
     def test_every_case_has_a_spec_and_the_refusals_are_the_long_and_emoji_drafts(self):
         specs = self.specs()
         self.assertEqual(set(specs), set(checks.WHOLE_NATIVE_CASES) | set(checks.WHOLE_WEB_CASES) | {"r4k", "cancel"})
-        # Web hosts refuse text with emoji: etail (a lone emoji at the end) is a native case only.
-        self.assertEqual(set(checks.WHOLE_NATIVE_CASES) - set(checks.WHOLE_WEB_CASES), {"etail"})
+        # Web hosts refuse text with emoji: etail (a lone emoji at the end) is a native case only; so is shead (the
+        # page's script selection never reached the keyboard, run 297dc27-205).
+        self.assertEqual(set(checks.WHOLE_NATIVE_CASES) - set(checks.WHOLE_WEB_CASES), {"etail", "shead"})
         self.assertEqual({k for k, v in specs.items() if "cancel: true" in v[3]}, {"cancel"})
         self.assertEqual({k for k, v in specs.items() if "refusal: true" in v[3]}, {"x14k", "emoji"})
         self.assertEqual({k for k, v in specs.items() if "selectAll: true" in v[3]}, {"sel", "ssel"})
@@ -1268,31 +1294,37 @@ class WholeReadTests(unittest.TestCase):
             cursor = second + utf16(paras[1]) // 2 if m.group(5) else utf16(text)
             drafts.append((m.group(1), text, cursor))
         # F02c's short and bug drafts, rebuilt from their definitions (HostApp.swift WholeDrafts.short, short3).
-        short = marker + "\u00a71 " + sentence
+        inline = swift_string(re.search(r'static let inline = "([^"]*)"', block).group(1))
+        self.assertEqual(inline, "protly-stub read ")
+        short = inline + "\u00a71 " + sentence
         short3 = short + " Send me the notes after the call. " + sentence
-        at26 = utf16(marker + "\u00a71 " + sentence[:6])
-        self.assertIn('static let short = marker + "\\u{00A7}1 " + sentence', block)
+        head = marker + "\u00a71 " + sentence
+        at26 = utf16(inline + "\u00a71 " + sentence[:6])
+        self.assertIn('static let short = inline + "\\u{00A7}1 " + sentence', block)
         self.assertIn('static let short3 = short + " Send me the notes after the call. " + sentence', block)
+        self.assertIn('static let head = marker + "\\u{00A7}1 " + sentence', block)
         listed = re.findall(r'Draft\(name: "(\w+)"', all_block)
-        self.assertEqual(listed, ["s1", "s1mid", "s3", "etail"])
+        self.assertEqual(listed, ["s1", "s1mid", "s3", "etail", "s1head"])
         drafts += [("s1", short, utf16(short)), ("s1mid", short, at26), ("s3", short3, utf16(short3)),
-                   ("etail", short + " \U0001F600", at26)]
+                   ("etail", short + " \U0001F600", at26), ("s1head", head, utf16(head))]
         return drafts
 
     def test_the_specs_match_the_host_drafts(self):
         drafts = self.host_drafts()
         self.assertEqual([d[0] for d in drafts], ["p5", "p5mid", "xlong", "x14k", "emoji", "r4k", "s1", "s1mid", "s3",
-                                                  "etail"])
+                                                  "etail", "s1head"])
         for name, (fill, units, cursor, _) in self.specs().items():
             _, text, at = drafts[fill - 1]
-            self.assertTrue(text.startswith("protly-stub read\n"), name)
+            self.assertTrue(text.startswith("protly-stub read"), name)
             self.assertEqual((utf16(text), at), (units, cursor), name)
         # The walk-back probe's drafts under the marker line (docs/research/2026-11-21-walk-back-probe.md).
         shapes = {d[0]: (utf16(d[1][len("protly-stub read\n"):]), sum(1 for c in d[1][len("protly-stub read\n"):]
                                                                        if ord(c) > 0xFFFF)) for d in drafts}
+        # The one-line drafts carry the marker and a space in the same 17 units.
         self.assertEqual(shapes, {"p5": (318, 0), "p5mid": (318, 0), "xlong": (3230, 0), "x14k": (14038, 320),
                                   "emoji": (443, 10), "r4k": (3958, 0), "s1": (22, 0), "s1mid": (22, 0),
-                                  "s3": (76, 0), "etail": (25, 1)})
+                                  "s3": (76, 0), "etail": (25, 1), "s1head": (22, 0)})
+        self.assertNotIn("\n", drafts[6][1] + drafts[8][1] + drafts[9][1])
 
     def test_the_hash_matches_the_page_and_the_probe(self):
         # p5 318/8/h6d75860b (walk-back probe); the Swift and the page hash the same way (FNV-1a 32 over UTF-16).

@@ -70,7 +70,9 @@ HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-glo
 # units of three sentences on one line), a partial selection at the start up to a line feed (shead: a copy-only card
 # of the selection), and a lone emoji ending the line after a mid-text cursor (etail, native only).
 WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead", "etail")
-WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead")
+# shead is native only: on the read page a selection set by script never reached the keyboard (run 297dc27-205: the
+# read started with no selection), and a person's selection there is made by touch.
+WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3")
 WHOLE_WEB_HOSTS = ("textarea", "lexical")
 WHOLE_TRIES = {"win": 2, "long": 2, "swin": 3, "smid": 2, "ssel": 2}
 WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r4k", "wr-uikit-cancel"]
@@ -1348,6 +1350,12 @@ def resolve_whole_log(check, marks, kb_text):
                 problems.append(f"t{t}:no read done" if not done else f"t{t}:{len(done)} reads")
                 continue
             outcome, reason, took = kv(done[0], "outcome"), kv(done[0], "reason"), kv(done[0], "ms")
+            # F02c: a card (its `call done` line) only after an accepted read; the speculative call's fate is noted.
+            calls = [line for line in lines if line.startswith("call done ")]
+            if calls:
+                notes.append(f"t{t}:spec={kv(calls[0], 'spec')}")
+            if outcome != "accepted" and calls:
+                problems.append(f"t{t}:a card after a read that was {outcome}")
             if (kind, case) in WHOLE_CANCELLED:
                 notes.append(f"t{t}:{outcome}/{took}ms")
                 if outcome != "cancelled":
@@ -1435,7 +1443,8 @@ def latency_tries(wr_id, case, marks, kb_text):
                 return value
         out.append({"first": one("call done ", "first"), "done": one("call done ", "done"),
                     "api": one("call done ", "api"), "spec": one("call done ", "spec"),
-                    "replace": one("write replace ", "keys"), "undo": one("write undo ", "keys")})
+                    "replace": one("write replace ", "keys"), "undo": one("write undo ", "keys"),
+                    "reason": one("read done ", "reason"), "read": one("read done ", "ms")})
     return out
 
 
@@ -1445,7 +1454,13 @@ def resolve_latency(lat_id, wr, marks, kb_text):
     if kb_text is None:
         return unreadable(lat_id, "no keyboard-log.txt")
     main_ms = LATENCY_MAIN.get((host, case))
+    if main_ms is not None and case == "ssel":
+        # Select all on main is a selection: no Replace or Undo there. They are held to swin's (the same draft).
+        main_ms = {**{k: v for k, v in LATENCY_MAIN.get((host, "swin"), {}).items() if k in ("replace", "undo")},
+                   **main_ms}
     parts, problems = [], []
+    if wr.status == "FAIL":
+        problems.append(f"{wr.id} FAIL")
     for i, t in enumerate(latency_tries(wr.id, case, marks, kb_text), 1):
         if t is None:
             problems.append(f"t{i}:no MARK")
@@ -1460,13 +1475,14 @@ def resolve_latency(lat_id, wr, marks, kb_text):
             if want is None:
                 continue
             got = t[k]
-            if not isinstance(got, int):
+            if not isinstance(got, int) or got < 0:
                 problems.append(f"t{i}:{k}={got}")
             elif got > want + LATENCY_SLACK_MS:
                 problems.append(f"t{i}:{k}={got}ms over main {want}+{LATENCY_SLACK_MS}")
     evidence = " ".join(parts)
     if main_ms is None:
-        return Check(lat_id, "RECORD", f"{evidence} main=none (the baseline run)".strip())
+        return Check(lat_id, "RECORD", f"{evidence} main=none (the baseline run)".strip()
+                     + (f" problems={','.join(problems)}" if problems else ""))
     evidence += " main={" + " ".join(f"{k}={main_ms.get(k, 'none')}" for k in LATENCY_KEYS) + "}"
     if problems:
         return Check(lat_id, "FAIL", f"{evidence} problems={','.join(problems)}")
