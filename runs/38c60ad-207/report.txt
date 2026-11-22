@@ -1,0 +1,3 @@
+STATUS build-failed
+run-shots.sh stopped before writing a report; see the workflow log.
+LEAK-GUARD pass: no key prefix in 1 files
