@@ -1,0 +1,20 @@
+CHECK dsp-uikit-en PENDING kind=en tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.85,0.89,0.85
+CHECK dsp-uikit-word PENDING kind=word tries=6 t0="world" t1="hello. world" t2="hello. hello. world" t3="hello. hello. hello. world" t4="hello. hello. hello. hello. world" t5="hello. hello. hello. hello. hello. world" t6="hello. hello. hello. hello. hello. hello. world" gaps=1.22,0.88,0.84,0.95,0.88,0.88 sel0="0,0"
+CHECK dsp-uikit-ko PENDING kind=ko tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.94,0.93,0.86
+CHECK dsp-uikit-pick2 PENDING kind=pick2 tries=3 t0="" t1="the. " t2="the. the. " t3="the. the. the. " gaps=0.93,0.87,1.23
+CHECK dsp-uikit-pick1 PENDING kind=pick1 tries=4 t0="" t1="the " t2="the the " t3="the the the " t4="the the the the " gaps=4.68,6.03,4.90,4.59 p1="the " p2="the the " p3="the the the " p4="the the the the "
+CHECK dsp-uikit-fast PENDING kind=fast tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.058,0.060,0.086 edits=0/58/63,0/60/65,0/86/91 calls=0.94,0.59,0.56
+CHECK dsp-uikit-kofast PENDING kind=kofast tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.052,0.120,0.134 edits=0/52/57,0/120/126,0/134/149 calls=0.55,0.61,0.72
+CHECK dsp-uikit-kopick2 PENDING kind=kopick2 tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.94,0.94,0.97
+CHECK dsp-uikit-pickmid PENDING kind=pickmid tries=4 t0="world" t1="the world" t2="the the world" t3="the the the world" t4="the the the the world" gaps=4.00,3.90,3.89,4.27 p1="the world" p2="the the world" p3="the the the world" p4="the the the the world" sel0="0,0"
+CHECK dsp-uikit-pickmove PENDING kind=pickmove tries=3 t0="" t1="the " t2="the the  " t3="the the  the  " gaps=16.41,13.00,13.92 p1="the " away1="4,0" back1="4,0" p2="the the " away2="0,0" back2="8,0" p3="the the  the " away3="0,0" back3="13,0"
+CHECK dsp-composer-en PENDING kind=en tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.97,0.97,1.00
+CHECK dsp-composer-word PENDING kind=word tries=6 t0="world" t1="hello. world" t2="hello. hello. world" t3="hello. hello. hello. world" t4="hello. hello. hello. hello. world" t5="hello. hello. hello. hello. hello. world" t6="hello. hello. hello. hello. hello. hello. world" gaps=0.95,0.90,0.90,0.95,0.89,0.94 sel0="0"
+CHECK dsp-composer-ko PENDING kind=ko tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=1.11,0.91,0.88
+CHECK dsp-composer-pick2 PENDING kind=pick2 tries=3 t0="" t1="the. " t2="the. the. " t3="the. the. the. " gaps=0.89,0.88,0.90
+CHECK dsp-composer-pick1 PENDING kind=pick1 tries=4 t0="" t1="the " t2="the the " t3="the the the " t4="the the the the " gaps=3.30,3.53,3.36,3.48 p1="the " p2="the the " p3="the the the " p4="the the the the "
+CHECK dsp-composer-fast PENDING kind=fast tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.108,0.075,0.075 edits=0/108/144/144/170,0/75/85/86/97,0/75/82/82/98 calls=0.64,0.63,0.57
+CHECK dsp-composer-kofast PENDING kind=kofast tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.088,0.082,0.072 edits=0/88/94/96/108,0/82/89/90/102,0/72/81/82/92 calls=0.59,0.62,0.59
+CHECK dsp-composer-kopick2 PENDING kind=kopick2 tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.93,0.96,0.89
+CHECK dsp-composer-pickmid PENDING kind=pickmid tries=4 t0="world" t1="the world" t2="the the world" t3="the the the world" t4="the the the the world" gaps=3.39,3.58,3.30,3.40 p1="the world" p2="the the world" p3="the the the world" p4="the the the the world" sel0="0"
+CHECK dsp-composer-pickmove PENDING kind=pickmove tries=3 t0="" t1="the  " t2="the  the  " t3="the  the  the  " gaps=9.90,9.57,9.71 p1="the " away1="0" back1="4" p2="the  the " away2="0" back2="9" p3="the  the  the " away3="0" back3="14"
