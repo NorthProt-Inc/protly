@@ -1,0 +1,113 @@
+STATUS measured
+source e6287fce580ef9e46745448f37d650c5ad53705b
+xcode Xcode 26.6 Build version 17F113 
+network key: present (CI key); DerivedData cache: restore only, not saved in this run
+FILTER PhoneChecksUITests/test0_access PhoneChecksUITests/test5f_period (a debug run, outside the run budget; other IDs are NOT-RUN)
+runtime iOS 26.5 (com.apple.CoreSimulator.SimRuntime.iOS-26-5)
+device iPhone-13-Pro (4C15BE9E-A6CA-4DD2-AA1C-05582D2311EC), 390 pt wide
+build ok
+AppleKeyboards ("com.northprot.protly.cihost.keyboard","emoji@sw=Emoji","en_US@sw=QWERTY;hw=Automatic")
+appearance dark
+memory sampler pid 8182, probe 0, network 1
+web-events.txt: 1627 lines
+RESULT NOT-RUN (filtered run: KeyboardShotsUITests not selected)
+CHECKS
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-en PASS kind=en tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.90,0.90,0.88 => 3/3 tries added 'hello. ' at the end
+CHECK dsp-composer-fast PASS kind=fast tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.068,0.063,0.082 edits=0/68/75/77/92,0/63/70/72/82,0/82/97/99/114 calls=0.57,0.61,0.57 => 3/3 tries added 'hello. ' at the end
+CHECK dsp-composer-ko PASS kind=ko tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.87,0.92,0.87 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-composer-kofast PASS kind=kofast tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.065,0.062,0.068 edits=0/65/71/72/78,0/62/68/68/75,0/68/73/74/80 calls=0.56,0.58,0.56 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-composer-kopick2 PASS kind=kopick2 tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.89,0.86,0.88 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-composer-pick1 PASS kind=pick1 tries=4 t0="" t1="the " t2="the the " t3="the the the " t4="the the the the " gaps=3.29,3.27,3.35,3.28 p1="the " p2="the the " p3="the the the " p4="the the the the " => 4/4 tries added 'the ' at the end; the field showed the pick 'the ' before each tap
+CHECK dsp-composer-pick2 PASS kind=pick2 tries=3 t0="" t1="the. " t2="the. the. " t3="the. the. the. " gaps=0.87,0.88,0.88 => 3/3 tries added 'the. ' at the end
+CHECK dsp-composer-pickmid PASS kind=pickmid tries=4 t0="world" t1="the world" t2="the the world" t3="the the the world" t4="the the the the world" gaps=3.28,3.33,3.34,3.29 p1="the world" p2="the the world" p3="the the the world" p4="the the the the world" sel0="0" => 4/4 tries added 'the ' before 'world'; the field showed the pick 'the ' before each tap
+CHECK dsp-composer-pickmove FAIL kind=pickmove tries=3 t0="" t1="the " t2="the the " t3="the the the " gaps=8.72,8.20,8.28 p1="the " away1="0" back1="4" p2="the the " away2="0" back2="8" p3="the the the " away3="0" back3="12" => try 1: '' became 'the ', want 'the  '; try 2: 'the ' became 'the the ', want 'the the  '; try 3: 'the the ' became 'the the the ', want 'the the the  '; 0/3 tries added 'the  ' at the end; the field showed the pick 'the ' before each tap
+CHECK dsp-composer-word PASS kind=word tries=6 t0="world" t1="hello. world" t2="hello. hello. world" t3="hello. hello. hello. world" t4="hello. hello. hello. hello. world" t5="hello. hello. hello. hello. hello. world" t6="hello. hello. hello. hello. hello. hello. world" gaps=0.89,0.86,0.89,0.87,0.88,0.87 sel0="0" => 6/6 tries added 'hello. ' before 'world'
+CHECK dsp-uikit-en PASS kind=en tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.90,1.89,1.06 => 3/3 tries added 'hello. ' at the end
+CHECK dsp-uikit-fast PASS kind=fast tries=3 t0="" t1="hello. " t2="hello. hello. " t3="hello. hello. hello. " gaps=0.069,0.074,0.077 edits=0/69/73,0/74/79,0/77/91 calls=0.56,0.63,0.58 => 3/3 tries added 'hello. ' at the end
+CHECK dsp-uikit-ko PASS kind=ko tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.85,0.90,0.96 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-uikit-kofast PASS kind=kofast tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.074,0.070,0.118 edits=0/74/81,0/70/75,0/118/127 calls=0.62,0.67,0.78 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-uikit-kopick2 PASS kind=kopick2 tries=3 t0="" t1="안녕. " t2="안녕. 안녕. " t3="안녕. 안녕. 안녕. " gaps=0.93,0.88,0.87 => 3/3 tries added '안녕. ' at the end
+CHECK dsp-uikit-pick1 PASS kind=pick1 tries=4 t0="" t1="the " t2="the the " t3="the the the " t4="the the the the " gaps=3.82,4.07,3.77,3.56 p1="the " p2="the the " p3="the the the " p4="the the the the " => 4/4 tries added 'the ' at the end; the field showed the pick 'the ' before each tap
+CHECK dsp-uikit-pick2 PASS kind=pick2 tries=3 t0="" t1="the. " t2="the. the. " t3="the. the. the. " gaps=0.91,0.88,0.84 => 3/3 tries added 'the. ' at the end
+CHECK dsp-uikit-pickmid PASS kind=pickmid tries=4 t0="world" t1="the world" t2="the the world" t3="the the the world" t4="the the the the world" gaps=3.72,3.98,3.74,3.61 p1="the world" p2="the the world" p3="the the the world" p4="the the the the world" sel0="0,0" => 4/4 tries added 'the ' before 'world'; the field showed the pick 'the ' before each tap
+CHECK dsp-uikit-pickmove FAIL unreadable: try 1: the caret did not move to the start and back to the pick (away='0,0', back='0,0', want 0 and 4): 'kind=pickmove tries=3 t0="" t1="the " t2="the " t3="the " gaps=11.93,11.26,11.35 p1="the " away1="0,0" back1="0,0" p2="the " away2="0,0" back2="0,0" p3="the " away3="0,0" back3="0,0"'
+CHECK dsp-uikit-word PASS kind=word tries=6 t0="world" t1="hello. world" t2="hello. hello. world" t3="hello. hello. hello. world" t4="hello. hello. hello. hello. world" t5="hello. hello. hello. hello. hello. world" t6="hello. hello. hello. hello. hello. hello. world" gaps=6.69,0.99,0.89,0.88,0.95,0.94 sel0="0,0" => 6/6 tries added 'hello. ' before 'world'
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
+CHECKS pass 18 fail 2 record 0 skip 0 not-run 77
+LEAK-GUARD pass: no key prefix in 34 files
