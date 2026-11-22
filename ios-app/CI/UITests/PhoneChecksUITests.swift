@@ -18,8 +18,10 @@ final class PhoneChecksUITests: XCTestCase {
     static let allowance: [String: TimeInterval] = [
         "test0_access": 300, "test0_probe": 480, "test1_68": 900, "test2_ws": 300, "test3_85offline": 900,
         "test4_memory": 600, "test5_icon": 300, "test5a_web": 900, "test5b_menu": 420, "test5c_pad": 420,
-        "test5d_card": 720, "test5e_bar": 600, "test5f_period": 1500,
-        "test6_85net": 1080, "test7_77": 1080,
+        "test5d_card": 720, "test5e_bar": 600, "test5f_period": 1500, "test5g_wholenative": 1800,
+        "test5h_wholeweb": 1800,
+        // K1b: every Translate and Polish reads the whole field first (3-5 s on a short draft, run 7cdefa4-180).
+        "test6_85net": 1380, "test7_77": 1380,
     ]
 
     override func setUpWithError() throws {
@@ -114,6 +116,27 @@ final class PhoneChecksUITests: XCTestCase {
             throw XCTSkip("runs only in a filtered run (deadline)")
         }
         try PhoneRun(test: self, name: "test5f_period", arguments: ["-screen", "uikit"]).checksPeriod()
+    }
+
+    /// K1b, the whole-field read (WholeReadChecks.swift): the read, Replace and Undo on the UITextView screen and the
+    /// SwiftUI field, from the host's whole-read drafts (`-wholefills 1`). Offline (the CI stub's `read` marker). Only in
+    /// a filtered run, as test5f_period: up to 20 s a read would push a full run past MAIN_TEST_DEADLINE.
+    @MainActor
+    func test5g_wholenative() throws {
+        guard ProcessInfo.processInfo.environment["FILTERED"] == "1" else {
+            throw XCTSkip("runs only in a filtered run (deadline)")
+        }
+        try PhoneRun(test: self, name: "test5g_wholenative", arguments: ["-screen", "uikit", "-wholefills", "1"])
+            .checksWholeNative()
+    }
+
+    /// K1b: the same on the read page's textarea and Lexical-shaped field (`-screen readweb`). Only in a filtered run.
+    @MainActor
+    func test5h_wholeweb() throws {
+        guard ProcessInfo.processInfo.environment["FILTERED"] == "1" else {
+            throw XCTSkip("runs only in a filtered run (deadline)")
+        }
+        try PhoneRun(test: self, name: "test5h_wholeweb").checksWholeWeb()
     }
 
     /// After every offline group, so the requests and the about-me note change nothing they check.
