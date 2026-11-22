@@ -267,8 +267,10 @@ enum FieldText {
     /// end again (the probe saw returns land a few units short: runs 154, 155); the next walk confirms the end anyway.
     /// nil: no time left for the move. Else whether the contexts show the end again (F02c's window proof needs it).
     /// The contexts settled after a return can still be on their way (run 1b402b4-204 uikit smid: two polls agreed on
-    /// a before-context of the line before the end, then FM's probe saw the end's and called it a bad step): they get
-    /// up to WholeRead.emptyWait to show the end. A return that landed short never shows it.
+    /// a before-context of the line before the end, with nothing after the cursor, then FM's probe saw the end's and
+    /// called it a bad step): with nothing after the cursor they get up to WholeRead.emptyWait to show the end. Text
+    /// after the cursor is a return that landed short (the Lexical-shaped page, 2 units after its phantom): no wait
+    /// (run 52eeb7e-217: waiting there too put two Lexical long reads past the 20 s budget).
     private static func returnMove(_ p: UITextDocumentProxy, by n: Int, end: Ctx, start t0: TimeInterval,
                                    track: Track) async -> Bool? {
         guard n > 0 else { return false }
@@ -279,9 +281,9 @@ enum FieldText {
         let s = await step(p, by: n, wait: WholeRead.moveWait)
         func showsEnd(_ c: Ctx) -> Bool { c.a.isEmpty && !c.b.isEmpty && WholeRead.agreeAtEnd(c.before, end.before) }
         var c = s.c, atEnd = showsEnd(c)
-        lastReturnWaited = !atEnd
+        lastReturnWaited = !atEnd && c.a.isEmpty
         let e0 = uptime()
-        while !atEnd, uptime() - e0 < WholeRead.emptyWait {
+        while !atEnd, c.a.isEmpty, uptime() - e0 < WholeRead.emptyWait {
             await pause()
             c = ctx(p)
             atEnd = showsEnd(c)
@@ -404,6 +406,13 @@ enum FieldText {
                 if move != 0 {
                     track.sending()
                     let s = await step(p, by: move, wait: WholeRead.moveWait)
+                    track.landed(nil, s.c.b)
+                }
+                // A native window stops at a line feed: right after the one the collapse crossed it shows nothing (run
+                // 8be8a93-218). One unit back, at the selection's end, it shows the selection's line.
+                if ctx(p).before.isEmpty, !Task.isCancelled {
+                    track.sending()
+                    let s = await step(p, by: -1, wait: WholeRead.moveWait)
                     track.landed(nil, s.c.b)
                 }
                 before = ctx(p).before
@@ -553,7 +562,11 @@ enum FieldText {
                 last = c
                 quietFrom = uptime()
             }
-            if uptime() >= settle, uptime() - quietFrom >= WholeRead.quiet, shows(new, c) {
+            // An empty field in the contexts after the bound, quiet: the proxy may have stopped following the host (run
+            // 8be8a93-218 etail: b=0 a=0 for 4.7 s while the field held the result). The check walk moves the cursor,
+            // which refreshes the contexts, and decides; an empty field fails it as before.
+            let blank = c.b.isEmpty && c.a.isEmpty && !new.isEmpty
+            if uptime() >= settle, uptime() - quietFrom >= WholeRead.quiet, shows(new, c) || blank {
                 shown = true
                 break
             }

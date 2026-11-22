@@ -89,9 +89,24 @@ LATENCY_NATIVE_IDS = [f"lat-{h}-{c}" for h in ("uikit", "swiftui") for c in LATE
 LATENCY_WEB_IDS = [f"lat-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in LATENCY_CASES]
 LATENCY_SLACK_MS = 500
 LATENCY_KEYS = ("first", "done", "replace", "undo")
-# main's medians in ms per (host, case) from its baseline run (diag/k1b-base-*: main's read and write path with this
-# harness). Select all on main is a selection (a copy-only card, no Replace): ssel's Replace and Undo are held to swin's.
-LATENCY_MAIN = {}
+# main's medians in ms per (host, case) from its baseline runs (diag/k1b-base-*: main's read and write path with this
+# harness and the same log lines): native runs/a6c7969-214 (the one-line drafts), web runs/8a64cb5-209 (the web window
+# showed the two-line draft whole, so main read all of it and the stub answered). A key main has no value for (its
+# Undo was not offered after smid on the web, select all on the UITextView is a copy-only selection) is held to swin's.
+LATENCY_MAIN = {
+    ("uikit", "swin"): {"first": 472, "done": 667, "replace": 0, "undo": 0},
+    ("uikit", "smid"): {"first": 505, "done": 622, "replace": 0, "undo": 0},
+    ("uikit", "ssel"): {"first": 551, "done": 696},
+    ("swiftui", "swin"): {"first": 491, "done": 597, "replace": 0, "undo": 0},
+    ("swiftui", "smid"): {"first": 501, "done": 605, "replace": 0, "undo": 0},
+    ("swiftui", "ssel"): {"first": 487, "done": 606, "replace": 0, "undo": 0},
+    ("textarea", "swin"): {"first": 495, "done": 669, "replace": 0, "undo": 0},
+    ("textarea", "smid"): {"first": 497, "done": 650, "replace": 0},
+    ("textarea", "ssel"): {"first": 491, "done": 598, "replace": 0, "undo": 0},
+    ("lexical", "swin"): {"first": 494, "done": 606, "replace": 0, "undo": 0},
+    ("lexical", "smid"): {"first": 474, "done": 577, "replace": 0},
+    ("lexical", "ssel"): {"first": 473, "done": 624, "replace": 2, "undo": 0},
+}
 # What the keyboard's own log (keyboard-log.txt, category `read`) must say for each wr- try, between the try's MARK
 # (wr-<host>-<case>-t<n> in ui-log.txt) and the next MARK: a refusal case its refusal reason (`<walk>:<why>`; the web
 # drafts with emoji are refused for the emoji, the native 14 055-unit one at the read's 4000-unit cap or, as in run
@@ -1459,8 +1474,8 @@ def resolve_latency(lat_id, wr, marks, kb_text):
     if kb_text is None:
         return unreadable(lat_id, "no keyboard-log.txt")
     main_ms = LATENCY_MAIN.get((host, case))
-    if main_ms is not None and case == "ssel":
-        # Select all on main is a selection: no Replace or Undo there. They are held to swin's (the same draft).
+    if main_ms is not None and case != "swin":
+        # A Replace or Undo main did not offer is held to swin's (the same draft).
         main_ms = {**{k: v for k, v in LATENCY_MAIN.get((host, "swin"), {}).items() if k in ("replace", "undo")},
                    **main_ms}
     parts, problems = [], []
