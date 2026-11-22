@@ -1,0 +1,93 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5j_walkuikit
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wk-uikit-p5-1 1795316561.703
+tapped protlyKey
+MARK wk-uikit-p5-2 1795316650.874
+tapped protlyKey
+CHECK walk-uikit-p5 RECORD t1={real=318/8/h6d75860b sel=318,0 carried="→" whole=unparsed s=73.0 selafter=318,0 left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=318,0 carried="→" whole=unparsed s=19.6 selafter=318,0 left=318/8/h6d75860b}
+MARK wk-uikit-l5-1 1795316685.691
+tapped protlyKey
+MARK wk-uikit-l5-2 1795316711.869
+tapped protlyKey
+CHECK walk-uikit-l5 RECORD t1={real=114/4/h377e638b sel=114,0 carried="→" whole=unparsed s=10.3 selafter=114,0 left=114/4/h377e638b} t2={real=114/4/h377e638b sel=114,0 carried="→" whole=unparsed s=11.6 selafter=114,0 left=114/4/h377e638b}
+MARK wk-uikit-xlong-1 1795316739.609
+tapped protlyKey
+MARK wk-uikit-xlong-2 1795316887.247
+tapped protlyKey
+CHECK walk-uikit-xlong RECORD t1={real=3230/14/h7328b445 sel=3230,0 carried="→" whole=unparsed s=129.6 selafter=3230,0 left=3230/14/h7328b445} t2={real=3230/14/h7328b445 sel=3230,0 carried="→" whole=unparsed s=73.7 selafter=3230,0 left=3230/14/h7328b445}
+MARK wk-uikit-p5mid-1 1795316977.626
+tapped protlyKey
+MARK wk-uikit-p5mid-2 1795317008.623
+tapped protlyKey
+CHECK walk-uikit-p5mid RECORD t1={real=318/8/h6d75860b sel=95,0 carried="→" whole=unparsed s=15.3 selafter=318,0 left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=95,0 carried="→" whole=unparsed s=11.8 selafter=318,0 left=318/8/h6d75860b}
+MARK wk-uikit-l5mid-1 1795317036.185
+tapped protlyKey
+CHECK walk-uikit-l5mid RECORD t1={real=114/4/h377e638b sel=34,0 carried="→" whole=unparsed s=8.2 selafter=114,0 left=114/4/h377e638b}
+MARK wk-uikit-longmid-1 1795317060.588
+tapped protlyKey
+CHECK walk-uikit-longmid RECORD t1={real=1518/8/hc63d54cb sel=455,0 carried="→" whole=unparsed s=32.2 selafter=1518,0 left=1518/8/hc63d54cb}
+MARK wk-uikit-trail-1 1795317109.831
+tapped protlyKey
+CHECK walk-uikit-trail RECORD t1={real=71/5/hb9b91f66 sel=71,0 carried="→" whole=unparsed s=12.5 selafter=71,0 left=71/5/hb9b91f66}
+MARK wk-uikit-selp5-1 1795317141.267
+tapped protlyKey
+MARK wk-uikit-selp5-2 1795317179.076
+tapped protlyKey
+MARK wk-uikit-selp5-3 1795317214.121
+tapped protlyKey
+CHECK walk-uikit-selp5 RECORD t1={real=318/8/h6d75860b sel=0,318 carried="→" whole=unparsed s=20.4 selafter=318,0 left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=0,318 carried="→" whole=unparsed s=18.6 selafter=318,0 left=318/8/h6d75860b} t3={real=318/8/h6d75860b sel=0,318 carried="→" whole=unparsed s=19.0 selafter=318,0 left=318/8/h6d75860b}
+MARK wk-uikit-selxlong-1 1795317250.026
+tapped protlyKey
+MARK wk-uikit-selxlong-2 1795317348.874
+tapped protlyKey
+MARK wk-uikit-selxlong-3 1795317433.880
+tapped protlyKey
+CHECK walk-uikit-selxlong RECORD t1={real=3230/14/h7328b445 sel=0,3230 carried="→" whole=unparsed s=81.2 selafter=3230,0 left=3230/14/h7328b445} t2={real=3230/14/h7328b445 sel=0,3230 carried="→" whole=unparsed s=68.6 selafter=3230,0 left=3230/14/h7328b445} t3={real=3230/14/h7328b445 sel=0,3230 carried="ok" whole=unparsed s=57.5 selafter=3230,0 left=3230/14/h7328b445}
+== PhoneChecksUITests.test5k_walkswiftui
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wk-swiftui-p5-1 1795317525.722
+tapped protlyKey
+MARK wk-swiftui-p5-2 1795317552.945
+tapped protlyKey
+CHECK walk-swiftui-p5 RECORD t1={real=318/8/h6d75860b sel=- carried="→" whole=unparsed s=16.5 selafter=- left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=- carried="→" whole=unparsed s=15.4 selafter=- left=318/8/h6d75860b}
+MARK wk-swiftui-l5-1 1795317579.279
+tapped protlyKey
+MARK wk-swiftui-l5-2 1795317600.390
+tapped protlyKey
+CHECK walk-swiftui-l5 RECORD t1={real=114/4/h377e638b sel=- carried="→" whole=unparsed s=9.4 selafter=- left=114/4/h377e638b} t2={real=114/4/h377e638b sel=- carried="→" whole=unparsed s=10.5 selafter=- left=114/4/h377e638b}
+MARK wk-swiftui-xlong-1 1795317622.588
+tapped protlyKey
+MARK wk-swiftui-xlong-2 1795317689.294
+tapped protlyKey
+CHECK walk-swiftui-xlong RECORD t1={real=3230/14/h7328b445 sel=- carried="→" whole=unparsed s=55.3 selafter=- left=3230/14/h7328b445} t2={real=3230/14/h7328b445 sel=- carried="→" whole=unparsed s=56.0 selafter=- left=3230/14/h7328b445}
+== PhoneChecksUITests.test5l_walkweb
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wk-textarea-p5-1 1795317788.485
+tapped protlyKey
+MARK wk-textarea-p5-2 1795317818.706
+tapped protlyKey
+CHECK walk-textarea-p5 RECORD t1={real=318/8/h6d75860b sel=- carried="→" whole=unparsed s=10.2 selafter=- left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=- carried="→" whole=unparsed s=12.6 selafter=- left=318/8/h6d75860b}
+MARK wk-textarea-xlong-1 1795317850.815
+tapped protlyKey
+CHECK walk-textarea-xlong RECORD t1={real=3230/14/h7328b445 sel=- carried="Could not read the whole text. Select all, then tap again." outcome=panel s=11.2 selafter=- left=3230/14/h7328b445}
+MARK wk-lexical-p5-1 1795317880.404
+tapped protlyKey
+MARK wk-lexical-p5-2 1795317912.582
+tapped protlyKey
+CHECK walk-lexical-p5 RECORD t1={real=318/8/h6d75860b sel=- carried="→" whole=unparsed s=13.3 selafter=- left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=- carried="→" whole=unparsed s=12.5 selafter=- left=318/8/h6d75860b}
+MARK wk-lexical-xlong-1 1795317947.732
+tapped protlyKey
+CHECK walk-lexical-xlong RECORD t1={real=3230/14/h7328b445 sel=- carried="Could not read the whole text. Select all, then tap again." outcome=panel s=15.9 selafter=- left=3230/14/h7328b445}
