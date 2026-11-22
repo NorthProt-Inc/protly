@@ -173,7 +173,9 @@ export function mountOutgoing(cur) {
         break;
       }
       case 'restore': {
-        const back = !c || await write(c, effect.korean); // false: refused (cutsShort) or superseded
+        // A box that already holds the draft (Enter on it, a Shift+Enter during the request) needs no write: writing it
+        // could be refused (cutsShort) and show a false failure.
+        const back = !c || norm(getComposerText(c)) === norm(effect.korean) || await write(c, effect.korean); // false: refused (cutsShort) or superseded
         hideNote();
         lastText = '';
         if (!back && live()) say('Could not restore the draft. Ctrl+Z may bring it back.', true);
