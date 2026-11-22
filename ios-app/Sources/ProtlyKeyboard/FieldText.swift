@@ -221,7 +221,7 @@ enum FieldText {
         if case .cancelled = feEnd { return finish(.cancelled, "cancelled") }
         guard case .done(let last) = feEnd else { return finish(.refused, "fe") }
         if Task.isCancelled { return finish(.cancelled, "cancelled") }
-        if let why = WholeRead.refusal(back1: back1, mid: mid, back2: back2, last: last) {
+        if let why = WholeRead.refusal(first: first, back1: back1, mid: mid, back2: back2, last: last) {
             return finish(.refused, why, back1)
         }
         record(.confirmedEnd(fromOrigin: first.count, before: ctx(p).b))
@@ -232,16 +232,23 @@ enum FieldText {
 
     /// Cancel or a refusal (P6): the cursor goes back by `move` (CursorReturn.back) in one step. The probe saw such a
     /// move miss by a few units beyond about 3230 units and on the Lexical-shaped page; a miss is logged, not fixed.
-    static func restore(_ move: Int, _ p: UITextDocumentProxy) {
+    /// `known` false: the read's record lost the position (a phantom step), so the cursor stays where the read left it.
+    static func restore(_ move: Int, known: Bool, _ p: UITextDocumentProxy) {
+        let units = abs(move), position = known ? 1 : 0
+        log.debug("read restore units=\(units, privacy: .public) known=\(position, privacy: .public)")
         guard move != 0 else { return }
         p.adjustTextPosition(byCharacterOffset: move)
-        let units = abs(move)
-        log.debug("read restore units=\(units, privacy: .public)")
     }
 
-    /// Replace what `read` returned (the cursor at the field's end) with `new`: one deleteBackward per Character of
-    /// the read, then a wait until the field is empty, then the insert, then a check that the field holds the result.
-    /// `emptied` false: the field never showed empty within 5 s; the result was inserted anyway and the caller says so.
+    /// How long Replace waits for the field to show empty, and then for it to show the result.
+    static let writeWait: TimeInterval = 5
+
+    /// Replace `old` (the whole field, the cursor at its end) with `new`: one deleteBackward per Character of `old`,
+    /// a wait until the field is empty, the insert, then a walk back over the result to the start (it must read
+    /// exactly `new`) and one move forward to the end again. Undo of a Replace runs the same way the other way round.
+    /// `emptied` false: the field never showed empty; the result was inserted anyway. `held` false: the walk did not
+    /// read exactly the result (old text left in front, or the contexts could not be read). The caller says so and
+    /// offers no Undo then.
     static func replace(_ old: String, with new: String, _ p: UITextDocumentProxy) async -> (emptied: Bool, held: Bool) {
         let t0 = uptime()
         var deleted = 0
@@ -250,22 +257,38 @@ enum FieldText {
             deleted += 1
         }
         let sent = ms(since: t0)
-        let emptied = await waitEmpty(p, limit: 5)
+        let emptied = await waitEmpty(p, limit: writeWait)
         let emptyMS = ms(since: t0)
         p.insertText(new)
-        var held = false
-        let h0 = uptime()
-        while uptime() - h0 < 2 {
-            await pause(0.05)
-            let c = ctx(p)
-            if FieldGuard.holdsResult(new, before: c.b, after: c.a) {
-                held = true
-                break
-            }
-        }
+        let held = await holds(new, p)
         let inserted = new.utf16.count, heldMS = ms(since: t0), empty = emptied ? 1 : 0, ok = held ? 1 : 0
         log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) emptyms=\(emptyMS, privacy: .public) empty=\(empty, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public)")
         return (emptied, held)
+    }
+
+    /// The field is exactly `new` with the cursor at its end: the contexts show its end first (up to writeWait), then
+    /// a walk back reads exactly `new` to the start (a window shows only the end, so leftover text in front would be
+    /// invisible to the contexts alone), then one move forward lands at the end again.
+    private static func holds(_ new: String, _ p: UITextDocumentProxy) async -> Bool {
+        let units = Array(new.utf16)
+        guard !units.isEmpty else { return ctx(p).b.isEmpty && ctx(p).a.isEmpty }
+        let h0 = uptime()
+        var shown = false
+        while uptime() - h0 < writeWait {
+            await pause(0.05)
+            let c = ctx(p)
+            if FieldGuard.holdsResult(new, before: c.b, after: c.a) {
+                shown = true
+                break
+            }
+        }
+        guard shown else { return false }
+        let end = ctx(p)
+        guard case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: uptime(),
+                                                record: { _ in }, progress: {}),
+              read == units else { return false }
+        let s = await step(p, by: units.count, wait: WholeRead.moveWait)
+        return s.c.a.isEmpty && WholeRead.agreeAtEnd(s.c.before, end.before)
     }
 
     /// The field is empty: both contexts empty for WholeRead.emptyWait, and the proxy has no text or a one-unit probe

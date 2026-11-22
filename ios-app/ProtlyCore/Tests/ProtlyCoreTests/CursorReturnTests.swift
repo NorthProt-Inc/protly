@@ -37,6 +37,7 @@ final class CursorReturnTests: XCTestCase {
         step(&c, nil, before: "y")
         step(&c, 5, before: "z")
         XCTAssertEqual(c.back(before: "z"), 0)
+        XCTAssertFalse(c.isKnown)
     }
 
     /// An accepted read ends at the field's end, which the walks confirmed: the cursor is then the first forward walk's

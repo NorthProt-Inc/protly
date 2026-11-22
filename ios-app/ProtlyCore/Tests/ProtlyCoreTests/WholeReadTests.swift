@@ -289,13 +289,19 @@ final class WholeReadTests: XCTestCase {
 
     func testAcceptOnlyAgreeingWalksAndConfirmedEnds() {
         let text = u("the whole field\nsecond line")
-        XCTAssertNil(WholeRead.refusal(back1: text, mid: [], back2: text, last: []))
+        XCTAssertNil(WholeRead.refusal(first: [], back1: text, mid: [], back2: text, last: []))
         // A return that landed 2 units short: the confirming walk crossed the text's last 2 units.
-        XCTAssertNil(WholeRead.refusal(back1: text, mid: Array(text.suffix(2)), back2: text, last: Array(text.suffix(1))))
-        XCTAssertEqual(WholeRead.refusal(back1: text, mid: [], back2: Array(text.dropFirst()), last: []), "disagree")
+        XCTAssertNil(WholeRead.refusal(first: [], back1: text, mid: Array(text.suffix(2)), back2: text, last: Array(text.suffix(1))))
+        XCTAssertEqual(WholeRead.refusal(first: [], back1: text, mid: [], back2: Array(text.dropFirst()), last: []), "disagree")
         // The second walk started from a false end, and the last walk went on past it: never the text's end.
-        XCTAssertEqual(WholeRead.refusal(back1: text, mid: [], back2: text, last: u(" more")), "lastEnd")
-        XCTAssertEqual(WholeRead.refusal(back1: text, mid: u("extra"), back2: text, last: []), "midEnd")
-        XCTAssertEqual(WholeRead.refusal(back1: [], mid: [], back2: [], last: u("x")), "lastEnd")
+        XCTAssertEqual(WholeRead.refusal(first: [], back1: text, mid: [], back2: text, last: u(" more")), "lastEnd")
+        XCTAssertEqual(WholeRead.refusal(first: [], back1: text, mid: u("extra"), back2: text, last: []), "midEnd")
+        XCTAssertEqual(WholeRead.refusal(first: [], back1: [], mid: [], back2: [], last: u("x")), "lastEnd")
+        // Both walks back stopped at the same false start between the user's cursor and the end: the first walk to
+        // the end crossed more than they read.
+        XCTAssertNil(WholeRead.refusal(first: Array(text.suffix(6)), back1: text, mid: [], back2: text, last: []))
+        XCTAssertEqual(WholeRead.refusal(first: u("x") + Array(text.suffix(6)), back1: text, mid: [], back2: text, last: []),
+                       "firstEnd")
+        XCTAssertEqual(WholeRead.refusal(first: u("more text") + text, back1: text, mid: [], back2: text, last: []), "firstEnd")
     }
 }

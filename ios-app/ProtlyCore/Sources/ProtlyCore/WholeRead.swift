@@ -88,8 +88,11 @@ public enum WholeRead {
     /// the start): nil = accept, else why not. `mid` and `last` are what the walks that confirmed the end crossed
     /// after each return move: a return that landed a few units short (probe runs 154, 155) walks the text's last
     /// units again; anything else means a walk back began short of the end (a false end), so the read is refused.
-    public static func refusal(back1: [UInt16], mid: [UInt16], back2: [UInt16], last: [UInt16]) -> String? {
+    /// `first` (the walk from the user's cursor to the end) must be the read's end too: two walks back that stopped at
+    /// the same false start after the cursor would agree with each other, never with it.
+    public static func refusal(first: [UInt16], back1: [UInt16], mid: [UInt16], back2: [UInt16], last: [UInt16]) -> String? {
         if back1 != back2 { return "disagree" }
+        if !hasSuffix(back1, first) { return "firstEnd" }
         if !hasSuffix(back1, mid) { return "midEnd" }
         if !hasSuffix(back2, last) { return "lastEnd" }
         return nil

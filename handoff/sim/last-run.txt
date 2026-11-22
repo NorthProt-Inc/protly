@@ -1,0 +1,74 @@
+LOG read walk f units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=506
+LOG read walk b1 units=350 lf=3 h=233a8790 reason=done steps=6 ms=1013
+LOG read walk fm units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=506
+LOG read walk b2 units=350 lf=3 h=233a8790 reason=done steps=6 ms=1034
+LOG read walk fe units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=506
+LOG read done outcome=accepted reason=- units=350 lf=3 h=233a8790 ms=3669
+LOG read walk v units=6 lf=0 h=5b9ed065 reason=done steps=3 ms=912
+LOG replace deleted=350 inserted=6 sentms=3 emptyms=357 empty=1 heldms=1360 held=1
+LOG read walk v units=350 lf=3 h=233a8790 reason=done steps=6 ms=1052
+LOG replace deleted=6 inserted=350 sentms=0 emptyms=353 empty=1 heldms=1496 held=1
+PASS win335 3.7s text 350 sel=false pos=350 replace=(emptied: true, held: true) undo=(emptied: true, held: true)
+LOG read walk f units=290 lf=2 h=93e9a781 reason=done steps=9 ms=891
+LOG read walk b1 units=350 lf=3 h=233a8790 reason=done steps=6 ms=1070
+LOG read walk fm units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=505
+LOG read walk b2 units=350 lf=3 h=233a8790 reason=done steps=6 ms=1073
+LOG read walk fe units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=507
+LOG read done outcome=accepted reason=- units=350 lf=3 h=233a8790 ms=4131
+PASS mid 4.1s text 350 sel=false pos=350
+LOG read walk f units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=510
+LOG read walk b1 units=350 lf=3 h=233a8790 reason=done steps=6 ms=1064
+LOG read walk fm units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=507
+LOG read walk b2 units=350 lf=3 h=233a8790 reason=done steps=6 ms=1034
+LOG read walk fe units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=505
+LOG read done outcome=accepted reason=- units=350 lf=3 h=233a8790 ms=3744
+PASS selall 3.7s text 350 sel=false pos=350
+LOG read walk f units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=506
+LOG read walk b1 units=3262 lf=24 h=5f0ce160 reason=done steps=23 ms=1804
+LOG read walk fm units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=507
+LOG read walk b2 units=3262 lf=24 h=5f0ce160 reason=done steps=23 ms=1867
+LOG read walk fe units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=508
+LOG read done outcome=accepted reason=- units=3262 lf=24 h=5f0ce160 ms=5297
+LOG read walk v units=6 lf=0 h=5b9ed065 reason=done steps=3 ms=936
+LOG replace deleted=3262 inserted=6 sentms=8 emptyms=596 empty=1 heldms=1623 held=1
+LOG read walk v units=3262 lf=24 h=5f0ce160 reason=done steps=23 ms=1867
+LOG replace deleted=6 inserted=3262 sentms=0 emptyms=354 empty=1 heldms=2312 held=1
+PASS long3247 5.3s text 3262 sel=false pos=3262 replace=(emptied: true, held: true) undo=(emptied: true, held: true)
+LOG read walk f units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=506
+LOG read walk b1 units=4019 lf=28 h=8449b422 reason=tooLong steps=28 ms=1362
+LOG read done outcome=refused reason=b1 units=0 lf=0 h=811c9dc5 ms=1868
+LOG read restore units=4019 known=1
+PASS x14k 1.9s refused back=4019 pos=14046/14046
+LOG read walk f units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=508
+LOG read walk b1 units=462 lf=4 h=6cc013df reason=done steps=5 ms=994
+LOG read walk fm units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=508
+LOG read walk b2 units=462 lf=4 h=6cc013df reason=done steps=5 ms=994
+LOG read walk fe units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=507
+LOG read done outcome=accepted reason=- units=462 lf=4 h=6cc013df ms=3615
+PASS emojiNative 3.6s text 462 sel=false pos=462
+LOG read walk f units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=506
+LOG read walk b1 units=0 lf=0 h=811c9dc5 reason=badStep steps=1 ms=40
+LOG read done outcome=refused reason=b1 units=0 lf=0 h=811c9dc5 ms=547
+LOG read restore units=157 known=1
+PASS emojiWeb 0.5s refused back=157 pos=462/462
+LOG read walk f units=815 lf=6 h=3c396fc9 reason=done steps=20 ms=1407
+LOG read walk b1 units=1515 lf=12 h=9cc9102c reason=done steps=10 ms=1278
+LOG read walk fm units=0 lf=0 h=811c9dc5 reason=cancelled steps=0 ms=0
+LOG read done outcome=cancelled reason=cancelled units=0 lf=0 h=811c9dc5 ms=2746
+LOG read restore units=815 known=1
+PASS cancelMid 2.7s cancelled back=-815 pos=700/700
+LOG read walk f units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=507
+LOG read walk b1 units=1515 lf=12 h=9cc9102c reason=done steps=10 ms=1280
+LOG read walk fm units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=508
+LOG read walk b2 units=1515 lf=12 h=9cc9102c reason=done steps=10 ms=1258
+LOG read walk fe units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=508
+LOG read done outcome=accepted reason=- units=1515 lf=12 h=9cc9102c ms=4165
+PASS blanks1500 4.2s text 1515 sel=false pos=1515
+LOG read walk f units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=508
+LOG read walk b1 units=0 lf=0 h=811c9dc5 reason=done steps=1 ms=813
+LOG read done outcome=empty reason=empty units=0 lf=0 h=811c9dc5 ms=1322
+LOG read restore units=0 known=1
+PASS empty 1.3s empty back=0 pos=0/0
+LOG replace deleted=0 inserted=0 sentms=0 emptyms=5003 empty=0 heldms=5003 held=0
+LOG replace deleted=350 inserted=6 sentms=0 emptyms=5050 empty=0 heldms=10091 held=0
+PASS leftover (emptied: false, held: false)

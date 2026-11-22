@@ -340,7 +340,11 @@ final class KeyboardViewController: KeyboardInputViewController {
             switch outcome {
             case .text(let text, let isSelection):
                 field = (text, isSelection)
-            case .empty, .cancelled:
+            case .cancelled:
+                // Only a cancel ends a read this way, and the guard above caught it; never read the clipboard here.
+                putCursorBack()
+                return
+            case .empty:
                 // Nothing to send: put the cursor back at once, no Cancel will.
                 putCursorBack()
                 mode.strip = nil
@@ -580,12 +584,14 @@ final class KeyboardViewController: KeyboardInputViewController {
             let done = await FieldText.replace(original, with: result, textDocumentProxy)
             replacing = false
             watch.forget()
-            if done.emptied {
+            if done.emptied, done.held {
                 // Undo puts back exactly the text that was read.
                 lastInsert = (result, original)
                 mode.canUndo = true
+            } else {
+                // The old text may still be there: Undo would bring it back twice.
+                mode.panel = .notice(Self.replaceUnsureText)
             }
-            if !done.emptied || !done.held { mode.panel = .notice(Self.replaceUnsureText) }
             refreshField()
         }
     }
@@ -635,11 +641,24 @@ final class KeyboardViewController: KeyboardInputViewController {
             refreshField()  // the bar stops offering Undo
             return
         }
-        for _ in l.inserted { textDocumentProxy.deleteBackward() }
-        textDocumentProxy.insertText(l.original)
-        watch.forget()
         endUndo()
-        refreshField()
+        guard !l.original.isEmpty else {
+            // Read's Insert: the reply goes, the text around it stays.
+            for _ in l.inserted { textDocumentProxy.deleteBackward() }
+            watch.forget()
+            refreshField()
+            return
+        }
+        // K1b: Undo of a Replace is a Replace the other way round, with the keys waiting and the same checks.
+        replacing = true
+        Task { [weak self] in
+            guard let self else { return }
+            let done = await FieldText.replace(l.inserted, with: l.original, textDocumentProxy)
+            replacing = false
+            watch.forget()
+            if !done.emptied || !done.held { mode.panel = .notice(Self.replaceUnsureText) }
+            refreshField()
+        }
     }
 
     /// The strip's xmark, the card's Cancel or Done, and every other panel's close.
@@ -669,9 +688,10 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// Back to where the user had the cursor, while the read's record knows where that is and the field is unchanged.
     private func putCursorBack() {
         let back = cursorReturn.back(before: textDocumentProxy.documentContextBeforeInput ?? "")
+        let known = cursorReturn.isKnown
         cursorReturn.clear()
+        FieldText.restore(back, known: known, textDocumentProxy)
         guard back != 0 else { return }
-        FieldText.restore(back, textDocumentProxy)
         watch.forget()
     }
 

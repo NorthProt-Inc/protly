@@ -12,6 +12,9 @@ public struct CursorReturn: Sendable, Equatable {
 
     public init() {}
 
+    /// The record still knows where the user had the cursor.
+    public var isKnown: Bool { offset != nil }
+
     /// A step is on its way: wait for it to settle before moving back.
     public var isMoving: Bool { inFlight }
 

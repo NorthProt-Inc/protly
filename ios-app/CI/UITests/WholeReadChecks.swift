@@ -293,15 +293,12 @@ extension PhoneRun {
             return r
         }
         let want = s.selectAll ? "0,\(s.units)" : "\(s.cursor),0"
+        // Every host's probe must show the case's caret or selection, so a no-op set-up cannot pass as `win`.
         let caretBefore = wholeCaret(host, web)
-        if host == "swiftui" {
-            r.add("caret=unprobed")
-        } else {
-            r.add("caret=\(caretBefore ?? "unreadable")")
-            guard caretBefore == want else {
-                r.unreadable = "the caret is \(caretBefore ?? "unreadable"), want \(want)"
-                return r
-            }
+        r.add("caret=\(caretBefore ?? "unreadable")")
+        guard caretBefore == want else {
+            r.unreadable = "the caret is \(caretBefore ?? "unreadable"), want \(want)"
+            return r
         }
 
         d.mark(mark)
@@ -330,11 +327,12 @@ extension PhoneRun {
             closeCall(v)
             let left = wholeShape(host, web)
             r.check(left == before, "left=\(left?.text ?? "unreadable")")
-            if host == "uikit" {
+            if host == "uikit" || web != nil {
+                // The cursor goes back where it was (the UITextView `sel` probe, the page's posted caret).
                 let c = wholeCaret(host, web)
-                r.check(c == caretBefore, "caret-left=\(c ?? "unreadable")")
-            } else if web != nil {
-                r.add("caret-left=\(wholeCaret(host, web) ?? "none")")
+                r.check(c == caretBefore, "caret-left=\(c ?? "unreadable") want \(caretBefore ?? "unreadable")")
+            } else {
+                r.add("caret-left=\(wholeCaret(host, web) ?? "unreadable")")
             }
             return r
         }
@@ -357,10 +355,13 @@ extension PhoneRun {
         }
         r.add("read=\(parsed.ms)")
         r.check(parsed.shape == before, "reply=\(parsed.shape.text)")
-        if host != "swiftui" {
-            // An accepted read leaves the cursor at the end of the field.
-            let c = wholeCaret(host, web)
-            r.check(c == "\(s.units),0", "caret-read=\(c ?? "unreadable")")
+        // An accepted read leaves the cursor at the end of the field (recorded only on the SwiftUI field, whose
+        // probe follows the text system's selection changes as SwiftUI reports them).
+        let caretRead = wholeCaret(host, web)
+        if host == "swiftui" {
+            r.add("caret-read=\(caretRead ?? "unreadable")")
+        } else {
+            r.check(caretRead == "\(s.units),0", "caret-read=\(caretRead ?? "unreadable")")
         }
         guard let replace = v.button("Replace", in: v.card), replace.enabled else {
             r.check(false, "replace=none buttons=\(q(v.buttons(v.card)))")
@@ -455,10 +456,11 @@ extension PhoneRun {
         return field().map { WholeChecks.Shape(Array($0.utf16)) }
     }
 
-    /// `location,length` of the selection: the UITextView's `sel` probe or the page's caret; nil on the SwiftUI field.
+    /// `location,length` of the selection: the `sel` probe (the UITextView's, or HostView's for the SwiftUI field's
+    /// bound selection; empty there before iOS 18) or the page's caret.
     private func wholeCaret(_ host: String, _ web: ReadWeb?) -> String? {
         if let web { return web.caret(host) }
-        return host == "uikit" ? d.probeValue("sel") : nil
+        return d.probeValue("sel")
     }
 
     /// Seconds from `since` until the field equals `exact` (native, UTF-16 units) or has `shape` (web, or no exact
