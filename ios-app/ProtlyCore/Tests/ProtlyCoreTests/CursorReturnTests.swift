@@ -1,85 +1,87 @@
 import XCTest
 @testable import ProtlyCore
 
-/// keyboard-ui 003 (P6): Cancel puts the cursor back where it was before the field read moved it.
+/// keyboard-ui 003 (P6), K1b: Cancel puts the cursor back where it was before the whole-field read moved it. The read
+/// walks forward and back, so the record is the cursor's offset from where the user had it, while it is known.
 final class CursorReturnTests: XCTestCase {
-    /// One read from a cursor whose before-context is `before`, over `chunks`, each shown by the host.
-    private func read(_ c: inout CursorReturn, before: String, _ chunks: [String]) {
-        c.begin(before: before)
-        var now = before
-        for chunk in chunks {
-            c.sending(chunk)
-            now += chunk
-            c.applied(before: now)
-        }
+    private func step(_ c: inout CursorReturn, _ moved: Int?, before: String) {
+        c.sending()
+        c.landed(moved: moved, before: before)
     }
 
-    func testAFinishedReadGoesBackOverWhatItMovedOver() {
+    func testTheOffsetSumsTheSettledSteps() {
         var c = CursorReturn()
-        read(&c, before: "hello", [" world", "\nagain"])
-        XCTAssertEqual(c.back(before: "hello world\nagain"), " world\nagain".utf16.count)
-        XCTAssertEqual(c.back(before: "hello world\nagain😀"), 0, "the field changed: stay")
+        c.begin()
+        step(&c, 40, before: "a")
+        step(&c, 25, before: "b")
+        step(&c, -60, before: "c")
+        XCTAssertEqual(c.back(before: "c"), -5)
     }
 
-    /// A step on its way is not counted until it settles: the keyboard waits for it (isMoving) before moving back.
-    func testAStepOnItsWayCountsOnlyOnceShown() {
+    func testAStepOnItsWayCountsOnlyOnceSettled() {
         var c = CursorReturn()
-        c.begin(before: "hello")
-        c.sending(" world")
+        c.begin()
+        step(&c, 10, before: "x")
+        c.sending()
         XCTAssertTrue(c.isMoving)
-        XCTAssertEqual(c.back(before: "hello"), 0)
-        c.applied(before: "hello world")
+        c.landed(moved: 0, before: "x")
         XCTAssertFalse(c.isMoving)
-        XCTAssertEqual(c.back(before: "hello world"), 6)
+        XCTAssertEqual(c.back(before: "x"), -10)
     }
 
-    /// A step the host never showed (the read gave up) is not counted: the cursor never went there.
-    func testAStepTheHostNeverShowedDoesNotCount() {
+    /// A step whose move cannot be named (a bad step, a phantom): the cursor stays where it is on Cancel.
+    func testAnUnknownMoveStopsTheReturn() {
         var c = CursorReturn()
-        c.begin(before: "ok")
-        c.sending("ok")
-        c.notApplied()
-        XCTAssertFalse(c.isMoving)
-        XCTAssertEqual(c.back(before: "ok"), 0)
+        c.begin()
+        step(&c, 10, before: "x")
+        step(&c, nil, before: "y")
+        step(&c, 5, before: "z")
+        XCTAssertEqual(c.back(before: "z"), 0)
     }
 
-    /// Retry after an error: the first read left the cursor at the end, the second moves nothing.
-    func testARetryThatMovesNothingKeepsTheFirstOffset() {
+    /// An accepted read ends at the field's end, which the walks confirmed: the cursor is then the first forward walk's
+    /// length past where the user had it, whatever happened in between (a phantom at the start included).
+    func testAConfirmedEndMakesThePositionKnownAgain() {
         var c = CursorReturn()
-        read(&c, before: "hello", [" world"])
-        read(&c, before: "hello world", [])
-        XCTAssertEqual(c.back(before: "hello world"), 6)
+        c.begin()
+        step(&c, 30, before: "end")
+        step(&c, nil, before: "")
+        c.confirmEnd(fromOrigin: 30, before: "end")
+        XCTAssertEqual(c.back(before: "end"), -30)
     }
 
-    /// Retry from where a cut-short read stopped: the second read continues the record.
-    func testARetryFromWhereTheFirstReadStoppedAddsToIt() {
+    /// The field changed after the read: typed at the end, or the window no longer agrees with where the read left
+    /// the cursor. A window that only grew or shrank in front still agrees.
+    func testTheReturnNeedsTheSameBeforeContext() {
         var c = CursorReturn()
-        read(&c, before: "a", ["b"])
-        read(&c, before: "ab", ["c"])
-        XCTAssertEqual(c.back(before: "abc"), 2)
-    }
-
-    /// Retry after the user put the cursor back: the new read's offset replaces the first, never adds to it.
-    func testARetryAfterTheCursorMovedReplacesTheFirstOffset() {
-        var c = CursorReturn()
-        read(&c, before: "hello", [" world"])
-        read(&c, before: "hello wor", ["ld"])
-        XCTAssertEqual(c.back(before: "hello world"), 2)
-    }
-
-    /// The cursor moved to another spot that also ends with the recorded text: a new record, not an added one.
-    func testARetryElsewhereAfterTheSameTextStartsANewRecord() {
-        var c = CursorReturn()
-        read(&c, before: "one", ["\n"])
-        read(&c, before: "one\ntwo\n", ["three"])
-        XCTAssertEqual(c.back(before: "one\ntwo\nthree"), 5)
-    }
-
-    func testClearAndNoMove() {
-        var c = CursorReturn()
+        c.begin()
+        step(&c, 12, before: "the end.")
+        XCTAssertEqual(c.back(before: "the end.x"), 0)
+        XCTAssertEqual(c.back(before: "end."), -12)
+        XCTAssertEqual(c.back(before: "and so the end."), -12)
+        XCTAssertEqual(c.back(before: ""), 0, "an empty context agrees with everything: only with another empty one")
+        step(&c, -20, before: "")
+        XCTAssertEqual(c.back(before: ""), 8, "stopped at the start")
         XCTAssertEqual(c.back(before: "x"), 0)
-        read(&c, before: "", ["abc"])
+    }
+
+    func testNothingMovedOrClearedMeansNothingToDo() {
+        var c = CursorReturn()
+        XCTAssertEqual(c.back(before: ""), 0)
+        c.begin()
+        step(&c, 0, before: "a")
+        XCTAssertEqual(c.back(before: "a"), 0)
+        step(&c, 3, before: "abc")
         c.clear()
+        XCTAssertEqual(c.back(before: "abc"), 0)
+        XCTAssertFalse(c.isMoving)
+    }
+
+    func testBeginStartsAFreshRecord() {
+        var c = CursorReturn()
+        c.begin()
+        step(&c, 7, before: "abc")
+        c.begin()
         XCTAssertEqual(c.back(before: "abc"), 0)
     }
 }
