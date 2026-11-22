@@ -1,0 +1,348 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test9_height
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK hb-launch-1 1795349198.588
+HEIGHT hb-launch 1 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-fresh-1 1795349219.048
+HEIGHT hb-hide-fresh 1 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-fresh-2 1795349229.209
+HEIGHT hb-hide-fresh 2 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-fresh-3 1795349237.311
+HEIGHT hb-hide-fresh 3 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-fresh-4 1795349249.597
+HEIGHT hb-hide-fresh 4 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-fresh-5 1795349262.030
+HEIGHT hb-hide-fresh 5 52.00@512.00/564.00/ph529.00+315.00
+globe tapped
+emoji after a globe tap
+picked Protly, English from the globe list: protly
+MARK hb-emoji-1 1795349274.273
+HEIGHT hb-emoji 1 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-launch-2 1795349285.047
+HEIGHT hb-launch 2 52.00@512.00/564.00/ph529.00+315.00
+picked English (US) from the globe list: english
+MARK hb-apple-1 1795349292.924
+HEIGHT hb-apple 1 52.00@509.00/561.00/english/ph509.00+335.00
+picked Protly, English from the globe list: protly
+MARK hb-globe-1 1795349300.716
+HEIGHT hb-globe 1 69.00@495.00/564.00/ph512.00+332.00
+tapped the field
+MARK hb-hide-globe-1 1795349308.756
+HEIGHT hb-hide-globe 1 69.00@495.00/564.00/ph512.00+332.00
+picked English (US) from the globe list: english
+MARK hb-apple-2 1795349315.255
+HEIGHT hb-apple 2 52.00@509.00/561.00/english/ph509.00+335.00
+picked Protly, English from the globe list: protly
+MARK hb-globe-2 1795349322.463
+HEIGHT hb-globe 2 69.00@495.00/564.00/ph512.00+332.00
+tapped the field
+MARK hb-hide-globe-2 1795349331.723
+HEIGHT hb-hide-globe 2 69.00@495.00/564.00/ph512.00+332.00
+picked English (US) from the globe list: english
+MARK hb-apple-3 1795349338.527
+HEIGHT hb-apple 3 52.00@509.00/561.00/english/ph509.00+335.00
+picked Protly, English from the globe list: protly
+MARK hb-globe-3 1795349345.442
+HEIGHT hb-globe 3 69.00@495.00/564.00/ph512.00+332.00
+tapped the field
+MARK hb-hide-globe-3 1795349353.740
+HEIGHT hb-hide-globe 3 69.00@495.00/564.00/ph512.00+332.00
+picked English (US) from the globe list: english
+MARK hb-apple-4 1795349360.100
+HEIGHT hb-apple 4 52.00@509.00/561.00/english/ph509.00+335.00
+picked Protly, English from the globe list: protly
+MARK hb-globe-4 1795349367.187
+HEIGHT hb-globe 4 69.00@495.00/564.00/ph512.00+332.00
+tapped the field
+MARK hb-hide-globe-4 1795349375.207
+HEIGHT hb-hide-globe 4 69.00@495.00/564.00/ph512.00+332.00
+picked English (US) from the globe list: english
+MARK hb-apple-5 1795349381.738
+HEIGHT hb-apple 5 52.00@509.00/561.00/english/ph509.00+335.00
+picked Protly, English from the globe list: protly
+MARK hb-globe-5 1795349388.770
+HEIGHT hb-globe 5 69.00@495.00/564.00/ph512.00+332.00
+tapped the field
+MARK hb-hide-globe-5 1795349397.034
+HEIGHT hb-hide-globe 5 69.00@495.00/564.00/ph512.00+332.00
+MARK hb-launch-3 1795349408.481
+HEIGHT hb-launch 3 52.00@512.00/564.00/ph529.00+315.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK hb-globe-6 1795349420.279
+HEIGHT hb-globe 6 69.00@495.00/564.00/ph512.00+332.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-2 1795349439.267
+HEIGHT hb-emoji 2 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-emoji-1 1795349448.015
+HEIGHT hb-hide-emoji 1 52.00@512.00/564.00/ph529.00+315.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-3 1795349466.273
+HEIGHT hb-emoji 3 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-emoji-2 1795349475.918
+HEIGHT hb-hide-emoji 2 52.00@512.00/564.00/ph529.00+315.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-4 1795349494.034
+HEIGHT hb-emoji 4 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-emoji-3 1795349501.853
+HEIGHT hb-hide-emoji 3 52.00@512.00/564.00/ph529.00+315.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-5 1795349521.979
+HEIGHT hb-emoji 5 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-emoji-4 1795349530.469
+HEIGHT hb-hide-emoji 4 52.00@512.00/564.00/ph529.00+315.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-6 1795349548.405
+HEIGHT hb-emoji 6 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-emoji-5 1795349556.245
+HEIGHT hb-hide-emoji 5 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-launch-4 1795349568.097
+HEIGHT hb-launch 4 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-1 1795349575.351
+HEIGHT hb-switch 1 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-1 1795349583.616
+HEIGHT hb-hide-switch 1 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-2 1795349590.744
+HEIGHT hb-switch 2 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-2 1795349598.716
+HEIGHT hb-hide-switch 2 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-3 1795349605.740
+HEIGHT hb-switch 3 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-3 1795349613.679
+HEIGHT hb-hide-switch 3 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-4 1795349621.352
+HEIGHT hb-switch 4 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-4 1795349633.277
+HEIGHT hb-hide-switch 4 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-5 1795349641.021
+HEIGHT hb-switch 5 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-5 1795349653.171
+HEIGHT hb-hide-switch 5 52.00@512.00/564.00/ph529.00+315.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-7 1795349671.768
+HEIGHT hb-emoji 7 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-emoji-6 1795349680.033
+HEIGHT hb-hide-emoji 6 52.00@512.00/564.00/ph529.00+315.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-8 1795349698.990
+HEIGHT hb-emoji 8 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-emoji-7 1795349707.181
+HEIGHT hb-hide-emoji 7 52.00@512.00/564.00/ph529.00+315.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-9 1795349724.787
+HEIGHT hb-emoji 9 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-emoji-8 1795349732.677
+HEIGHT hb-hide-emoji 8 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-launch-5 1795349742.480
+HEIGHT hb-launch 5 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-6 1795349749.639
+HEIGHT hb-switch 6 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-long-1 1795349769.099
+HEIGHT hb-hide-long 1 69.00@495.00/564.00/ph512.00+332.00
+MARK hb-switch-7 1795349776.328
+HEIGHT hb-switch 7 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-long-2 1795349795.282
+HEIGHT hb-hide-long 2 69.00@495.00/564.00/ph512.00+332.00
+MARK hb-switch-8 1795349802.081
+HEIGHT hb-switch 8 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-long-3 1795349821.674
+HEIGHT hb-hide-long 3 69.00@495.00/564.00/ph512.00+332.00
+MARK hb-switch-9 1795349828.877
+HEIGHT hb-switch 9 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-long-4 1795349848.218
+HEIGHT hb-hide-long 4 69.00@495.00/564.00/ph512.00+332.00
+MARK hb-switch-10 1795349855.212
+HEIGHT hb-switch 10 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-long-5 1795349874.651
+HEIGHT hb-hide-long 5 69.00@495.00/564.00/ph512.00+332.00
+MARK hb-launch-6 1795349885.342
+HEIGHT hb-launch 6 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-11 1795349892.344
+HEIGHT hb-switch 11 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-6 1795349900.237
+HEIGHT hb-hide-switch 6 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-switch-hidden-1 1795349922.616
+HEIGHT hb-switch-hidden 1 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-12 1795349929.291
+HEIGHT hb-switch 12 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-7 1795349936.822
+HEIGHT hb-hide-switch 7 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-switch-hidden-2 1795349961.304
+HEIGHT hb-switch-hidden 2 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-13 1795349971.062
+HEIGHT hb-switch 13 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-8 1795349980.693
+HEIGHT hb-hide-switch 8 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-switch-hidden-3 1795350004.715
+HEIGHT hb-switch-hidden 3 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-14 1795350011.880
+HEIGHT hb-switch 14 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-9 1795350020.598
+HEIGHT hb-hide-switch 9 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-switch-hidden-4 1795350043.587
+HEIGHT hb-switch-hidden 4 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-15 1795350051.333
+HEIGHT hb-switch 15 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-hide-switch-10 1795350059.375
+HEIGHT hb-hide-switch 10 52.00@512.00/564.00/ph529.00+315.00
+tapped the field
+MARK hb-switch-hidden-5 1795350082.177
+HEIGHT hb-switch-hidden 5 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-launch-7 1795350092.438
+HEIGHT hb-launch 7 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-16 1795350099.626
+HEIGHT hb-switch 16 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-up-1 1795350110.650
+HEIGHT hb-kill-up 1 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-17 1795350117.492
+HEIGHT hb-switch 17 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-up-2 1795350129.161
+HEIGHT hb-kill-up 2 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-18 1795350136.116
+HEIGHT hb-switch 18 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-up-3 1795350146.917
+HEIGHT hb-kill-up 3 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-19 1795350153.484
+HEIGHT hb-switch 19 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-up-4 1795350163.838
+HEIGHT hb-kill-up 4 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-20 1795350170.485
+HEIGHT hb-switch 20 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-up-5 1795350180.662
+HEIGHT hb-kill-up 5 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-launch-8 1795350188.905
+HEIGHT hb-launch 8 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-21 1795350196.462
+HEIGHT hb-switch 21 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-hidden-1 1795350222.154
+HEIGHT hb-kill-hidden 1 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-22 1795350229.225
+HEIGHT hb-switch 22 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-hidden-2 1795350253.981
+HEIGHT hb-kill-hidden 2 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-23 1795350261.414
+HEIGHT hb-switch 23 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-hidden-3 1795350288.132
+HEIGHT hb-kill-hidden 3 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-24 1795350296.394
+HEIGHT hb-switch 24 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-hidden-4 1795350323.783
+HEIGHT hb-kill-hidden 4 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-25 1795350332.140
+HEIGHT hb-switch 25 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-kill-hidden-5 1795350359.413
+HEIGHT hb-kill-hidden 5 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-launch-9 1795350369.725
+HEIGHT hb-launch 9 52.00@512.00/564.00/ph529.00+315.00
+MARK hb-switch-26 1795350378.569
+HEIGHT hb-switch 26 52.00@512.00/564.00/ph529.00+315.00
+hb-card: center <unreadable> before English: bringing the keyboard back
+hb-card after switch: no call (unreadable: center=<unreadable> want "English")
+MARK hb-launch-10 1795350408.172
+HEIGHT hb-launch 10 52.00@512.00/564.00/ph529.00+315.00
+tapped the center slot
+MARK hb-card-1 1795350431.030
+HEIGHT hb-card 1 222.00@512.00/734.00/ph529.00+315.00
+MARK hb-cancel-1 1795350434.884
+HEIGHT hb-cancel 1 52.00@512.00/564.00/ph529.00+315.00
+tapped the center slot
+MARK hb-card-2 1795350458.258
+HEIGHT hb-card 2 222.00@512.00/734.00/ph529.00+315.00
+MARK hb-cancel-2 1795350462.385
+HEIGHT hb-cancel 2 52.00@512.00/564.00/ph529.00+315.00
+tapped the center slot
+MARK hb-card-3 1795350485.541
+HEIGHT hb-card 3 222.00@512.00/734.00/ph529.00+315.00
+MARK hb-cancel-3 1795350489.863
+HEIGHT hb-cancel 3 52.00@512.00/564.00/ph529.00+315.00
+tapped the center slot
+MARK hb-card-4 1795350513.721
+HEIGHT hb-card 4 222.00@512.00/734.00/ph529.00+315.00
+MARK hb-cancel-4 1795350517.685
+HEIGHT hb-cancel 4 52.00@512.00/564.00/ph529.00+315.00
+tapped the center slot
+MARK hb-card-5 1795350540.185
+HEIGHT hb-card 5 222.00@512.00/734.00/ph529.00+315.00
+MARK hb-cancel-5 1795350544.032
+HEIGHT hb-cancel 5 52.00@512.00/564.00/ph529.00+315.00
+CHECK hb-apple RECORD shots="52.00@509.00/561.00/english/ph509.00+335.00,52.00@509.00/561.00/english/ph509.00+335.00,52.00@509.00/561.00/english/ph509.00+335.00,52.00@509.00/561.00/english/ph509.00+335.00,52.00@509.00/561.00/english/ph509.00+335.00" band=52.00..52.00 apple=5/5 on English with a band spread=0.00 pt
+CHECK hb-launch PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-hide-fresh PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-globe FAIL shots="69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00" band=69.00..69.00 apple=52.00 wrong=1,2,3,4,5,6 (not as expected)
+CHECK hb-hide-globe FAIL shots="69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00" band=69.00..69.00 apple=52.00 wrong=1,2,3,4,5 (not as expected)
+CHECK hb-emoji PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-hide-emoji PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-switch PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-hide-switch PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-hide-long RECORD shots="69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00,69.00@495.00/564.00/ph512.00+332.00" band=69.00..69.00 apple=52.00
+CHECK hb-switch-hidden PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-kill-up PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-kill-hidden PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-card PASS shots="222.00@512.00/734.00/ph529.00+315.00,222.00@512.00/734.00/ph529.00+315.00,222.00@512.00/734.00/ph529.00+315.00,222.00@512.00/734.00/ph529.00+315.00,222.00@512.00/734.00/ph529.00+315.00" band=222.00..222.00 apple=52.00 wrong=0
+CHECK hb-cancel PASS shots="52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00,52.00@512.00/564.00/ph529.00+315.00" band=52.00..52.00 apple=52.00 wrong=0
