@@ -168,6 +168,8 @@ enum FieldText {
             guard fits(wait) else { return end(.failed("timeUp")) }
             // A Cancel during the wait above already put the cursor back (no step was on its way): never move it again.
             if Task.isCancelled { return end(.cancelled) }
+            // Checked again right before every move: the waits above can take 0.3 s (silent-failure review).
+            guard here() else { return end(.failed("focus")) }
             let k = back ? bw.plan(before: c.before, after: c.after) : fw.plan(before: c.before, after: c.after)
             steps += 1
             track.sending()
@@ -238,6 +240,7 @@ enum FieldText {
                 logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
                 if Task.isCancelled { return end(.cancelled) }
                 guard fits(WholeRead.moveWait) else { return end(.failed("timeUp")) }
+                guard here() else { return end(.failed("focus")) }
                 track.sending()
                 let u = await step(p, by: m, wait: WholeRead.moveWait)
                 let undone = back ? bw.undone(changed: u.changed, before: u.c.before, after: u.c.after)
@@ -403,17 +406,25 @@ enum FieldText {
                 track.landed(nil, ctx(p).b)
             } else {
                 let move = track.cursor.back(before: ctx(p).b)
+                func fits() -> Bool { WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait)) }
                 if move != 0 {
+                    guard fits() else { return finish(.refused, "collapse:timeUp") }
                     track.sending()
                     let s = await step(p, by: move, wait: WholeRead.moveWait)
                     track.landed(nil, s.c.b)
                 }
-                // A native window stops at a line feed: right after the one the collapse crossed it shows nothing (run
-                // 8be8a93-218). One unit back, at the selection's end, it shows the selection's line.
-                if ctx(p).before.isEmpty, !Task.isCancelled {
-                    track.sending()
-                    let s = await step(p, by: -1, wait: WholeRead.moveWait)
-                    track.landed(nil, s.c.b)
+                // A native window stops at a line feed: right after the one the collapse crossed (the walk to the end did
+                // not start with it) it shows nothing (run 8be8a93-218). One unit back, at the selection's end, it shows
+                // the selection's line. A blank that comes back within emptyWait was only on its way.
+                if first.first != 10 {
+                    let e0 = uptime()
+                    while uptime() - e0 < WholeRead.emptyWait, ctx(p).before.isEmpty { await pause() }
+                    if ctx(p).before.isEmpty, !Task.isCancelled {
+                        guard fits() else { return finish(.refused, "collapse:timeUp") }
+                        track.sending()
+                        let s = await step(p, by: -1, wait: WholeRead.moveWait)
+                        track.landed(nil, s.c.b)
+                    }
                 }
                 before = ctx(p).before
             }
@@ -565,7 +576,8 @@ enum FieldText {
             // An empty field in the contexts after the bound, quiet: the proxy may have stopped following the host (run
             // 8be8a93-218 etail: b=0 a=0 for 4.7 s while the field held the result). The check walk moves the cursor,
             // which refreshes the contexts, and decides; an empty field fails it as before.
-            let blank = c.b.isEmpty && c.a.isEmpty && !new.isEmpty
+            // Only in the field Replace wrote to: with no document from iOS, another empty field would open it (code review).
+            let blank = c.b.isEmpty && c.a.isEmpty && !new.isEmpty && FieldGuard.focus(before: doc0, now: document()) == .same
             if uptime() >= settle, uptime() - quietFrom >= WholeRead.quiet, shows(new, c) || blank {
                 shown = true
                 break
@@ -633,9 +645,11 @@ enum FieldText {
                 } else {
                     found = "ve"
                 }
-            case .done:
+            case .done(let read):
                 found = "vOther"
-                evidence = true
+                // Nothing read (a start probe on contexts that did not follow the host yet) is no evidence of other text:
+                // the second attempt may run (silent-failure review).
+                evidence = !read.isEmpty
             case .failed(let w):
                 found = "v" + w.prefix(1).uppercased() + w.dropFirst()
                 evidence = w == "tooLong"
