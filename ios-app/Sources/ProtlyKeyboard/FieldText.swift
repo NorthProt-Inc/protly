@@ -70,12 +70,8 @@ enum FieldText {
         proxy.adjustTextPosition(byCharacterOffset: -moved)
     }
 
-    /// Replace what `read` returned (cursor at the end, or the selection) with new text.
-    static func replace(_ old: String, isSelection: Bool, with new: String, _ proxy: UITextDocumentProxy) {
-        if isSelection {
-            proxy.insertText(new)  // typing over a selection replaces it
-            return
-        }
+    /// Replace what `read` returned (the cursor at the end) with new text.
+    static func replace(_ old: String, with new: String, _ proxy: UITextDocumentProxy) {
         for _ in old { proxy.deleteBackward() }  // one grapheme per call
         proxy.insertText(new)
     }

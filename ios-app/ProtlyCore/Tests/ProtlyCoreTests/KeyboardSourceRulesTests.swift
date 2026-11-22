@@ -485,9 +485,54 @@ final class KeyboardSourceRulesTests: XCTestCase {
         // Every Retry goes through retry(_:), which sends Read's own text again instead of reading the clipboard.
         XCTAssertEqual(matches(#"retry: \{ \[unowned host\] in host\.retry\(\$0\) \}"#, in: controller).count, 2)
         XCTAssertEqual(matches(#"retry: \{ \[unowned host\] in host\.act\("#, in: controller).count, 0)
-        // Read's Insert keeps what it typed over, so Undo can put a selection back.
-        let insert = body(of: "func insertResult()", in: cns).map { cns.substring(with: $0) } ?? ""
-        XCTAssertTrue(insert.contains("lastInsert = (result, selected, !selected.isEmpty)"), "Read's Insert drops the selection")
+    }
+
+    private func controllerSource() throws -> String {
+        guard let text = try sources().first(where: { $0.name == "KeyboardViewController.swift" })?.text else {
+            XCTFail("KeyboardViewController.swift not found")
+            return ""
+        }
+        return text
+    }
+
+    /// P1a cause 3 (track K1a): protly never types over a selection, because `selectedText` can hold only the start of
+    /// it. FieldGuard decides: a card opens with copyOnly applied, a finished card checks the field with it, insertResult
+    /// acts on its answer before the first write, and Undo is neither offered nor run with text selected.
+    func testProtlyNeverTypesOverASelection() throws {
+        let controller = try controllerSource()
+        let cns = controller as NSString
+        func fn(_ declaration: String) -> String { body(of: declaration, in: cns).map { cns.substring(with: $0) } ?? "" }
+        // insertResult binds the answer for the field as it is now: an ignored answer or `field: nil` would let it write.
+        let insert = fn("func insertResult()")
+        let check = matches(#"if let \w+ = FieldGuard\.copyOnly\([^)]*field: observed\(\)\)"#, in: insert).first
+        XCTAssertNotNil(check, "insertResult: if let ... = FieldGuard.copyOnly(..., field: observed())")
+        for write in [#"\binsertText\("#, #"\bFieldText\.replace\("#] {
+            let at = matches(write, in: insert).first
+            XCTAssertTrue(at != nil && check != nil && check!.location < at!.location,
+                          "insertResult asks FieldGuard.copyOnly before \(write)")
+        }
+        // The card opens with the rule, and checks the field once done, wherever in the controller that code lives.
+        XCTAssertFalse(matches(#"FieldGuard\.copyOnly\([^)]*field: nil\)"#, in: controller).isEmpty,
+                       "a card opens with the rule applied")
+        XCTAssertGreaterThanOrEqual(matches(#"FieldGuard\.copyOnly\([^)]*field: observed\(\)\)"#, in: controller).count, 2,
+                                    "a finished card checks the field with the rule, as insertResult does")
+        XCTAssertFalse(controller.contains("selectedText =="), "selectedText cannot be checked against the real selection")
+        // Undo: refused with text selected, and the bar does not offer it then.
+        let undo = fn("func undoInsert()")
+        XCTAssertFalse(matches(#"FieldGuard\.canUndo\([^)]*selected: "#, in: undo).isEmpty, "undoInsert passes the selection")
+        XCTAssertTrue(undo.contains("observed()"), "undoInsert reads the field as it is now")
+        XCTAssertFalse(matches(#"BarAction\.center\([^)]*canUndo: FieldGuard\.offersUndo\("#, in: controller).isEmpty,
+                       "the bar offers Undo through FieldGuard.offersUndo")
+    }
+
+    /// P1a cause 3 (track K1a): a selection is read cut short too, so the cut-short panel no longer sends the user to
+    /// Select all, and no other text does. Retry stays.
+    func testTheCutShortPanelDoesNotSendUsersToSelectAll() throws {
+        let controller = try controllerSource()
+        XCTAssertTrue(controller.contains(#".failed("Could not read the whole text.", retry: action)"#), "the cut-short panel")
+        for (name, text) in try sources() {
+            XCTAssertFalse(text.lowercased().contains("select all"), "\(name): sends the user to Select all")
+        }
     }
 
     /// Tower decision D-B: the keys wait during the field read, so the read runs on FieldReadBudget's clock (2 s in all,

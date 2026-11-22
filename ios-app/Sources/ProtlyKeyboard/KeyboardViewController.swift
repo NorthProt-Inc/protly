@@ -67,7 +67,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// What the field reads moved the cursor over, for Cancel (P6).
     private var cursorReturn = CursorReturn()
     /// Text protly inserted and what it replaced, for Undo.
-    private var lastInsert: (inserted: String, original: String, isSelection: Bool)?
+    private var lastInsert: (inserted: String, original: String)?
     /// LearnedWords.changes at the last save (Words.swift). Per controller: each one loads its own copy.
     var savedChanges = 0
 
@@ -316,10 +316,11 @@ final class KeyboardViewController: KeyboardInputViewController {
             if field.isSelection { cursorReturn.clear() }
             // The action comes from the text read here (the whole field or the selection), not from the bar's view of it.
             let action = ActionAPI.mode(forDraft: field.text)
-            // Text left after the cursor = only a prefix was read: Replace would glue the result to the rest.
+            // Text left after the cursor = only a prefix was read: Replace would glue the result to the rest. No advice
+            // to select: a selection read is cut too, and its card only copies (FieldGuard.copyOnly).
             if !field.isSelection, !(textDocumentProxy.documentContextAfterInput ?? "").isEmpty {
                 mode.strip = nil
-                mode.panel = .failed("Could not read the whole text. Select all, then tap again.", retry: action)
+                mode.panel = .failed("Could not read the whole text.", retry: action)
                 return
             }
             run(ActionCall(mode: action, text: field.text, original: field.text, isSelection: field.isSelection), call: call)
@@ -458,14 +459,18 @@ final class KeyboardViewController: KeyboardInputViewController {
         case .partial(let text):
             feed.partial = text
             if openCard != nil { return }
-            mode.panel = .card(fresh)
+            // A card read from a selection opens copy-only: it never writes.
+            var card = fresh
+            card.copyOnly = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: nil)
+            mode.panel = .card(card)
         case .done(let result):
             feed.partial = result.translation
             feed.back = result.backTranslation
             var card = openCard ?? fresh
             card.phase = .done
-            // P10: typed or moved during the call: the result stays, only Copy is offered.
-            card.copyOnly = card.action != .in && !fieldHolds(card.original, isSelection: card.isSelection)
+            // P10: typed or moved during the call, or text selected: the result stays, only Copy is offered.
+            card.copyOnly = FieldGuard.copyOnly(
+                card.action, original: card.original, isSelection: card.isSelection, field: observed())
             mode.strip = nil
             mode.panel = .card(card)
         case .failed(let error):
@@ -487,14 +492,6 @@ final class KeyboardViewController: KeyboardInputViewController {
         return nil
     }
 
-    /// The field still holds what the read returned (the selection, or the whole text with the cursor at its end).
-    private func fieldHolds(_ original: String, isSelection: Bool) -> Bool {
-        let p = textDocumentProxy
-        return isSelection
-            ? p.selectedText == original
-            : FieldGuard.canReplace(original, before: p.documentContextBeforeInput ?? "", after: p.documentContextAfterInput ?? "")
-    }
-
     /// Replace (Translate, Polish) and Insert (Read) on the card, and Save on the About me confirm panel: the panel's
     /// insert button is the only caller.
     func insertResult() {
@@ -507,22 +504,22 @@ final class KeyboardViewController: KeyboardInputViewController {
             return
         }
         guard var card = openCard, card.primary != nil, AboutMe.canSave(shownAt: card.shownAt, now: now) else { return }
+        // The user may have moved the cursor, edited or selected since: never delete the wrong text (P10), never type
+        // over a selection (P1a cause 3). A selection card never gets here (no primary), but the check covers it too.
+        if let why = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: observed()) {
+            card.copyOnly = why
+            mode.panel = .card(card)
+            return
+        }
         let result = feed.partial
         let p = textDocumentProxy
         if card.action == .in {
-            // Read: the reply goes in at the cursor, over the selection if there is one; Undo puts that back.
-            let selected = p.selectedText ?? ""
+            // Read: the reply goes in at the cursor (no selection: the check above).
             p.insertText(result)
-            lastInsert = (result, selected, !selected.isEmpty)
+            lastInsert = (result, "")
         } else {
-            // The user may have moved the cursor or edited since: never delete the wrong text (P10).
-            guard fieldHolds(card.original, isSelection: card.isSelection) else {
-                card.copyOnly = true
-                mode.panel = .card(card)
-                return
-            }
-            FieldText.replace(card.original, isSelection: card.isSelection, with: result, p)
-            lastInsert = (result, card.original, card.isSelection)
+            FieldText.replace(card.original, with: result, p)
+            lastInsert = (result, card.original)
         }
         cursorReturn.clear()
         watch.forget()
@@ -556,8 +553,9 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     func undoInsert() {
         guard let l = lastInsert else { return }
-        guard FieldGuard.canUndo(l.inserted, before: textDocumentProxy.documentContextBeforeInput ?? "") else {
-            endUndo()  // the cursor moved or the text changed since Insert
+        let field = observed()
+        guard FieldGuard.canUndo(l.inserted, before: field.before, selected: field.selected) else {
+            endUndo()  // the cursor moved, the text changed or text is selected since Insert
             refreshField()  // the bar stops offering Undo
             return
         }
@@ -624,8 +622,10 @@ final class KeyboardViewController: KeyboardInputViewController {
             && pb.changeCount != d.integer(forKey: Self.clipboardKey) && pb.hasStrings
         if mode.clipboardIsNew != isNew { mode.clipboardIsNew = isNew }
 
-        // @Published fires on every write; an unchanged write would rebuild the keyboard on each key.
-        let center = BarAction.center(text: text, canUndo: mode.canUndo, clipboardIsNew: isNew)
+        // @Published fires on every write; an unchanged write would rebuild the keyboard on each key. No Undo is offered
+        // while text is selected: the tap would refuse it.
+        let center = BarAction.center(
+            text: text, canUndo: FieldGuard.offersUndo(mode.canUndo, selected: p.selectedText ?? ""), clipboardIsNew: isNew)
         if mode.center != center { mode.center = center }
         let key = center ?? .read  // BarAction.protlyKey, without a second scan of the field
         if mode.protlyKey != key { mode.protlyKey = key }
