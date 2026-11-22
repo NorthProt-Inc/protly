@@ -1,0 +1,60 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5g_wholenative
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+picked Protly, English from the globe list: protly
+MARK wr-uikit-swin-t1 1795382191.252
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-swin-t2 1795382217.084
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-swin-t3 1795382276.459
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=3.2 reply=39/0/h84d73b78 caret-read=39,0 replace=2.73 kb=3.61 undo=2.66 kbundo=3.36} t2={real=39/0/h84d73b78 caret=39,0 s=2.9 reply=39/0/h84d73b78 caret-read=39,0 replace=2.09 kb=19.24 undo=6.61 kbundo=18.20} t3={real=39/0/h84d73b78 caret=39,0 s=3.3 reply=39/0/h84d73b78 caret-read=39,0 replace=2.70 kb=3.61 undo=3.24 kbundo=4.07}
+MARK wr-uikit-smid-t1 1795382304.215
+tapped protlyKey
+tapped protlyKey
+MARK wr-uikit-smid-t2 1795382351.869
+tapped protlyKey
+tapped protlyKey
+CHECK wr-uikit-smid PASS t1={real=39/0/h84d73b78 caret=26,0 s=3.0 reply=39/0/h84d73b78 caret-read=39,0 replace=4.12 kb=4.91 undo=2.65 kbundo=3.47} t2={real=39/0/h84d73b78 caret=26,0 s=3.0 reply=39/0/h84d73b78 caret-read=39,0 replace=5.32 kb=6.70 undo=12.32 kbundo=13.40}
+MARK wr-uikit-ssel-t1 1795382391.471
+tapped protlyKey
+MARK wr-uikit-ssel-t2 1795382432.349
+tapped protlyKey
+CHECK wr-uikit-ssel FAIL t1={real=39/0/h84d73b78 caret=0,39 s=5.0 reply=39/0/h84d73b78 caret-read=0,39 replace=none buttons="Cancel 68.7x44.0,Deep 56.7x44.0,Copy 56.0x44.0"} t1=caret-read=0,39 replace=none buttons="Cancel 68.7x44.0,Deep 56.7x44.0,Copy 56.0x44.0" (not as expected) t2={real=39/0/h84d73b78 caret=0,39 s=2.8 reply=39/0/h84d73b78 caret-read=0,39 replace=none buttons="Cancel 64.5x41.4,Deep 53.3x41.4,Copy 52.6x41.4"} t2=caret-read=0,39 replace=none buttons="Cancel 64.5x41.4,Deep 53.3x41.4,Copy 52.6x41.4" (not as expected)
+MARK wr-swiftui-swin-t1 1795382492.015
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-swin-t2 1795382529.925
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-swin-t3 1795382562.834
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=6.0 reply=39/0/h84d73b78 caret-read=39,0 replace=3.40 kb=5.08 undo=3.22 kbundo=4.25} t2={real=39/0/h84d73b78 caret=39,0 s=2.5 reply=39/0/h84d73b78 caret-read=39,0 replace=2.84 kb=4.03 undo=3.48 kbundo=4.29} t3={real=39/0/h84d73b78 caret=39,0 s=2.0 reply=39/0/h84d73b78 caret-read=39,0 replace=2.51 kb=3.27 undo=2.88 kbundo=3.55}
+MARK wr-swiftui-smid-t1 1795382585.078
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-smid-t2 1795382609.611
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-smid PASS t1={real=39/0/h84d73b78 caret=26,0 s=2.1 reply=39/0/h84d73b78 caret-read=39,0 replace=2.44 kb=3.14 undo=2.83 kbundo=3.64} t2={real=39/0/h84d73b78 caret=26,0 s=2.7 reply=39/0/h84d73b78 caret-read=39,0 replace=2.36 kb=3.28 undo=2.64 kbundo=3.52}
+MARK wr-swiftui-ssel-t1 1795382635.878
+tapped protlyKey
+tapped protlyKey
+MARK wr-swiftui-ssel-t2 1795382660.735
+tapped protlyKey
+tapped protlyKey
+CHECK wr-swiftui-ssel PASS t1={real=39/0/h84d73b78 caret=0,39 s=2.5 reply=39/0/h84d73b78 caret-read=0,39 replace=2.34 kb=3.37 undo=2.66 kbundo=3.28} t2={real=39/0/h84d73b78 caret=0,39 s=2.9 reply=39/0/h84d73b78 caret-read=0,39 replace=2.51 kb=3.50 undo=3.08 kbundo=4.17}
