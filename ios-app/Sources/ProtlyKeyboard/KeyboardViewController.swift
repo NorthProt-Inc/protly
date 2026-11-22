@@ -79,6 +79,10 @@ final class KeyboardViewController: KeyboardInputViewController {
     private var cursorReturn = CursorReturn()
     /// Text protly inserted and what it replaced, for Undo.
     private var lastInsert: (inserted: String, original: String)?
+    /// systemUptime when protly last wrote to the field (Insert, Replace, Undo): host callbacks for its own edits come
+    /// within a second; a later one is the user's (a paste, a tap), and Undo ends (code review: Undo checks only the
+    /// window at the field's end, so an edit further back would be deleted with the inserted text).
+    private var wroteAt: Double = 0
     /// LearnedWords.changes at the last save (Words.swift). Per controller: each one loads its own copy.
     var savedChanges = 0
 
@@ -569,6 +573,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         if card.action == .in {
             // Read: the reply goes in at the cursor (no selection: the check above).
             p.insertText(result)
+            wroteAt = now
             lastInsert = (result, "")
             mode.canUndo = true
             refreshField()
@@ -604,6 +609,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     private func endWriting() {
         replacing = false
         writeTask = nil
+        wroteAt = now
         if mode.strip?.writing == true { mode.strip = nil }
         watch.forget()
     }
@@ -673,6 +679,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         guard !l.original.isEmpty else {
             // Read's Insert: the reply goes, the text around it stays.
             for _ in l.inserted { textDocumentProxy.deleteBackward() }
+            wroteAt = now
             watch.forget()
             refreshField()
             return
@@ -725,6 +732,12 @@ final class KeyboardViewController: KeyboardInputViewController {
     private func endUndo() {
         lastInsert = nil
         if mode.canUndo { mode.canUndo = false }
+    }
+
+    /// A host callback more than 1 s after protly's own write: the user changed the field or the cursor (K1b).
+    private func endUndoIfTouched() {
+        guard lastInsert != nil, now - wroteAt > 1 else { return }
+        endUndo()
     }
 
     /// Which action the bar and the protly key offer for the field text around the cursor, and whether new text was
@@ -892,6 +905,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         FieldText.hostEvents += 1
         // K1b: Replace sends thousands of deletes, and the host reports each: the bar follows once it is done.
         guard !replacing else { return }
+        endUndoIfTouched()
         noteTouched(byHost: true)
         noticeFieldMoved()
         refreshField()
@@ -901,6 +915,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         super.selectionDidChange(textInput)
         FieldText.hostEvents += 1
         guard !replacing else { return }
+        endUndoIfTouched()
         noteTouched(byHost: true)
         noticeFieldMoved()
         refreshField()

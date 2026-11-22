@@ -109,7 +109,8 @@ enum FieldText {
     /// budget stops the walk only between steps.
     private static func walk(_ p: UITextDocumentProxy, back: Bool, cap: Int, tag: String, start t0: TimeInterval,
                              track: Track, progress: () -> Void) async -> WalkEnd {
-        var bw = BackWalk(cap: cap)
+        // The second walk back steps elsewhere than the first (silent-failure review).
+        var bw = BackWalk(cap: cap, shifted: tag == "b2")
         // Only the walk from the user's cursor may start from contexts the host never refreshed (run 163 web `mid`).
         var fw = ForwardWalk(cap: cap, resyncFirst: tag == "f")
         var steps = 0, late = 0, firstMS = -1
@@ -124,9 +125,11 @@ enum FieldText {
             case .failed(let why): units = back ? bw.units : fw.units; reason = why
             case .cancelled: units = []; reason = "cancelled"
             }
-            let count = units.count, lf = WholeRead.lineFeeds(units), hash = WholeRead.fnv(units), took = ms(since: w0)
+            // No hash here: a walk's piece can be a few units long, and a 32-bit hash of so little can be reversed (code
+            // review). `read done` hashes the whole read.
+            let count = units.count, lf = WholeRead.lineFeeds(units), took = ms(since: w0)
             let retries = bw.retries, resyncs = fw.resyncs
-            log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) h=\(hash, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) first=\(firstMS, privacy: .public) retries=\(retries, privacy: .public) resyncs=\(resyncs, privacy: .public) late=\(late, privacy: .public)")
+            log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) first=\(firstMS, privacy: .public) retries=\(retries, privacy: .public) resyncs=\(resyncs, privacy: .public) late=\(late, privacy: .public)")
             return e
         }
         /// A step that fit nothing: the contexts' lengths and which of them fit, never their text.
@@ -288,8 +291,11 @@ enum FieldText {
         // B1: back to the start.
         let b1End = await walk(true, cap: WholeRead.cap, "b1")
         guard case .done(let back1) = b1End else { return await stopped(b1End, "b1") }
-        // An empty field (no text crossed either way): nothing to read twice.
-        if back1.isEmpty, first.isEmpty { return finish(.empty, "empty") }
+        // An empty field (no text crossed either way): nothing to read twice, unless the proxy says there is text (a
+        // host whose contexts and moves show nothing: refused, never read as empty; silent-failure review).
+        if back1.isEmpty, first.isEmpty {
+            return p.hasText ? await refuse("emptyHasText") : finish(.empty, "empty")
+        }
         // R1 and FM: forward again, confirm the end. B2: the second walk back may not read more than the first.
         if Task.isCancelled { return finish(.cancelled, "cancelled") }
         guard await returnMove(p, by: back1.count, end: end, start: t0, track: track) else {
@@ -398,18 +404,35 @@ enum FieldText {
     /// The field is exactly `new` with the cursor at its end: a walk back reads exactly `new` to the start, a move
     /// forward by its length, and a walk forward reaches the end over `new`'s last units (a long move can land a few
     /// units short: probe runs 154, 155). Called once the host has had its time and the contexts show `new`'s end.
+    /// Whatever the outcome, the cursor ends at the field's end (both reviews: the next key must not land mid-text).
     private static func holds(_ new: String, _ p: UITextDocumentProxy) async -> Bool {
         let units = Array(new.utf16)
         guard !units.isEmpty else { return !p.hasText }
+        var cursor = CursorReturn()
+        let track = Track { cursor = $0 }
         let t0 = uptime()
-        let none = Track { _ in }
-        guard case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: t0, track: none,
-                                                progress: {}),
-              read == units else { return false }
-        let s = await step(p, by: units.count, wait: WholeRead.moveWait)
-        guard s.changed, case .done(let rest) = await walk(p, back: false, cap: units.count, tag: "ve", start: t0,
-                                                            track: none, progress: {})
-        else { return false }
-        return Array(units.suffix(rest.count)) == rest
+        var ok = false
+        if case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: t0, track: track,
+                                             progress: {}),
+           read == units {
+            track.sending()
+            let s = await step(p, by: units.count, wait: WholeRead.moveWait)
+            track.landed(nil, s.c.b)  // may land short: the walk forward finds the end
+            if s.changed, case .done(let rest) = await walk(p, back: false, cap: units.count, tag: "ve", start: t0,
+                                                             track: track, progress: {}) {
+                ok = Array(units.suffix(rest.count)) == rest
+            }
+        }
+        if !ok { await backToEnd(p, cursor, cap: units.count + WholeRead.cap) }
+        return ok
+    }
+
+    /// After a check that did not prove the result: back to the field's end, by the record while it knows the way (one
+    /// move, sent even after a hide), then, unless the keyboard was hidden, by a walk forward.
+    private static func backToEnd(_ p: UITextDocumentProxy, _ cursor: CursorReturn, cap: Int) async {
+        let move = cursor.back(before: ctx(p).b)
+        if move != 0 { _ = await step(p, by: move, wait: WholeRead.moveWait) }
+        guard !Task.isCancelled else { return }
+        _ = await walk(p, back: false, cap: cap, tag: "vr", start: uptime(), track: Track { _ in }, progress: {})
     }
 }

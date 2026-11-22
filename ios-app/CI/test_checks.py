@@ -1328,7 +1328,14 @@ class WholeReadTests(unittest.TestCase):
         bare = "CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec read=15457} t2={replace=1.0 undo=1.0}\n"
         final = self.assemble_with_logs(bare, ui, kb)["wr-uikit-long"]
         self.assertEqual(final.status, "FAIL")
-        self.assertIn("t1:no replace= time", final.evidence)
+        self.assertIn("t1:replace=None heldms=", final.evidence)
+        # The test timed out waiting for Undo while the keyboard said it held: a FAIL with both sides, not a crash.
+        timeout = "CHECK wr-uikit-long FAIL t1={real=3247/15/h3ca63fec replace=9.00 undo=timeout} t2={replace=1.0 undo=1.0}\n"
+        kb2 = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", close), ("10", "20.000", self.HELD))
+        kb2 += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
+        final = self.assemble_with_logs(timeout, ui, kb2)["wr-uikit-long"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:undo=timeout heldms=3600: no time", final.evidence)
 
     def test_a_refusal_try_needs_its_reason(self):
         ui = self.marks(("wr-uikit-x14k-t1", 10, 0), ("wr-textarea-emoji-t1", 20, 0), ("wr-textarea-x14k-t1", 30, 0))

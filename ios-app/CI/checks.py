@@ -1343,9 +1343,14 @@ def resolve_whole_log(check, marks, kb_text):
             ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
             for name, ms_text in zip(("replace", "undo"), heldms):
                 seen = kv(ui.group(1), name) if ui else None
-                if seen is None or ms_text is None:
-                    problems.append(f"t{t}:no {name}= time to hold heldms against")
-                elif int(ms_text) + WHOLE_HOST_SLACK_MS < float(seen) * 1000:
+                try:
+                    host_ms, kb_ms = float(seen) * 1000, int(ms_text)
+                except (TypeError, ValueError):
+                    # No time on either side (`undo=timeout`: the field never held it): nothing to hold the keyboard's
+                    # claim against, which is a FAIL, not a crash (silent-failure review).
+                    problems.append(f"t{t}:{name}={seen} heldms={ms_text}: no time to hold heldms against")
+                    continue
+                if kb_ms + WHOLE_HOST_SLACK_MS < host_ms:
                     problems.append(f"t{t}:{name} checked at {ms_text}ms, the field held it at {seen}s")
     evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
     if problems:

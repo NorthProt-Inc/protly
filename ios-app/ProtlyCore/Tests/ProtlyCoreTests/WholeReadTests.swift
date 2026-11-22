@@ -126,13 +126,15 @@ final class WholeReadTests: XCTestCase {
     }
 
     /// Runs a walk to its end: the driver's loop without the waits.
-    private func walkBack(_ f: inout Field, cap: Int = WholeRead.cap) -> (step: WalkStep, units: [UInt16], net: Int?) {
-        var w = BackWalk(cap: cap)
+    private func walkBack(_ f: inout Field, cap: Int = WholeRead.cap, shifted: Bool = false,
+                          positions: UnsafeMutablePointer<[Int]>? = nil) -> (step: WalkStep, units: [UInt16], net: Int?) {
+        var w = BackWalk(cap: cap, shifted: shifted)
         var net: Int? = 0
         for _ in 0..<10_000 {
             let k = w.plan(before: f.before, after: f.after)
             let b0 = f.before, a0 = f.after
             let from = f.pos
+            positions?.pointee.append(from)
             let changed = f.move(-k)
             let changedContexts = changed && (f.before != b0 || f.after != a0)
             var s = w.landed(changed: changedContexts, before: f.before, after: f.after)
@@ -204,6 +206,36 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(bw.net, -t.count)
     }
 
+    /// The second walk back steps elsewhere (silent-failure review): a host slow at one place in the first walk (a
+    /// false start whose probe showed late) must not meet the second walk at the same place. Its jumps are planned
+    /// from the context without its first unit, which keeps them changing the context and off low surrogates.
+    func testTheSecondWalkBackStepsElsewhereAndReadsTheSame() {
+        let t = u(draft)
+        var f = Field(text: t, pos: t.count)
+        var p1: [Int] = [], p2: [Int] = []
+        let first = walkBack(&f, positions: &p1)
+        f.pos = t.count
+        let second = walkBack(&f, shifted: true, positions: &p2)
+        XCTAssertEqual(first.step, .done)
+        XCTAssertEqual(second.step, .done)
+        XCTAssertEqual(first.units, t)
+        XCTAssertEqual(second.units, t)
+        // Away from the start, where the last steps and the probe meet whatever the jumps; one jump may still meet
+        // (here the first: the first walk's jump was one short of the window already).
+        let shared = Set(p1.dropFirst().filter { $0 > 2 }).intersection(p2.dropFirst())
+        XCTAssertLessThanOrEqual(shared.count, 1, "the walks share \(shared.sorted()) of \(p1), \(p2)")
+        // Emoji and repeated text stay safe.
+        let e = u(String(repeating: "Send me the notes \u{1F44D}. ", count: 30))
+        var g = Field(text: e, pos: e.count)
+        XCTAssertEqual(walkBack(&g, shifted: true).units, e)
+        let r = u(String(repeating: "Thanks for the help ", count: 60))
+        var h = Field(text: r, pos: r.count)
+        XCTAssertEqual(walkBack(&h, shifted: true).units, r)
+        var w = BackWalk(cap: 100, shifted: true)
+        XCTAssertEqual(w.plan(before: u("abcdef")), 4)
+        XCTAssertEqual(w.plan(before: u("ab")), 1)
+    }
+
     func testRepeatedTextNeverStopsTheWalk() {
         let t = u(String(repeating: "Thanks for the help ", count: 60))  // period 20, the probe's stuck case
         var f = Field(text: t, pos: t.count)
@@ -240,6 +272,22 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(f.pos, t.count)
     }
 
+    /// Code review: one emoji over and over fits a move of k units and a move of k characters alike, so a web view
+    /// would read half the field and both walks would agree. A step whose characters cross more units than k and fit
+    /// either way is refused (`characters`), on any host.
+    func testRepeatedEmojiThatFitsBothReadingsIsRefused() {
+        let t = u(String(repeating: "\u{1F602}", count: 8))
+        for web in [true, false] {
+            var f = Field(text: t, pos: t.count, window: 30, byCharacters: web)
+            let bw = walkBack(&f)
+            XCTAssertEqual(bw.step, .failed("characters", moved: -2), "web \(web)")
+        }
+        XCTAssertEqual(WholeRead.charUnits(t, 2), 4)
+        XCTAssertEqual(WholeRead.charUnits(u("ab\u{1F602}"), 2), 3)
+        XCTAssertEqual(WholeRead.charUnits(u("ab"), 2), 2)
+        XCTAssertNil(WholeRead.charUnits(u("a"), 2))
+    }
+
     func testNativeTextWithEmojiIsReadExactly() {
         let t = u("오늘 고마워 👍 정말로.\nSend me the notes 🙂 after the call.\n끝 👍👍")
         var f = Field(text: t, pos: t.count, window: 25)
@@ -269,7 +317,8 @@ final class WholeReadTests: XCTestCase {
     func testANonProbeStepThatChangesNothingIsStuck() {
         var w = BackWalk(cap: 100)
         _ = w.plan(before: u("hello world"))
-        XCTAssertEqual(w.landed(changed: false, before: u("hello world"), after: []), .failed("stuck", moved: 0))
+        // Nothing showed: the move may still land later (silent-failure review), so it cannot be named.
+        XCTAssertEqual(w.landed(changed: false, before: u("hello world"), after: []), .failed("stuck", moved: nil))
     }
 
     func testTheStartIsAProbeThatChangesNothing() {
@@ -401,6 +450,9 @@ final class WholeReadTests: XCTestCase {
         XCTAssertEqual(w.units, u("a"))
         var x = ForwardWalk(cap: 100)
         XCTAssertEqual(x.plan(after: u("abcdef")), 5)
+        // Never inside an emoji: two units over a surrogate pair.
+        var y = ForwardWalk(cap: 100, resyncFirst: true)
+        XCTAssertEqual(y.plan(after: u("\u{1F602}abc")), 2)
     }
 
     /// The limits of the resync when the host already had the caret at the end: if the contexts stay stale, the step
@@ -411,8 +463,8 @@ final class WholeReadTests: XCTestCase {
         var f = Field(text: t, pos: t.count)
         let stale = (before: Array(t[0..<10]), after: Array(t[10...].prefix { $0 != 10 }))
         let fw = walkForward(&f, resync: true, stale: stale)
-        XCTAssertEqual(fw.step, .failed("stuck", moved: 0))
-        XCTAssertEqual(fw.net, 0)
+        XCTAssertEqual(fw.step, .failed("stuck", moved: nil))
+        XCTAssertNil(fw.net)
         var w = ForwardWalk(cap: 100, resyncFirst: true)
         XCTAssertEqual(w.plan(after: stale.after), 1)
         XCTAssertEqual(w.landed(changed: true, before: Array(t.suffix(20)), after: []), .moved(1))

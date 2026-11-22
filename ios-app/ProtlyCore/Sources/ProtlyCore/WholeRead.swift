@@ -50,7 +50,19 @@ public enum WholeRead {
         elapsed + wait <= total
     }
 
-    private static func isLow(_ x: UInt16) -> Bool { (0xDC00...0xDFFF).contains(x) }
+    static func isLow(_ x: UInt16) -> Bool { (0xDC00...0xDFFF).contains(x) }
+
+    /// The UTF-16 units the last `k` characters of `u` take, as a web view counts them (a surrogate pair is one); nil
+    /// when `u` holds fewer.
+    public static func charUnits(_ u: [UInt16], _ k: Int) -> Int? {
+        var i = u.count
+        for _ in 0..<k {
+            guard i > 0 else { return nil }
+            i -= 1
+            if i > 0, isLow(u[i]), (0xD800...0xDBFF).contains(u[i - 1]) { i -= 1 }
+        }
+        return u.count - i
+    }
 
     /// The step for a context `u` that ends (back) or starts (forward) at the cursor: the largest k < u.count that is
     /// not a period of `u` (so the move must change the context: the same context k units away would give `u` period
@@ -130,7 +142,7 @@ public enum WalkStep: Equatable, Sendable {
     /// The driver moves by this many units to undo it, then asks BackWalk.undone, then plans again.
     case retry(Int)
     /// The walk stopped short. `moved`: the move the walk asked for (the host applies the requested offset; only the
-    /// contexts were not as expected), nil when not even that is known.
+    /// contexts were not as expected), nil when not even that is known (a move that showed nothing may still land).
     case failed(String, moved: Int?)
 }
 
@@ -150,7 +162,16 @@ public struct BackWalk: Sendable {
     /// For the log after a step that fits nothing: did the before- and after-context fit the planned move?
     public private(set) var fit = (before: true, after: true)
 
-    public init(cap: Int) { self.cap = cap }
+    /// The second walk back plans its jumps from the context without its first unit, so it lands elsewhere than the
+    /// first: a host slow at one place (a false start whose probe showed late) does not meet both walks there
+    /// (silent-failure review). Such a jump still changes the context (a period of the context is one of its tail)
+    /// and lands on the same unit checks.
+    private let shifted: Bool
+
+    public init(cap: Int, shifted: Bool = false) {
+        self.cap = cap
+        self.shifted = shifted
+    }
 
     /// The units walked over, in field order.
     public var units: [UInt16] { pieces.reversed().flatMap { $0 } }
@@ -160,7 +181,13 @@ public struct BackWalk: Sendable {
     public mutating func plan(before: [UInt16], after: [UInt16] = []) -> Int {
         b0 = before
         a0 = after
-        k = before.isEmpty ? 1 : WholeRead.safeJump(before, back: true)
+        if before.isEmpty {
+            k = 1
+        } else if shifted, before.count > 2 {
+            k = WholeRead.safeJump(Array(before.dropFirst()), back: true)
+        } else {
+            k = WholeRead.safeJump(before, back: true)
+        }
         return k
     }
 
@@ -177,21 +204,21 @@ public struct BackWalk: Sendable {
             }
             return .phantom
         }
-        guard changed else { return .failed("stuck", moved: 0) }
+        guard changed else { return .failed("stuck", moved: nil) }
         func fits(_ c: Int) -> Bool {
             WholeRead.agree(b1, Array(b0.prefix(b0.count - c)), atEnd: true)
                 && WholeRead.agree(a1, Array(b0.suffix(c).prefix { $0 != 10 }), atEnd: false)
         }
         fit = (WholeRead.agree(b1, Array(b0.prefix(b0.count - k)), atEnd: true),
                WholeRead.agree(a1, Array(b0.suffix(k).prefix { $0 != 10 }), atEnd: false))
-        guard fits(k) else {
-            // A web view moves by characters (run 4a2110a-150): the contexts fit k plus the pairs crossed. Refused,
-            // never corrected (owner decision). Either way the requested move is what the host applied, and it
-            // undoes the same way.
-            let pairs = b0.suffix(k).filter { (0xDC00...0xDFFF).contains($0) }.count
-            if pairs > 0, k + pairs <= b0.count, fits(k + pairs) { return .failed("characters", moved: -k) }
-            return .failed("badStep", moved: -k)
-        }
+        // A web view moves by characters (run 4a2110a-150): the contexts fit the units k characters take. Refused,
+        // never corrected (owner decision), also when both readings fit (text that repeats, such as one emoji over and
+        // over: the walk cannot tell which host it is, code review). Either way the requested move is what the host
+        // applied, and it undoes the same way.
+        let chars = WholeRead.charUnits(b0, k)
+        let byChars = chars.map { $0 != k && fits($0) } ?? false
+        guard fits(k) else { return .failed(byChars ? "characters" : "badStep", moved: -k) }
+        if byChars { return .failed("characters", moved: -k) }
         pieces.append(Array(b0.suffix(k)))
         count += k
         if count > cap { return .failed("tooLong", moved: -k) }
@@ -232,7 +259,14 @@ public struct ForwardWalk: Sendable {
     /// way to the end, and the host would cut it short while the record counted all of it (design review).
     public mutating func plan(after: [UInt16]) -> Int {
         a0 = after
-        k = after.isEmpty || (resyncFirst && steps == 0) ? 1 : WholeRead.safeJump(after, back: false)
+        if after.isEmpty {
+            k = 1
+        } else if resyncFirst, steps == 0 {
+            // Never inside an emoji (code review): two units over a surrogate pair.
+            k = after.count > 1 && WholeRead.isLow(after[1]) ? 2 : 1
+        } else {
+            k = WholeRead.safeJump(after, back: false)
+        }
         return k
     }
 
@@ -246,7 +280,7 @@ public struct ForwardWalk: Sendable {
             guard b1.last == 10 else { return resync() ?? .failed("badStep", moved: 1) }
             units.append(10)
         } else {
-            guard changed else { return .failed("stuck", moved: 0) }
+            guard changed else { return .failed("stuck", moved: nil) }
             // The before-context window can be shorter than the piece: they agree where both have units.
             let piece = Array(a0.prefix(k))
             fit = (!b1.isEmpty && WholeRead.agree(b1, piece, atEnd: true), WholeRead.agree(a1, Array(a0.dropFirst(k)), atEnd: false))
