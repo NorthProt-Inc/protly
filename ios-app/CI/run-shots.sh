@@ -317,14 +317,15 @@ note "memory sampler pid $sampler, probe ${PROBE:-0}, network $network"
 
 # Layout scenarios (KeyboardShotsUITests), then the phone checks (PhoneChecksUITests). Each method has an XCTest
 # time allowance (PhoneChecksUITests.allowance, -test-timeouts-enabled), and the whole run a deadline
-# (MAIN_TEST_DEADLINE, 65 minutes: run 53, a slow runner, ran past 50 in test7_77) that leaves the 85-minute step
-# time to build, measure and publish.
+# (MAIN_TEST_DEADLINE, 75 minutes: run 53, a slow runner, ran past 50 in test7_77; K1b's whole-field read takes a few
+# seconds a call, and run 7cdefa4-180 reached 65 in test7_77) that leaves the 95-minute step time to build, measure and
+# publish.
 rm -rf "$work/Tests.xcresult"
 progress &
 progress_pid=$!
 looks_helper > /dev/null 2>&1 &
 looks_pid=$!
-main_deadline="${MAIN_TEST_DEADLINE:-3900}"
+main_deadline="${MAIN_TEST_DEADLINE:-4500}"
 with_deadline "$main_deadline" env TEST_RUNNER_SHOTS_DIR="$out" TEST_RUNNER_PROBE="${PROBE:-0}" \
   TEST_RUNNER_OCR_FALLBACK="${OCR_FALLBACK:-0}" TEST_RUNNER_NETWORK="$network" TEST_RUNNER_FILTERED="$filtered" \
   xcodebuild test-without-building \
@@ -378,7 +379,7 @@ for test in manifest:
 EOF
 fi
 # The keyboard's own height log (ProtlyHeight.swift), for what iOS did between the screenshots, and its read log
-# (FieldText.swift, K1b): the whole test step (at most 65 min of tests after the build), not its last 30 minutes (run
+# (FieldText.swift, K1b): the whole test step (at most 75 min of tests after the build), not its last 30 minutes (run
 # 28c1fef-164 lost the read lines of its first 45 minutes).
 xcrun simctl spawn "$udid" log show --last 100m --debug --info --style compact \
   --predicate 'subsystem == "com.northprot.protly"' > "$out/keyboard-log.txt" 2>&1

@@ -20,7 +20,8 @@ final class PhoneChecksUITests: XCTestCase {
         "test4_memory": 600, "test5_icon": 300, "test5a_web": 900, "test5b_menu": 420, "test5c_pad": 420,
         "test5d_card": 720, "test5e_bar": 600, "test5f_period": 1500, "test5g_wholenative": 1800,
         "test5h_wholeweb": 1800,
-        "test6_85net": 1080, "test7_77": 1080,
+        // K1b: every Translate and Polish reads the whole field first (3-5 s on a short draft, run 7cdefa4-180).
+        "test6_85net": 1380, "test7_77": 1380,
     ]
 
     override func setUpWithError() throws {
