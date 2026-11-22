@@ -302,6 +302,44 @@ test('focus moved into another contenteditable while working: left alone, with a
   assert.equal(s.doc.activeElement, other);
 });
 
+test('focus moved into a field in a closed shadow root while working: a contenteditable is left alone', async () => {
+  const s = setup(`${CE}<x-field id="x"></x-field>`);
+  const writes = editable(s);
+  const input = s.doc.createElement('input');
+  s.doc.getElementById('x').attachShadow({ mode: 'closed' }).appendChild(input);
+  s.box.textContent = '내일 봐';
+  s.box.focus();
+  s.inst.run({ source: 'command' });
+  await until(() => s.calls.length === 1);
+  input.focus();
+  assert.equal(s.doc.activeElement, s.doc.getElementById('x')); // the page sees only the host
+  s.pending[0].res(reply('see you tomorrow'));
+  await until(() => /Focus moved, so the translation was not written\./.test(s.toasts()));
+  assert.deepEqual(writes, []);
+  assert.equal(s.box.textContent, '내일 봐');
+});
+
+test('the language chip on a contenteditable: the re-run is written while focus sits on the chip', async () => {
+  const s = setup(CE);
+  const writes = editable(s);
+  s.box.textContent = '내일 봐';
+  s.box.focus();
+  s.inst.run({ source: 'command' });
+  await until(() => s.calls.length === 1);
+  s.pending[0].res(reply('see you tomorrow'));
+  await until(() => s.btn('Undo'));
+  const chip = s.root().querySelector('select.pl-chip');
+  chip.focus();
+  chip.value = 'ru';
+  chip.dispatchEvent(new s.dom.window.Event('change', { bubbles: true }));
+  await until(() => s.calls.length === 2);
+  assert.equal(s.calls[1].lang, 'ru');
+  s.pending[1].res(reply('до завтра'));
+  await until(() => writes.length === 2);
+  assert.deepEqual(writes, ['see you tomorrow', 'до завтра']);
+  assert.doesNotMatch(s.toasts(), /Focus moved/);
+});
+
 test('a box inside a shadow root: Alt+Z in it undoes', async () => {
   const s = setup('<div id="h"></div>');
   const sr = s.doc.getElementById('h').attachShadow({ mode: 'open' });

@@ -203,6 +203,9 @@ export function createInstance({ doc: top = document, fonts = null, ask = defaul
       const { el, blocked } = deepActive(top);
       if (blocked) return true;
       if (!el || el === cur.t.el || cur.t.el.contains(el)) return false;
+      // A focused custom element can hold a field in a closed shadow root deepActive cannot enter. The card's own
+      // host is a plain div, so its language chip still re-runs.
+      if (el !== cur.card.host && el.tagName.includes('-')) return true;
       return FIELD.test(el.tagName) || classify(el) !== null; // any input (password, number), readonly or not
     };
     const focusOk = () => cur.t.kind === 'text' || !typingElsewhere();
