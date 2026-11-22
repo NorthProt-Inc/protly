@@ -309,6 +309,49 @@ final class KeyboardSourceRulesTests: XCTestCase {
         XCTAssertTrue(controller.contains("hapticConfiguration = .disabled"), "haptics must stay off")
     }
 
+    /// K4E: the space a pick types stands in for the next space tap (PickSpace in ProtlyCore). That tap types nothing
+    /// but still runs KeyboardKit's flow, whose double-space clock then starts at it; any other key, a cursor move, a
+    /// hide, an action or a host change ends the pick. No vendor change: `lastSpaceTap` is not Protly's to set.
+    func testPickSpaceWiring() throws {
+        let all = try sources()
+        guard let handler = all.first(where: { $0.name == "ProtlyActionHandler.swift" })?.text,
+              let controller = all.first(where: { $0.name == "KeyboardViewController.swift" })?.text else {
+            return XCTFail("ProtlyActionHandler.swift or KeyboardViewController.swift not found")
+        }
+        let hns = handler as NSString, cns = controller as NSString
+        func code(_ declaration: String, _ ns: NSString) -> String {
+            body(of: declaration, in: ns).map { ns.substring(with: $0) } ?? ""
+        }
+        let action = code("override func action(for gesture:", hns)
+        XCTAssertTrue(action.contains("if takenByPick, gesture == .release, action == .space { return { _ in } }"),
+                      "only the taken space release types nothing")
+        XCTAssertTrue(action.contains("return super.action(for: gesture, on: action)"), "every other action is KeyboardKit's")
+        let handle = code("override func handle(_ gesture:", hns)
+        let take = (handle as NSString).range(of: "takenByPick = host.takePickSpace(typing: !keyboardContext.isSpaceDragGestureActive)")
+        let run = (handle as NSString).range(of: "super.handle(gesture, on: action, replaced: replaced)")
+        let reset = (handle as NSString).range(of: "takenByPick = false")
+        XCTAssertTrue(take.location != NSNotFound && run.location != NSNotFound && reset.location != NSNotFound
+                      && take.location < run.location && run.location < reset.location,
+                      "the space release is decided before KeyboardKit's flow and cleared after it")
+        XCTAssertTrue(handle.contains("} else if action != .space, gesture == .press {\n                host?.endPickSpace()"),
+                      "any other key ends the pick")
+        XCTAssertEqual(matches(#"takenByPick = true"#, in: handler).count, 0)
+        XCTAssertFalse(handler.contains("lastSpaceTap"), "KeyboardKit's double-space clock stays KeyboardKit's")
+
+        let pick = code("func pickSuggestion()", cns)
+        let typed = (pick as NSString).range(of: "insertText(\" \")")
+        let waits = (pick as NSString).range(of: "pickSpace.picked(")
+        XCTAssertTrue(typed.location != NSNotFound && waits.location != NSNotFound && typed.location < waits.location,
+                      "the pick waits only once its space is typed")
+        XCTAssertTrue(code("private func noticeFieldMoved()", cns).contains("pickSpace.noticed("),
+                      "a host change ends the pick")
+        for declaration in ["override func adjustTextPosition(by offset: Int)", "override func viewWillDisappear(",
+                            "private func beginCall()", "func endPickSpace()"] {
+            XCTAssertTrue(code(declaration, cns).contains("pickSpace.end()"), "\(declaration) does not end the pick")
+        }
+        XCTAssertTrue(code("func takePickSpace(typing: Bool) -> Bool", cns).contains("pickSpace.spaceReleased(types: typing,"))
+    }
+
     /// keyboard-ui 001: the bar and the protly key read their labels only through BarAction (ProtlyCore), so a label
     /// cannot drift from the request again. Longer strings (the Full Access notice, the panel's "Polishing") stay
     /// allowed; the container app has its own copy. The pill's motion has a Reduce Motion form.
