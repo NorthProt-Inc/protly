@@ -18,7 +18,7 @@ final class PhoneChecksUITests: XCTestCase {
     static let allowance: [String: TimeInterval] = [
         "test0_access": 300, "test0_probe": 480, "test1_68": 900, "test2_ws": 300, "test3_85offline": 900,
         "test4_memory": 600, "test5_icon": 300, "test5a_web": 900, "test5b_menu": 420, "test5c_pad": 420,
-        "test5d_card": 720, "test5e_bar": 600,
+        "test5d_card": 720, "test5e_bar": 600, "test5f_period": 1200,
         "test6_85net": 1080, "test7_77": 1080,
     ]
 
@@ -101,6 +101,18 @@ final class PhoneChecksUITests: XCTestCase {
     func test5e_bar() throws {
         try PhoneRun(test: self, name: "test5e_bar", arguments: ["-fills", PhoneRun.barFills.joined(separator: "|")])
             .checksBar()
+    }
+
+    /// fix/double-space-period (checksPeriod below): two space taps after a word end the sentence, also with a word
+    /// right after the cursor, on the UITextView screen and in the web composer. Offline. Only in a filtered run
+    /// (FILTERED=1, run-shots.sh): its minutes would push a full run past MAIN_TEST_DEADLINE, and checks.py marks its
+    /// IDs NOT-RUN in a full run.
+    @MainActor
+    func test5f_period() throws {
+        guard ProcessInfo.processInfo.environment["FILTERED"] == "1" else {
+            throw XCTSkip("runs only in a filtered run (deadline)")
+        }
+        try PhoneRun(test: self, name: "test5f_period", arguments: ["-screen", "uikit"]).checksPeriod()
     }
 
     /// After every offline group, so the requests and the about-me note change nothing they check.
@@ -814,5 +826,119 @@ final class PhoneRun {
             p(String(format: "  word %@ at x %.1f y %.1f w %.1f h %.1f", q(w.text), w.rect.minX, w.rect.minY,
                      w.rect.width, w.rect.height))
         }
+    }
+}
+
+// MARK: Double-space period (fix/double-space-period)
+
+/// docs/research/2026-11-17-keyboard-diagnosis.md, P4: two space taps after a word make ". ". Case D, a word right
+/// after the cursor, made two spaces and no period (KeyboardKit's endSentence returned early); Apple's keyboard gives
+/// `hello. world`. Ported from the probe on diag/p4-double-space (SpaceChecks.swift), without its logging.
+///
+/// `dsp-<field>-<kind>` on the UITextView screen (`uikit`) and in the web composer (`composer`, contenteditable):
+/// - `word`: `world`, the caret tapped in front of it (`sel0`: the caret then, the UITextView's `location,length` or
+///   the composer's offset), then `hello` and two spaces at the driver's pace. The text grows (`hello. hello. world`)
+///   with the caret still in front of `world`.
+/// - `en`, `ko`: `hello` / `안녕` and two spaces at the driver's pace, at the end of the text.
+/// - `pick2`: `teh`, the bar's right slot (`the` and its space), then two spaces.
+/// The timing cases of the probe (a coordinate double tap, a held space, one tap after a pick) are K4E's: this fix
+/// does not touch KeyboardKit's timing gate.
+/// Each line is PENDING with the field before the first try (`t0`) and after each try (`t1`...); checks.py
+/// (resolve_period) wants every try to add exactly its unit in front of the text after the cursor.
+extension PhoneRun {
+    /// Kinds and tries per field (checks.py PERIOD_MIN_TRIES: case D at least 6). `en` first: case D's `world` then
+    /// follows English words, as `hello` does.
+    static let periodCases: [(kind: String, tries: Int)] = [("en", 3), ("word", 6), ("ko", 3), ("pick2", 3)]
+
+    /// The same list as checks.py PERIOD_IDS.
+    static var periodIDs: [String] {
+        ["uikit", "composer"].flatMap { f in periodCases.map { "dsp-\(f)-\($0.kind)" } }
+    }
+
+    func checksPeriod() {
+        let ids = Self.periodIDs
+        if notReady(ids) { return }
+        // Row 1 here: on the web screen the form accessory bar would read as the keyboard's top.
+        guard let row1 = d.rowOne() else {
+            for id in ids { unreadableLine(id, "no row 1 on the UITextView screen") }
+            return
+        }
+
+        // The UITextView screen (PhoneRun launched it).
+        for c in Self.periodCases {
+            periodCase("dsp-uikit-\(c.kind)", kind: c.kind, tries: c.tries, read: { self.d.fieldText() }, setUp: {
+                self.d.clearField()
+                guard self.protlyUp() else { return nil }
+                guard c.kind == "word" else { return "" }
+                self.d.type("world")
+                self.d.pause(0.6)
+                guard let r = Self.rect(self.d.probeValue("first-word")) else {
+                    self.d.fail("no frame for the word")
+                    return ""
+                }
+                self.d.point(r.minX + 1, r.midY).tap()
+                self.d.pause(0.8)
+                return " sel0=\(q(self.d.probeValue("sel")))"
+            })
+        }
+
+        // The web composer; `-caret 1` makes the page post its state when the caret moves (sel0 below).
+        d.app.terminate()
+        d.launch(arguments: ["-screen", "web", "-caret", "1"])
+        d.fixedRow1 = row1
+        defer { d.fixedRow1 = nil }
+        let web = WebPage(d: d)
+        let loaded = web.waitLoaded()
+        for c in Self.periodCases {
+            let id = "dsp-composer-\(c.kind)"
+            guard loaded else {
+                unreadableLine(id, "the web page did not load (state \(q(web.raw())))")
+                continue
+            }
+            periodCase(id, kind: c.kind, tries: c.tries, read: { web.text("composer") }, setUp: {
+                web.clear()
+                guard web.focus("composer"), self.protlyUp() else { return nil }
+                guard c.kind == "word" else { return "" }
+                self.d.type("world")
+                self.d.pause(0.6)
+                guard let r = web.rect("composer") else {
+                    self.d.fail("no composer frame")
+                    return ""
+                }
+                // Left of the first letter, inside the padding (1 px border, 8 px padding): the caret goes before it.
+                self.d.point(r.minX + 5, r.midY).tap()
+                self.d.pause(0.8)
+                // The page's caret offset in the focused field (web-composer.html, posted on selectionchange with
+                // `-caret 1`).
+                let caret = (web.state()?["caret"] as? NSNumber).map { String($0.intValue) }
+                return " sel0=\(q(caret))"
+            })
+        }
+        if loaded { web.clear() }
+    }
+
+    /// One case: `setUp` (nil when Protly is not up on the field, else extra evidence), then `tries` tries; the field
+    /// is read before the first (t0) and after each.
+    private func periodCase(_ id: String, kind: String, tries: Int, read: () -> String?, setUp: () -> String?) {
+        guard let extra = setUp() else {
+            unreadableLine(id, "Protly not up on the field")
+            return
+        }
+        d.mark(id)
+        var ev = "kind=\(kind) tries=\(tries) t0=\(q(read()))"
+        var gaps: [String] = []
+        for i in 1...tries {
+            if kind == "pick2" {
+                d.type("teh")
+                d.tapSlot(.right, settle: 0.6)
+                d.type("  ", lastGap: d.keyPause)
+            } else {  // word, en, ko
+                d.type((kind == "ko" ? "안녕" : "hello") + "  ", lastGap: d.keyPause)
+            }
+            gaps.append(String(format: "%.2f", d.lastGap))
+            d.pause(0.5)
+            ev += " t\(i)=\(q(read()))"
+        }
+        pending(id, ev + " gaps=\(gaps.joined(separator: ","))" + extra)
     }
 }

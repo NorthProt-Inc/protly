@@ -32,7 +32,9 @@ checks the same thing, but the keyboard has not learned the words earlier method
 result with a full run before calling it fixed. The memory sampler starts at the first selected phone method. A new
 push with either tag cancels a run in progress on the branch, and the workflow sees a tag anywhere in the head
 commit message: a message that only describes the syntax starts a run too (b784f28 did: `bad-filter`, and it
-cancelled the full run in progress). Name the syntax in a commit message without its opening bracket.
+cancelled the full run in progress). Name the syntax in a commit message without its opening bracket. The push
+trigger has a paths filter (`ios-app/**` and the workflow file), so the tagged head commit must change a file there:
+an empty commit, or one that touches only other paths, starts no run at all.
 
 Runner image `macos-26` (GitHub-hosted, arm64): Xcode 26.6 by default and iOS 26.x simulator runtimes. The
 script takes the newest iOS 26 runtime and an iPhone 13 Pro (else the first 390 pt wide iPhone it can create).
@@ -66,8 +68,9 @@ script takes the newest iOS 26 runtime and an iPhone 13 Pro (else the first 390 
 After the layout scenarios, `UITests/PhoneChecksUITests.swift` runs the phone checklists in the order
 `test0_access`, `test0_probe` (only with `[probe]` in the commit message; Sprint 002's probe since then), `test1_68`,
 `test2_ws`, `test3_85offline`, `test4_memory`, `test5_icon`, the typing-fixes methods `test5a_web`, `test5b_menu` and
-`test5c_pad`, the keyboard-ui methods `test5d_card` and `test5e_bar` (below), then the network groups `test6_85net` and
-`test7_77` (below); learned words carry over between them.
+`test5c_pad`, the keyboard-ui methods `test5d_card` and `test5e_bar` (below), `test5f_period` (the double-space
+period, below; only in a filtered run), then the network groups `test6_85net` and `test7_77` (below); learned words
+carry over between them.
 
 - `UITests/Driver.swift`: the shared helpers. Text is typed by coordinate: Hangul as its Dubeolsik keys
   (ProtlyCore `KeyEncoder`, linked into the UI tests), capitals and shifted jamo with a shift tap, symbols on the
@@ -232,6 +235,32 @@ methods after `test5c_pad`; every line is `PENDING` with its readings and `check
   name; RECORD when the OCR shows the long name cut short or the text did not grow), `app-dark` and `app-light`
   (`ProtlyCIApp`'s guide screen: the hero line, and an ink or paper background; `c-app-<look>-1.png` and `-2.png` one
   screen down).
+
+## Double-space period checks (fix/double-space-period)
+
+Cause and cases: `docs/research/2026-11-17-keyboard-diagnosis.md`, P4 (on the diagnosis branch until it lands). Code:
+`checksPeriod` in `UITests/PhoneChecksUITests.swift`, ported from the probe on `diag/p4-double-space` without its
+logging. Every line is `PENDING` with the field before the first try (`t0`) and after each try (`t1`...);
+`resolve_period` in checks.py decides (unit-tested in `test_checks.py`, `PeriodTests`).
+
+- **Filtered runs only.** `test5f_period` takes about 8 minutes, and full runs already come close to
+  `MAIN_TEST_DEADLINE`. run-shots.sh passes `FILTERED=1` to the tests when a `[shots:...]` filter is active (as
+  `PROBE` reaches `test0_probe`); without it the method throws `XCTSkip`, and checks.py (`FILTERED_ONLY`) marks its IDs
+  `NOT-RUN` with `runs only in a filtered run (deadline)`, not FAIL. Run it with
+  `[shots:PhoneChecksUITests/test5f_period]` in the head commit message.
+- **IDs** `dsp-<field>-<kind>`, fields `uikit` (`-screen uikit`, the UITextView) and `composer` (`-screen web`, the
+  contenteditable), kinds:
+  - `word` (case D, 6 tries): `world`, the caret tapped in front of it, then `hello` and two spaces. Each try must add
+    `hello. ` in front of `world`, so the text grows to `hello. hello. world`. `sel0` is the caret before the first
+    try: the UITextView's `sel` probe, or the composer's offset, `caret` in `web-state`. The page posts its state on
+    `selectionchange` only when loaded with `?caret=1` (the host's `-caret 1`, which only this method passes), so
+    `test5a_web` and the other web checks see the page post exactly as before. A caret that is not at 0 makes the
+    line FAIL `unreadable` ("caret not at word start"): the set-up failed, not the fix.
+  - `en`, `ko` (3 tries): `hello` / `안녕` and two spaces at the end of the text; each try adds `hello. ` / `안녕. `.
+  - `pick2` (3 tries): `teh`, the bar's right slot, then two spaces; each try adds `the. `.
+  A field that did not start empty (or as `world`), a missing reading or fewer tries than these is FAIL `unreadable`.
+- The probe's timing cases (a coordinate double tap, a held space, one tap after a pick) belong to K4E: this fix does
+  not touch KeyboardKit's timing gate.
 
 ## Reading a run without GitHub access
 
