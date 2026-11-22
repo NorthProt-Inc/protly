@@ -1,0 +1,21 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard not found
+full access: off, Settings: Keyboard not found
+== PhoneChecksUITests.test5h_wholeweb
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+CHECK wr-textarea-win FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-textarea-mid FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-textarea-sel FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-textarea-long FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-textarea-x14k FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-textarea-emoji FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-lexical-win FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-lexical-mid FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-lexical-sel FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-lexical-long FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-lexical-x14k FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
+CHECK wr-lexical-emoji FAIL unreadable: the read page did not load (state "{\"focus\":\"\",\"last\":\"\",\"textarea\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null},\"lexical\":{\"len\":0,\"lf\":0,\"h\":\"811c9dc5\",\"caret\":null}}")
