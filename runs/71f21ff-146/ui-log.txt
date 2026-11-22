@@ -1,0 +1,93 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5j_walkuikit
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wk-uikit-p5-1 1795322133.570
+tapped protlyKey
+MARK wk-uikit-p5-2 1795322157.999
+tapped protlyKey
+CHECK walk-uikit-p5 RECORD t1={real=318/8/h6d75860b sel=318,0 carried="read 318 8 1.2.3.4.5 h6d75860b | big=0/b62/a0/1015ms f=0/0/h811c9dc5/end/517ms j=318/8/h6d75860b/start/r1/1128ms j1=318/8/h6d75860b/start/r1/1040ms fm=0/end fe=0/end pick=np2 agree=1 ms=4878" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=9.3 selafter=318,0 left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=318,0 carried="read 318 8 1.2.3.4.5 h6d75860b | big=0/b62/a0/1011ms f=0/0/h811c9dc5/end/520ms j=318/8/h6d75860b/start/r1/1107ms j1=318/8/h6d75860b/start/r1/1001ms fm=0/end fe=0/end pick=np2 agree=1 ms=4805" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=8.2 selafter=318,0 left=318/8/h6d75860b}
+MARK wk-uikit-l5-1 1795322181.060
+tapped protlyKey
+MARK wk-uikit-l5-2 1795322204.271
+tapped protlyKey
+CHECK walk-uikit-l5 RECORD t1={real=114/4/h377e638b sel=114,0 carried="read 114 4 1.2.3.4.5 h377e638b | big=0/b45/a0/1003ms f=0/0/h811c9dc5/end/520ms j=114/4/h377e638b/start/r1/767ms j1=114/4/h377e638b/start/r1/783ms fm=0/end fe=0/end pick=np2 agree=1 ms=4229" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.4 selafter=114,0 left=114/4/h377e638b} t2={real=114/4/h377e638b sel=114,0 carried="read 114 4 1.2.3.4.5 h377e638b | big=0/b45/a0/1011ms f=0/0/h811c9dc5/end/515ms j=114/4/h377e638b/start/r1/745ms j1=114/4/h377e638b/start/r1/796ms fm=0/end fe=0/end pick=np2 agree=1 ms=4251" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.7 selafter=114,0 left=114/4/h377e638b}
+MARK wk-uikit-xlong-1 1795322229.189
+tapped protlyKey
+MARK wk-uikit-xlong-2 1795322263.135
+tapped protlyKey
+CHECK walk-uikit-xlong RECORD t1={real=3230/14/h7328b445 sel=3230,0 carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | big=0/b59/a0/1012ms f=0/0/h811c9dc5/end/501ms j=3230/14/h7328b445/start/r1/6431ms j1=3230/14/h7328b445/start/r1/6028ms fm=0/end fe=0/end pick=np2 agree=1 ms=15137" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=18.4 selafter=3230,0 left=3230/14/h7328b445} t2={real=3230/14/h7328b445 sel=3230,0 carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | big=0/b59/a0/1006ms f=0/0/h811c9dc5/end/522ms j=3230/14/h7328b445/start/r1/6331ms j1=3230/14/h7328b445/start/r1/5631ms fm=0/end fe=0/end pick=np2 agree=1 ms=14637" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=18.5 selafter=3230,0 left=3230/14/h7328b445}
+MARK wk-uikit-p5mid-1 1795322299.749
+tapped protlyKey
+MARK wk-uikit-p5mid-2 1795322327.826
+tapped protlyKey
+CHECK walk-uikit-p5mid RECORD t1={real=318/8/h6d75860b sel=95,0 carried="read 318 8 1.2.3.4.5 h6d75860b | big=0/b52/a12/1016ms f=223/6/h1fd3e851/end/2336ms j=318/8/h6d75860b/start/r1/1016ms j1=318/8/h6d75860b/start/r1/983ms fm=0/end fe=0/end pick=np2 agree=1 ms=6523" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=9.5 selafter=318,0 left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=95,0 carried="read 318 8 1.2.3.4.5 h6d75860b | big=1/b64/a0/34ms f=223/6/h1fd3e851/end/2642ms j=318/8/h6d75860b/start/r1/1051ms j1=318/8/h6d75860b/start/r1/1001ms fm=0/end fe=0/end pick=np2 agree=1 ms=5939" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=11.1 selafter=318,0 left=318/8/h6d75860b}
+MARK wk-uikit-l5mid-1 1795322357.557
+tapped protlyKey
+CHECK walk-uikit-l5mid RECORD t1={real=114/4/h377e638b sel=34,0 carried="read 114 4 1.2.3.4.5 h377e638b | big=0/b34/a11/1021ms f=80/3/h75efcd4f/end/1146ms j=114/4/h377e638b/start/r1/725ms j1=114/4/h377e638b/start/r1/815ms fm=0/end fe=0/end pick=np2 agree=1 ms=4876" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=8.2 selafter=114,0 left=114/4/h377e638b}
+MARK wk-uikit-longmid-1 1795322388.495
+tapped protlyKey
+CHECK walk-uikit-longmid RECORD t1={real=1518/8/hc63d54cb sel=455,0 carried="read 1518 8 1.2.3.4.5 hc63d54cb | big=1/b48/a12/21ms f=1063/6/h61b27999/end/8114ms j=1518/8/hc63d54cb/start/r1/2942ms j1=1518/8/hc63d54cb/start/r1/3154ms fm=0/end fe=0/end pick=np2 agree=1 ms=15459" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=18.2 selafter=1518,0 left=1518/8/hc63d54cb}
+MARK wk-uikit-trail-1 1795322422.694
+tapped protlyKey
+CHECK walk-uikit-trail RECORD t1={real=71/5/hb9b91f66 sel=71,0 carried="read 71 5 1.2.3 hb9b91f66 | big=0/b47/a0/1015ms f=0/0/h811c9dc5/end/505ms j=71/5/hb9b91f66/start/r1/722ms j1=71/5/hb9b91f66/start/r1/774ms fm=0/end fe=0/end pick=np2 agree=1 ms=4160" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.5 selafter=71,0 left=71/5/hb9b91f66}
+MARK wk-uikit-selp5-1 1795322447.863
+tapped protlyKey
+MARK wk-uikit-selp5-2 1795322472.116
+tapped protlyKey
+MARK wk-uikit-selp5-3 1795322496.328
+tapped protlyKey
+CHECK walk-uikit-selp5 RECORD t1={real=318/8/h6d75860b sel=0,318 carried="read 318 8 1.2.3.4.5 h6d75860b | c1=1/b62/a0/s0 big=0/b62/a0/1017ms f=0/0/h811c9dc5/end/500ms j=318/8/h6d75860b/start/r1/957ms j1=318/8/h6d75860b/start/r1/929ms fm=0/end fe=0/end pick=np2 agree=1 ms=4680" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.5 selafter=318,0 left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=0,318 carried="read 318 8 1.2.3.4.5 h6d75860b | c1=1/b62/a0/s0 big=0/b62/a0/1003ms f=0/0/h811c9dc5/end/513ms j=318/8/h6d75860b/start/r1/1011ms j1=318/8/h6d75860b/start/r1/1014ms fm=0/end fe=0/end pick=np2 agree=1 ms=4922" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.4 selafter=318,0 left=318/8/h6d75860b} t3={real=318/8/h6d75860b sel=0,318 carried="read 318 8 1.2.3.4.5 h6d75860b | c1=1/b62/a0/s0 big=0/b62/a0/1011ms f=0/0/h811c9dc5/end/505ms j=318/8/h6d75860b/start/r1/1007ms j1=318/8/h6d75860b/start/r1/952ms fm=0/end fe=0/end pick=np2 agree=1 ms=4813" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.4 selafter=318,0 left=318/8/h6d75860b}
+MARK wk-uikit-selxlong-1 1795322522.645
+tapped protlyKey
+MARK wk-uikit-selxlong-2 1795322555.806
+tapped protlyKey
+MARK wk-uikit-selxlong-3 1795322589.833
+tapped protlyKey
+CHECK walk-uikit-selxlong RECORD t1={real=3230/14/h7328b445 sel=0,3230 carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | c1=1/b59/a0/s0 big=0/b59/a0/1018ms f=0/0/h811c9dc5/end/500ms j=3230/14/h7328b445/start/r1/5653ms j1=3230/14/h7328b445/start/r1/5529ms fm=0/end fe=0/end pick=np2 agree=1 ms=14011" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=16.7 selafter=3230,0 left=3230/14/h7328b445} t2={real=3230/14/h7328b445 sel=0,3230 carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | c1=1/b59/a0/s0 big=0/b59/a0/1003ms f=0/0/h811c9dc5/end/505ms j=3230/14/h7328b445/start/r1/5910ms j1=3230/14/h7328b445/start/r1/5410ms fm=0/end fe=0/end pick=np2 agree=1 ms=14146" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=17.2 selafter=3230,0 left=3230/14/h7328b445} t3={real=3230/14/h7328b445 sel=0,3230 carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | c1=1/b59/a0/s0 big=0/b59/a0/1018ms f=0/0/h811c9dc5/end/502ms j=3230/14/h7328b445/start/r1/5834ms j1=3230/14/h7328b445/start/r1/6004ms fm=0/end fe=0/end pick=np2 agree=1 ms=14727" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=17.4 selafter=3230,0 left=3230/14/h7328b445}
+== PhoneChecksUITests.test5k_walkswiftui
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wk-swiftui-p5-1 1795322646.958
+tapped protlyKey
+MARK wk-swiftui-p5-2 1795322666.828
+tapped protlyKey
+CHECK walk-swiftui-p5 RECORD t1={real=318/8/h6d75860b sel=- carried="read 318 8 1.2.3.4.5 h6d75860b | big=0/b62/a0/1012ms f=0/0/h811c9dc5/end/503ms j=318/8/h6d75860b/start/r1/983ms j1=318/8/h6d75860b/start/r1/1012ms fm=0/end fe=0/end pick=np2 agree=1 ms=4631" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.8 selafter=- left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=- carried="read 318 8 1.2.3.4.5 h6d75860b | big=0/b62/a0/1008ms f=0/0/h811c9dc5/end/516ms j=318/8/h6d75860b/start/r1/976ms j1=318/8/h6d75860b/start/r1/1038ms fm=0/end fe=0/end pick=np2 agree=1 ms=4703" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.4 selafter=- left=318/8/h6d75860b}
+MARK wk-swiftui-l5-1 1795322686.324
+tapped protlyKey
+MARK wk-swiftui-l5-2 1795322705.877
+tapped protlyKey
+CHECK walk-swiftui-l5 RECORD t1={real=114/4/h377e638b sel=- carried="read 114 4 1.2.3.4.5 h377e638b | big=0/b45/a0/1002ms f=0/0/h811c9dc5/end/513ms j=114/4/h377e638b/start/r1/839ms j1=114/4/h377e638b/start/r1/840ms fm=0/end fe=0/end pick=np2 agree=1 ms=4415" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.6 selafter=- left=114/4/h377e638b} t2={real=114/4/h377e638b sel=- carried="read 114 4 1.2.3.4.5 h377e638b | big=0/b45/a0/1013ms f=0/0/h811c9dc5/end/519ms j=114/4/h377e638b/start/r1/770ms j1=114/4/h377e638b/start/r1/839ms fm=0/end fe=0/end pick=np2 agree=1 ms=4318" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=7.5 selafter=- left=114/4/h377e638b}
+MARK wk-swiftui-xlong-1 1795322725.657
+tapped protlyKey
+MARK wk-swiftui-xlong-2 1795322756.398
+tapped protlyKey
+CHECK walk-swiftui-xlong RECORD t1={real=3230/14/h7328b445 sel=- carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | big=0/b59/a0/1016ms f=0/0/h811c9dc5/end/502ms j=3230/14/h7328b445/start/r1/6164ms j1=3230/14/h7328b445/start/r1/5691ms fm=0/end fe=0/end pick=np2 agree=1 ms=14553" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=18.9 selafter=- left=3230/14/h7328b445} t2={real=3230/14/h7328b445 sel=- carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | big=0/b59/a0/1002ms f=0/0/h811c9dc5/end/514ms j=3230/14/h7328b445/start/r1/6198ms j1=3230/14/h7328b445/start/r1/5307ms fm=0/end fe=0/end pick=np2 agree=1 ms=14194" whole=1 f=suf1 j=pre1/all1 j1=pre1/all1 s=19.3 selafter=- left=3230/14/h7328b445}
+== PhoneChecksUITests.test5l_walkweb
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wk-textarea-p5-1 1795322829.206
+tapped protlyKey
+MARK wk-textarea-p5-2 1795322859.093
+tapped protlyKey
+CHECK walk-textarea-p5 RECORD t1={real=318/8/h6d75860b sel=- carried="read 39 0 none heacc7147 | big=1/b37/a2/21ms f=2/0/h769ec51f/end/591ms j=39/0/heacc7147/start/r1/587ms j1=318/8/h6d75860b/start/r1/1155ms fm=256/end fe=0/end pick=none agree=0 ms=5769" whole=0 s=10.0 selafter=- left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=- carried="read 318 8 1.2.3.4.5 h6d75860b | big=0/b37/a2/1001ms f=258/8/hd917e46b/end/2578ms j=318/8/h6d75860b/start/r1/1100ms j1=318/8/h6d75860b/start/r1/1150ms fm=0/end fe=0/end pick=np2 agree=1 ms=6980" whole=1 s=10.9 selafter=- left=318/8/h6d75860b}
+MARK wk-textarea-xlong-1 1795322889.788
+tapped protlyKey
+CHECK walk-textarea-xlong RECORD t1={real=3230/14/h7328b445 sel=- carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | big=0/b37/a3/1003ms f=3170/14/h7c9f9565/end/22349ms j=3230/14/h7328b445/start/r1/6395ms j1=3230/14/h7328b445/start/r1/6521ms fm=0/end fe=0/end pick=np2 agree=1 ms=37694" whole=1 s=41.0 selafter=- left=3230/14/h7328b445}
+MARK wk-lexical-p5-1 1795322949.752
+tapped protlyKey
+MARK wk-lexical-p5-2 1795322981.364
+tapped protlyKey
+CHECK walk-lexical-p5 RECORD t1={real=318/8/h6d75860b sel=- carried="read 318 8 1.2.3.4.5 h6d75860b | big=0/b37/a2/1017ms f=258/8/hd917e46b/end/2471ms j=318/8/h6d75860b/start/rx/1418ms j1=318/8/h6d75860b/start/rx/1341ms fm=2/end fe=2/end pick=none agree=1 ms=7856" whole=1 s=12.2 selafter=- left=318/8/h6d75860b} t2={real=318/8/h6d75860b sel=- carried="read 318 8 1.2.3.4.5 h6d75860b | big=1/b37/a2/22ms f=258/8/hd917e46b/end/2549ms j=318/8/h6d75860b/start/rx/1314ms j1=357/10/hb1dd7230/start/rx/1548ms fm=2/end fe=0/end pick=none agree=0 ms=7858" whole=1 s=12.5 selafter=- left=318/8/h6d75860b}
+MARK wk-lexical-xlong-1 1795323014.946
+tapped protlyKey
+CHECK walk-lexical-xlong RECORD t1={real=3230/14/h7328b445 sel=- carried="read 3230 14 1.2.3.4.5.6.7.8 h7328b445 | big=1/b40/a0/32ms f=3170/14/h7c9f9565/end/23069ms j=3230/14/h7328b445/start/rx/7412ms j1=3230/14/h7328b445/start/rx/6749ms fm=2/end fe=2/end pick=none agree=1 ms=39049" whole=1 s=43.5 selafter=- left=3230/14/h7328b445}
