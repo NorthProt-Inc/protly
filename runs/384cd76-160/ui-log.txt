@@ -1,0 +1,198 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test9_height
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK hb-launch-1 1795336401.484
+HEIGHT hb-launch 1 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-fresh-1 1795336411.225
+HEIGHT hb-hide-fresh 1 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-fresh-2 1795336419.796
+HEIGHT hb-hide-fresh 2 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-fresh-3 1795336429.837
+HEIGHT hb-hide-fresh 3 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-fresh-4 1795336446.634
+HEIGHT hb-hide-fresh 4 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-fresh-5 1795336461.131
+HEIGHT hb-hide-fresh 5 52.00@512.00/564.00
+globe tapped
+emoji after a globe tap
+picked Protly, English from the globe list: protly
+MARK hb-emoji-1 1795336478.597
+HEIGHT hb-emoji 1 52.00@512.00/564.00
+MARK hb-launch-2 1795336490.752
+HEIGHT hb-launch 2 52.00@512.00/564.00
+picked English (US) from the globe list: english
+MARK hb-apple-1 1795336498.075
+HEIGHT hb-apple 1 52.00@509.00/561.00/english
+picked Protly, English from the globe list: protly
+MARK hb-globe-1 1795336506.473
+HEIGHT hb-globe 1 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-1 1795336516.985
+HEIGHT hb-hide-used 1 69.00@495.00/564.00
+picked English (US) from the globe list: english
+MARK hb-apple-2 1795336524.151
+HEIGHT hb-apple 2 52.00@509.00/561.00/english
+picked Protly, English from the globe list: protly
+MARK hb-globe-2 1795336532.196
+HEIGHT hb-globe 2 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-2 1795336540.911
+HEIGHT hb-hide-used 2 69.00@495.00/564.00
+picked English (US) from the globe list: english
+MARK hb-apple-3 1795336547.689
+HEIGHT hb-apple 3 52.00@509.00/561.00/english
+picked Protly, English from the globe list: protly
+MARK hb-globe-3 1795336556.144
+HEIGHT hb-globe 3 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-3 1795336565.797
+HEIGHT hb-hide-used 3 69.00@495.00/564.00
+picked English (US) from the globe list: english
+MARK hb-apple-4 1795336572.687
+HEIGHT hb-apple 4 52.00@509.00/561.00/english
+picked Protly, English from the globe list: protly
+MARK hb-globe-4 1795336580.347
+HEIGHT hb-globe 4 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-4 1795336589.407
+HEIGHT hb-hide-used 4 69.00@495.00/564.00
+picked English (US) from the globe list: english
+MARK hb-apple-5 1795336596.542
+HEIGHT hb-apple 5 52.00@509.00/561.00/english
+picked Protly, English from the globe list: protly
+MARK hb-globe-5 1795336604.130
+HEIGHT hb-globe 5 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-5 1795336617.206
+HEIGHT hb-hide-used 5 52.00@509.00/561.00/english/unreached
+MARK hb-launch-3 1795336630.064
+HEIGHT hb-launch 3 52.00@512.00/564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+MARK hb-globe-6 1795336644.339
+HEIGHT hb-globe 6 69.00@495.00/564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-2 1795336666.762
+HEIGHT hb-emoji 2 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-used-6 1795336675.692
+HEIGHT hb-hide-used 6 52.00@512.00/564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-3 1795336695.680
+HEIGHT hb-emoji 3 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-used-7 1795336706.127
+HEIGHT hb-hide-used 7 52.00@512.00/564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-4 1795336726.343
+HEIGHT hb-emoji 4 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-used-8 1795336736.914
+HEIGHT hb-hide-used 8 69.00@495.00/564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-5 1795336756.294
+HEIGHT hb-emoji 5 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-used-9 1795336765.041
+HEIGHT hb-hide-used 9 69.00@495.00/564.00
+globe tapped
+a globe tap gave english, not emoji
+picked Emoji from the globe list: emoji
+picked Protly, English from the globe list: protly
+MARK hb-emoji-6 1795336784.699
+HEIGHT hb-emoji 6 52.00@512.00/564.00
+tapped the field
+MARK hb-hide-used-10 1795336793.780
+HEIGHT hb-hide-used 10 69.00@495.00/564.00
+MARK hb-launch-4 1795336804.372
+HEIGHT hb-launch 4 52.00@512.00/564.00
+MARK hb-switch-1 1795336811.949
+HEIGHT hb-switch 1 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-11 1795336820.477
+HEIGHT hb-hide-used 11 69.00@495.00/564.00
+MARK hb-switch-2 1795336828.692
+HEIGHT hb-switch 2 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-12 1795336837.078
+HEIGHT hb-hide-used 12 69.00@495.00/564.00
+MARK hb-switch-3 1795336845.354
+HEIGHT hb-switch 3 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-13 1795336854.149
+HEIGHT hb-hide-used 13 69.00@495.00/564.00
+MARK hb-switch-4 1795336862.996
+HEIGHT hb-switch 4 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-14 1795336875.525
+HEIGHT hb-hide-used 14 69.00@495.00/564.00
+MARK hb-switch-5 1795336882.857
+HEIGHT hb-switch 5 69.00@495.00/564.00
+tapped the field
+MARK hb-hide-used-15 1795336895.239
+HEIGHT hb-hide-used 15 69.00@495.00/564.00
+MARK hb-launch-5 1795336903.989
+HEIGHT hb-launch 5 52.00@512.00/564.00
+picked English (US) from the globe list: english
+picked Protly, English from the globe list: protly
+tapped the center slot
+MARK hb-card-1 1795336936.691
+HEIGHT hb-card 1 none@495.00/none
+MARK hb-cancel-1 1795336940.680
+HEIGHT hb-cancel 1 69.00@495.00/564.00
+tapped the center slot
+MARK hb-card-2 1795336961.973
+HEIGHT hb-card 2 none@495.00/none
+MARK hb-cancel-2 1795336965.468
+HEIGHT hb-cancel 2 69.00@495.00/564.00
+tapped the center slot
+MARK hb-card-3 1795336987.048
+HEIGHT hb-card 3 none@495.00/none
+MARK hb-cancel-3 1795336990.830
+HEIGHT hb-cancel 3 69.00@495.00/564.00
+tapped the center slot
+MARK hb-card-4 1795337012.877
+HEIGHT hb-card 4 none@495.00/none
+MARK hb-cancel-4 1795337016.377
+HEIGHT hb-cancel 4 69.00@495.00/564.00
+tapped the center slot
+MARK hb-card-5 1795337037.078
+HEIGHT hb-card 5 none@495.00/none
+MARK hb-cancel-5 1795337040.692
+HEIGHT hb-cancel 5 69.00@495.00/564.00
+CHECK hb-apple RECORD shots="52.00@509.00/561.00/english,52.00@509.00/561.00/english,52.00@509.00/561.00/english,52.00@509.00/561.00/english,52.00@509.00/561.00/english" band=52.00..52.00 apple=5/5 on English with a band spread=0.00 pt
+CHECK hb-launch PASS shots="52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-hide-fresh PASS shots="52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-hide-used FAIL shots="69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,52.00@509.00/561.00/english/unreached,52.00@512.00/564.00,52.00@512.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00" band=52.00..69.00 apple=52.00 wrong=1,2,3,4,5,8,9,10,11,12,13,14,15 (not as expected)
+CHECK hb-globe FAIL shots="69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00" band=69.00..69.00 apple=52.00 wrong=1,2,3,4,5,6 (not as expected)
+CHECK hb-emoji PASS shots="52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00,52.00@512.00/564.00" band=52.00..52.00 apple=52.00 wrong=0
+CHECK hb-switch FAIL shots="69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00" band=69.00..69.00 apple=52.00 wrong=1,2,3,4,5 (not as expected)
+CHECK hb-card FAIL shots="none@495.00/none,none@495.00/none,none@495.00/none,none@495.00/none,none@495.00/none" apple=52.00 wrong=1,2,3,4,5 (not as expected)
+CHECK hb-cancel FAIL shots="69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00,69.00@495.00/564.00" band=69.00..69.00 apple=52.00 wrong=1,2,3,4,5 (not as expected)
