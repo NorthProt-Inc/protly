@@ -1348,6 +1348,12 @@ def resolve_whole_log(check, marks, kb_text):
                 problems.append(f"t{t}:no read done" if not done else f"t{t}:{len(done)} reads")
                 continue
             outcome, reason, took = kv(done[0], "outcome"), kv(done[0], "reason"), kv(done[0], "ms")
+            # F02c: a card (its `call done` line) only after an accepted read; the speculative call's fate is noted.
+            calls = [line for line in lines if line.startswith("call done ")]
+            if calls:
+                notes.append(f"t{t}:spec={kv(calls[0], 'spec')}")
+            if outcome != "accepted" and calls:
+                problems.append(f"t{t}:a card after a read that was {outcome}")
             if (kind, case) in WHOLE_CANCELLED:
                 notes.append(f"t{t}:{outcome}/{took}ms")
                 if outcome != "cancelled":

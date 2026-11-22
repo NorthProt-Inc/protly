@@ -1154,6 +1154,17 @@ class LatencyTests(unittest.TestCase):
         self.assertIn("t1:spec=cancelled:longer want used", c.evidence)
         self.assertIn("t1:undo=None", c.evidence)
 
+    def test_a_card_after_a_refused_read_fails_the_wr_line(self):
+        kb = ("2026-11-22 12:00:01.000 Db K[1:2] [com.northprot.protly:read] read done outcome=refused reason=b1:tooLong "
+              "units=0 lf=0 h=811c9dc5 ms=7900 known=1\n"
+              "2026-11-22 12:00:02.000 Db K[1:2] [com.northprot.protly:read] call done first=8000 done=8100 api=400 "
+              "spec=used\n")
+        wr = checks.Check("wr-uikit-x14k", "PASS", "t1={real=14055/15/h00000000 panel=...}")
+        c = checks.resolve_whole_log(wr, self.marks("wr-uikit-x14k", 1), kb)
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("t1:a card after a read that was refused", c.evidence)
+        self.assertIn("t1:spec=used", c.evidence)
+
     def test_assemble_derives_a_lat_line_for_each_short_wr_line(self):
         raw = "CHECK wr-uikit-smid PASS t1={real=39/1/h00000000} t2={real=39/1/h00000000}\n"
         with tempfile.TemporaryDirectory() as d:
