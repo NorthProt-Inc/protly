@@ -252,6 +252,14 @@ class RunShotsBlockTests(unittest.TestCase):
         self.assertIn("arg: -only-testing:ProtlyCIUITests/PhoneChecksUITests/test5f_period\n", out)
         self.assertIn("filtered=1", out)
 
+    def test_the_whole_read_methods_get_the_flag_and_can_run_alone(self):
+        # K1b: each whole-read method is its own debug run, so two CI runs can take one each in parallel.
+        for method in ("test5g_wholenative", "test5h_wholeweb"):
+            out = self.run_block(f"fix [shots:PhoneChecksUITests/{method}]")
+            self.assertIn(f"arg: -only-testing:ProtlyCIUITests/PhoneChecksUITests/{method}\n", out)
+            self.assertIn("filtered=1", out)
+            self.assertIn(method, checks.FILTERED_ONLY)
+
     def test_the_main_test_run_receives_the_flag(self):
         with open(os.path.join(HERE, "run-shots.sh"), encoding="utf-8") as f:
             src = f.read()
