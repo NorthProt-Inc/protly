@@ -1378,6 +1378,11 @@ def resolve_whole_log(check, marks, kb_text):
                 problems.append(f"t{t}:{outcome}/{reason}")
                 continue
             notes.append(f"t{t}:{outcome}/{took}ms/held={','.join(held)}")
+            # Replace's focus guard read the field's document both times (runs 204, 205: always); -1 would mean the guard
+            # did nothing on that host (silent-failure review).
+            focus = [kv(line, "focus") for line in lines if line.startswith("replace ")]
+            if any(f != "0" for f in focus):
+                problems.append(f"t{t}:focus={','.join(f or '?' for f in focus)} want 0,0")
             if held != ["1", "1"]:
                 problems.append(f"t{t}:held={','.join(held) or 'none'} want 1,1 (Replace, Undo)")
                 continue
