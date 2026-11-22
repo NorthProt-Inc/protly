@@ -915,6 +915,13 @@ extension PhoneRun {
                 }
                 self.d.point(r.minX + 1, r.midY).tap()
                 self.d.pause(0.8)
+                // Runs 147, 148: right after a pick of the only word, that tap now and then left the caret where it
+                // was. Once more, left of the line's first letter (inside the text view's inset).
+                if !self.caretWaits(for: 0) {
+                    self.d.log("caret not at the start after the tap on the first word: tapping left of it")
+                    self.d.point(r.minX - 4, r.midY).tap()
+                    self.d.pause(0.8)
+                }
                 return true
             },
             tapEnd: {
@@ -926,6 +933,14 @@ extension PhoneRun {
                 // empty area below the text: there a tap opened iOS's AutoFill menu (runs 141, 144).
                 self.d.point(r.maxX + 14, r.midY).tap()
                 self.d.pause(0.8)
+                let end = (self.d.fieldText() ?? "").utf16.count
+                let f = self.d.field.frame
+                if !self.caretWaits(for: end), f.width > 40 {
+                    // Run 148: that tap now and then left the caret at the start. Once more, at the line's far right.
+                    self.d.log("caret not at the end after the tap right of the last word: tapping the line's end")
+                    self.d.point(f.maxX - 12, r.midY).tap()
+                    self.d.pause(0.8)
+                }
                 return true
             },
             edits: { Self.edits(self.d.probeValue("edits")) })
@@ -1061,6 +1076,16 @@ extension PhoneRun {
             now = f.caret()
         }
         return now
+    }
+
+    /// Whether the UITextView screen's `sel` probe shows the caret at `offset` within 1 s.
+    private func caretWaits(for offset: Int) -> Bool {
+        let end = Date().addingTimeInterval(1)
+        while Self.caretOffset(d.probeValue("sel")) != offset {
+            if Date() >= end { return false }
+            d.pause(0.25)
+        }
+        return true
     }
 
     /// The offset in a caret reading: `location,length` or a plain number.
