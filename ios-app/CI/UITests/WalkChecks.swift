@@ -210,7 +210,16 @@ extension PhoneRun {
             return "real=\(realShape) sel=\(sel) outcome=timeout s=\(secs) strip=\(q(r.view?.stripText))"
         }
         let onPanel = !v.panel.isEmpty
-        let carried = onPanel ? v.texts(v.panel).map(\.label).joined(separator: " ") : (v.cardRows.body.first ?? "none")
+        // The stub's reply is long and wraps, so it can sit above the `→` row, and CallView.cardRows then takes it
+        // for the header (run 7f2f443-135: every card carried "→"). Look for it among all the card's texts instead.
+        var cardTexts = v.texts(v.card).map(\.label)
+        if !onPanel, !cardTexts.contains(where: { $0.hasPrefix("read ") }) {
+            let again = poll(5, every: 0.5) { w in w.texts(w.card).contains { $0.label.hasPrefix("read ") } }
+            if let w = again.view { cardTexts = w.texts(w.card).map(\.label) }
+        }
+        let reply = cardTexts.first { $0.hasPrefix("read ") }
+        let carried = onPanel ? v.texts(v.panel).map(\.label).joined(separator: " ")
+            : (reply ?? "noreply: " + cardTexts.joined(separator: " | "))
         let verdict = onPanel ? "outcome=panel" : WalkProbe.judge(carried, real: real, realShape: realShape, cursor: cursor)
         let selAfter = web == nil && host == "uikit" ? (d.probeValue("sel") ?? "?") : "-"
         if let cancel = v.button("Cancel", in: onPanel ? v.panel : v.card) {
