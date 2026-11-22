@@ -812,12 +812,24 @@ class PeriodTests(unittest.TestCase):
     WEB_SEL = ' sel0="0"'
 
     def test_every_id_is_expected_has_a_method_and_a_rule(self):
-        ids = [f"dsp-{f}-{k}" for f in ("uikit", "composer") for k in ("en", "word", "ko", "pick2")]
+        kinds = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2")
+        ids = [f"dsp-{f}-{k}" for f in ("uikit", "composer") for k in kinds]
         self.assertEqual(checks.METHOD_IDS["test5f_period"], ids)
         for i in ids:
             self.assertIn(i, checks.EXPECTED_IDS)
             self.assertIn(i, checks.RESOLVERS)
         self.assertTrue(checks.known_entry(PERIOD_METHOD))
+
+    def test_the_ui_test_runs_the_same_kinds_with_enough_tries(self):
+        # PhoneRun.periodCases is the other half of PERIOD_IDS: a kind missing there is a FAIL `no CHECK line` in CI.
+        with open(os.path.join(HERE, "UITests", "PhoneChecksUITests.swift"), encoding="utf-8") as f:
+            swift = f.read()
+        block = swift[swift.index("static let periodCases"):]
+        cases = re.findall(r'\("(\w+)", (\d+)\)', block[:block.index("]\n")])
+        self.assertEqual([k for k, _ in cases], list(checks.PERIOD_KINDS))
+        for kind, tries in cases:
+            self.assertIn(kind, checks.PERIOD_UNIT)
+            self.assertGreaterEqual(int(tries), checks.PERIOD_MIN_TRIES.get(kind, checks.PERIOD_DEFAULT_TRIES), kind)
 
     def test_a_filtered_period_run_marks_the_other_ids_not_run(self):
         ran = checks.covered_ids(["PhoneChecksUITests/test0_access", PERIOD_METHOD])
@@ -916,6 +928,45 @@ class PeriodTests(unittest.TestCase):
 
     def test_end_of_text_without_the_period_fails(self):
         c = period("dsp-composer-en", ["", "hello. ", "hello. hello  ", "hello. hello  hello. "])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("try 2", c.evidence)
+
+    # K4E (report P4 case E): one tap after a pick from the bar adds nothing, as on Apple's keyboard (4/4).
+
+    def test_one_tap_after_a_pick_adds_nothing(self):
+        for check_id in ("dsp-uikit-pick1", "dsp-composer-pick1"):
+            c = period(check_id, ["the " * i for i in range(5)])
+            self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
+            self.assertIn("4/4 tries added 'the ' at the end", c.evidence)
+
+    def test_one_tap_after_a_pick_that_types_a_second_space_fails(self):
+        # Protly before K4E (report run 121 pick1, 18/18): the pick's space and the tap's.
+        c = period("dsp-uikit-pick1", ["the  " * i for i in range(5)])
+        self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+        self.assertIn("try 1", c.evidence)
+
+    def test_one_tap_after_a_pick_never_ends_the_sentence(self):
+        # From the code: a space typed less than 3 s before the pick made that one tap a period.
+        c = period("dsp-composer-pick1", ["", "the ", "the the. ", "the the. the ", "the the. the the "])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("try 2", c.evidence)
+        self.assertNotIn("try 3", c.evidence)
+
+    def test_one_tap_after_a_pick_needs_four_tries(self):
+        c = period("dsp-uikit-pick1", ["the " * i for i in range(4)])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+        self.assertIn("at least 4", c.evidence)
+
+    def test_fast_double_taps_and_the_korean_pick_end_the_sentence(self):
+        for field in ("uikit", "composer"):
+            for kind, unit in [("fast", "hello. "), ("kofast", "안녕. "), ("kopick2", "안녕. ")]:
+                c = period(f"dsp-{field}-{kind}", [unit * i for i in range(4)])
+                self.assertEqual(c.status, "PASS", f"{field}-{kind}: {c.evidence}")
+
+    def test_a_fast_double_tap_without_the_period_fails(self):
+        c = period("dsp-uikit-fast", ["", "hello. ", "hello. hello  ", "hello. hello  hello. "])
         self.assertEqual(c.status, "FAIL")
         self.assertIn("try 2", c.evidence)
 

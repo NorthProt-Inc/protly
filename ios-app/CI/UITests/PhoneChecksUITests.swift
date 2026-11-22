@@ -18,7 +18,7 @@ final class PhoneChecksUITests: XCTestCase {
     static let allowance: [String: TimeInterval] = [
         "test0_access": 300, "test0_probe": 480, "test1_68": 900, "test2_ws": 300, "test3_85offline": 900,
         "test4_memory": 600, "test5_icon": 300, "test5a_web": 900, "test5b_menu": 420, "test5c_pad": 420,
-        "test5d_card": 720, "test5e_bar": 600, "test5f_period": 1200,
+        "test5d_card": 720, "test5e_bar": 600, "test5f_period": 1500,
         "test6_85net": 1080, "test7_77": 1080,
     ]
 
@@ -103,8 +103,9 @@ final class PhoneChecksUITests: XCTestCase {
             .checksBar()
     }
 
-    /// fix/double-space-period (checksPeriod below): two space taps after a word end the sentence, also with a word
-    /// right after the cursor, on the UITextView screen and in the web composer. Offline. Only in a filtered run
+    /// fix/double-space-period and K4E (checksPeriod below): two space taps after a word end the sentence, also with a
+    /// word right after the cursor, as a fast double tap and after a pick from the bar; one tap after a pick adds
+    /// nothing. On the UITextView screen and in the web composer. Offline. Only in a filtered run
     /// (FILTERED=1, run-shots.sh): its minutes would push a full run past MAIN_TEST_DEADLINE, and checks.py marks its
     /// IDs NOT-RUN in a full run.
     @MainActor
@@ -840,15 +841,25 @@ final class PhoneRun {
 ///   the composer's offset), then `hello` and two spaces at the driver's pace. The text grows (`hello. hello. world`)
 ///   with the caret still in front of `world`.
 /// - `en`, `ko`: `hello` / `안녕` and two spaces at the driver's pace, at the end of the text.
-/// - `pick2`: `teh`, the bar's right slot (`the` and its space), then two spaces.
-/// The timing cases of the probe (a coordinate double tap, a held space, one tap after a pick) are K4E's: this fix
-/// does not touch KeyboardKit's timing gate.
+/// - `pick2`: `teh`, the bar's right slot (`the` and its space), then two spaces. `kopick2`: the same with `안녀` and the
+///   slot's `안녕`.
+/// K4E (P4 case E and the probe's timing cases), with Apple's keyboard as the reference:
+/// - `pick1`: `teh`, the bar's right slot, then one space: the pick's space takes the tap's place, so each try adds
+///   `the ` (Apple: 4/4; Protly before K4E: two spaces, 18/18).
+/// - `fast`, `kofast`: `hello` / `안녕`, then a double tap on space by coordinate (XCUICoordinate.doubleTap, its taps
+///   46-75 ms apart in the probe).
+/// The held space (the trackpad, no space by design) stays out: K4E leaves the 0.4 s hold and the 3.0 s window as they
+/// are.
 /// Each line is PENDING with the field before the first try (`t0`) and after each try (`t1`...); checks.py
-/// (resolve_period) wants every try to add exactly its unit in front of the text after the cursor.
+/// (resolve_period) wants every try to add exactly its unit in front of the text after the cursor. `gaps`: for the
+/// two-tap kinds the time between the two space taps, for `fast` and `kofast` the double tap's own duration as the
+/// test saw it, for `pick1` the slot tap's start to the end of typing the space (the driver's pause after it included).
 extension PhoneRun {
-    /// Kinds and tries per field (checks.py PERIOD_MIN_TRIES: case D at least 6). `en` first: case D's `world` then
-    /// follows English words, as `hello` does.
-    static let periodCases: [(kind: String, tries: Int)] = [("en", 3), ("word", 6), ("ko", 3), ("pick2", 3)]
+    /// Kinds and tries per field (checks.py PERIOD_MIN_TRIES: case D at least 6, pick1 at least 4). `en` first: case
+    /// D's `world` then follows English words, as `hello` does.
+    static let periodCases: [(kind: String, tries: Int)] = [
+        ("en", 3), ("word", 6), ("ko", 3), ("pick2", 3), ("pick1", 4), ("fast", 3), ("kofast", 3), ("kopick2", 3),
+    ]
 
     /// The same list as checks.py PERIOD_IDS.
     static var periodIDs: [String] {
@@ -928,17 +939,45 @@ extension PhoneRun {
         var ev = "kind=\(kind) tries=\(tries) t0=\(q(read()))"
         var gaps: [String] = []
         for i in 1...tries {
-            if kind == "pick2" {
+            let gap: Double
+            switch kind {
+            case "pick1":
                 d.type("teh")
+                let pick = Date()
+                d.tapSlot(.right, settle: 0.6)
+                d.type(" ")
+                gap = Date().timeIntervalSince(pick)
+            case "pick2", "kopick2":
+                d.type(kind == "kopick2" ? "안녀" : "teh")
                 d.tapSlot(.right, settle: 0.6)
                 d.type("  ", lastGap: d.keyPause)
-            } else {  // word, en, ko
+                gap = d.lastGap
+            case "fast", "kofast":
+                d.type(kind == "kofast" ? "안녕" : "hello")
+                gap = doubleTapSpace()
+            default:  // word, en, ko
                 d.type((kind == "ko" ? "안녕" : "hello") + "  ", lastGap: d.keyPause)
+                gap = d.lastGap
             }
-            gaps.append(String(format: "%.2f", d.lastGap))
+            gaps.append(String(format: "%.2f", gap))
             d.pause(0.5)
             ev += " t\(i)=\(q(read()))"
         }
         pending(id, ev + " gaps=\(gaps.joined(separator: ","))" + extra)
+    }
+
+    /// A double tap on space by coordinate, as the probe's `fast` cases. Returns the gesture's own duration in seconds
+    /// as the test saw it, -1 without a keyboard (a driver problem: the line is FAIL unreadable).
+    private func doubleTapSpace() -> Double {
+        guard let row1 = d.rowOne() else {
+            d.fail("no keyboard for a space double tap")
+            return -1
+        }
+        let (x, y) = d.position(of: .space, row1: row1)
+        let start = Date()
+        d.point(x, y).doubleTap()
+        let took = Date().timeIntervalSince(start)
+        d.pause(d.keyPause)
+        return took
     }
 }
