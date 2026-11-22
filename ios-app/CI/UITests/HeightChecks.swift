@@ -18,7 +18,8 @@ import XCTest
 extension PhoneRun {
     /// The same order as checks.py's HEIGHT_IDS.
     static let heightIDs = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji",
-                            "hb-hide-emoji", "hb-switch", "hb-hide-switch", "hb-switch-hidden", "hb-card", "hb-cancel"]
+                            "hb-hide-emoji", "hb-switch", "hb-hide-switch", "hb-switch-hidden", "hb-kill-up",
+                            "hb-kill-hidden", "hb-card", "hb-cancel"]
     static let heightArguments = ["-fills", Stub.draft("ok")]
     /// measure.py's BAND_TOLERANCE.
     static let bandTolerance: CGFloat = 1.0
@@ -104,11 +105,23 @@ extension PhoneRun {
             d.waitOutStandIn()
             take("hb-switch-hidden", d.wait(for: .protly, timeout: 3))
         }
-        // 6. The result card from a stub Translate call and the keys after Cancel, after an app switch with the keyboard
-        // up (the keyboard's shortest pin).
+        // 6. The host killed in the background after an app switch with the keyboard up (iOS's margin look), then
+        // launched again: left with the keyboard up (`hb-kill-up`) or hidden first (`hb-kill-hidden`).
+        for keyboardUp in [true, false] {
+            launch()
+            for _ in 0..<5 {
+                take("hb-switch", heightAppSwitch())
+                take(keyboardUp ? "hb-kill-up" : "hb-kill-hidden", heightKill(keyboardUp: keyboardUp))
+            }
+        }
+        // 7. The result card from a stub Translate call and the keys after Cancel, in a fresh host. First one card
+        // after an app switch (the 240 pt pin), not judged: runs 159 and 178 could not read the bar's center there,
+        // and its tree goes to tree-hb-card-after-switch.txt when that happens again.
         launch()
         if accessReadyQuiet() {
             take("hb-switch", heightAppSwitch())
+            heightCard(diagnostic: true) { _, _, _ in }
+            launch()
             for _ in 0..<5 { heightCard { take($0, $1, settle: $2) } }
         }
         let apple = shots["hb-apple"] ?? []
@@ -163,8 +176,11 @@ extension PhoneRun {
             if keys {
                 ok = s.board == .protly && s.band.map { abs($0 - appleBand) <= tol } == true
                     && s.row1.map { abs($0 - PhoneRun.row1) <= tol } == true
+                    && (id != "hb-cancel" || s.reached)  // Cancel was tapped on a finished card
             } else {
-                ok = s.board == .protly && s.top.map { abs($0 - topWant) <= tol } == true
+                // A finished card, which covers row 1.
+                ok = s.board == .protly && s.reached && s.row1 == nil
+                    && s.top.map { abs($0 - topWant) <= tol } == true
             }
             if !ok { wrong.append(i + 1) }
         }
@@ -174,14 +190,34 @@ extension PhoneRun {
 
     /// Reached: Protly is up. Picked: it came up on another keyboard and Protly was picked from the globe list, so
     /// the shot shows the globe path, not a fresh presentation (run 161's hb-launch-2).
+    /// iOS brings back the keyboard last used in the host: after a pick, a second launch comes up on Protly itself.
     private func heightRelaunch() -> (reached: Bool, picked: Bool) {
+        for attempt in 1...3 {
+            d.app.terminate()
+            d.launch(arguments: PhoneRun.heightArguments)
+            if !d.waitForKeyboard() { d.focusField() }
+            d.waitOutStandIn()
+            if d.wait(for: .protly, timeout: 3) { return (true, false) }
+            d.log("hb-launch: came up on \(d.current().rawValue) (launch \(attempt)), picking Protly")
+            if !d.pick(.protly) { _ = d.cycle(to: .protly, taps: 3) }
+        }
+        return (d.current() == .protly, true)
+    }
+
+    /// An app switch with the keyboard up came first. Leaves the host (the keyboard hidden first unless
+    /// `keyboardUp`), terminates it in the background and launches it again.
+    private func heightKill(keyboardUp: Bool) -> Bool {
+        if !keyboardUp {
+            d.dismissKeyboard()
+            d.pause(1)
+        }
+        XCUIDevice.shared.press(.home)
+        d.pause(2)
         d.app.terminate()
         d.launch(arguments: PhoneRun.heightArguments)
         if !d.waitForKeyboard() { d.focusField() }
         d.waitOutStandIn()
-        if d.wait(for: .protly, timeout: 3) { return (true, false) }
-        d.log("hb-launch: came up on \(d.current().rawValue), picking Protly")
-        return (d.pick(.protly), true)
+        return d.wait(for: .protly, timeout: 3)
     }
 
     /// Hides the keyboard with the host's Dismiss button, waits `hidden` seconds and taps the field again.
@@ -208,11 +244,21 @@ extension PhoneRun {
     }
 
     /// One stub Translate call: the finished card, then the keys after Cancel.
-    private func heightCard(_ take: (String, Bool, TimeInterval) -> Void) {
+    /// `diagnostic`: logs whether the call ran and keeps the tree when the bar's center cannot be read.
+    private func heightCard(diagnostic: Bool = false, _ take: (String, Bool, TimeInterval) -> Void) {
         let scratch = Item("hb-card")
         d.clearField()
         guard fill(1, Stub.draft("ok"), scratch), tapCenter(want: "English", scratch) != nil else {
-            d.log("hb-card: no call (\(scratch.evidence))")
+            d.log("hb-card\(diagnostic ? " after switch" : ""): no call (\(scratch.evidence))")
+            if diagnostic { d.dumpOnce("hb-card-after-switch") }
+            return
+        }
+        if diagnostic {
+            d.log("hb-card after switch: the call ran")
+            if let v = poll(14, until: { $0.finished("Replace") }).view, let cancel = v.button("Cancel", in: v.card) {
+                d.pause(0.6)
+                d.point(cancel.frame.midX, cancel.frame.midY).tap()
+            }
             return
         }
         let done = poll(14) { $0.finished("Replace") }

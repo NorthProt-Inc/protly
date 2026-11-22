@@ -295,15 +295,21 @@ Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis br
   both of iOS's looks, and its height is Protly's view plus the dock, 17 pt less when iOS draws no margin above the
   keyboard. `picked`: the relaunch came up on another keyboard and Protly was picked from the globe list.
 - **IDs.** `hb-apple` (RECORD): Apple's English keyboard, 5 shots, the reference band (the median). Each other ID
-  collects one path's shots across six sections that each start with a relaunch, and PASSes only when every shot is
+  collects one path's shots across the sections (each starts with a relaunch), and PASSes only when every shot is
   on Protly with its band within 1 pt of Apple's and row 1 within 1 pt of 564 (iPhone 13 Pro):
   `hb-launch` (the relaunch at each section's start), `hb-hide-fresh` (hide and show in a fresh host, 1 s and 5 s
   hidden), `hb-globe` (Protly picked right after Apple's English keyboard), `hb-hide-globe` (hide and show after it),
   `hb-emoji` (the Emoji round trip in a fresh host, after the globe pick and after an app switch), `hb-hide-emoji` (hide
   and show after it), `hb-switch` (an app switch back with the keyboard up), `hb-hide-switch` (hide and show after
-  it), `hb-switch-hidden` (an app switch with the keyboard hidden, then the field tapped), `hb-card` (a stub
-  Translate's finished card after an app switch, judged by the glass top only: it covers row 1) and `hb-cancel` (the
-  keys after the card's Cancel). Fewer than 5 shots, or no Apple band, is FAIL `unreadable`.
+  it), `hb-switch-hidden` (an app switch with the keyboard hidden, then the field tapped), `hb-kill-up` and
+  `hb-kill-hidden` (after an app switch with the keyboard up, the host left with the keyboard up or hidden, terminated
+  in the background and launched again), `hb-card` (a stub Translate's finished card in a fresh host, judged by the
+  glass top only: it covers row 1; a card that did not finish FAILs) and `hb-cancel` (the keys after the card's
+  Cancel). Fewer than 5 shots, or no Apple band, is FAIL `unreadable`. One more card after an app switch is not judged:
+  runs 159 and 178 could not read the bar's center at the 240 pt pin, and its tree goes to
+  `tree-hb-card-after-switch.txt` when that happens.
+- A relaunch that comes up on another keyboard picks Protly and launches again (iOS brings back the keyboard last
+  used), up to three launches; only then is the shot marked `picked`.
 
 ## Reading a run without GitHub access
 
