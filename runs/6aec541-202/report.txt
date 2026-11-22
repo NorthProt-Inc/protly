@@ -1,0 +1,210 @@
+STATUS build-failed
+source 6aec541c5b7fe415b1bda0e5561b99088bce1d5c
+xcode Xcode 26.6 Build version 17F113 
+network key: present (CI key); DerivedData cache: restore only, not saved in this run
+FILTER PhoneChecksUITests/test0_access PhoneChecksUITests/test5g_wholenative (a debug run, outside the run budget; other IDs are NOT-RUN)
+runtime iOS 26.5 (com.apple.CoreSimulator.SimRuntime.iOS-26-5)
+device iPhone-13-Pro (A8C8DFC1-A295-4715-B6D6-EBF9DE09A5BE), 390 pt wide
+build failed
+--- last 200 lines of build.log
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/AVRouting-E63Z8O5144UMB4W8RXURBACSE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/CoreData-EBOIQQXUJJXK3NQBQWNRRZEOQ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/AudioToolbox-7GC2DW3WAAEPZM9XEIYRSQBR6.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/Metal-31B9Y3L2LBFJIKD3ADTHJFH82.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/UniformTypeIdentifiers-1YH5Q82F8P8Q3T3KGQ0H6WYKG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/CoreVideo-9MQA3V23KZ4MFRRB1RD0A2LWB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/CoreMedia-YZK39WPDBI97S2NXWMJK9WTA.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/QuartzCore-3PZ30L76OE8KIG5EIMXZWVO1C.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/CoreImage-8ZZ1AYSL6QTCAPZQEF13WLCFC.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/SwiftUICore-44LO9UE4WJP7LBEX1ISJ8RI5O.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/UIKit-B225BUAJ1AO05H8C4THC0QTZ1.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/MediaToolbox-3EZLX4RS7E3V9WM3O943BNYKO.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/AVFAudio-4HKHCJLXK3AZ26Q2YR9HZEF62.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/AVFoundation-55GL94J4P8CTYTQ1Y180RI8J0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/Speech-DLHRF0WG5ILDGAI17VLY5A7NH.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/SwiftUI-CMPKLAXFE6WNYMT5HV4FA2AF5.pcm
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ProtlyCIKeyboard (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+
+EmitSwiftModule normal arm64 (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 Compiling\ ProgressStrip.swift,\ ProtlyActionHandler.swift,\ ProtlyBar.swift,\ ProtlyHeight.swift,\ ProtlyLayout.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProgressStrip.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyActionHandler.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyBar.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyHeight.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyLayout.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProgressStrip.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyActionHandler.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyBar.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyHeight.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyLayout.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 Compiling\ ActionClient.swift,\ BarSlotStyle.swift,\ Brand.swift,\ FieldText.swift,\ KeyboardViewController.swift,\ Panel.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ActionClient.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/BarSlotStyle.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Brand.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/KeyboardViewController.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Panel.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+Failed frontend command:
+/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c -primary-file /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ActionClient.swift -primary-file /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/BarSlotStyle.swift -primary-file /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Brand.swift -primary-file /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift -primary-file /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/KeyboardViewController.swift -primary-file /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Panel.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProgressStrip.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyActionHandler.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyBar.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyHeight.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ProtlyLayout.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ResultCard.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ResultFeed.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Secrets.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/StubActionClient.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Words.swift -supplementary-output-file-map /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/supplementaryOutputs-15 -target arm64-apple-ios17.0-simulator -load-resolved-plugin /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ProtlyCIKeyboard-dependencies-1.json -debug-module-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ProtlyCIKeyboard.swiftmodule -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -I /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator -no-color-diagnostics -Xcc -fno-color-diagnostics -application-extension -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -swift-version 5 -Onone -D DEBUG -D PROTLY_CI_STUB -serialize-debugging-options -const-gather-protocols-file /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ProtlyCIKeyboard_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/runner/work/protly/protly/ios-app/CI -enable-anonymous-context-mangled-names -file-compilation-dir /Users/runner/work/protly/protly/ios-app/CI -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/ProtlyCIKeyboard-generated-files.hmap -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/ProtlyCIKeyboard-own-target-headers.hmap -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/ProtlyCIKeyboard-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCI-001f1ac1d20962ef98de1dfa64df9df8-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/ProtlyCIKeyboard-project-headers.hmap -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/DerivedSources -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name ProtlyCIKeyboard -frontend-parseable-output -disable-clang-spi -clang-target arm64-apple-ios26.5-simulator -target-sdk-version 26.5 -target-sdk-name iphonesimulator26.5 -in-process-plugin-server-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ActionClient.o -o /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/BarSlotStyle.o -o /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/Brand.o -o /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/FieldText.o -o /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/KeyboardViewController.o -o /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/Panel.o -index-unit-output-path /ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ActionClient.o -index-unit-output-path /ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/BarSlotStyle.o -index-unit-output-path /ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/Brand.o -index-unit-output-path /ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/FieldText.o -index-unit-output-path /ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/KeyboardViewController.o -index-unit-output-path /ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/Panel.o -index-store-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Index.noindex/DataStore -index-system-modules
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ActionClient.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:200:67: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                    logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                  ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:210:79: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+            if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: ms(since: s0)) }
+                                                                              ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:212:54: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep("resync", k: k, from: c, to: s, ms: ms(since: s0))
+                                                     ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:222:78: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                             ^
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/BarSlotStyle.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:200:67: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                    logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                  ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:210:79: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+            if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: ms(since: s0)) }
+                                                                              ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:212:54: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep("resync", k: k, from: c, to: s, ms: ms(since: s0))
+                                                     ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:222:78: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                             ^
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Brand.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:200:67: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                    logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                  ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:210:79: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+            if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: ms(since: s0)) }
+                                                                              ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:212:54: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep("resync", k: k, from: c, to: s, ms: ms(since: s0))
+                                                     ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:222:78: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                             ^
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:200:67: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                    logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                  ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:210:79: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+            if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: ms(since: s0)) }
+                                                                              ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:212:54: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep("resync", k: k, from: c, to: s, ms: ms(since: s0))
+                                                     ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:222:78: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                             ^
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/KeyboardViewController.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:200:67: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                    logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                  ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:210:79: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+            if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: ms(since: s0)) }
+                                                                              ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:212:54: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep("resync", k: k, from: c, to: s, ms: ms(since: s0))
+                                                     ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:222:78: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                             ^
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Panel.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:200:67: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                    logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                  ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:210:79: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+            if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: ms(since: s0)) }
+                                                                              ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:212:54: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep("resync", k: k, from: c, to: s, ms: ms(since: s0))
+                                                     ^
+/Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift:222:78: error: cannot convert value of type '(changed: Bool, c: FieldText.Ctx, seen: Int)' to expected argument type '(changed: Bool, c: FieldText.Ctx)'
+                logStep(back ? "falseStart" : "falseEnd", k: k, from: c, to: s, ms: ms(since: s0))
+                                                                             ^
+
+SwiftCompile normal arm64 Compiling\ ResultCard.swift,\ ResultFeed.swift,\ Secrets.swift,\ StubActionClient.swift,\ Words.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ResultCard.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ResultFeed.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Secrets.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/StubActionClient.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Words.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ResultCard.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ResultFeed.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Secrets.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/StubActionClient.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Words.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ProtlyCIKeyboard (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+
+SwiftDriver\ Compilation\ Requirements ProtlyCIKeyboard normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+    cd /Users/runner/work/protly/protly/ios-app/CI
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ProtlyCIKeyboard -Onone @/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ProtlyCIKeyboard.SwiftFileList -DDEBUG -DPROTLY_CI_STUB -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -application-extension -enable-testing -index-store-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ProtlyCIKeyboard-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ProtlyCIKeyboard.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ProtlyCIKeyboard_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/ProtlyCIKeyboard-generated-files.hmap -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/ProtlyCIKeyboard-own-target-headers.hmap -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/ProtlyCIKeyboard-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCI-001f1ac1d20962ef98de1dfa64df9df8-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/ProtlyCIKeyboard-project-headers.hmap -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/protly/protly/ios-app/CI/build/DerivedData/Build/Intermediates.noindex/ProtlyCI.build/Debug-iphonesimulator/ProtlyCIKeyboard.build/Objects-normal/arm64/ProtlyCIKeyboard-Swift.h -working-directory /Users/runner/work/protly/protly/ios-app/CI -experimental-emit-module-separately -disable-cmo
+
+** TEST BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ ActionClient.swift,\ BarSlotStyle.swift,\ Brand.swift,\ FieldText.swift,\ KeyboardViewController.swift,\ Panel.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ActionClient.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/BarSlotStyle.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Brand.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/KeyboardViewController.swift /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Panel.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+	SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/ActionClient.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+	SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/BarSlotStyle.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+	SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Brand.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+	SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/FieldText.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+	SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/KeyboardViewController.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+	SwiftCompile normal arm64 /Users/runner/work/protly/protly/ios-app/Sources/ProtlyKeyboard/Panel.swift (in target 'ProtlyCIKeyboard' from project 'ProtlyCI')
+	Building project ProtlyCI for testing with scheme ProtlyCI
+(8 failures)
+LEAK-GUARD pass: no key prefix in 1 files
