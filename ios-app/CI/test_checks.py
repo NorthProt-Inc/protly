@@ -1145,6 +1145,14 @@ class LatencyTests(unittest.TestCase):
             self.assertEqual(c.status, "PASS", c.evidence)
             self.assertIn("main={first=1300 done=1400 replace=2700 undo=2400}", c.evidence)
 
+    def test_main_has_a_baseline_for_every_latency_case(self):
+        for host in ("uikit", "swiftui", "textarea", "lexical"):
+            for case in checks.LATENCY_CASES:
+                main_ms = checks.LATENCY_MAIN[(host, case)]
+                self.assertIn("first", main_ms)
+                self.assertIn("done", main_ms)
+            self.assertEqual(set(checks.LATENCY_MAIN[(host, "swin")]), set(checks.LATENCY_KEYS), host)
+
     def test_a_failed_wr_line_or_a_missing_time_fails_the_lat_line(self):
         main_ms = {("uikit", "ssel"): {"first": 5000, "done": 5000}, ("uikit", "swin"): {"replace": 2000, "undo": 9000}}
         wr = checks.Check("wr-uikit-ssel", "FAIL", "t1={real=39/1/h00000000}")
