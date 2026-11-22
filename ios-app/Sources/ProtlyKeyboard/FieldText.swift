@@ -106,14 +106,20 @@ enum FieldText {
     }
 
     /// One walk to the end (`back` false) or the start. Every step settles before the next check, so a cancel or the
-    /// budget stops the walk only between steps.
+    /// budget stops the walk only between steps. `budget`: seconds from `t0` (a read's 20 s; Replace's check walk
+    /// gets its own). `firstWait`: how long the first step may take to show (Replace's check: the host applies the
+    /// move after the edits queued before it).
     private static func walk(_ p: UITextDocumentProxy, back: Bool, cap: Int, tag: String, start t0: TimeInterval,
-                             track: Track, progress: () -> Void) async -> WalkEnd {
+                             track: Track, progress: () -> Void, budget: TimeInterval = WholeRead.total,
+                             firstWait: TimeInterval? = nil) async -> WalkEnd {
         var bw = BackWalk(cap: cap)
         // Only the walk from the user's cursor may start from contexts the host never refreshed (run 163 web `mid`).
         var fw = ForwardWalk(cap: cap, resyncFirst: tag == "f")
-        var steps = 0, late = 0
+        var steps = 0, late = 0, firstMS = -1
         let w0 = uptime()
+        func fits(_ wait: TimeInterval) -> Bool {
+            WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(wait), total: budget)
+        }
         func end(_ e: WalkEnd) -> WalkEnd {
             let units: [UInt16], reason: String
             switch e {
@@ -123,7 +129,7 @@ enum FieldText {
             }
             let count = units.count, lf = WholeRead.lineFeeds(units), hash = WholeRead.fnv(units), took = ms(since: w0)
             let retries = bw.retries, resyncs = fw.resyncs
-            log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) h=\(hash, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) retries=\(retries, privacy: .public) resyncs=\(resyncs, privacy: .public) late=\(late, privacy: .public)")
+            log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) h=\(hash, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) first=\(firstMS, privacy: .public) retries=\(retries, privacy: .public) resyncs=\(resyncs, privacy: .public) late=\(late, privacy: .public)")
             return e
         }
         /// A step that fit nothing: the contexts' lengths and which of them fit, never their text.
@@ -139,16 +145,15 @@ enum FieldText {
             var c = ctx(p)
             if back, c.before.isEmpty {
                 // An empty before-context mid-field comes back within 0.3 s (run 471e282-153): wait before probing.
-                guard WholeRead.canStart(elapsed: uptime() - t0, wait: WholeRead.emptyWait + stepCost(WholeRead.probeWait)) else {
-                    return end(.failed("timeUp"))
-                }
+                guard fits(WholeRead.emptyWait + WholeRead.probeWait) else { return end(.failed("timeUp")) }
                 let e0 = uptime()
                 while uptime() - e0 < WholeRead.emptyWait, ctx(p).before.isEmpty { await pause() }
                 c = ctx(p)
             }
             let probing = back ? c.before.isEmpty : c.after.isEmpty
-            let wait = probing ? WholeRead.probeWait : WholeRead.moveWait
-            guard WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(wait)) else { return end(.failed("timeUp")) }
+            let wait = steps == 0 ? max(firstWait ?? 0, probing ? WholeRead.probeWait : WholeRead.moveWait)
+                : probing ? WholeRead.probeWait : WholeRead.moveWait
+            guard fits(wait) else { return end(.failed("timeUp")) }
             // A Cancel during the wait above already put the cursor back (no step was on its way): never move it again.
             if Task.isCancelled { return end(.cancelled) }
             let k = back ? bw.plan(before: c.before, after: c.after) : fw.plan(after: c.after)
@@ -156,7 +161,8 @@ enum FieldText {
             track.sending()
             let s0 = uptime()
             var s = await step(p, by: back ? -k : k, wait: wait)
-            if !s.changed, !probing, WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait)) {
+            if steps == 1 { firstMS = ms(since: s0) }
+            if !s.changed, !probing, fits(WholeRead.moveWait) {
                 // A move that has not shown after 1 s may still come (run 163 textarea: the first step back; steps
                 // take 26-33 ms at the median, 286 ms at most in probe runs 154-155): one more look before "stuck".
                 late += 1
@@ -184,9 +190,7 @@ enum FieldText {
                 track.landed(-1, s.c.b)
                 logStep("falseStart", k: k, from: c, to: s, ms: ms(since: s0))
                 if Task.isCancelled { return end(.cancelled) }
-                guard WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(WholeRead.moveWait)) else {
-                    return end(.failed("timeUp"))
-                }
+                guard fits(WholeRead.moveWait) else { return end(.failed("timeUp")) }
                 track.sending()
                 let u = await step(p, by: m, wait: WholeRead.moveWait)
                 switch bw.undone(changed: u.changed, before: u.c.before, after: u.c.after) {
@@ -335,8 +339,8 @@ enum FieldText {
     /// Then the keyboard waits until the host has caught up: the contexts show `new`'s end with nothing after it, and
     /// neither they nor the host's callbacks changed for WholeRead.quiet, within WholeRead.replaceLimit; then a walk
     /// back over the result to the start must read exactly `new` (a window shows only the end, so old text left in
-    /// front would be invisible to the contexts alone), and one move forward lands at the end again. false: not
-    /// proven; the caller says so and offers no Undo.
+    /// front would be invisible to the contexts alone), and a walk forward must reach the end over `new`'s last units.
+    /// false: not proven (or the keyboard was hidden: the Task is cancelled); the caller says so and offers no Undo.
     static func replace(_ old: String, with new: String, _ p: UITextDocumentProxy) async -> Bool {
         let t0 = uptime()
         var deleted = 0
@@ -346,10 +350,10 @@ enum FieldText {
         }
         p.insertText(new)
         let sent = ms(since: t0)
-        let limit = WholeRead.replaceLimit(deletes: deleted)
+        let deadline = t0 + WholeRead.replaceLimit(deletes: deleted)
         var last = ctx(p), events = hostEvents, quietFrom = uptime(), changes = 0, seen = 0
         var shown = false
-        while uptime() - t0 < limit {
+        while uptime() < deadline, !Task.isCancelled {
             await pause(0.05)
             let c = ctx(p)
             if c != last || hostEvents != events {
@@ -367,9 +371,10 @@ enum FieldText {
         let quietMS = ms(since: t0)
         let c = ctx(p)
         let lb = c.before.count, la = c.after.count, ends = new.utf16.reversed().starts(with: c.before.reversed()) ? 1 : 0
-        let held = shown ? await holds(new, p) : false
+        let held = shown && !Task.isCancelled ? await holds(new, p, until: deadline) : false
         let inserted = new.utf16.count, heldMS = ms(since: t0), ok = held ? 1 : 0, gate = shown ? 1 : 0
-        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) events=\(seen, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public)")
+        let cancelled = Task.isCancelled ? 1 : 0
+        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) events=\(seen, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) cancelled=\(cancelled, privacy: .public)")
         return held
     }
 
@@ -378,16 +383,23 @@ enum FieldText {
         new.isEmpty ? c.b.isEmpty && c.a.isEmpty : FieldGuard.holdsResult(new, before: c.b, after: c.a)
     }
 
-    /// The field is exactly `new` with the cursor at its end: a walk back reads exactly `new` to the start, then one
-    /// move forward lands at the end again. Called once the contexts show `new`'s end and the host is quiet.
-    private static func holds(_ new: String, _ p: UITextDocumentProxy) async -> Bool {
+    /// The field is exactly `new` with the cursor at its end: a walk back reads exactly `new` to the start, a move
+    /// forward by its length, and a walk forward reaches the end over `new`'s last units (a long move can land a few
+    /// units short: probe runs 154, 155). Called once the contexts show `new`'s end and the host looks quiet. The
+    /// host applies a move after the edits sent before it, so the first step back may wait until `deadline` (if the
+    /// host's callbacks stopped before it finished, the step shows only once it has).
+    private static func holds(_ new: String, _ p: UITextDocumentProxy, until deadline: TimeInterval) async -> Bool {
         let units = Array(new.utf16)
         guard !units.isEmpty else { return !p.hasText }
-        let end = ctx(p)
-        guard case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: uptime(),
-                                                track: Track { _ in }, progress: {}),
+        let t0 = uptime(), left = max(0, deadline - t0)
+        let none = Track { _ in }
+        guard case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: t0, track: none,
+                                                progress: {}, budget: left + WholeRead.total, firstWait: left),
               read == units else { return false }
         let s = await step(p, by: units.count, wait: WholeRead.moveWait)
-        return s.c.a.isEmpty && WholeRead.agreeAtEnd(s.c.before, end.before)
+        guard s.changed, case .done(let rest) = await walk(p, back: false, cap: units.count, tag: "ve", start: t0,
+                                                            track: none, progress: {}, budget: left + WholeRead.total)
+        else { return false }
+        return Array(units.suffix(rest.count)) == rest
     }
 }

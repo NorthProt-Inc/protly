@@ -62,6 +62,9 @@ final class WholeReadTests: XCTestCase {
         XCTAssertTrue(WholeRead.canStart(elapsed: 19, wait: 1))
         XCTAssertFalse(WholeRead.canStart(elapsed: 19.01, wait: 1))
         XCTAssertFalse(WholeRead.canStart(elapsed: 20, wait: 0.01))
+        // Replace's check walk has its own budget: what is left of Replace's limit, then a read's 20 s.
+        XCTAssertTrue(WholeRead.canStart(elapsed: 25, wait: 1, total: 30))
+        XCTAssertFalse(WholeRead.canStart(elapsed: 29.5, wait: 1, total: 30))
         XCTAssertEqual(WholeRead.cap, 4000)
         XCTAssertEqual(WholeRead.progressAfter, 2)
         XCTAssertEqual(WholeRead.probeWait, 0.5)
@@ -361,7 +364,8 @@ final class WholeReadTests: XCTestCase {
 
     /// Runs 163 textarea and lexical `mid`, `sel`: the page moved the caret without telling the keyboard, so the
     /// first step forward from the contexts it was shown fits nothing. The first walk may count that one step as a
-    /// resync: the requested move, no units (the walk only has to reach the end); a later bad step still stops it.
+    /// resync, and it is one unit (design review: a jump planned from a stale window can be longer than the way to the
+    /// end, which the host would cut short while the record counted all of it): one unit, unread at most.
     func testTheFirstForwardStepMayResync() {
         let t = u(draft)
         var f = Field(text: t, pos: 30)
@@ -369,19 +373,48 @@ final class WholeReadTests: XCTestCase {
         let fw = walkForward(&f, resync: true, stale: stale)
         XCTAssertEqual(fw.step, .done)
         XCTAssertEqual(f.pos, t.count)
-        XCTAssertEqual(fw.net, t.count - 30, "the resync step counts its requested move")
-        XCTAssertTrue(t.elementsEqual(t.prefix(t.count - fw.units.count) + fw.units), "the rest is the field's end")
+        XCTAssertEqual(fw.net, t.count - 30, "the resync step counts its one unit")
+        XCTAssertEqual(fw.units, Array(t[31...]), "all but the resync's one unit")
         var g = Field(text: t, pos: 30)
         let gw = walkForward(&g, resync: false, stale: stale)
         guard case .failed(let why, _) = gw.step else { return XCTFail("\(gw.step)") }
         XCTAssertEqual(why, "badStep")
         // Only the first step: a later one that fits nothing stops the walk.
         var w = ForwardWalk(cap: 100, resyncFirst: true)
-        XCTAssertEqual(w.plan(after: u("abcdef")), 5)
-        XCTAssertEqual(w.landed(changed: true, before: u("qq"), after: u("zz")), .moved(5))
+        XCTAssertEqual(w.plan(after: u("abcdef")), 1, "the first step of a walk that may resync is one unit")
+        XCTAssertEqual(w.landed(changed: true, before: u("qq"), after: u("zz")), .moved(1))
         XCTAssertEqual(w.resyncs, 1)
         XCTAssertEqual(w.plan(after: u("abcdef")), 5)
         XCTAssertEqual(w.landed(changed: true, before: u("qq"), after: u("zz")), .failed("badStep", moved: 5))
+    }
+
+    /// A first step that fits reads its unit like any other; a walk that may not resync jumps at once.
+    func testTheResyncStepIsOneUnitThatFitsAsUsual() {
+        var w = ForwardWalk(cap: 100, resyncFirst: true)
+        XCTAssertEqual(w.plan(after: u("abcdef")), 1)
+        XCTAssertEqual(w.landed(changed: true, before: u("xa"), after: u("bcdef")), .moved(1))
+        XCTAssertEqual(w.resyncs, 0)
+        XCTAssertEqual(w.units, u("a"))
+        var x = ForwardWalk(cap: 100)
+        XCTAssertEqual(x.plan(after: u("abcdef")), 5)
+    }
+
+    /// The limits of the resync when the host already had the caret at the end: if the contexts stay stale, the step
+    /// is stuck and the read refused (nothing moved, the record exact); if they change to show the real place, the
+    /// one-unit step counts one unit the caret never moved.
+    func testAResyncAtTheEndIsStuckOrOneUnitOff() {
+        let t = u(draft)
+        var f = Field(text: t, pos: t.count)
+        let stale = (before: Array(t[0..<10]), after: Array(t[10...].prefix { $0 != 10 }))
+        let fw = walkForward(&f, resync: true, stale: stale)
+        XCTAssertEqual(fw.step, .failed("stuck", moved: 0))
+        XCTAssertEqual(fw.net, 0)
+        var w = ForwardWalk(cap: 100, resyncFirst: true)
+        XCTAssertEqual(w.plan(after: stale.after), 1)
+        XCTAssertEqual(w.landed(changed: true, before: Array(t.suffix(20)), after: []), .moved(1))
+        XCTAssertEqual(w.plan(after: []), 1)
+        XCTAssertEqual(w.landed(changed: false, before: Array(t.suffix(20)), after: []), .done)
+        XCTAssertEqual(w.units, [])
     }
 
     // MARK: Acceptance

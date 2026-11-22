@@ -74,7 +74,7 @@ final class KeyboardSourceRulesTests: XCTestCase {
         let values = Set(["tag", "count", "lf", "hash", "reason", "steps", "took", "outcome", "units", "deleted",
                           "inserted", "sent", "heldMS", "ok", "position", "known", "retries", "resyncs", "why", "k",
                           "b0", "a0", "b1", "a1", "fb", "fa", "ch", "sb", "sa", "ss", "quietMS", "gate", "changes",
-                          "seen", "lb", "la", "ends", "late"])
+                          "seen", "lb", "la", "ends", "late", "firstMS", "cancelled"])
         for range in calls {
             let line = lineText(ns, range)
             for m in matches(#"\\\(([A-Za-z_][A-Za-z0-9_.]*)"#, in: line) {
@@ -130,7 +130,8 @@ final class KeyboardSourceRulesTests: XCTestCase {
                       uses.joined())
     }
 
-    /// keyboard-ui 003: the one write, Copy on the result card, is an assignment inside copyResult().
+    /// keyboard-ui 003: the one write is an assignment inside writeClipboard(), which Copy on the result card and (K1b)
+    /// Copy original after a Replace that was not proven call.
     func testTheClipboardStringIsReadOnlyInReadClipboard() throws {
         var writes: [String] = []
         for (name, text) in try sources() {
@@ -144,12 +145,12 @@ final class KeyboardSourceRulesTests: XCTestCase {
             guard let read = body(of: "private func readClipboard()", in: ns) else {
                 XCTFail("\(name): readClipboard not found"); continue
             }
-            let copy = body(of: "func copyResult()", in: ns)
+            let copy = body(of: "private func writeClipboard(", in: ns)
             for r in uses {
                 let rest = ns.substring(from: r.location + r.length)
                 if rest.range(of: #"^\s*=(?!=)"#, options: .regularExpression) != nil {
                     XCTAssertTrue(copy.map { NSLocationInRange(r.location, $0) } == true,
-                                  "\(name): clipboard write outside copyResult: \(lineText(ns, r))")
+                                  "\(name): clipboard write outside writeClipboard: \(lineText(ns, r))")
                     writes.append("\(name): \(lineText(ns, r))")
                 } else {
                     XCTAssertTrue(NSLocationInRange(r.location, read),

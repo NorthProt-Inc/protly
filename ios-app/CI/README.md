@@ -297,7 +297,8 @@ units). The test writes PASS or FAIL itself; checks.py then holds each try again
   UITextView, Dismiss and `rfocus` on the SwiftUI field, Dismiss and a tap at the field's end on the page), `mid` (the
   cursor in paragraph 2: the fill's offset, on the page set again by `rcaret` after the tap), `sel` (select all: `rselall`,
   in code; on the SwiftUI field through its bound `TextSelection`, iOS 18, read back by HostView's `sel` probe), `long` (3247), `x14k` (14 055, with emoji:
-  the refusal), `emoji` (web only, 460 with 10 emoji: the refusal), `wr-uikit-r4k` (3975, under the read's 4000-unit
+  the refusal), `emoji` (460 with 10 emoji: read on native hosts, which move by UTF-16 units; the refusal on web
+  hosts, which move by characters), `wr-uikit-r4k` (3975, under the read's 4000-unit
   cap), `wr-uikit-cancel` (the `mid` draft: once the strip says "Reading the whole text…", its Cancel; the strip goes,
   no panel or card comes, the field and the caret are as before, and the keyboard log says `outcome=cancelled`). `win`
   and `long` run twice; every try must pass.
@@ -313,9 +314,11 @@ units). The test writes PASS or FAIL itself; checks.py then holds each try again
   hashes, offsets and times, never text.
 - **The keyboard's log** (`keyboard-log.txt`, category `read`, lines between the try's MARK `wr-<host>-<case>-t<n>`
   in `ui-log.txt` and the next MARK): an accepted case needs `read done outcome=accepted` and two `replace ... held=1`
-  lines (Replace and Undo, each proven by the keyboard's walk over the field once the host was quiet); a refusal case
-  needs `read done outcome=refused` with its reason (`WHOLE_REFUSALS`: native `x14k` `b1:tooLong`, the web drafts
-  with emoji `b1:characters` or `b1:badStep`). A PASS without those lines is a FAIL; the line gains
+  lines (Replace and Undo, each proven by the keyboard's walk over the field once the host was quiet), each `heldms`
+  no more than 1 s before the test saw the field hold it (`replace=`, `undo=`: a check that ends while the host is
+  still deleting proved only the proxy's own copy of the field); a refusal case needs `read done outcome=refused` with
+  its reason (`WHOLE_REFUSALS`: native `x14k` `b1:tooLong`, or `b1:characters` / `b1:badStep` as in run 162; the web
+  drafts with emoji `b1:characters` or `b1:badStep`). A PASS without those lines is a FAIL; the line gains
   `log=t<n>:<outcome>/...` either way.
 - `test_checks.py` (`WholeReadTests`) keeps the Swift lists, tries and draft lengths equal to checks.py and HostApp.swift.
 

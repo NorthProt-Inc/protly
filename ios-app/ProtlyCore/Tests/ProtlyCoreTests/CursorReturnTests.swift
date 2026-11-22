@@ -60,15 +60,21 @@ final class CursorReturnTests: XCTestCase {
     }
 
     /// The end is where the field ends: a known offset that disagrees with it (a step the host applied short) gives way.
-    func testTheEndWinsOverTheSummedSteps() {
+    func testKnownStepsWinOverAFirstEndThatWasNotTheEnd() {
+        // The first walk stopped at a false end (a host that stalled for the probe's 0.5 s; the read is refused as
+        // midEnd): the summed steps, each checked against the contexts, say where the cursor is (design review).
         var c = CursorReturn()
         c.begin()
         step(&c, 20, before: "end")
         c.reachedEnd(before: "end")
         step(&c, -40, before: "")
-        step(&c, 38, before: "en")
-        c.reachedEnd(before: "end")
-        XCTAssertEqual(c.back(before: "end"), -20)
+        step(&c, 45, before: "real end")
+        c.reachedEnd(before: "real end")
+        XCTAssertEqual(c.back(before: "real end"), -25)
+        // And that end is the end from now on: a position lost later comes back to it.
+        step(&c, nil, before: "x")
+        c.reachedEnd(before: "real end")
+        XCTAssertEqual(c.back(before: "real end"), -25)
     }
 
     /// Lost before the first end: no end can bring the position back.

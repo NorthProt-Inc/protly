@@ -58,6 +58,8 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// Also while Replace deletes, waits for the field to empty and inserts (K1b): a key then would land mid-write.
     var isReadingField: Bool { readingCall != nil || replacing }
     private var replacing = false
+    /// Replace or its Undo: a hide cancels it, so the keys never wait on a keyboard that is not shown (design review).
+    private var writeTask: Task<Void, Never>?
     /// K1b: the user typed or moved the cursor since the read ended. The before-context is only a window of the
     /// field's end, so an edit further back is invisible to FieldGuard; Replace is then copy-only.
     private var touchedSinceRead = false
@@ -89,6 +91,7 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     deinit {
         actionTask?.cancel()
+        writeTask?.cancel()
     }
 
     override func viewDidLoad() {
@@ -148,8 +151,10 @@ final class KeyboardViewController: KeyboardInputViewController {
         // word. The abandoned word's language carries to the next message.
         abandonWord()
         pickSpace.end()
-        // Hiding mid-call counts as Cancel: the call stops and the cursor goes back too.
+        // Hiding mid-call counts as Cancel: the call stops and the cursor goes back too. A Replace stops waiting for the
+        // host (its edits are on their way and cannot be called back): it says it may not have finished.
         restoreCursor()
+        writeTask?.cancel()
         if mode.panel != nil { mode.panel = nil }
         if mode.strip != nil { mode.strip = nil }  // also stops the glow
         readInput = nil
@@ -572,7 +577,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         // K1b: the deletes, the insert and the check run with the keys waiting (isReadingField) and the strip saying so.
         let original = card.original
         beginWriting(card.action)
-        Task { [weak self] in
+        writeTask = Task { [weak self] in
             guard let self else { return }
             let held = await FieldText.replace(original, with: result, textDocumentProxy)
             endWriting()
@@ -581,8 +586,9 @@ final class KeyboardViewController: KeyboardInputViewController {
                 lastInsert = (result, original)
                 mode.canUndo = true
             } else {
-                // Not proven: old text may still be there, and Undo would bring it back twice.
-                mode.panel = .notice(Self.replaceUnsureText)
+                // Not proven: old text may still be there, and Undo would bring it back twice. The text that was read
+                // can still be copied.
+                mode.panel = .unsure(Self.replaceUnsureText, original: original)
             }
             refreshField()
         }
@@ -597,6 +603,7 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     private func endWriting() {
         replacing = false
+        writeTask = nil
         if mode.strip?.writing == true { mode.strip = nil }
         watch.forget()
     }
@@ -616,16 +623,29 @@ final class KeyboardViewController: KeyboardInputViewController {
         touchedSinceRead = true
     }
 
-    /// Copy on the card: the one write to the pasteboard. false when the tap came too soon after the card appeared.
+    /// Copy on the card. false when the tap came too soon after the card appeared.
     func copyResult() -> Bool {
         guard let card = openCard, card.phase != .streaming, !feed.partial.isEmpty,
               AboutMe.canSave(shownAt: card.shownAt, now: now) else { return false }
-        let pb = UIPasteboard.general
-        pb.string = feed.partial
-        // Protly's own copy is not new text: the bar must not offer to Read it.
-        UserDefaults.standard.set(pb.changeCount, forKey: Self.clipboardKey)
+        writeClipboard(feed.partial)
         refreshField()
         return true
+    }
+
+    /// Copy original on the panel after a Replace or Undo that was not proven (K1b): the text that was in the field
+    /// before protly wrote, as it was read.
+    func copyOriginal(_ text: String) {
+        writeClipboard(text)
+        if mode.panel != nil { mode.panel = nil }
+        refreshField()
+    }
+
+    /// The one write to the pasteboard (KeyboardSourceRulesTests).
+    private func writeClipboard(_ text: String) {
+        let pb = UIPasteboard.general
+        pb.string = text
+        // Protly's own copy is not new text: the bar must not offer to Read it.
+        UserDefaults.standard.set(pb.changeCount, forKey: Self.clipboardKey)
     }
 
     /// The protly key runs exactly what its symbol shows (K1): symbol and action are the same BarAction value.
@@ -659,11 +679,11 @@ final class KeyboardViewController: KeyboardInputViewController {
         }
         // K1b: Undo of a Replace is a Replace the other way round, with the keys waiting and the same checks.
         beginWriting(.out)
-        Task { [weak self] in
+        writeTask = Task { [weak self] in
             guard let self else { return }
             let held = await FieldText.replace(l.inserted, with: l.original, textDocumentProxy)
             endWriting()
-            if !held { mode.panel = .notice(Self.replaceUnsureText) }
+            if !held { mode.panel = .unsure(Self.replaceUnsureText, original: l.original) }
             refreshField()
         }
     }
@@ -973,6 +993,7 @@ struct ProtlyRoot: View {
                         feed: shown.feed,
                         insert: { [unowned host] in host.insertResult() },
                         copy: { [unowned host] in host.copyResult() },
+                        copyOriginal: { [unowned host] in host.copyOriginal($0) },
                         close: { [unowned host] in host.closePanel() },
                         retry: { [unowned host] in host.retry($0) },
                         deep: { [unowned host] in host.deep() }

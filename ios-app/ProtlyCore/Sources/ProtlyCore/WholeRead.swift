@@ -36,9 +36,10 @@ public enum WholeRead {
         3 + 0.005 * Double(deletes)
     }
 
-    /// A step that may wait `wait` s still ends within `total`: the cap stops a read only between steps, so a step
-    /// on its way always settles (Cancel's record, CursorReturn, never guesses about it).
-    public static func canStart(elapsed: TimeInterval, wait: TimeInterval) -> Bool {
+    /// A step that may wait `wait` s still ends within `total` (a read's 20 s; Replace's check walk has its own): the
+    /// cap stops a walk only between steps, so a step on its way always settles (Cancel's record, CursorReturn, never
+    /// guesses about it).
+    public static func canStart(elapsed: TimeInterval, wait: TimeInterval, total: TimeInterval = total) -> Bool {
         elapsed + wait <= total
     }
 
@@ -219,10 +220,12 @@ public struct ForwardWalk: Sendable {
         self.resyncFirst = resyncFirst
     }
 
-    /// Units to move forward: a jump, or one unit over the line feed an empty after-context stops at.
+    /// Units to move forward: a jump, or one unit over the line feed an empty after-context stops at. The first step
+    /// of a walk that may resync is one unit: planned from a window that may be stale, a jump could be longer than the
+    /// way to the end, and the host would cut it short while the record counted all of it (design review).
     public mutating func plan(after: [UInt16]) -> Int {
         a0 = after
-        k = after.isEmpty ? 1 : WholeRead.safeJump(after, back: false)
+        k = after.isEmpty || (resyncFirst && steps == 0) ? 1 : WholeRead.safeJump(after, back: false)
         return k
     }
 
@@ -248,8 +251,9 @@ public struct ForwardWalk: Sendable {
     }
 
     /// The first step of a walk from the user's cursor fit nothing: the contexts it planned from were stale. The host
-    /// applied the requested move (native hosts in UTF-16 units), so the position stays known; the units it crossed
-    /// are not named, and the walk goes on from the contexts it shows now.
+    /// applied the one-unit move, so the position stays known (one unit off when the host already had the caret at
+    /// the end: the contexts changed, the caret did not); the unit is not named, and the walk goes on from the
+    /// contexts it shows now.
     private mutating func resync() -> WalkStep? {
         guard resyncFirst, steps == 1 else { return nil }
         resyncs += 1

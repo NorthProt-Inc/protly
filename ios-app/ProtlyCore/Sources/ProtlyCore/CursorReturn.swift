@@ -37,13 +37,15 @@ public struct CursorReturn: Sendable, Equatable {
     /// The read knows where the field's end is from where the user had the cursor.
     public var hasEnd: Bool { end != nil }
 
-    /// A walk forward reached the field's end (a probe there changed nothing). The first time, with the position
-    /// known, that fixes the end; any later time the cursor is there again, whatever the steps in between summed to.
+    /// A walk forward reached the field's end (a probe there changed nothing). With the position known, that fixes
+    /// the end: each step was checked against the contexts, so a known position wins over an earlier end that was
+    /// not the end (a host that stalled for the probe; the read is refused then, design review). With the position
+    /// lost, the cursor is at the end the last known walk found.
     public mutating func reachedEnd(before: String) {
-        if let end {
-            offset = end
-        } else {
+        if let offset {
             end = offset
+        } else {
+            offset = end
         }
         at = Array(before.utf16)
         inFlight = false

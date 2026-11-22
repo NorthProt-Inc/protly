@@ -54,11 +54,12 @@ BAR_IDS = ["hit-1", "bar-dark", "bar-light", "bar-xxl", "app-dark", "app-light"]
 PERIOD_FIELDS = ("uikit", "composer")
 PERIOD_KINDS = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2", "pickmid", "pickmove")
 PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
-# K1b: the whole-field read, Replace (within 5 s) and Undo, wr-<host>-<case>. The test writes PASS or FAIL itself
+# K1b: the whole-field read, Replace and Undo (times recorded), wr-<host>-<case>. The test writes PASS or FAIL itself
 # (UITests/WholeReadChecks.swift); the same lists as WholeChecks there. Native hosts: the UITextView screen (uikit) and
-# the SwiftUI field (swiftui), plus a 3975-unit Replace and Undo on the UITextView (r4k); web hosts: the read page's
-# textarea and Lexical-shaped field, plus text with emoji (emoji, a refusal there).
-WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k")
+# the SwiftUI field (swiftui), plus a 3975-unit Replace and Undo (r4k) and Cancel mid-read (cancel) on the UITextView;
+# web hosts: the read page's textarea and Lexical-shaped field. Text with emoji (emoji) is read on native hosts and
+# refused on web hosts (they move by characters).
+WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k", "emoji")
 WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji")
 WHOLE_WEB_HOSTS = ("textarea", "lexical")
 WHOLE_TRIES = {"win": 2, "long": 2}
@@ -67,13 +68,21 @@ WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r
 WHOLE_WEB_IDS = [f"wr-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in WHOLE_WEB_CASES]
 # What the keyboard's own log (keyboard-log.txt, category `read`) must say for each wr- try, between the try's MARK
 # (wr-<host>-<case>-t<n> in ui-log.txt) and the next MARK: a refusal case its refusal reason (`<walk>:<why>`; the web
-# drafts with emoji are refused for the emoji, the native 14 055-unit one at the read's 4000-unit cap), an accepted
-# case the read accepted and Replace and Undo both proven by the keyboard (`replace ... held=1`, twice).
+# drafts with emoji are refused for the emoji, the native 14 055-unit one at the read's 4000-unit cap or, as in run
+# a6de577-162 on both native hosts, at its second step back, where the host's move fit one more unit per emoji crossed
+# (probe run 150 saw 11 such native steps in 14 038-unit walks)), an accepted
+# case the read accepted and Replace and Undo both proven by the keyboard (`replace ... held=1`, twice), with the
+# keyboard's check ending no earlier than WHOLE_HOST_SLACK_MS before the test saw the field hold the result
+# (`heldms` against the test's replace= and undo=): a check that ends while the host is still deleting proved only
+# the proxy's own copy of the field (design review).
 # wr-uikit-cancel (Cancel on the strip mid-read) needs `outcome=cancelled`.
-WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong",),
+WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong", "b1:characters", "b1:badStep"),
                   ("web", "x14k"): ("b1:characters", "b1:badStep"),
                   ("web", "emoji"): ("b1:characters", "b1:badStep")}
 WHOLE_CANCELLED = {("native", "cancel")}
+# The test polls the field every 0.2 s, and reading a long field takes a few hundred ms more; the keyboard's clock
+# starts a little after the test's tap.
+WHOLE_HOST_SLACK_MS = 1000
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
                 + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
@@ -1329,6 +1338,15 @@ def resolve_whole_log(check, marks, kb_text):
             notes.append(f"t{t}:{outcome}/{took}ms/held={','.join(held)}")
             if held != ["1", "1"]:
                 problems.append(f"t{t}:held={','.join(held) or 'none'} want 1,1 (Replace, Undo)")
+                continue
+            heldms = [kv(line, "heldms") for line in lines if line.startswith("replace ")]
+            ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
+            for name, ms_text in zip(("replace", "undo"), heldms):
+                seen = kv(ui.group(1), name) if ui else None
+                if seen is None or ms_text is None:
+                    problems.append(f"t{t}:no {name}= time to hold heldms against")
+                elif int(ms_text) + WHOLE_HOST_SLACK_MS < float(seen) * 1000:
+                    problems.append(f"t{t}:{name} checked at {ms_text}ms, the field held it at {seen}s")
     evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
     if problems:
         evidence += " log-problems=" + ",".join(problems)

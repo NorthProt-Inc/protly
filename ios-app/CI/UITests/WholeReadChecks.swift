@@ -14,7 +14,7 @@ import XCTest
 /// Ported from the walk-back probe (diag/p1-walk-back-strict: WalkChecks.swift, ReadChecks.swift) without its logging.
 enum WholeChecks {
     /// The same lists as checks.py WHOLE_NATIVE_CASES, WHOLE_WEB_CASES and WHOLE_WEB_HOSTS (test_checks.py compares).
-    static let nativeCases = ["win", "mid", "sel", "long", "x14k"]
+    static let nativeCases = ["win", "mid", "sel", "long", "x14k", "emoji"]
     static let webCases = ["win", "mid", "sel", "long", "x14k", "emoji"]
     static let webHosts = ["textarea", "lexical"]
     /// Tries per case, all of which must pass; 1 for the others (checks.py WHOLE_TRIES).
@@ -50,6 +50,8 @@ enum WholeChecks {
         var selectAll = false
         /// The keyboard must refuse (too long, or text with emoji on a web host).
         var refusal = false
+        /// A refusal on web hosts only: native hosts move by UTF-16 units and read it (emoji: probe runs 149, 153).
+        var nativeReads = false
         /// Cancel on the strip once it says the read is still going: the caret goes back, the field stays.
         var cancel = false
     }
@@ -61,7 +63,7 @@ enum WholeChecks {
         case "sel": return Spec(name: name, fill: 1, units: 335, cursor: 335, selectAll: true)
         case "long": return Spec(name: name, fill: 3, units: 3247, cursor: 3247)
         case "x14k": return Spec(name: name, fill: 4, units: 14055, cursor: 14055, refusal: true)
-        case "emoji": return Spec(name: name, fill: 5, units: 460, cursor: 460, refusal: true)
+        case "emoji": return Spec(name: name, fill: 5, units: 460, cursor: 460, refusal: true, nativeReads: true)
         case "r4k": return Spec(name: name, fill: 6, units: 3975, cursor: 3975)
         case "cancel": return Spec(name: name, fill: 2, units: 335, cursor: 112, cancel: true)
         default: return nil
@@ -325,7 +327,7 @@ extension PhoneRun {
             return r
         }
 
-        if s.refusal {
+        if s.refusal, web != nil || !s.nativeReads {
             if v.panel.isEmpty {
                 let reply = v.texts(v.card).map(\.label).first { $0.hasPrefix("read ") }
                 r.check(false, "outcome=card reply=\(reply.flatMap { WholeChecks.parseReply($0)?.shape.text } ?? "none")")

@@ -1118,8 +1118,8 @@ class WholeReadTests(unittest.TestCase):
         return re.findall(r'"(\w+)"', m.group(1))
 
     def test_every_id_is_expected_and_has_its_method(self):
-        native = [f"wr-uikit-{c}" for c in ("win", "mid", "sel", "long", "x14k")] + ["wr-uikit-r4k", "wr-uikit-cancel"] + [
-            f"wr-swiftui-{c}" for c in ("win", "mid", "sel", "long", "x14k")]
+        cases = ("win", "mid", "sel", "long", "x14k", "emoji")
+        native = [f"wr-uikit-{c}" for c in cases] + ["wr-uikit-r4k", "wr-uikit-cancel"] + [f"wr-swiftui-{c}" for c in cases]
         web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji")]
         self.assertEqual(checks.METHOD_IDS["test5g_wholenative"], native)
         self.assertEqual(checks.METHOD_IDS["test5h_wholeweb"], web)
@@ -1287,7 +1287,8 @@ class WholeReadTests(unittest.TestCase):
             return {c.id: c for c in checks.assemble(lines, ui, "", ran=ran, run_dir=d)}
 
     ACCEPTED = "read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=4871 known=1"
-    HELD = "replace deleted=335 inserted=26 sentms=0 quietms=900 quiet=1 changes=3 events=4 b=26 a=0 ends=1 heldms=2100 held=1"
+    HELD = ("replace deleted=335 inserted=26 sentms=0 quietms=2900 quiet=1 changes=3 events=40 b=26 a=0 ends=1 heldms=3600 "
+            "held=1 cancelled=0")
     UNSURE = HELD.replace("held=1", "held=0")
 
     def test_an_accepted_try_needs_the_read_and_both_writes_proven_in_the_keyboard_log(self):
@@ -1305,6 +1306,29 @@ class WholeReadTests(unittest.TestCase):
         # Lines after the next MARK belong to the next try.
         late = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("11", "02.000", self.HELD))
         self.assertEqual(self.assemble_with_logs(line, ui, late)["wr-uikit-mid"].status, "FAIL")
+
+    def test_the_keyboards_check_may_not_end_before_the_field_held_the_result(self):
+        # The host needed 9 s for the deletes; a check that ended at 1.4 s proved only the proxy's own copy.
+        line = "CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec read=15457 replace=9.00 kb=9.60 undo=3.10 kbundo=4.00}\n"
+        ui = self.marks(("wr-uikit-long-t1", 10, 0), ("wr-uikit-long-t2", 11, 0))
+        early = self.HELD.replace("heldms=3600", "heldms=1400")
+        kb = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", early), ("10", "20.000", self.HELD))
+        final = self.assemble_with_logs(line, ui, kb)["wr-uikit-long"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:replace checked at 1400ms, the field held it at 9.00s", final.evidence)
+        self.assertNotIn("t1:undo", final.evidence.split("log-problems=")[1])
+        # Within the slack (the test polls every 0.2 s and its clock starts first): PASS.
+        close = self.HELD.replace("heldms=3600", "heldms=8100")
+        kb = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", close), ("10", "20.000", self.HELD))
+        line2 = line.replace("wr-uikit-long PASS t1=", "wr-uikit-long PASS t1=").replace("}\n", "} t2={replace=1.0 undo=1.0}\n")
+        kb += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
+        final = self.assemble_with_logs(line2, ui, kb)["wr-uikit-long"]
+        self.assertEqual(final.status, "PASS", final.evidence)
+        # No replace= time on the test's side: nothing to hold the keyboard against, which is a FAIL.
+        bare = "CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec read=15457} t2={replace=1.0 undo=1.0}\n"
+        final = self.assemble_with_logs(bare, ui, kb)["wr-uikit-long"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:no replace= time", final.evidence)
 
     def test_a_refusal_try_needs_its_reason(self):
         ui = self.marks(("wr-uikit-x14k-t1", 10, 0), ("wr-textarea-emoji-t1", 20, 0), ("wr-textarea-x14k-t1", 30, 0))
