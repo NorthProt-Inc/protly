@@ -91,11 +91,14 @@ test('a Lexical draft the paste would cut short is refused before writing and le
   }
 });
 
-test('Lexical drafts ending in a line break that a paste replaces whole are written', async () => {
+test('Lexical drafts that a paste replaces whole are written, lists too', async () => {
   for (const html of [
     '<p><span>가나다</span><br><br></p>', // one line, then Shift+Enter
     '<p><span>가나다</span></p><p><span>라마바</span></p><p><span>사아자</span><br><br></p>', // the last paragraph is one line
     '<p><span>가나다</span></p><p><span>라마바</span></p><p><br></p>', // rich text, Enter onto an empty last line
+    '<p><span data-lexical-decorator="true" contenteditable="false">@민지</span><br></p>', // an inline decorator alone, then its caret <br>
+    '<ul><li><span>가나다</span></li><li><span>라마바</span><br><br></li></ul>', // a list whose last item is one line, then Shift+Enter
+    '<ul><li><span>가나다</span></li><li><span>라마바</span></li></ul>', // a list whose last item is plain text
   ]) {
     const { d, el } = page();
     const log = fakeEditor(el, { kind: 'lexical' });
@@ -104,6 +107,10 @@ test('Lexical drafts ending in a line break that a paste replaces whole are writ
     assert.equal(await writeBox(box(d, el), EN, { settleMs: 0 }), true, html);
     assert.deepEqual(log.pastes, [EN], html);
     assert.deepEqual(log.inserts, [], html);
+    const fresh = page(); // the composer path too
+    fakeEditor(fresh.el, { kind: 'lexical' });
+    fresh.el.innerHTML = html;
+    assert.equal(await setComposerText(fresh.el, EN), true, html);
   }
 });
 
