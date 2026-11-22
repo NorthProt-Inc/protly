@@ -434,13 +434,13 @@ enum ReadDrafts {
     /// stretches of a draft read the same (run 7f2f443-135: jumps over 3 repeated sentences changed nothing).
     static var unique: Bool { UserDefaults.standard.string(forKey: "uniquedrafts") == "1" }
 
-    /// diag/p1-walk-back-mix: with `-uniquedrafts 1` the numbered sentences take turns: the Korean one, an English one
-    /// with an emoji (a surrogate pair, 2 UTF-16 units), a Korean one with an emoji.
+    /// diag/p1-walk-back-mix: the mixed sentences (unused on diag/p1-walk-back-strictlong-unique: Korean only, as
+    /// run 1233d72-139).
     static let mixed = [sentence, "Send me the notes after the call \u{1F44D}.", "\u{D68C}\u{C758} \u{B05D}\u{B098}\u{ACE0} \u{C804}\u{D654}\u{D560}\u{AC8C} \u{1F642}."]
 
     static func paragraphs(_ count: Int, sentences: Int) -> [String] {
         (1...count).map { k in
-            "\u{00A7}\(k) " + (1...sentences).map { j in unique ? "\(k)-\(j) " + mixed[(k + j) % 3] : sentence }.joined(separator: " ")
+            "\u{00A7}\(k) " + (1...sentences).map { j in unique ? "\(k)-\(j) " + sentence : sentence }.joined(separator: " ")
         }
     }
 
@@ -458,8 +458,8 @@ enum ReadDrafts {
         make("l5", paragraphs(5, sentences: 1), "\n", mid: false),
         make("long", paragraphs(5, sentences: 15), "\n\n", mid: false),
         make("longmid", paragraphs(5, sentences: 15), "\n\n", mid: true),
-        // diag/p1-walk-back-mix: with `-uniquedrafts 1` xlong has 60 sentences a paragraph (about 12 000 units).
-        make("xlong", paragraphs(8, sentences: unique ? 60 : 20), "\n\n", mid: false),
+        // diag/p1-walk-back-strictlong-unique: back to 20 sentences a paragraph (3958 units, as run 1233d72-139).
+        make("xlong", paragraphs(8, sentences: 20), "\n\n", mid: false),
     ] + window
 
     // MARK: Probe 3 (test5i_readwindow): what bounds the before-window, select all, a step over a line break
