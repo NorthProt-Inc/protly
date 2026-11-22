@@ -17,8 +17,28 @@ final class FieldGuardTests: XCTestCase {
         let edited = "Fi" + "XYZ" + draft.dropFirst(2)
         XCTAssertEqual(String(edited.suffix(40)), String(draft.suffix(40)))
         XCTAssertFalse(FieldGuard.canReplace(draft, before: edited, after: ""))
-        // A cut near the start: the field is shorter than what Insert would delete.
-        XCTAssertFalse(FieldGuard.canReplace(draft, before: String(draft.dropFirst(6)), after: ""))
+        // More text in front of the read text: the field is not what was read.
+        XCTAssertFalse(FieldGuard.canReplace(draft, before: "Earlier. " + draft, after: ""))
+    }
+
+    /// K1b: the before-context is a window of the last sentences (about 300 units at most), so a read longer than
+    /// that is checked on its end. A cut near the start looks the same as the window: the controller's "touched"
+    /// flag (a key or a cursor move since the read) covers that case, not this rule.
+    func testAWindowOfTheReadAgrees() {
+        let long = String(repeating: "문장이 하나 있어요. ", count: 100)
+        XCTAssertTrue(FieldGuard.canReplace(long, before: String(long.suffix(60)), after: ""))
+        XCTAssertTrue(FieldGuard.canReplace(draft, before: String(draft.dropFirst(6)), after: ""))
+        XCTAssertFalse(FieldGuard.canReplace(long, before: String(long.suffix(60)) + "x", after: ""))
+        XCTAssertFalse(FieldGuard.canReplace(long, before: "", after: ""))
+        // A window that starts inside a character (a combining mark after its base) agrees on its UTF-16 units.
+        XCTAssertTrue(FieldGuard.canReplace("Cafe\u{301} au lait", before: "\u{301} au lait", after: ""))
+        // The check after Replace uses the same rule on the result.
+        XCTAssertTrue(FieldGuard.holdsResult("read 335/9/h6d75860b t4210", before: "read 335/9/h6d75860b t4210", after: ""))
+        XCTAssertFalse(FieldGuard.holdsResult("read 335/9/h6d75860b t4210", before: "x read 335/9/h6d75860b t4210", after: ""))
+        XCTAssertFalse(FieldGuard.holdsResult("abc", before: "abc", after: "left over"))
+        // Undo of a long Replace (proven whole when it ended): the window shows the result's end.
+        XCTAssertTrue(FieldGuard.canUndoReplace(long, before: String(long.suffix(50)), after: "", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndoReplace(long, before: "", after: "", selected: ""))
     }
 
     func testNoInsertWithTextAfterTheCursorOrNothingRead() {
@@ -35,8 +55,32 @@ final class FieldGuardTests: XCTestCase {
         XCTAssertFalse(FieldGuard.canUndo("", before: "x", selected: ""))
     }
 
+    /// Tower review of f0533ae: Read's Insert into a field that took only part of it (a length limit) leaves text
+    /// that is a window of the insert's end; Undo then sent 8 deletes over 2 characters, into the user's own text.
+    /// Insert's Undo needs all of the inserted text before the cursor, as on main; only a Replace the keyboard
+    /// proved whole may be undone from a window of its end.
+    func testInsertUndoNeedsAllOfTheInsert() {
+        XCTAssertFalse(FieldGuard.canUndo("Looks OK", before: "OK", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndo("Looks OK", before: "Mine. OK", selected: ""))
+        XCTAssertTrue(FieldGuard.canUndo("Looks OK", before: "Mine. Looks OK", selected: ""))
+        XCTAssertTrue(FieldGuard.canUndoReplace("Looks OK", before: "OK", after: "", selected: ""))
+    }
+
     /// Replace left "Hi|", then the user added " there" and selected it: Undo's first delete would take the selection,
     /// the next ones the user's text before it. With text selected Undo is refused, and the bar does not offer it.
+    /// K1b: Undo of a whole-field Replace puts the read text back with the cursor at the end; text after the cursor
+    /// (moved since) means the deletes would take the wrong characters.
+    func testUndoOfAReplaceNeedsTheCursorAtTheEnd() {
+        XCTAssertTrue(FieldGuard.canUndoReplace("Hello there.", before: "Hello there.", after: "", selected: ""))
+        XCTAssertTrue(FieldGuard.canUndoReplace("Hello there.", before: "there.", after: "", selected: ""),
+                      "a window of the result's end")
+        XCTAssertFalse(FieldGuard.canUndoReplace("Hello there.", before: "Hello there.", after: " more", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndoReplace("Hello there.", before: "Hello", after: " there.", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndoReplace("Hello there.", before: "Hello there.", after: "", selected: "there"))
+        XCTAssertFalse(FieldGuard.canUndoReplace("Hello there.", before: "Hello there.x", after: "", selected: ""))
+        XCTAssertFalse(FieldGuard.canUndoReplace("", before: "", after: "", selected: ""))
+    }
+
     func testNoUndoOverASelection() {
         XCTAssertTrue(FieldGuard.canUndo("Hi", before: "Hi", selected: ""))
         XCTAssertFalse(FieldGuard.canUndo("Hi", before: "Hi", selected: " there"))
@@ -101,7 +145,8 @@ final class FieldGuardTests: XCTestCase {
         for action in [ActionMode.out, .fix] {
             XCTAssertNil(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: nil))
             XCTAssertNil(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field(draft)))
-            XCTAssertNil(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field("Earlier. " + draft)))
+            XCTAssertEqual(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field("Earlier. " + draft)),
+                           .fieldChanged, "K1b: the read was the whole field")
             XCTAssertEqual(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field(draft + "x")),
                            .fieldChanged)
             XCTAssertEqual(FieldGuard.copyOnly(action, original: draft, isSelection: false, field: field(draft, after: " tail")),
@@ -126,14 +171,5 @@ final class FieldGuardTests: XCTestCase {
     func testCopyOnlyLines() {
         XCTAssertEqual(FieldGuard.CopyOnly.fieldChanged.message, "The text changed while this ran. Copy the result instead.")
         XCTAssertEqual(FieldGuard.CopyOnly.selection.message, "Protly does not type over selected text. Copy the result instead.")
-    }
-
-    /// keyboard-ui 003 (P6): Cancel moves the cursor back only while the text the read moved over is still just
-    /// before it.
-    func testRestoreOnlyWhileTheReadTextIsBeforeTheCursor() {
-        XCTAssertTrue(FieldGuard.canRestore("hello there", before: "hello there"))
-        XCTAssertTrue(FieldGuard.canRestore("hello", before: "x hello"))
-        XCTAssertFalse(FieldGuard.canRestore("hello", before: "hello!"))
-        XCTAssertFalse(FieldGuard.canRestore("", before: "x"))
     }
 }

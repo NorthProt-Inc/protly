@@ -19,6 +19,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 FAKE_KEY = "sk-" + "ant-test"
 
 
+WHOLE_IDS = checks.WHOLE_NATIVE_IDS + checks.WHOLE_WEB_IDS
+
+
 def every_id_but(*skip, status="PASS"):
     """A line per expected ID; the IDs checks.py judges by model output (RULES) as a key-less run writes them."""
     return "".join(f"CHECK {i} SKIP no network key\n" if i in checks.RULES else f"CHECK {i} {status} ok\n"
@@ -218,14 +221,16 @@ class MainTests(unittest.TestCase):
     def test_writes_final_checks_and_keeps_the_raw(self):
         with tempfile.TemporaryDirectory() as d:
             with open(os.path.join(d, "checks.txt"), "w", encoding="utf-8") as f:
-                f.write(every_id_but("icon") + "CHECK icon RECORD found\n")
+                # wr- lines need the keyboard's log (WholeReadTests); a full run never has them (FILTERED_ONLY).
+                f.write(every_id_but("icon", *WHOLE_IDS) + "CHECK icon RECORD found\n")
             out = subprocess.run([sys.executable, os.path.join(HERE, "checks.py"), d],
                                  capture_output=True, text=True)
             self.assertEqual(out.returncode, 0, out.stderr)
             lines = out.stdout.splitlines()
             self.assertEqual(lines[0], "CHECKS")
-            ruled = len(checks.RULES)
-            self.assertEqual(lines[-1], f"CHECKS pass {len(checks.EXPECTED_IDS) - 1 - ruled} fail 0 record 1 skip {ruled}")
+            ruled, whole = len(checks.RULES), len(WHOLE_IDS)
+            self.assertEqual(lines[-1], f"CHECKS pass {len(checks.EXPECTED_IDS) - 1 - ruled - whole} fail 0 record 1 "
+                                        f"skip {ruled} not-run {whole}")
             with open(os.path.join(d, "checks.txt"), encoding="utf-8") as f:
                 self.assertEqual(f.read().splitlines(), lines[1:-1])
             self.assertTrue(os.path.exists(os.path.join(d, "checks-raw.txt")))
@@ -879,10 +884,11 @@ class PeriodTests(unittest.TestCase):
     def test_main_without_a_filter_counts_the_period_ids_not_run(self):
         with tempfile.TemporaryDirectory() as d:
             with open(os.path.join(d, "checks.txt"), "w", encoding="utf-8") as f:
-                f.write(every_id_but(*checks.PERIOD_IDS))
+                f.write(every_id_but(*checks.PERIOD_IDS, *WHOLE_IDS))
             out = subprocess.run([sys.executable, os.path.join(HERE, "checks.py"), d], capture_output=True, text=True)
             self.assertEqual(out.returncode, 0, out.stdout)
-            self.assertTrue(out.stdout.splitlines()[-1].endswith(f" not-run {len(checks.PERIOD_IDS)}"), out.stdout)
+            n = len(checks.PERIOD_IDS) + len(WHOLE_IDS)
+            self.assertTrue(out.stdout.splitlines()[-1].endswith(f" not-run {n}"), out.stdout)
 
     def test_word_after_the_cursor_gets_the_period(self):
         for check_id, sel in [("dsp-uikit-word", self.UIKIT_SEL), ("dsp-composer-word", self.WEB_SEL)]:
@@ -1084,6 +1090,340 @@ class PeriodTests(unittest.TestCase):
         line = 'CHECK dsp-uikit-en FAIL unreadable: problems="no keyboard to type on" kind=en\n'
         c = {c.id: c for c in checks.assemble(line, "", "")}["dsp-uikit-en"]
         self.assertEqual(c.status, "FAIL")
+
+
+
+WHOLE_METHODS = ("test5g_wholenative", "test5h_wholeweb")
+
+
+def read_here(*parts):
+    with open(os.path.join(HERE, *parts), encoding="utf-8") as f:
+        return f.read()
+
+
+def swift_string(literal):
+    r"""A Swift string literal's text: \u{...} and \n escapes, as in HostApp.swift WholeDrafts."""
+    return re.sub(r"\\u\{([0-9A-Fa-f]+)\}|\\n", lambda m: chr(int(m.group(1), 16)) if m.group(1) else "\n", literal)
+
+
+class WholeReadTests(unittest.TestCase):
+    """K1b (fix/whole-field-read): wr-<host>-<case>, written PASS or FAIL by UITests/WholeReadChecks.swift."""
+
+    def swift(self):
+        return read_here("UITests", "WholeReadChecks.swift")
+
+    def swift_list(self, name):
+        m = re.search(r"static let " + name + r" = \[([^\]]*)\]", self.swift())
+        self.assertIsNotNone(m, name)
+        return re.findall(r'"(\w+)"', m.group(1))
+
+    def test_every_id_is_expected_and_has_its_method(self):
+        cases = ("win", "mid", "sel", "long", "x14k", "emoji")
+        native = [f"wr-uikit-{c}" for c in cases] + ["wr-uikit-r4k", "wr-uikit-cancel"] + [f"wr-swiftui-{c}" for c in cases]
+        web = [f"wr-{h}-{c}" for h in ("textarea", "lexical") for c in ("win", "mid", "sel", "long", "x14k", "emoji")]
+        self.assertEqual(checks.METHOD_IDS["test5g_wholenative"], native)
+        self.assertEqual(checks.METHOD_IDS["test5h_wholeweb"], web)
+        for i in native + web:
+            self.assertIn(i, checks.EXPECTED_IDS)
+            # The test writes PASS or FAIL itself: no resolver, no model output.
+            self.assertNotIn(i, checks.RESOLVERS)
+            self.assertNotIn(i, checks.RULES)
+        for m in WHOLE_METHODS:
+            self.assertTrue(checks.known_entry(f"PhoneChecksUITests/{m}"))
+            self.assertEqual(checks.FILTERED_ONLY[m], "runs only in a filtered run (deadline)")
+
+    def test_the_ui_test_lists_the_same_cases_and_tries(self):
+        # WholeChecks is the other half of WHOLE_*_IDS: a case missing there is a FAIL `no CHECK line` in CI.
+        self.assertEqual(self.swift_list("nativeCases"), list(checks.WHOLE_NATIVE_CASES))
+        self.assertEqual(self.swift_list("webCases"), list(checks.WHOLE_WEB_CASES))
+        self.assertEqual(self.swift_list("webHosts"), list(checks.WHOLE_WEB_HOSTS))
+        m = re.search(r"static let tries: \[String: Int\] = \[([^\]]*)\]", self.swift())
+        self.assertEqual({k: int(v) for k, v in re.findall(r'"(\w+)": (\d+)', m.group(1))}, checks.WHOLE_TRIES)
+        self.assertEqual(checks.WHOLE_TRIES, {"win": 2, "long": 2})
+        native = re.search(r"static var nativeIDs: \[String\] \{\n(.*?)\n    \}", self.swift(), re.S).group(1)
+        self.assertEqual(" ".join(native.split()),
+                         'nativeCases.map { "wr-uikit-\\($0)" } + ["wr-uikit-r4k", "wr-uikit-cancel"] + '
+                         'nativeCases.map { "wr-swiftui-\\($0)" }')
+        self.assertIn('webHosts.flatMap { h in webCases.map { "wr-\\(h)-\\($0)" } }', self.swift())
+
+    def specs(self):
+        out = {}
+        for m in re.finditer(r'case "(\w+)": return Spec\(name: name, fill: (\d+), units: (\d+), cursor: (\d+)([^)]*)\)',
+                             self.swift()):
+            out[m.group(1)] = (int(m.group(2)), int(m.group(3)), int(m.group(4)), m.group(5))
+        return out
+
+    def test_every_case_has_a_spec_and_the_refusals_are_the_long_and_emoji_drafts(self):
+        specs = self.specs()
+        self.assertEqual(set(specs), set(checks.WHOLE_WEB_CASES) | {"r4k", "cancel"})
+        self.assertEqual({k for k, v in specs.items() if "cancel: true" in v[3]}, {"cancel"})
+        self.assertEqual({k for k, v in specs.items() if "refusal: true" in v[3]}, {"x14k", "emoji"})
+        self.assertEqual({k for k, v in specs.items() if "selectAll: true" in v[3]}, {"sel"})
+        # The read's cap is 4000 UTF-16 units: every accepted draft stays under it, marker line included.
+        for name, (_, units, cursor, extra) in specs.items():
+            self.assertLessEqual(cursor, units, name)
+            if "refusal: true" not in extra:
+                self.assertLessEqual(units, 4000, name)
+
+    def host_drafts(self):
+        """HostApp.swift WholeDrafts.all, rebuilt here: [(name, text, cursor)] in rfill order."""
+        host = read_here("Host", "HostApp.swift")
+        block = host[host.index("enum WholeDrafts"):]
+        marker = swift_string(re.search(r'static let marker = "([^"]*)"', block).group(1))
+        sentence = swift_string(re.search(r'static let sentence = "([^"]*)"', block).group(1))
+        listed = re.search(r"static let mixed = \[(.*?)\]\n", block).group(1)
+        # The first is the `sentence` constant itself, then two literals.
+        self.assertTrue(listed.startswith("sentence, "))
+        mixed = [sentence] + [swift_string(x) for x in re.findall(r'"((?:[^"\\]|\\.)*)"', listed)]
+        self.assertEqual(len(mixed), 3)
+        def paragraphs(count, sentences, kind):
+            out = []
+            for k in range(1, count + 1):
+                if kind == "plain":
+                    body = [sentence] * sentences
+                elif kind == "numbered":
+                    body = [f"{k}-{j} " + sentence for j in range(1, sentences + 1)]
+                else:
+                    body = [f"{k}-{j} " + mixed[(k + j) % 3] for j in range(1, sentences + 1)]
+                out.append(f"\u00a7{k} " + " ".join(body))
+            return out
+        all_block = block[block.index("static let all: [Draft] = ["):]
+        all_block = all_block[:all_block.index("\n    ]\n")]
+        drafts = []
+        for m in re.finditer(r'make\("(\w+)", paragraphs\((\d+), sentences: (\d+), \.(\w+)\)(, mid: true)?\)', all_block):
+            paras = paragraphs(int(m.group(2)), int(m.group(3)), m.group(4))
+            text = marker + "\n\n".join(paras)
+            second = utf16(marker + paras[0] + "\n\n")
+            cursor = second + utf16(paras[1]) // 2 if m.group(5) else utf16(text)
+            drafts.append((m.group(1), text, cursor))
+        return drafts
+
+    def test_the_specs_match_the_host_drafts(self):
+        drafts = self.host_drafts()
+        self.assertEqual([d[0] for d in drafts], ["p5", "p5mid", "xlong", "x14k", "emoji", "r4k"])
+        for name, (fill, units, cursor, _) in self.specs().items():
+            _, text, at = drafts[fill - 1]
+            self.assertTrue(text.startswith("protly-stub read\n"), name)
+            self.assertEqual((utf16(text), at), (units, cursor), name)
+        # The walk-back probe's drafts under the marker line (docs/research/2026-11-21-walk-back-probe.md).
+        shapes = {d[0]: (utf16(d[1][len("protly-stub read\n"):]), sum(1 for c in d[1][len("protly-stub read\n"):]
+                                                                       if ord(c) > 0xFFFF)) for d in drafts}
+        self.assertEqual(shapes, {"p5": (318, 0), "p5mid": (318, 0), "xlong": (3230, 0), "x14k": (14038, 320),
+                                  "emoji": (443, 10), "r4k": (3958, 0)})
+
+    def test_the_hash_matches_the_page_and_the_probe(self):
+        # p5 318/8/h6d75860b (walk-back probe); the Swift and the page hash the same way (FNV-1a 32 over UTF-16).
+        p5 = self.host_drafts()[0][1][len("protly-stub read\n"):]
+        self.assertEqual(fnv16(p5), "6d75860b")
+        self.assertIn("0x811C_9DC5", self.swift())
+        self.assertIn("0x0100_0193", self.swift())
+        page = read_here("Host", "read-probe.html")
+        self.assertIn("let h = 0x811c9dc5;", page)
+        self.assertIn("h = Math.imul(h, 0x01000193) >>> 0;", page)
+
+    def test_the_methods_skip_outside_a_filtered_run_and_call_their_checks(self):
+        swift = read_here("UITests", "PhoneChecksUITests.swift")
+        for m, call in (("test5g_wholenative", ".checksWholeNative()"), ("test5h_wholeweb", ".checksWholeWeb()")):
+            body = swift[swift.index(f"func {m}()"):]
+            body = body[:body.index("\n    }\n")]
+            self.assertIn('environment["FILTERED"] == "1"', body)
+            self.assertIn('throw XCTSkip("runs only in a filtered run (deadline)")', body)
+            self.assertIn(call, body)
+            self.assertIn(f'"{m}": ', swift[swift.index("static let allowance"):swift.index("override func setUp")])
+        self.assertIn('"-wholefills", "1"', swift[swift.index("func test5g_wholenative()"):])
+
+    def test_the_refusal_and_notice_texts_are_the_keyboards(self):
+        kvc = read_here("..", "Sources", "ProtlyKeyboard", "KeyboardViewController.swift")
+        swift = self.swift()
+        for name in ("refusedText", "replaceUnsureText"):
+            m = re.search(r"static let " + name + r' = "([^"]*)"', kvc)
+            if m is None:
+                self.skipTest(f"KeyboardViewController.{name} not in this tree")
+            self.assertIn(f'"{m.group(1)}"', swift)
+
+    def test_a_full_run_marks_the_whole_ids_not_run(self):
+        ids = checks.WHOLE_NATIVE_IDS + checks.WHOLE_WEB_IDS
+        final = {c.id: c for c in checks.assemble(every_id_but(*ids), "", "")}
+        for i in ids:
+            self.assertEqual(final[i].status, checks.NOT_RUN, i)
+            self.assertIn("runs only in a filtered run (deadline)", final[i].evidence)
+        self.assertFalse(any(c.status == "FAIL" for c in final.values()))
+
+    def test_a_filtered_whole_run_fails_its_missing_ids_and_skips_the_others(self):
+        ran = checks.covered_ids(["PhoneChecksUITests/test0_access", "PhoneChecksUITests/test5g_wholenative"])
+        final = {c.id: c for c in checks.assemble("", "", "", ran=ran)}
+        self.assertEqual(final["wr-uikit-r4k"].status, "FAIL")
+        self.assertIn("no CHECK line", final["wr-uikit-r4k"].evidence)
+        self.assertEqual(final["wr-lexical-win"].status, checks.NOT_RUN)
+        self.assertEqual(final["dsp-uikit-en"].status, checks.NOT_RUN)
+
+    def test_the_test_lines_keep_their_status(self):
+        lines = ('CHECK wr-uikit-win PASS t1={real=335/9/h49b6f226 read=4210 replace=1.20 undo=2.10}\n'
+                 'CHECK wr-uikit-long FAIL t1={replace=7.10} t1=replace=7.10 (not as expected)\n'
+                 'CHECK wr-textarea-win FAIL unreadable: t1: set-up: no rfill-1 button\n')
+        ran = checks.covered_ids(["PhoneChecksUITests/test5g_wholenative", "PhoneChecksUITests/test5h_wholeweb"])
+        final = {c.id: c for c in checks.assemble(lines, "", "", ran=ran)}
+        self.assertEqual(final["wr-uikit-win"].status, "PASS")
+        self.assertEqual(final["wr-uikit-long"].status, "FAIL")
+        self.assertEqual(final["wr-textarea-win"].status, "FAIL")
+        self.assertEqual(final["wr-lexical-emoji"].status, "FAIL")  # selected, no line
+
+    # The keyboard's own log for each try (keyboard-log.txt, category `read`, in UTC), after the try's MARK.
+    KB = "2026-11-22 08:{m}:{s} Db ProtlyCIKeyboard[1:2] [com.northprot.protly:read] {line}\n"
+
+    def kb(self, *events):
+        return "".join(self.KB.format(m=m, s=s, line=line) for m, s, line in events)
+
+    def marks(self, *pairs):
+        # MARK times in epoch seconds: 2026-11-22 08:00:00 UTC is 1795334400.
+        return "".join(f"MARK {name} {1795334400 + minute * 60 + sec}\n" for name, minute, sec in pairs)
+
+    def assemble_with_logs(self, lines, ui, kb):
+        ran = checks.covered_ids(["PhoneChecksUITests/test5g_wholenative", "PhoneChecksUITests/test5h_wholeweb"])
+        with tempfile.TemporaryDirectory() as d:
+            if kb is not None:
+                with open(os.path.join(d, "keyboard-log.txt"), "w", encoding="utf-8") as f:
+                    f.write(kb)
+            return {c.id: c for c in checks.assemble(lines, ui, "", ran=ran, run_dir=d)}
+
+    ACCEPTED = "read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=4871 known=1"
+    HELD = ("replace deleted=335 inserted=26 sentms=0 quietms=2900 quiet=1 changes=3 events=40 b=26 a=0 ends=1 heldms=3600 "
+            "held=1 tries=1 why=- cancelled=0")
+    UNSURE = HELD.replace("held=1", "held=0")
+
+    def test_an_accepted_try_needs_the_read_and_both_writes_proven_in_the_keyboard_log(self):
+        line = "CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 read=4871 replace=3.40 kb=5.10 undo=3.10 kbundo=6.00}\n"
+        ui = self.marks(("wr-uikit-mid-t1", 10, 0), ("wr-uikit-sel-t1", 11, 0))
+        good = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("10", "20.000", self.HELD))
+        final = self.assemble_with_logs(line, ui, good)
+        self.assertEqual(final["wr-uikit-mid"].status, "PASS", final["wr-uikit-mid"].evidence)
+        self.assertIn("log=t1:accepted/4871ms/held=1,1", final["wr-uikit-mid"].evidence)
+        # Undo not proven by the keyboard (held=0): FAIL although the UI test saw the draft back.
+        bad = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("10", "20.000", self.UNSURE))
+        final = self.assemble_with_logs(line, ui, bad)
+        self.assertEqual(final["wr-uikit-mid"].status, "FAIL")
+        self.assertIn("held=1,0", final["wr-uikit-mid"].evidence)
+        # Lines after the next MARK belong to the next try.
+        late = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", self.HELD), ("11", "02.000", self.HELD))
+        self.assertEqual(self.assemble_with_logs(line, ui, late)["wr-uikit-mid"].status, "FAIL")
+
+    def test_the_keyboards_check_may_not_begin_before_the_field_held_the_result(self):
+        # The host needed 9 s for the deletes; a check that began moving the cursor at 1.4 s raced the host.
+        line = "CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec read=15457 replace=9.00 kb=9.60 undo=3.10 kbundo=4.00}\n"
+        ui = self.marks(("wr-uikit-long-t1", 10, 0), ("wr-uikit-long-t2", 11, 0))
+        early = self.HELD.replace("quietms=2900", "quietms=1400")
+        kb = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", early), ("10", "20.000", self.HELD))
+        final = self.assemble_with_logs(line, ui, kb)["wr-uikit-long"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:replace check began at 1400ms, the field held it at 9.00s", final.evidence)
+        self.assertNotIn("t1:undo", final.evidence.split("log-problems=")[1])
+        # Within the slack (the test polls every 0.2 s and its clock starts first): PASS.
+        close = self.HELD.replace("quietms=2900", "quietms=8100").replace("tries=1", "tries=2")
+        kb = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", close), ("10", "20.000", self.HELD))
+        line2 = line.replace("wr-uikit-long PASS t1=", "wr-uikit-long PASS t1=").replace("}\n", "} t2={replace=1.0 undo=1.0}\n")
+        kb += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
+        final = self.assemble_with_logs(line2, ui, kb)["wr-uikit-long"]
+        self.assertEqual(final.status, "PASS", final.evidence)
+        self.assertIn("t1:tries=2,1", final.evidence)  # a second attempt is shown, not judged
+        # A native host whose last callback came long before the check began: the UI test saw the field late.
+        lagged = self.HELD.replace("events=40", "events=11 firstev=1200 lastev=1500")
+        kb3 = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", lagged), ("10", "20.000", self.HELD))
+        kb3 += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
+        late_ui = line.replace("replace=9.00", "replace=7.09").replace("}\n", "} t2={replace=1.0 undo=1.0}\n")
+        final = self.assemble_with_logs(late_ui, ui, kb3)["wr-uikit-long"]
+        self.assertEqual(final.status, "PASS", final.evidence)
+        self.assertIn("t1:replace ui-late=7.09s host-last=1500ms began=2900ms", final.evidence)
+        # A check that began before the host's last callback had settled: still a FAIL.
+        racing = self.HELD.replace("events=40", "events=11 firstev=1200 lastev=2600")
+        kb4 = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", racing), ("10", "20.000", self.HELD))
+        kb4 += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
+        final = self.assemble_with_logs(late_ui, ui, kb4)["wr-uikit-long"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:replace check began at 2900ms, the field held it at 7.09s", final.evidence)
+        # No replace= time on the test's side: nothing to hold the keyboard against, which is a FAIL.
+        bare = "CHECK wr-uikit-long PASS t1={real=3247/15/h3ca63fec read=15457} t2={replace=1.0 undo=1.0}\n"
+        final = self.assemble_with_logs(bare, ui, kb)["wr-uikit-long"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:replace=None quietms=", final.evidence)
+        # The test timed out waiting for Undo while the keyboard said it held: a FAIL with both sides, not a crash.
+        timeout = "CHECK wr-uikit-long FAIL t1={real=3247/15/h3ca63fec replace=9.00 undo=timeout} t2={replace=1.0 undo=1.0}\n"
+        kb2 = self.kb(("10", "05.000", self.ACCEPTED), ("10", "12.000", close), ("10", "20.000", self.HELD))
+        kb2 += self.kb(("11", "05.000", self.ACCEPTED), ("11", "12.000", self.HELD), ("11", "20.000", self.HELD))
+        final = self.assemble_with_logs(timeout, ui, kb2)["wr-uikit-long"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:undo=timeout quietms=2900: no time", final.evidence)
+
+    def test_a_refusal_try_needs_its_reason(self):
+        ui = self.marks(("wr-uikit-x14k-t1", 10, 0), ("wr-textarea-emoji-t1", 20, 0), ("wr-textarea-x14k-t1", 30, 0))
+        lines = ('CHECK wr-uikit-x14k PASS t1={real=14055/15/h0c02b8be panel="x" left=14055/15/h0c02b8be}\n'
+                 'CHECK wr-textarea-emoji PASS t1={real=460/9/h0755cc33 panel="x" left=460/9/h0755cc33}\n'
+                 'CHECK wr-textarea-x14k PASS t1={real=14055/15/h0c02b8be panel="x" left=14055/15/h0c02b8be}\n')
+        refused = "read done outcome=refused reason={} units=0 lf=0 h=811c9dc5 ms=3100 known=1"
+        kb = self.kb(("10", "04.000", refused.format("b1:tooLong")), ("20", "02.000", refused.format("b1:characters")),
+                     ("30", "02.000", refused.format("b1:badStep")))
+        final = self.assemble_with_logs(lines, ui, kb)
+        for i in ("wr-uikit-x14k", "wr-textarea-emoji", "wr-textarea-x14k"):
+            self.assertEqual(final[i].status, "PASS", final[i].evidence)
+        self.assertIn("log=t1:refused/b1:tooLong", final["wr-uikit-x14k"].evidence)
+        # Refused, but for another reason than the case is about: FAIL, with the reason.
+        kb = self.kb(("10", "04.000", refused.format("f:badStep")), ("20", "02.000", refused.format("b1:characters")),
+                     ("30", "02.000", refused.format("b1:characters")))
+        final = self.assemble_with_logs(lines, ui, kb)
+        self.assertEqual(final["wr-uikit-x14k"].status, "FAIL")
+        self.assertIn("f:badStep", final["wr-uikit-x14k"].evidence)
+        self.assertEqual(final["wr-textarea-x14k"].status, "PASS")
+
+    def test_the_cancel_try_needs_a_cancelled_read(self):
+        line = "CHECK wr-uikit-cancel PASS t1={real=335/9/h49b6f226 caret=112,0 progress=2.4 cancelled=2.9 caret-left=112,0}\n"
+        ui = self.marks(("wr-uikit-cancel-t1", 10, 0))
+        done = "read done outcome={} reason={} units=0 lf=0 h=811c9dc5 ms=3010 known=1"
+        final = self.assemble_with_logs(line, ui, self.kb(("10", "03.000", done.format("cancelled", "cancelled"))))
+        self.assertEqual(final["wr-uikit-cancel"].status, "PASS", final["wr-uikit-cancel"].evidence)
+        self.assertIn("log=t1:cancelled/3010ms", final["wr-uikit-cancel"].evidence)
+        # The read ended before the tap: Cancel then closed the card, which proves nothing about a read in progress.
+        final = self.assemble_with_logs(line, ui, self.kb(("10", "06.000", done.format("accepted", "-"))))
+        self.assertEqual(final["wr-uikit-cancel"].status, "FAIL")
+
+    def test_no_keyboard_log_fails_a_pass(self):
+        line = "CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 read=4871 replace=3.40}\n"
+        ui = self.marks(("wr-uikit-mid-t1", 10, 0))
+        final = self.assemble_with_logs(line, ui, None)
+        self.assertEqual(final["wr-uikit-mid"].status, "FAIL")
+        self.assertIn("no keyboard-log.txt", final["wr-uikit-mid"].evidence)
+        # Nothing logged after the MARK (the log show window ended before it): FAIL too.
+        final = self.assemble_with_logs(line, ui, self.kb(("09", "59.000", self.ACCEPTED)))
+        self.assertEqual(final["wr-uikit-mid"].status, "FAIL")
+        self.assertIn("t1:no read done", final["wr-uikit-mid"].evidence)
+
+    def test_a_failed_try_keeps_its_fail_and_gains_the_log(self):
+        line = "CHECK wr-swiftui-long FAIL t1={s=6.3 outcome=panel} t1=outcome=panel (not as expected)\n"
+        ui = self.marks(("wr-swiftui-long-t1", 10, 0))
+        kb = self.kb(("10", "02.000", "read done outcome=refused reason=b1:falseStart units=0 lf=0 h=811c9dc5 ms=2291 known=1"))
+        final = self.assemble_with_logs(line, ui, kb)
+        self.assertEqual(final["wr-swiftui-long"].status, "FAIL")
+        self.assertIn("log=t1:refused/b1:falseStart", final["wr-swiftui-long"].evidence)
+
+    def test_main_without_a_filter_counts_every_filtered_only_id_not_run(self):
+        ids = [i for m in checks.FILTERED_ONLY for i in checks.METHOD_IDS[m]]
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "checks.txt"), "w", encoding="utf-8") as f:
+                f.write(every_id_but(*ids))
+            out = subprocess.run([sys.executable, os.path.join(HERE, "checks.py"), d], capture_output=True, text=True)
+            self.assertEqual(out.returncode, 0, out.stdout)
+            self.assertTrue(out.stdout.splitlines()[-1].endswith(f" not-run {len(ids)}"), out.stdout)
+
+
+def utf16(text):
+    return len(text.encode("utf-16-le")) // 2
+
+
+def fnv16(text):
+    b = text.encode("utf-16-le")
+    h = 0x811C9DC5
+    for i in range(0, len(b), 2):
+        h ^= b[i] | (b[i + 1] << 8)
+        h = (h * 0x01000193) & 0xFFFFFFFF
+    return f"{h:08x}"
 
 
 HEIGHT_METHOD = "PhoneChecksUITests/test9_height"
