@@ -236,14 +236,14 @@ methods after `test5c_pad`; every line is `PENDING` with its readings and `check
   (`ProtlyCIApp`'s guide screen: the hero line, and an ink or paper background; `c-app-<look>-1.png` and `-2.png` one
   screen down).
 
-## Double-space period checks (fix/double-space-period)
+## Double-space period checks (fix/double-space-period, fix/pick-space)
 
 Cause and cases: `docs/research/2026-11-17-keyboard-diagnosis.md`, P4 (on the diagnosis branch until it lands). Code:
 `checksPeriod` in `UITests/PhoneChecksUITests.swift`, ported from the probe on `diag/p4-double-space` without its
 logging. Every line is `PENDING` with the field before the first try (`t0`) and after each try (`t1`...);
 `resolve_period` in checks.py decides (unit-tested in `test_checks.py`, `PeriodTests`).
 
-- **Filtered runs only.** `test5f_period` takes about 8 minutes, and full runs already come close to
+- **Filtered runs only.** `test5f_period` takes about 15 minutes, and full runs already come close to
   `MAIN_TEST_DEADLINE`. run-shots.sh passes `FILTERED=1` to the tests when a `[shots:...]` filter is active (as
   `PROBE` reaches `test0_probe`); without it the method throws `XCTSkip`, and checks.py (`FILTERED_ONLY`) marks its IDs
   `NOT-RUN` with `runs only in a filtered run (deadline)`, not FAIL. Run it with
@@ -257,10 +257,16 @@ logging. Every line is `PENDING` with the field before the first try (`t0`) and 
     `test5a_web` and the other web checks see the page post exactly as before. A caret that is not at 0 makes the
     line FAIL `unreadable` ("caret not at word start"): the set-up failed, not the fix.
   - `en`, `ko` (3 tries): `hello` / `안녕` and two spaces at the end of the text; each try adds `hello. ` / `안녕. `.
-  - `pick2` (3 tries): `teh`, the bar's right slot, then two spaces; each try adds `the. `.
+  - `pick2` (3 tries): `teh`, the bar's right slot, then two spaces; each try adds `the. `. `kopick2` (3 tries): the
+    same with `안녀` and the slot's `안녕`; each try adds `안녕. `.
+  - `pick1` (4 tries, K4E, case E): `teh`, the bar's right slot, then one space. The pick's space takes the tap's
+    place, as on Apple's keyboard, so each try adds `the ` (two spaces, or a period, FAIL).
+  - `fast`, `kofast` (3 tries, K4E): `hello` / `안녕`, then a double tap on space by coordinate
+    (`XCUICoordinate.doubleTap`, its taps 46-75 ms apart in the probe); each try adds `hello. ` / `안녕. `.
   A field that did not start empty (or as `world`), a missing reading or fewer tries than these is FAIL `unreadable`.
-- The probe's timing cases (a coordinate double tap, a held space, one tap after a pick) belong to K4E: this fix does
-  not touch KeyboardKit's timing gate.
+  `test_checks.py` also checks that `PhoneRun.periodCases` lists the same kinds as checks.py, with enough tries.
+- The probe's held space (the trackpad, which types nothing by design) stays out: K4E leaves the 0.4 s hold and the
+  3.0 s window as they are.
 
 ## Reading a run without GitHub access
 

@@ -39,6 +39,8 @@ final class KeyboardViewController: KeyboardInputViewController {
     private var written = ""
     /// Protly's model of the text before the cursor from its own writes: whether the field still holds the word.
     private var watch = FieldWatch(known: false)
+    /// K4E: the space the last pick typed, standing in for the next space tap (ProtlyActionHandler takes it).
+    private var pickSpace = PickSpace()
 
     let english = ProtlyLayoutService(alphabeticInputSet: .qwerty, numericInputSet: .numeric, symbolicInputSet: .symbolic)
     let korean = ProtlyLayoutService(alphabeticInputSet: .dubeolsik, numericInputSet: .numeric, symbolicInputSet: .symbolic)
@@ -138,6 +140,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         // The word is already plain text in the field: only the session state goes, so the next key starts a new
         // word. The abandoned word's language carries to the next message.
         abandonWord()
+        pickSpace.end()
         // Hiding mid-call counts as Cancel: the call stops and the cursor goes back too.
         restoreCursor()
         if mode.panel != nil { mode.panel = nil }
@@ -190,18 +193,32 @@ final class KeyboardViewController: KeyboardInputViewController {
         refreshMode()
     }
 
-    /// The bar's right slot: the word becomes the suggestion, then a space typed like any other.
+    /// The bar's right slot: the word becomes the suggestion, then a space. As on Apple's keyboard (K4E), that space
+    /// stands in for the next space tap: one tap adds nothing, two end the sentence (`the. `).
     func pickSuggestion() {
         let shown = mode.suggestion  // what the user tapped, before noticeFieldMoved can refresh the bar
         noticeFieldMoved()
         // If the suggestion changed since the bar showed it, do nothing.
-        guard session.suggestion == shown, let edit = session.accept() else { return }
+        guard let shown, session.suggestion == shown, let edit = session.accept() else { return }
         guard apply(edit) else {
             refreshMode()  // the field moved: the word was abandoned, nothing written
             return
         }
         savePrevious()
         insertText(" ")
+        pickSpace.picked(shown, after: textDocumentProxy.documentContextAfterInput ?? "", at: now)
+    }
+
+    /// A space release (ProtlyActionHandler): true when the space the last pick typed takes this tap's place, so the
+    /// tap types nothing. typing false: the release ends a trackpad hold. Every release ends the pick (PickSpace).
+    func takePickSpace(typing: Bool) -> Bool {
+        guard pickSpace.isWaiting else { return false }
+        return pickSpace.spaceReleased(types: typing, observed(), now: now)
+    }
+
+    /// Any other key: the next space types as usual.
+    func endPickSpace() {
+        pickSpace.end()
     }
 
     /// The host changed the field under protly (a chat app sent the message and cleared the field with the
@@ -211,7 +228,9 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// text now, and WebKit reports hasText false right after each edit, which would split every word.
     /// Called from host callbacks: it only reads the field and decides, never writes (KeyboardSourceRulesTests).
     private func noticeFieldMoved() {
-        switch watch.decide(observed(), composing: session.isComposing, lastTail: session.lastTail, now: now) {
+        let o = observed()
+        pickSpace.noticed(o, now: now)  // a field that no longer shows the pick ends it (K4E)
+        switch watch.decide(o, composing: session.isComposing, lastTail: session.lastTail, now: now) {
         case .keep: return
         case .abandon: abandonWord()
         case .forgetLast: session.forgetLast()
@@ -356,6 +375,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         onScreen = nil
         commitWord()
         session.forgetLast()  // the field is about to change: the bar's flip must not reach into it
+        pickSpace.end()  // and the next space types as usual
         watch.forget()  // reading the field moves the cursor
         refreshMode()
         // Every path after this shows its own strip or panel: a request still running must not replace it later.
@@ -713,6 +733,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         endUndo()
         super.adjustTextPosition(by: offset)
         watch.forget()  // the cursor moved
+        pickSpace.end()  // the space trackpad: the next space types as usual (K4E)
         refreshMode()
     }
 
