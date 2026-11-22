@@ -135,7 +135,7 @@ enum FieldText {
             return e
         }
         /// A step that fit nothing: the contexts' lengths and which of them fit, never their text.
-        func logStep(_ why: String, k: Int, from c: Ctx, to s: (changed: Bool, c: Ctx), ms took: Int) {
+        func logStep(_ why: String, k: Int, from c: Ctx, to s: (changed: Bool, c: Ctx, seen: Int), ms took: Int) {
             let fit = back ? bw.fit : fw.fit
             let b0 = c.before.count, a0 = c.after.count, b1 = s.c.before.count, a1 = s.c.after.count
             let fb = fit.before ? 1 : 0, fa = fit.after ? 1 : 0, ch = s.changed ? 1 : 0
@@ -322,6 +322,20 @@ enum FieldText {
         // F: to the end. Its steps all fit the contexts, so it fixes where the end is from the user's cursor.
         let fEnd = await walk(false, cap: WholeRead.cap, "f")
         guard case .done(let first) = fEnd else { return await stopped(fEnd, "f") }
+        if !c0.s.isEmpty {
+            // Select all leaves nothing between the collapse and the end. Text crossed: a partial selection at the
+            // field's start that reached a line feed also shows both contexts empty (tower review of f0533ae). K1a: its
+            // own text, a copy-only card; the cursor goes back to where the collapse left it.
+            let move = track.cursor.back(before: ctx(p).b)
+            if !first.isEmpty || move != 0 {
+                if move != 0 {
+                    track.sending()
+                    let s = await step(p, by: move, wait: WholeRead.moveWait)
+                    track.landed(nil, s.c.b)
+                }
+                return finish(.text(c0.s, isSelection: true), "partialSelection")
+            }
+        }
         let end = ctx(p)
         // B1: back to the start.
         let b1End = await walk(true, cap: WholeRead.cap, "b1")
@@ -383,8 +397,13 @@ enum FieldText {
     /// exactly `new` (a window shows only the end, so old text left in front would be invisible to the contexts
     /// alone), and a walk forward must reach the end over `new`'s last units. false: not proven (or the keyboard was
     /// hidden: the Task is cancelled); the caller says so and offers no Undo.
-    static func replace(_ old: String, with new: String, _ p: UITextDocumentProxy) async -> Bool {
+    /// `document`: the field's document identity (ProtlyHeight.document), nil when iOS gives none. A different one
+    /// before the insert (the user tapped another field while the deletes showed) means no insert and not proven: the
+    /// insert would land in the other field (tower review of f0533ae); the panel offers Copy original.
+    static func replace(_ old: String, with new: String, _ p: UITextDocumentProxy,
+                        document: () -> UUID? = { nil }) async -> Bool {
         let t0 = uptime()
+        let doc0 = document()
         slowSeen = false
         let events0 = hostEvents
         var deleted = 0
@@ -399,6 +418,14 @@ enum FieldText {
             emptied = shows("", ctx(p))
         }
         let emptyMS = ms(since: t0)
+        let doc1 = document()
+        // 1: another field now; 0: the same; -1: iOS gave no document.
+        let focus = doc0 == nil || doc1 == nil ? -1 : doc0 == doc1 ? 0 : 1
+        if focus == 1 {
+            let deletedNow = deleted
+            log.debug("replace deleted=\(deletedNow, privacy: .public) emptyms=\(emptyMS, privacy: .public) focus=\(focus, privacy: .public) held=0")
+            return false
+        }
         p.insertText(new)
         let size = new.utf16.count
         let settle = t0 + WholeRead.replaceSettle(deletes: deleted, inserted: size)
@@ -433,7 +460,7 @@ enum FieldText {
         let held = check.ok, tries = check.tries, why = check.why
         let inserted = size, heldMS = ms(since: t0), ok = held ? 1 : 0, gate = shown ? 1 : 0
         let empty = emptied ? 1 : 0, seen = hostEvents - events0, cancelled = Task.isCancelled ? 1 : 0
-        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) emptyms=\(emptyMS, privacy: .public) empty=\(empty, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) lastch=\(lastChange, privacy: .public) events=\(seen, privacy: .public) firstev=\(firstEvent, privacy: .public) lastev=\(lastEvent, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) tries=\(tries, privacy: .public) why=\(why, privacy: .public) cancelled=\(cancelled, privacy: .public)")
+        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) emptyms=\(emptyMS, privacy: .public) empty=\(empty, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) lastch=\(lastChange, privacy: .public) events=\(seen, privacy: .public) firstev=\(firstEvent, privacy: .public) lastev=\(lastEvent, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) tries=\(tries, privacy: .public) why=\(why, privacy: .public) focus=\(focus, privacy: .public) cancelled=\(cancelled, privacy: .public)")
         return held
     }
 

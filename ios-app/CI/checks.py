@@ -1382,7 +1382,7 @@ def resolve_whole_log(check, marks, kb_text):
                 # A native host's own callbacks follow its edits (runs 181, 185: the last one before the UI test saw
                 # the result). A check that began after the host had been quiet for the gate's 0.5 s is after the
                 # host, also when the UI test saw the field late (uikit sel, runs 185 and 189: 7.0-7.1 s, while the
-                # host's last callback came at 1.2-1.5 s, as in win and mid). Web hosts send none: the UI time rules.
+                # host's last callback came at 2.0 and 1.5 s, as in win and mid). Web hosts send none: the UI time rules.
                 try:
                     last = int(last_text)
                 except (TypeError, ValueError):

@@ -16,17 +16,21 @@ public enum FieldGuard {
         canReplace(result, before: before, after: after)
     }
 
-    /// Undo: nothing is selected and the text before the cursor still ends with all of the inserted text, or (a long
-    /// insert, K1b) is a window of its end. With text selected, the first delete would take the selection and the
-    /// next ones the user's text before it.
+    /// Undo of Read's Insert: nothing is selected and the text before the cursor still ends with all of the inserted
+    /// text. With text selected, the first delete would take the selection and the next ones the user's text before
+    /// it. A window of the insert's end is not enough: a field that took only part of it (a length limit) shows just
+    /// that (tower review of f0533ae: Undo would delete the user's own text).
     public static func canUndo(_ inserted: String, before: String, selected: String) -> Bool {
-        offersUndo(true, selected: selected) && !inserted.isEmpty && (before.hasSuffix(inserted) || isEnd(of: inserted, before))
+        offersUndo(true, selected: selected) && !inserted.isEmpty && before.hasSuffix(inserted)
     }
 
-    /// Undo of a whole-field Replace (K1b): as canUndo, and nothing after the cursor, where Replace left it. A cursor
-    /// moved into the result since would make the deletes take the wrong characters.
+    /// Undo of a whole-field Replace (K1b): nothing selected, nothing after the cursor (where Replace left it), and
+    /// the text before it all of the result or a window of its end. Only a Replace that the keyboard proved whole
+    /// (a walk over the field read exactly the result) offers this Undo, so the window is that field's end, not an
+    /// insert the host cut short; a host change since ends Undo (KeyboardViewController.endUndoIfTouched).
     public static func canUndoReplace(_ inserted: String, before: String, after: String, selected: String) -> Bool {
-        after.isEmpty && canUndo(inserted, before: before, selected: selected)
+        after.isEmpty && offersUndo(true, selected: selected) && !inserted.isEmpty
+            && (before.hasSuffix(inserted) || isEnd(of: inserted, before))
     }
 
     /// `window` is non-empty and is `text`'s end: by whole characters (canonical equivalence counts), or by UTF-16
