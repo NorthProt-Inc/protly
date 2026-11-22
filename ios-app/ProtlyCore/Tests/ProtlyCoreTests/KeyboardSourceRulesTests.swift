@@ -74,7 +74,8 @@ final class KeyboardSourceRulesTests: XCTestCase {
         let values = Set(["tag", "count", "lf", "hash", "reason", "steps", "took", "outcome", "units", "deleted",
                           "inserted", "sent", "heldMS", "ok", "position", "known", "retries", "resyncs", "why", "k",
                           "b0", "a0", "b1", "a1", "fb", "fa", "ch", "sb", "sa", "ss", "quietMS", "gate", "changes",
-                          "seen", "lb", "la", "ends", "late", "firstMS", "cancelled"])
+                          "seen", "lb", "la", "ends", "late", "firstMS", "cancelled",
+                          "emptyMS", "empty", "lastChange", "firstEvent", "lastEvent"])
         for range in calls {
             let line = lineText(ns, range)
             for m in matches(#"\\\(([A-Za-z_][A-Za-z0-9_.]*)"#, in: line) {

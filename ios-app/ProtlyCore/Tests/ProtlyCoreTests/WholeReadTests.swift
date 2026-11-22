@@ -62,9 +62,6 @@ final class WholeReadTests: XCTestCase {
         XCTAssertTrue(WholeRead.canStart(elapsed: 19, wait: 1))
         XCTAssertFalse(WholeRead.canStart(elapsed: 19.01, wait: 1))
         XCTAssertFalse(WholeRead.canStart(elapsed: 20, wait: 0.01))
-        // Replace's check walk has its own budget: what is left of Replace's limit, then a read's 20 s.
-        XCTAssertTrue(WholeRead.canStart(elapsed: 25, wait: 1, total: 30))
-        XCTAssertFalse(WholeRead.canStart(elapsed: 29.5, wait: 1, total: 30))
         XCTAssertEqual(WholeRead.cap, 4000)
         XCTAssertEqual(WholeRead.progressAfter, 2)
         XCTAssertEqual(WholeRead.probeWait, 0.5)
@@ -74,14 +71,21 @@ final class WholeReadTests: XCTestCase {
         XCTAssertGreaterThan(WholeRead.total, 5 * WholeRead.probeWait)
     }
 
-    /// Replace waits for the host, which applies the deletes one by one (run 162: 3247 deletes took the host 7-12 s,
-    /// 2-3.6 ms each, while the proxy showed an empty field after 0.36 s), until the field has been quiet this long.
+    /// Replace waits for the host, which applies the deletes one by one while the proxy shows the keyboard's own edits
+    /// at once and, on web hosts, sends no callback either (run e070adc-172: the contexts and callbacks were still for
+    /// 0.5 s from 0.5 s on while the textarea needed 11.9 s for 3247 deletes). The keyboard moves the cursor again only
+    /// once the host has had `replaceSettle`: 1.5 s and 4 ms a delete (the slowest measured: 3247 deletes in 11.9 s on
+    /// the textarea, 11.8 s on the SwiftUI field, runs 162 and 172, about 3.7 ms each with the UI test's polling), and
+    /// gives up 3 s after that.
     func testReplaceWaitsForTheHostInProportion() {
         XCTAssertEqual(WholeRead.quiet, 0.5)
-        XCTAssertEqual(WholeRead.replaceLimit(deletes: 0), 3)
-        XCTAssertEqual(WholeRead.replaceLimit(deletes: 4000), 23, accuracy: 0.001)
-        // At the slowest rate measured (3.6 ms a delete, SwiftUI) a 4000-unit field still fits, with the quiet wait.
-        XCTAssertGreaterThan(WholeRead.replaceLimit(deletes: 4000), 4000 * 0.0036 + WholeRead.quiet)
+        XCTAssertEqual(WholeRead.replaceSettle(deletes: 0), 1.5)
+        XCTAssertEqual(WholeRead.replaceSettle(deletes: 3247), 14.488, accuracy: 0.001)
+        XCTAssertEqual(WholeRead.replaceSettle(deletes: 4000), 17.5, accuracy: 0.001)
+        XCTAssertEqual(WholeRead.replaceLimit(deletes: 4000), 20.5, accuracy: 0.001)
+        // The slowest measured rate, with the UI test's polling in it, still ends before the keyboard moves again.
+        XCTAssertGreaterThan(WholeRead.replaceSettle(deletes: 3247), 11.92)
+        XCTAssertGreaterThan(WholeRead.replaceSettle(deletes: 4000), 4000 * 0.0037)
     }
 
     // MARK: Walks on a fake field

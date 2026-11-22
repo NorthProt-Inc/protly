@@ -26,20 +26,27 @@ public enum WholeRead {
     public static let poll: TimeInterval = 0.02
     public static let settlePolls = 5
 
-    /// Replace: the host applies the deletes one by one (run 162: 7-12 s for 3247 on native hosts, 2-3.6 ms each)
-    /// while the proxy shows the keyboard's own edits at once, so the keyboard waits until the field and the host's
-    /// callbacks have been still this long, and the result shows.
+    /// Replace: the host applies the deletes one by one (runs 162, 172: 7-12 s for 3247, about 3-3.7 ms each) while
+    /// the proxy shows the keyboard's own edits at once; on web hosts neither the contexts nor the host's callbacks
+    /// change meanwhile (run e070adc-172). So the keyboard waits `replaceSettle` before it moves the cursor again (a
+    /// move sent while the Lexical-shaped page was still deleting left it empty, run 172), then until the contexts have
+    /// been still `quiet` and show the result, at most until `replaceLimit`.
     public static let quiet: TimeInterval = 0.5
 
-    /// How long Replace may wait for that: 3 s and 5 ms a delete (23 s for 4000).
-    public static func replaceLimit(deletes: Int) -> TimeInterval {
-        3 + 0.005 * Double(deletes)
+    /// 1.5 s and 4 ms a delete: above every Replace measured in CI (3247 deletes: 11.9 s at most, with the UI test's
+    /// polling in it). A bound from measurements, not a signal from the host: none was found.
+    public static func replaceSettle(deletes: Int) -> TimeInterval {
+        1.5 + 0.004 * Double(deletes)
     }
 
-    /// A step that may wait `wait` s still ends within `total` (a read's 20 s; Replace's check walk has its own): the
-    /// cap stops a walk only between steps, so a step on its way always settles (Cancel's record, CursorReturn, never
-    /// guesses about it).
-    public static func canStart(elapsed: TimeInterval, wait: TimeInterval, total: TimeInterval = total) -> Bool {
+    /// Replace gives up 3 s after `replaceSettle` (20.5 s for 4000 deletes).
+    public static func replaceLimit(deletes: Int) -> TimeInterval {
+        replaceSettle(deletes: deletes) + 3
+    }
+
+    /// A step that may wait `wait` s still ends within `total`: the cap stops a read only between steps, so a step
+    /// on its way always settles (Cancel's record, CursorReturn, never guesses about it).
+    public static func canStart(elapsed: TimeInterval, wait: TimeInterval) -> Bool {
         elapsed + wait <= total
     }
 

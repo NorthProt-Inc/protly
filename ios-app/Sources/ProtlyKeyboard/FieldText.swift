@@ -106,19 +106,16 @@ enum FieldText {
     }
 
     /// One walk to the end (`back` false) or the start. Every step settles before the next check, so a cancel or the
-    /// budget stops the walk only between steps. `budget`: seconds from `t0` (a read's 20 s; Replace's check walk
-    /// gets its own). `firstWait`: how long the first step may take to show (Replace's check: the host applies the
-    /// move after the edits queued before it).
+    /// budget stops the walk only between steps.
     private static func walk(_ p: UITextDocumentProxy, back: Bool, cap: Int, tag: String, start t0: TimeInterval,
-                             track: Track, progress: () -> Void, budget: TimeInterval = WholeRead.total,
-                             firstWait: TimeInterval? = nil) async -> WalkEnd {
+                             track: Track, progress: () -> Void) async -> WalkEnd {
         var bw = BackWalk(cap: cap)
         // Only the walk from the user's cursor may start from contexts the host never refreshed (run 163 web `mid`).
         var fw = ForwardWalk(cap: cap, resyncFirst: tag == "f")
         var steps = 0, late = 0, firstMS = -1
         let w0 = uptime()
         func fits(_ wait: TimeInterval) -> Bool {
-            WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(wait), total: budget)
+            WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(wait))
         }
         func end(_ e: WalkEnd) -> WalkEnd {
             let units: [UInt16], reason: String
@@ -151,8 +148,7 @@ enum FieldText {
                 c = ctx(p)
             }
             let probing = back ? c.before.isEmpty : c.after.isEmpty
-            let wait = steps == 0 ? max(firstWait ?? 0, probing ? WholeRead.probeWait : WholeRead.moveWait)
-                : probing ? WholeRead.probeWait : WholeRead.moveWait
+            let wait = probing ? WholeRead.probeWait : WholeRead.moveWait
             guard fits(wait) else { return end(.failed("timeUp")) }
             // A Cancel during the wait above already put the cursor back (no step was on its way): never move it again.
             if Task.isCancelled { return end(.cancelled) }
@@ -335,35 +331,51 @@ enum FieldText {
     static var hostEvents = 0
 
     /// Replace `old` (the whole field, the cursor at its end) with `new`: one deleteBackward per Character of `old`,
-    /// then the insert; the host applies them in that order (runs 162, 163: every Replace left exactly the result).
-    /// Then the keyboard waits until the host has caught up: the contexts show `new`'s end with nothing after it, and
-    /// neither they nor the host's callbacks changed for WholeRead.quiet, within WholeRead.replaceLimit; then a walk
-    /// back over the result to the start must read exactly `new` (a window shows only the end, so old text left in
-    /// front would be invisible to the contexts alone), and a walk forward must reach the end over `new`'s last units.
-    /// false: not proven (or the keyboard was hidden: the Task is cancelled); the caller says so and offers no Undo.
+    /// then, once the proxy shows them, the insert (runs 162, 163: every Replace then left exactly the result). The
+    /// host applies them in order, seconds after the proxy shows them, and on web hosts tells the keyboard nothing
+    /// meanwhile (run e070adc-172), so no move goes out before WholeRead.replaceSettle (a move sent while the
+    /// Lexical-shaped page was still deleting left it empty, run 172). Then the contexts must show `new`'s end and be
+    /// still for WholeRead.quiet, within WholeRead.replaceLimit; then a walk back over the result to the start must read
+    /// exactly `new` (a window shows only the end, so old text left in front would be invisible to the contexts
+    /// alone), and a walk forward must reach the end over `new`'s last units. false: not proven (or the keyboard was
+    /// hidden: the Task is cancelled); the caller says so and offers no Undo.
     static func replace(_ old: String, with new: String, _ p: UITextDocumentProxy) async -> Bool {
         let t0 = uptime()
+        let events0 = hostEvents
         var deleted = 0
         for _ in old {
             p.deleteBackward()  // one Character per call
             deleted += 1
         }
-        p.insertText(new)
         let sent = ms(since: t0)
+        var emptied = deleted == 0
+        while !emptied, uptime() - t0 < WholeRead.moveWait, !Task.isCancelled {
+            await pause(0.05)
+            emptied = shows("", ctx(p))
+        }
+        let emptyMS = ms(since: t0)
+        p.insertText(new)
+        let settle = t0 + WholeRead.replaceSettle(deletes: deleted)
         let deadline = t0 + WholeRead.replaceLimit(deletes: deleted)
-        var last = ctx(p), events = hostEvents, quietFrom = uptime(), changes = 0, seen = 0
+        var last = ctx(p), events = hostEvents, quietFrom = uptime(), changes = 0
+        var firstEvent = -1, lastEvent = -1, lastChange = -1
         var shown = false
         while uptime() < deadline, !Task.isCancelled {
             await pause(0.05)
             let c = ctx(p)
-            if c != last || hostEvents != events {
-                changes += 1
-                seen += hostEvents - events
-                last = c
+            if hostEvents != events {
+                if firstEvent < 0 { firstEvent = ms(since: t0) }
+                lastEvent = ms(since: t0)
                 events = hostEvents
                 quietFrom = uptime()
             }
-            if uptime() - quietFrom >= WholeRead.quiet, shows(new, c) {
+            if c != last {
+                changes += 1
+                lastChange = ms(since: t0)
+                last = c
+                quietFrom = uptime()
+            }
+            if uptime() >= settle, uptime() - quietFrom >= WholeRead.quiet, shows(new, c) {
                 shown = true
                 break
             }
@@ -371,10 +383,10 @@ enum FieldText {
         let quietMS = ms(since: t0)
         let c = ctx(p)
         let lb = c.before.count, la = c.after.count, ends = new.utf16.reversed().starts(with: c.before.reversed()) ? 1 : 0
-        let held = shown && !Task.isCancelled ? await holds(new, p, until: deadline) : false
+        let held = shown && !Task.isCancelled ? await holds(new, p) : false
         let inserted = new.utf16.count, heldMS = ms(since: t0), ok = held ? 1 : 0, gate = shown ? 1 : 0
-        let cancelled = Task.isCancelled ? 1 : 0
-        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) events=\(seen, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) cancelled=\(cancelled, privacy: .public)")
+        let empty = emptied ? 1 : 0, seen = hostEvents - events0, cancelled = Task.isCancelled ? 1 : 0
+        log.debug("replace deleted=\(deleted, privacy: .public) inserted=\(inserted, privacy: .public) sentms=\(sent, privacy: .public) emptyms=\(emptyMS, privacy: .public) empty=\(empty, privacy: .public) quietms=\(quietMS, privacy: .public) quiet=\(gate, privacy: .public) changes=\(changes, privacy: .public) lastch=\(lastChange, privacy: .public) events=\(seen, privacy: .public) firstev=\(firstEvent, privacy: .public) lastev=\(lastEvent, privacy: .public) b=\(lb, privacy: .public) a=\(la, privacy: .public) ends=\(ends, privacy: .public) heldms=\(heldMS, privacy: .public) held=\(ok, privacy: .public) cancelled=\(cancelled, privacy: .public)")
         return held
     }
 
@@ -385,20 +397,18 @@ enum FieldText {
 
     /// The field is exactly `new` with the cursor at its end: a walk back reads exactly `new` to the start, a move
     /// forward by its length, and a walk forward reaches the end over `new`'s last units (a long move can land a few
-    /// units short: probe runs 154, 155). Called once the contexts show `new`'s end and the host looks quiet. The
-    /// host applies a move after the edits sent before it, so the first step back may wait until `deadline` (if the
-    /// host's callbacks stopped before it finished, the step shows only once it has).
-    private static func holds(_ new: String, _ p: UITextDocumentProxy, until deadline: TimeInterval) async -> Bool {
+    /// units short: probe runs 154, 155). Called once the host has had its time and the contexts show `new`'s end.
+    private static func holds(_ new: String, _ p: UITextDocumentProxy) async -> Bool {
         let units = Array(new.utf16)
         guard !units.isEmpty else { return !p.hasText }
-        let t0 = uptime(), left = max(0, deadline - t0)
+        let t0 = uptime()
         let none = Track { _ in }
         guard case .done(let read) = await walk(p, back: true, cap: units.count, tag: "v", start: t0, track: none,
-                                                progress: {}, budget: left + WholeRead.total, firstWait: left),
+                                                progress: {}),
               read == units else { return false }
         let s = await step(p, by: units.count, wait: WholeRead.moveWait)
         guard s.changed, case .done(let rest) = await walk(p, back: false, cap: units.count, tag: "ve", start: t0,
-                                                            track: none, progress: {}, budget: left + WholeRead.total)
+                                                            track: none, progress: {})
         else { return false }
         return Array(units.suffix(rest.count)) == rest
     }
