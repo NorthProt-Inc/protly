@@ -180,6 +180,29 @@ enum FieldText {
         case jump1
         /// Back one UTF-16 unit at a time.
         case unit
+        /// diag/p1-walk-back-np: back by the largest k below the before-context's length that is not a period of it
+        /// (FieldText.safeJump), so the move always changes the before-context.
+        case np
+    }
+
+    /// The largest k < u.count such that `u` does not have period k (u[i] == u[i + k] for every i), else 1. A move
+    /// by such a k must change a context that ends (or starts) at the cursor: the same context k units away would
+    /// make the text over both have period k, and so `u` too. Run 7f2f443-135: jumps by the whole before-context
+    /// (60 units, 3 repeated 20-unit sentences) and by 40 changed nothing.
+    nonisolated static func safeJump(_ u: [UInt16]) -> Int {
+        let n = u.count
+        guard n > 2 else { return 1 }
+        var k = n - 1
+        while k > 1 {
+            var periodic = true
+            for i in 0..<(n - k) where u[i] != u[i + k] {
+                periodic = false
+                break
+            }
+            if !periodic { return k }
+            k -= 1
+        }
+        return 1
     }
 
     /// One walk: the text moved over (field order), why it stopped, its steps and time.
@@ -234,9 +257,18 @@ enum FieldText {
             if c1 != c0 {
                 let ms = Int((uptime() - sent) * 1000)
                 guard settle else { return (true, polls, ms, false, c1) }
-                await pause()
-                let c2 = ctx(p)
-                return (true, polls, ms, c2 != c1, c2)
+                // diag/p1-walk-back-np: settle until two polls in a row read the same (up to 5 more polls). Run
+                // 7f2f443-135: unit steps read without a settle gave right lengths but other texts.
+                var prev = c1
+                var late = false
+                for _ in 0..<5 {
+                    await pause()
+                    let c2 = ctx(p)
+                    if c2 == prev { break }
+                    late = true
+                    prev = c2
+                }
+                return (true, polls, ms, late, prev)
             }
         }
         // A last look: a stalled main thread can end the loop between two polls, never call that "no change".
@@ -254,7 +286,7 @@ enum FieldText {
         let start = uptime()
         var polls1 = 0, polls2 = 0, pollsMore = 0, maxPolls = 0, maxMs = 0
         var grew = 0, shrank = 0, maxFront = 0, minFront = 0, incons = 0, afterBad = 0, lfSteps = 0
-        var falseStarts = 0, late = 0, nilBefore = 0
+        var falseStarts = 0, late = 0, nilBefore = 0, phantoms = 0
         let p0 = ctx(p)
         walkLog("wb \(policy.rawValue) begin before=\(shape(p0.b)) after=\(shape(p0.a)) hb=\(fnv(p0.b ?? ""))")
         while true {
@@ -272,6 +304,7 @@ enum FieldText {
                 case .jump: k = b0.count
                 case .jump1: k = max(1, b0.count - 1)
                 case .unit: k = 1
+                case .np: k = safeJump(b0)
                 }
             }
             r.steps += 1
@@ -291,6 +324,13 @@ enum FieldText {
             if s.late { late += 1 }
             if s.c.b == nil { nilBefore += 1 }
             let b1 = units(s.c.b), a1 = units(s.c.a)
+            if probing, policy == .np, b1.isEmpty {
+                // diag/p1-walk-back-np: still nothing before the cursor, so no text was crossed (run 7f2f443-135: the
+                // Lexical-shaped field's after-context went empty there, and the walk counted a line feed).
+                phantoms += 1
+                walkLog("wb \(policy.rawValue) phantom s=\(r.steps) polls=\(s.polls) ms=\(s.ms) before=\(shape(s.c.b)) after=\(shape(s.c.a))")
+                continue
+            }
             let piece: [UInt16]
             var front = 0
             var cons = true
@@ -329,7 +369,7 @@ enum FieldText {
         }
         r.units = pieces.reversed().flatMap { $0 }
         r.ms = Int((uptime() - start) * 1000)
-        walkLog("wb \(policy.rawValue) done \(r.summary) steps=\(r.steps) ms=\(r.ms) polls=\(polls1),\(polls2),\(pollsMore) maxpolls=\(maxPolls) maxms=\(maxMs) grew=\(grew) shrank=\(shrank) front=\(minFront)..\(maxFront) incons=\(incons) afterbad=\(afterBad) lfsteps=\(lfSteps) falsestarts=\(falseStarts) late=\(late) nilbefore=\(nilBefore)")
+        walkLog("wb \(policy.rawValue) done \(r.summary) steps=\(r.steps) ms=\(r.ms) polls=\(polls1),\(polls2),\(pollsMore) maxpolls=\(maxPolls) maxms=\(maxMs) grew=\(grew) shrank=\(shrank) front=\(minFront)..\(maxFront) incons=\(incons) afterbad=\(afterBad) lfsteps=\(lfSteps) falsestarts=\(falseStarts) late=\(late) nilbefore=\(nilBefore) phantoms=\(phantoms)")
         return r
     }
 
@@ -349,7 +389,8 @@ enum FieldText {
 
     /// Walks forward to the end: by the after-context less one unit, or one unit when it is empty (over a line feed,
     /// which the after-context stops at); the end is a one-unit step that changes nothing for 0.5 s.
-    private static func walkForward(_ p: UITextDocumentProxy, maxSteps: Int, tag: String) async -> WalkResult {
+    private static func walkForward(_ p: UITextDocumentProxy, maxSteps: Int, tag: String, safe: Bool = false,
+                                    timeCap: TimeInterval = 600) async -> WalkResult {
         var r = WalkResult()
         var pieces: [UInt16] = []
         let start = uptime()
@@ -357,9 +398,10 @@ enum FieldText {
         while true {
             if Task.isCancelled { r.reason = "cancelled"; break }
             if r.steps >= maxSteps { r.reason = "step-cap"; break }
+            if uptime() - start > timeCap { r.reason = "time-cap"; break }
             let a0 = units(ctx(p).a)
             let probing = a0.isEmpty
-            let k = probing ? 1 : max(1, a0.count - 1)
+            let k = probing ? 1 : (safe ? safeJump(a0) : max(1, a0.count - 1))
             r.steps += 1
             let s = await step(p, by: k, limit: probing ? 0.5 : 1.0, settle: true)
             guard s.changed else {
@@ -380,59 +422,48 @@ enum FieldText {
         return r
     }
 
-    /// The probe read. A selection is collapsed first (+1, -1 or 0, in turn). From that base: the unit walk back
-    /// (the text before the cursor) and one move forward again, then the walk forward to the end (the text after it).
-    /// Then from the end, which a walk forward always finds again: the jump walk back, one move forward, a walk to
-    /// the end; the same with jump1. A step that changes nothing although text remained may still have moved the
-    /// cursor, so each jump walk starts from the end. Returns the first whole text found (unit plus forward, jump1,
-    /// jump) with the cursor at the end. The numbers go to the log and, through WalkNote, into the CI stub's reply.
+    /// diag/p1-walk-back-k1b: the candidate K1b read. A selection is collapsed with +1 (run 7f2f443-135: it lands at
+    /// the selection's end). One move of +1 000 000 toward the end, a forward walk to confirm it, then two np walks
+    /// back from the end, each followed by one move forward by what it read and a forward walk that confirms the end.
+    /// Every step settles (two equal polls). The numbers go to the log and, through WalkNote, into the CI stub's
+    /// reply: `f` = the forward walk after the big move, `j` and `j1` = the two walks back.
     static func walkRead(_ p: UITextDocumentProxy) async -> (text: String, isSelection: Bool)? {
         let t0 = uptime()
         let c0 = ctx(p)
         walkLog("walk start before=\(shape(c0.b)) after=\(shape(c0.a)) sel=\(shape(c0.s)) hb=\(fnv(c0.b ?? "")) ha=\(fnv(c0.a ?? "")) hs=\(fnv(c0.s ?? ""))")
         var note: [String] = []
         if let sel = c0.s, !sel.isEmpty {
-            let v = [1, -1, 0][selCalls % 3]
-            selCalls += 1
-            var tries = [v]
-            if v != 1 { tries.append(1) }  // still selected after the first move: +1
-            for (i, move) in tries.enumerated() {
-                if i > 0, (ctx(p).s ?? "").isEmpty { break }
-                let s = await step(p, by: move, limit: 1.0, settle: true)
-                walkLog("walk collapse v=\(move) try=\(i + 1) ch=\(s.changed ? 1 : 0) polls=\(s.polls) ms=\(s.ms) late=\(s.late ? 1 : 0) before=\(shape(s.c.b)) after=\(shape(s.c.a)) sel=\(shape(s.c.s)) hb=\(fnv(s.c.b ?? "")) ha=\(fnv(s.c.a ?? ""))")
-                note.append("c\(move)=\(s.changed ? 1 : 0)/b\((s.c.b ?? "").utf16.count)/a\((s.c.a ?? "").utf16.count)/s\((s.c.s ?? "").utf16.count)")
-            }
+            let s = await step(p, by: 1, limit: 1.0, settle: true)
+            walkLog("walk collapse v=1 try=1 ch=\(s.changed ? 1 : 0) polls=\(s.polls) ms=\(s.ms) late=\(s.late ? 1 : 0) before=\(shape(s.c.b)) after=\(shape(s.c.a)) sel=\(shape(s.c.s)) hb=\(fnv(s.c.b ?? "")) ha=\(fnv(s.c.a ?? ""))")
+            note.append("c1=\(s.changed ? 1 : 0)/b\((s.c.b ?? "").utf16.count)/a\((s.c.a ?? "").utf16.count)/s\((s.c.s ?? "").utf16.count)")
         }
         let base = ctx(p)
         walkLog("walk base before=\(shape(base.b)) after=\(shape(base.a)) sel=\(shape(base.s))")
-        let cap = longUnitWalks == 0 ? 6000 : unitShortCap
-        let unit = await walkBack(p, .unit, maxSteps: cap, timeCap: 200)
-        if unit.steps > unitShortCap { longUnitWalks += 1 }
-        let unitBack = await walkReturn(p, unit, base: base, tag: "unit")
-        let forward = await walkForward(p, maxSteps: 400, tag: "f")
+        // diag/p1-walk-back-k1b: to the end in one move (does a huge offset stop at the end?), then confirm the end
+        // with the forward walk (its units are what the move fell short by). Then two np walks back from the end,
+        // each followed by one move forward by what it read; the read counts when both reached the start and agree.
+        let big = await step(p, by: 1_000_000, limit: 1.0, settle: true)
+        walkLog("walk big ch=\(big.changed ? 1 : 0) polls=\(big.polls) ms=\(big.ms) late=\(big.late ? 1 : 0) before=\(shape(big.c.b)) after=\(shape(big.c.a))")
+        let forward = await walkForward(p, maxSteps: 800, tag: "f", safe: true, timeCap: 30)
         let end = ctx(p)
-        let jump = await walkBack(p, .jump, maxSteps: 400, timeCap: 60)
-        let jumpBack = await walkReturn(p, jump, base: end, tag: "jump")
-        let jumpEnd = await walkForward(p, maxSteps: 400, tag: "fj")
-        let jump1 = await walkBack(p, .jump1, maxSteps: 400, timeCap: 60)
-        let jump1Back = await walkReturn(p, jump1, base: end, tag: "jump1")
-        let jump1End = await walkForward(p, maxSteps: 400, tag: "fj1")
-        let landed = ["r1", "r-"]
-        var found: [(String, [UInt16])] = []
-        if unit.reason == "start", landed.contains(unitBack), forward.reason == "end" {
-            found.append(("unit", unit.units + forward.units))
-        }
-        if jump1.reason == "start", landed.contains(jump1Back) { found.append(("jump1", jump1.units)) }
-        if jump.reason == "start", landed.contains(jumpBack) { found.append(("jump", jump.units)) }
-        let pick = found.first?.0 ?? "none"
-        let whole = found.first?.1 ?? (unit.units + forward.units)
-        let agreeAll = found.allSatisfy { $0.1 == whole } ? 1 : 0
+        let back = await walkBack(p, .np, maxSteps: 800, timeCap: 30)
+        let backRet = await walkReturn(p, back, base: end, tag: "np1")
+        let mid = await walkForward(p, maxSteps: 800, tag: "fm", safe: true, timeCap: 30)
+        let back2 = await walkBack(p, .np, maxSteps: 800, timeCap: 30)
+        let back2Ret = await walkReturn(p, back2, base: end, tag: "np2")
+        // Replace needs the cursor at the end: confirm it (one probe step when the returns landed).
+        let fin = await walkForward(p, maxSteps: 800, tag: "fe", safe: true, timeCap: 30)
+        let same = back.units == back2.units
+        let ok = forward.reason == "end" && back.reason == "start" && back2.reason == "start" && same
+            && mid.reason == "end" && fin.reason == "end" && fin.units.isEmpty
+        let pick = ok ? "np2" : "none"
+        let whole = back.units
         let ms = Int((uptime() - t0) * 1000)
-        walkLog("walk whole \(whole.count)/\(whole.filter { $0 == 10 }.count)/h\(fnvUnits(whole)) pick=\(pick) found=\(found.count) agree=\(agreeAll) ms=\(ms) after=\(shape(p.documentContextAfterInput))")
-        note += ["u=\(unit.summary)/\(unitBack)/\(unit.ms)ms", "f=\(forward.summary)/\(forward.ms)ms",
-                 "j=\(jump.summary)/\(jumpBack)/\(jump.ms)ms", "fj=\(jumpEnd.units.count)/\(jumpEnd.reason)",
-                 "j1=\(jump1.summary)/\(jump1Back)/\(jump1.ms)ms", "fj1=\(jump1End.units.count)/\(jump1End.reason)",
-                 "pick=\(pick)", "agree=\(agreeAll)", "ms=\(ms)"]
+        walkLog("walk whole \(whole.count)/\(whole.filter { $0 == 10 }.count)/h\(fnvUnits(whole)) pick=\(pick) found=\(ok ? 1 : 0) agree=\(same ? 1 : 0) ms=\(ms) after=\(shape(p.documentContextAfterInput)) steps=\(forward.steps)+\(back.steps)+\(mid.steps)+\(back2.steps)+\(fin.steps) big=\(big.changed ? 1 : 0) ret=\(backRet),\(back2Ret)")
+        note += ["big=\(big.changed ? 1 : 0)/b\((big.c.b ?? "").utf16.count)/a\((big.c.a ?? "").utf16.count)/\(big.ms)ms",
+                 "f=\(forward.summary)/\(forward.ms)ms", "j=\(back.summary)/\(backRet)/\(back.ms)ms",
+                 "j1=\(back2.summary)/\(back2Ret)/\(back2.ms)ms", "fm=\(mid.units.count)/\(mid.reason)", "fe=\(fin.units.count)/\(fin.reason)",
+                 "pick=\(pick)", "agree=\(same ? 1 : 0)", "ms=\(ms)"]
         WalkNote.shared.set(note.joined(separator: " "))
         let text = String(decoding: whole, as: UTF16.self)
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
