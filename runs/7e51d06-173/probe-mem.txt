@@ -1,0 +1,12 @@
+memsample: process name ProtlyCIKeyboard, interval 2.0 s
+memsample: started at 1795339873.155 after '== PhoneChecksUITests.test9_height' in /Users/runner/work/_temp/shots/ui-log.txt
+pgrep -x ProtlyCIKeyboard: 11595
+footprint: `footprint -p 11595` exit 66 value_kb None
+    footprint: Unable to find pid for process matching '11595'
+    footprint: Unable to find any processes matching the supplied process names or pids (try as root?)
+sudo-footprint: `sudo -n footprint -p 11595` exit 66 value_kb None
+    footprint: Unable to find pid for process matching '11595'
+    footprint: Unable to find any processes matching the supplied process names or pids (try as root?)
+rss: `ps -o rss= -p 11595` exit 1 value_kb None
+
+chosen footprint method: none (rss only)
