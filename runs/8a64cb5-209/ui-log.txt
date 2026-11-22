@@ -1,0 +1,57 @@
+== PhoneChecksUITests.test0_access
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+Settings: General
+Settings: Keyboard
+Settings: Keyboards
+Settings: Protly
+Settings: switch tap 1, no alert, switch Optional(0)
+Settings: switch tap 2, Allow in the alert, switch Optional(1)
+full access: on, turned on in Settings (switch tap 2, Allow in the alert)
+== PhoneChecksUITests.test5h_wholeweb
+ocr self-test: "Polish 안녕하세요"
+ocr self-test: works true, hangul true
+MARK wr-textarea-swin-t1 1795380696.854
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-swin-t2 1795380767.481
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-swin-t3 1795380796.781
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-swin PASS t1={real=39/1/h2dea6b2a caret=39,0 s=8.7 reply=39/1/h2dea6b2a caret-read=39,0 replace=5.26 kb=6.47 undo=4.51 kbundo=5.50} t2={real=39/1/h2dea6b2a caret=39,0 s=2.2 reply=39/1/h2dea6b2a caret-read=39,0 replace=2.12 kb=3.04 undo=2.41 kbundo=3.10} t3={real=39/1/h2dea6b2a caret=39,0 s=2.2 reply=39/1/h2dea6b2a caret-read=39,0 replace=2.04 kb=3.24 undo=2.49 kbundo=3.58}
+MARK wr-textarea-smid-t1 1795380836.487
+tapped protlyKey
+MARK wr-textarea-smid-t2 1795380906.783
+tapped protlyKey
+CHECK wr-textarea-smid FAIL t1={real=39/1/h2dea6b2a caret=26,0 s=3.2 reply=39/1/h2dea6b2a caret-read=26,0 replace=timeout field=32/0/h343cb079} t1=caret-read=26,0 replace=timeout field=32/0/h343cb079 (not as expected) t2={real=39/1/h2dea6b2a caret=26,0 s=2.3 reply=39/1/h2dea6b2a caret-read=26,0 replace=timeout field=32/0/h343cb079} t2=caret-read=26,0 replace=timeout field=32/0/h343cb079 (not as expected)
+MARK wr-textarea-ssel-t1 1795380973.367
+tapped protlyKey
+tapped protlyKey
+MARK wr-textarea-ssel-t2 1795381003.329
+tapped protlyKey
+tapped protlyKey
+CHECK wr-textarea-ssel FAIL t1={real=39/1/h2dea6b2a caret=0,39 s=2.0 reply=39/1/h2dea6b2a caret-read=0,39 replace=1.96 kb=2.67 undo=2.15 kbundo=3.01} t1=caret-read=0,39 (not as expected) t2={real=39/1/h2dea6b2a caret=0,39 s=2.3 reply=39/1/h2dea6b2a caret-read=0,39 replace=1.77 kb=2.57 undo=2.50 kbundo=3.54} t2=caret-read=0,39 (not as expected)
+MARK wr-lexical-swin-t1 1795381033.585
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-swin-t2 1795381065.106
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-swin-t3 1795381094.061
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-swin PASS t1={real=39/1/h2dea6b2a caret=39,0 s=2.2 reply=39/1/h2dea6b2a caret-read=39,0 replace=2.01 kb=2.80 undo=2.20 kbundo=2.85} t2={real=39/1/h2dea6b2a caret=39,0 s=2.6 reply=39/1/h2dea6b2a caret-read=39,0 replace=1.89 kb=2.60 undo=2.45 kbundo=3.31} t3={real=39/1/h2dea6b2a caret=39,0 s=2.0 reply=39/1/h2dea6b2a caret-read=39,0 replace=1.71 kb=2.77 undo=2.32 kbundo=3.18}
+MARK wr-lexical-smid-t1 1795381126.251
+tapped protlyKey
+MARK wr-lexical-smid-t2 1795381196.471
+tapped protlyKey
+CHECK wr-lexical-smid FAIL t1={real=39/1/h2dea6b2a caret=26,0 s=2.2 reply=39/1/h2dea6b2a caret-read=26,0 replace=timeout field=32/0/h343cb079} t1=caret-read=26,0 replace=timeout field=32/0/h343cb079 (not as expected) t2={real=39/1/h2dea6b2a caret=26,0 s=1.9 reply=39/1/h2dea6b2a caret-read=26,0 replace=timeout field=32/0/h343cb079} t2=caret-read=26,0 replace=timeout field=32/0/h343cb079 (not as expected)
+MARK wr-lexical-ssel-t1 1795381263.880
+tapped protlyKey
+tapped protlyKey
+MARK wr-lexical-ssel-t2 1795381335.700
+tapped protlyKey
+tapped protlyKey
+CHECK wr-lexical-ssel FAIL t1={real=39/1/h2dea6b2a caret=0,39 s=1.9 reply=39/1/h2dea6b2a caret-read=0,39 replace=1.82 kb=2.70 undo=timeout field=38/0/h9407ec9c} t1=caret-read=0,39 undo=timeout field=38/0/h9407ec9c (not as expected) t2={real=39/1/h2dea6b2a caret=0,39 s=2.7 reply=39/1/h2dea6b2a caret-read=0,39 replace=2.11 kb=2.83 undo=timeout field=38/0/h9407ec9c} t2=caret-read=0,39 undo=timeout field=38/0/h9407ec9c (not as expected)
