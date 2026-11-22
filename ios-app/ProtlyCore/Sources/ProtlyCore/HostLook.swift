@@ -11,7 +11,7 @@ import Foundation
 // Rules (what the simulator showed; the keyboard process keeps one HostLook for its host):
 // 1. The host leaving with the keyboard up shows no margin afterwards, unless it comes back with the keyboard up
 //    (rule 2): a relaunch after the host was killed in the background is a fresh host. Leaving is a controller that
-//    disappears within `resignWindow` of NSExtensionHostWillResignActive (0.9-1.2 s on the simulator).
+//    disappears within `resignWindow` of NSExtensionHostWillResignActive (0.79-1.90 s on the simulator).
 //    1b. A controller that went without viewDidDisappear went with its host (terminated in the foreground): the next
 //    one is a fresh host.
 // 2. The host coming back with the keyboard up, after leaving with it up, shows the margin from then on. Its notice

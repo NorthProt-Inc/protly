@@ -80,7 +80,8 @@ final class ProtlyHeight: NSObject {
     }
 
     /// The host's notices, for the whole process. Selector-free blocks: they live as long as the process. Ignored
-    /// while no portrait pin is active: landscape keeps iOS's height, and its looks are not measured.
+    /// while the live pins are all inactive (landscape keeps iOS's height, and its looks are not measured). With no
+    /// live pin a notice still counts: the old controller can be gone before the host's return reaches the new one.
     private static func observeHost() {
         guard observers.isEmpty else { return }
         let notices: [(Notification.Name, String, @Sendable (inout HostLook, Double) -> Void)] = [
@@ -90,7 +91,8 @@ final class ProtlyHeight: NSObject {
         for (name, reason, apply) in notices {
             observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { _ in
                 MainActor.assumeIsolated {
-                    guard ProtlyHeight.pins.allObjects.contains(where: { $0.constraint.isActive }) else {
+                    let live = ProtlyHeight.pins.allObjects
+                    guard live.isEmpty || live.contains(where: { $0.constraint.isActive }) else {
                         return ProtlyHeight.follow(reason + ", not in portrait: ignored")
                     }
                     apply(&ProtlyHeight.look, ProtlyHeight.now)
