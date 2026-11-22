@@ -116,9 +116,13 @@ enum FieldText {
         // Only the walk from the user's cursor may start from contexts the host never refreshed (run 163 web `mid`).
         var fw = ForwardWalk(cap: cap, resyncFirst: tag == "f")
         var steps = 0, late = 0, firstMS = -1, phantoms = 0
+        // F02c: the host's contexts were seen on their way (a blank that came back, a second look, a step judged again):
+        // the window proof is not taken after such a walk (run 20c073c-216 uikit win t2: after a blank, a start probe
+        // that showed nothing for 0.5 s, then contexts that lagged into R1 and FM).
+        var lagged = false
         let w0 = uptime()
         defer {
-            lastWalkClean = bw.retries == 0 && fw.retries == 0 && fw.resyncs == 0 && phantoms == 0
+            lastWalkClean = bw.retries == 0 && fw.retries == 0 && fw.resyncs == 0 && phantoms == 0 && late == 0 && !lagged
             lastWalkResynced = fw.resyncs > 0
         }
         func fits(_ wait: TimeInterval) -> Bool {
@@ -157,6 +161,7 @@ enum FieldText {
                 let e0 = uptime()
                 while uptime() - e0 < WholeRead.emptyWait, ctx(p).before.isEmpty { await pause() }
                 c = ctx(p)
+                if !c.before.isEmpty { lagged = true }  // a blank mid-field that came back
             }
             let probing = back ? c.before.isEmpty : c.after.isEmpty
             let wait = probing ? WholeRead.probeWait : WholeRead.moveWait
@@ -190,6 +195,8 @@ enum FieldText {
                 let e0 = uptime()
                 while uptime() - e0 < WholeRead.emptyWait, ctx(p).before.isEmpty { await pause() }
                 s.c = ctx(p)
+                // It came back: the host's contexts lagged. (Still empty after a step over the whole context: the start.)
+                if !s.c.before.isEmpty { lagged = true }
             }
             func judge() -> WalkStep {
                 back ? bw.landed(changed: s.changed, before: s.c.before, after: s.c.after)
@@ -202,6 +209,7 @@ enum FieldText {
                 await pause(WholeRead.emptyWait)
                 let again = ctx(p)
                 // Never on an empty before-context: it agrees with anything (silent-failure review, round 2).
+                lagged = true
                 if again != s.c, !again.before.isEmpty {
                     logStep("rejudged:\(why)", k: k, from: c, to: s, ms: ms(since: s0))
                     s.c = again
@@ -271,6 +279,7 @@ enum FieldText {
         let s = await step(p, by: n, wait: WholeRead.moveWait)
         func showsEnd(_ c: Ctx) -> Bool { c.a.isEmpty && !c.b.isEmpty && WholeRead.agreeAtEnd(c.before, end.before) }
         var c = s.c, atEnd = showsEnd(c)
+        lastReturnWaited = !atEnd
         let e0 = uptime()
         while !atEnd, uptime() - e0 < WholeRead.emptyWait {
             await pause()
@@ -284,6 +293,8 @@ enum FieldText {
     /// The walk that ended last was clean, or resynced at its first step (see walk).
     private static var lastWalkClean = true
     private static var lastWalkResynced = false
+    /// The last return's contexts needed the extra wait to show the end (a lag signal for the window proof).
+    private static var lastReturnWaited = false
 
     /// The whole field, a partial selection, or a refusal. `record` gets the read's CursorReturn after every change
     /// (a step sent, a step settled, the end reached), for Cancel; `progress` is called while the read runs past
@@ -421,13 +432,15 @@ enum FieldText {
         guard let r1AtEnd = await returnMove(p, by: back1.count, end: end, start: t0, track: track) else {
             return await refuse("r1:timeUp")
         }
+        let r1Waited = lastReturnWaited
         let fmEnd = await walk(false, cap: WholeRead.cap, "fm")
         guard case .done(let mid) = fmEnd else { return await stopped(fmEnd, "fm") }
         clean = clean && lastWalkClean
         if Task.isCancelled { return finish(.cancelled, "cancelled") }
         // F02c: the window the proxy showed was the whole field.
-        if WholeRead.windowProof(window: shown, first: first, back1: back1, mid: mid, returnedAtEnd: r1AtEnd,
-                                 clean: clean) {
+        // A return whose contexts needed time to show the end counts as a lag, as in the walks.
+        if WholeRead.windowProof(window: shown, first: first, back1: back1, mid: mid,
+                                 returnedAtEnd: r1AtEnd && !r1Waited, clean: clean) {
             let text = String(decoding: back1, as: UTF16.self)
             return finish(.text(text, isSelection: false), "window", back1)
         }
