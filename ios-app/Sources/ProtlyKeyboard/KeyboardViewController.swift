@@ -206,7 +206,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         }
         savePrevious()
         insertText(" ")
-        pickSpace.picked(shown, after: textDocumentProxy.documentContextAfterInput ?? "", at: now)
+        pickSpace.picked(shown, after: "", at: now)
     }
 
     /// A space release (ProtlyActionHandler): true when the space the last pick typed takes this tap's place, so the
