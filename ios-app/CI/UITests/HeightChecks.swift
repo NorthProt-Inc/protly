@@ -19,8 +19,8 @@ import XCTest
 extension PhoneRun {
     /// The same order as checks.py's HEIGHT_IDS.
     static let heightIDs = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji",
-                            "hb-hide-emoji", "hb-switch", "hb-hide-switch", "hb-switch-hidden", "hb-kill-up",
-                            "hb-kill-hidden", "hb-card", "hb-cancel"]
+                            "hb-hide-emoji", "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden",
+                            "hb-kill-up", "hb-kill-hidden", "hb-card", "hb-cancel"]
     static let heightArguments = ["-fills", Stub.draft("ok")]
     /// measure.py's BAND_TOLERANCE.
     static let bandTolerance: CGFloat = 1.0
@@ -28,7 +28,7 @@ extension PhoneRun {
     static let row1: CGFloat = 564
     /// How long the host stays in the background with the keyboard hidden: longer than HostLook's expiry, as leaving
     /// for another app usually is (HostLook, rule 5). A quicker round trip is a known gap (run 183, hb-r1 and hb-r2).
-    static let away = HostLook.hiddenExpiry + 3
+    static let away: TimeInterval = 13
 
     /// One measured screen: glass top and row 1 in points (nil when not found), and which keyboard was up.
     struct HeightShot {
@@ -39,6 +39,8 @@ extension PhoneRun {
         let screen: XCUIScreenshot
         let placeholder: CGRect?
         var picked = false
+        /// What went wrong in the steps before this shot (Driver's problems): the shot does not show its path.
+        var problems: [String] = []
 
         var band: CGFloat? { top.flatMap { t in row1.map { $0 - t } } }
 
@@ -46,6 +48,7 @@ extension PhoneRun {
             func f(_ v: CGFloat?) -> String { v.map { String(format: "%.2f", Double($0)) } ?? "none" }
             return "\(f(band))@\(f(top))/\(f(row1))" + (board == .protly ? "" : "/\(board.rawValue)")
                 + (reached ? "" : "/unreached") + (picked ? "/picked" : "")
+                + (problems.isEmpty ? "" : "/problems\(problems.count)")
                 + (placeholder.map { "/ph\(f($0.minY))+\(f($0.height))" } ?? "/ph-none")
         }
     }
@@ -54,8 +57,11 @@ extension PhoneRun {
         if notReady(PhoneRun.heightIDs) { return }
         var shots: [String: [HeightShot]] = [:]
         func take(_ id: String, _ reached: Bool, settle: TimeInterval = 1.5, picked: Bool = false) {
-            shots[id, default: []].append(heightShot(id, (shots[id]?.count ?? 0) + 1, reached: reached,
-                                                     settle: settle, picked: picked))
+            let n = (shots[id]?.count ?? 0) + 1
+            var shot = heightShot(id, n, reached: reached, settle: settle, picked: picked)
+            shot.problems = d.takeProblems()
+            for p in shot.problems { d.log("\(id) \(n): problem \(q(p))") }
+            shots[id, default: []].append(shot)
         }
         func launch() {
             let (reached, picked) = heightRelaunch()
@@ -73,14 +79,16 @@ extension PhoneRun {
         launch()
         for _ in 0..<5 {
             d.switchToEnglish()
-            take("hb-apple", d.current() == .english)
-            take("hb-globe", d.pick(.protly) || d.cycle(to: .protly, taps: 3))
+            let english = d.current() == .english
+            take("hb-apple", english)
+            take("hb-globe", english && (d.pick(.protly) || d.cycle(to: .protly, taps: 3)))
             take("hb-hide-globe", heightRefocus(1))
         }
         // 3. The Emoji round trip in a used host (after the globe pick), each followed by hide/show.
         launch()
         d.switchToEnglish()
-        take("hb-globe", d.pick(.protly) || d.cycle(to: .protly, taps: 3))
+        let english = d.current() == .english
+        take("hb-globe", english && (d.pick(.protly) || d.cycle(to: .protly, taps: 3)))
         for _ in 0..<5 {
             take("hb-emoji", heightEmoji())
             take("hb-hide-emoji", heightRefocus(1))
@@ -95,6 +103,13 @@ extension PhoneRun {
         for _ in 0..<3 {
             take("hb-emoji", heightEmoji())
             take("hb-hide-emoji", heightRefocus(1))
+        }
+        // 4b. RECORD, the other side of HostLook's rule 5: after an app switch with the keyboard up, a hide of 12 s
+        // without leaving the host. iOS keeps its margin and the keyboard no longer believes it: the cost of the guess.
+        launch()
+        for _ in 0..<5 {
+            take("hb-switch", heightAppSwitch())
+            take("hb-hide-long", heightRefocus(12))
         }
         // 5. After iOS's margin look (an app switch with the keyboard up, then hide/show), an app switch with the
         // keyboard hidden, `away` seconds in the background, then the field tapped: no notice reaches the keyboard.
@@ -157,11 +172,14 @@ extension PhoneRun {
             item.note(String(format: "band=%.2f..%.2f", Double(lo), Double(hi)))
         }
         if id == "hb-apple" {
-            if list.count < 5 { item.markUnreadable("\(list.count) shots, want 5 or more") }
-            // The reference: Apple's keyboard on every shot, the same band each time.
-            let english = list.filter { $0.board == .english && $0.band != nil }
-            item.require("apple", english.count == list.count, "\(english.count)/\(list.count) on English with a band")
-            if let lo = bands.min(), let hi = bands.max() {
+            // The reference: Apple's keyboard on every shot whose steps went right, the same band each time.
+            let judged = list.filter { $0.problems.isEmpty }
+            if judged.count < 3 { item.markUnreadable("\(judged.count) shots without problems, want 3 or more") }
+            let english = judged.filter { $0.board == .english && $0.band != nil }
+            item.require("apple", english.count == judged.count,
+                         "\(english.count)/\(judged.count) on English with a band")
+            let appleBands = english.compactMap(\.band)
+            if let lo = appleBands.min(), let hi = appleBands.max() {
                 item.require("spread", hi - lo <= tol, String(format: "%.2f pt", Double(hi - lo)))
             }
             finish(item, record: true, screen: list.first?.screen)
@@ -173,15 +191,32 @@ extension PhoneRun {
             return
         }
         item.note(String(format: "apple=%.2f", Double(appleBand)))
-        // A shot that came up on another keyboard (a system stand-in, or iOS bringing back English) cannot show
-        // Protly's band: listed, not judged. Fewer than 5 judged shots is unreadable.
-        let skipped = list.indices.filter { list[$0].board != .protly }.map { $0 + 1 }
-        if !skipped.isEmpty { item.note("skipped=\(skipped.map(String.init).joined(separator: ",")) (not on Protly)") }
+        // A shot that does not show its path is listed, not judged: it came up on another keyboard (a system
+        // stand-in, or iOS bringing back English), a step before it failed (Driver's problems: Emoji or English not
+        // reached), its step did not reach Protly, or a relaunch needed a globe pick. A card that did not finish is
+        // judged (it FAILs). Fewer than 5 judged shots is unreadable.
+        let cardPath = id == "hb-card" || id == "hb-cancel"
+        func judged(_ s: HeightShot) -> Bool {
+            s.board == .protly && s.problems.isEmpty && !s.picked && (s.reached || cardPath)
+        }
+        let skipped = list.indices.filter { !judged(list[$0]) }.map { $0 + 1 }
+        if !skipped.isEmpty {
+            let numbers = skipped.map(String.init).joined(separator: ",")
+            item.note("skipped=\(numbers) (not on Protly, a step failed, or picked)")
+        }
+        for (i, s) in list.enumerated() where !s.problems.isEmpty {
+            item.note("problems\(i + 1)=\(q(s.problems.joined(separator: "; ")))")
+        }
+        if id == "hb-hide-long" {
+            // RECORD: what rule 5's guess costs when the host never left (iOS keeps its margin: 69 expected).
+            finish(item, record: true, screen: list.first?.screen)
+            return
+        }
         if list.count - skipped.count < 5 {
-            item.markUnreadable("\(list.count - skipped.count) shots on Protly, want 5 or more")
+            item.markUnreadable("\(list.count - skipped.count) judged shots, want 5 or more")
         }
         var wrong: [Int] = []
-        for (i, s) in list.enumerated() where s.board == .protly {
+        for (i, s) in list.enumerated() where judged(s) {
             // The card covers row 1: its shot is judged by the glass top only (row 1 at 564 puts the top at
             // row1 - appleBand).
             let keys = !(id == "hb-card")

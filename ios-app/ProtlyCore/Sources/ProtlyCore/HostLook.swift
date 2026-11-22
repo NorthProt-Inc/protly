@@ -55,8 +55,9 @@ public struct HostLook: Sendable, Equatable {
     /// When the current controller loaded or was shown again (seconds, the keyboard's monotonic clock).
     private var loadedAt: Double?
     private var resignedAt: Double?
-    /// The host left with the keyboard up and has not come back with it (rule 1).
+    /// The host left with the keyboard up and has not come back with it (rule 1), and when.
     private var leaving = false
+    private var leftAt: Double?
     /// When the host came back after leaving, while no controller had loaded for it yet.
     private var returnedAt: Double?
     /// The current controller is the host's return (rule 2), so rule 4 does not apply to it.
@@ -97,6 +98,7 @@ public struct HostLook: Sendable, Equatable {
             expire(at: now)
         }
         endedCleanly = false
+        disappearedAt = nil  // up now: rule 5 counts only hidden time
         guard let document else { return .none }
         guard document == lastDocument else { return .other }
         if margin, !leaving, !cameBack { margin = false }  // rule 4
@@ -110,8 +112,10 @@ public struct HostLook: Sendable, Equatable {
 
     /// NSExtensionHostDidBecomeActive.
     public mutating func hostBecameActive(at now: Double) {
+        resignedAt = nil  // a resign that ends here (Control Center, an alert) is not the host leaving
         guard leaving else { return }
-        if let loadedAt, now >= loadedAt, now - loadedAt < Self.freshWindow {
+        // Only a controller loaded after the leave can be the return.
+        if let loadedAt, loadedAt > (leftAt ?? 0), now >= loadedAt, now - loadedAt < Self.freshWindow {
             arrived()
         } else {
             returnedAt = now
@@ -123,9 +127,11 @@ public struct HostLook: Sendable, Equatable {
         endedCleanly = true
         lastDocument = document
         disappearedAt = now
+        cameBack = false  // only the returning controller's own appearance is the return
         if let resignedAt, now >= resignedAt, now - resignedAt < Self.resignWindow {  // rule 1
             margin = false
             leaving = true
+            leftAt = now
             returnedAt = nil
             self.resignedAt = nil
         }

@@ -115,6 +115,47 @@ final class HostLookTests: XCTestCase {
         XCTAssertFalse(cold.margin)
     }
 
+    func testAHideRightAfterControlCenterIsNotLeaving() {
+        // Control Center or Face ID over a live keyboard (resign, then became active), then a hide within the resign
+        // window (Send): iOS keeps its look (review, abeb289).
+        var look = afterAppSwitch()
+        look.hostWillResignActive(at: 20)
+        look.hostBecameActive(at: 21)
+        look.disappeared(document: nil, at: 21.5)
+        present(&look, at: 23, document: UUID())
+        XCTAssertTrue(look.margin)
+    }
+
+    func testANoticeBeforeTheNextLoadDoesNotMatchTheOldController() {
+        // The keyboard opened 1 s before the host left: the return's notice must wait for a load after the leave, or
+        // rule 4 would drop it again at that load's appearance (review, abeb289).
+        let doc = UUID()
+        var look = HostLook()
+        present(&look, at: 0, document: doc)
+        look.hostWillResignActive(at: 0.5)
+        look.disappeared(document: doc, at: 1)
+        look.hostBecameActive(at: 1.5)  // 1.5 s after the old controller loaded
+        present(&look, at: 2, document: doc)
+        XCTAssertTrue(look.margin)
+    }
+
+    func testAShownAgainControllerAfterAReturnStillMeetsRule4() {
+        // A controller reused after the host's return: back from Emoji it must drop the margin (review, abeb289).
+        let doc = UUID()
+        var look = afterAppSwitch(doc)
+        look.disappeared(document: doc, at: 20)
+        look.appeared(document: doc, at: 25)
+        XCTAssertFalse(look.margin)
+    }
+
+    func testTheExpiryCountsOnlyHiddenTime() {
+        // viewWillAppear again with no disappear in between (a cancelled interactive dismiss): the keyboard was never
+        // hidden, so the margin stays however long it was up (review, abeb289).
+        var look = afterAppSwitch()
+        look.appeared(document: UUID(), at: 80)
+        XCTAssertTrue(look.margin)
+    }
+
     func testAHideLongAfterAResignIsNotLeaving() {
         var look = HostLook()
         present(&look, at: 0, document: UUID())

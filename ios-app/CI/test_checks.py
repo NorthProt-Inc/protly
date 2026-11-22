@@ -1094,8 +1094,8 @@ class HeightTests(unittest.TestCase):
 
     def test_every_id_is_expected_and_has_a_method(self):
         ids = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
-               "hb-switch", "hb-hide-switch", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden", "hb-card",
-               "hb-cancel"]
+               "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
+               "hb-card", "hb-cancel"]
         self.assertEqual(checks.HEIGHT_IDS, ids)
         self.assertEqual(checks.METHOD_IDS["test9_height"], ids)
         for i in ids:

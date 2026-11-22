@@ -57,7 +57,8 @@ PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
 # Apple's band measured in the same run (hb-apple, RECORD). The same list as PhoneRun.heightIDs in
 # UITests/HeightChecks.swift; the UI test judges each item itself.
 HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
-              "hb-switch", "hb-hide-switch", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden", "hb-card", "hb-cancel"]
+              "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
+              "hb-card", "hb-cancel"]
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
                 + PERIOD_IDS + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
