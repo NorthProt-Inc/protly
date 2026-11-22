@@ -3,7 +3,8 @@
 docs/plans/2026-10-30-typing-fixes.md, Sprint 004: dark-1, ret-*, menu-*, pad-*, and
 docs/plans/2026-10-30-keyboard-ui.md, Task 3.5: card-*, mem-stream, hit-1, bar-*, app-*, and
 fix/double-space-period and fix/pick-space (K4E), docs/research/2026-11-17-keyboard-diagnosis.md P4: dsp-*, and
-K1b (fix/whole-field-read), the keyboard reads the whole field: wr-*, and fix/keyboard-height (K2, P2): hb-*).
+fix/keyboard-height (K2, P2): hb-*, and
+K1b (fix/whole-field-read), the keyboard reads the whole field: wr-*).
 
 Usage: checks.py <dir> [--network-key] [--ran <entry>,<entry>...]
 
@@ -54,6 +55,12 @@ BAR_IDS = ["hit-1", "bar-dark", "bar-light", "bar-xxl", "app-dark", "app-light"]
 PERIOD_FIELDS = ("uikit", "composer")
 PERIOD_KINDS = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2", "pickmid", "pickmove")
 PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
+# K2 (report P2, the keyboard height keeps changing): the band above the bar on every presentation path, against
+# Apple's band measured in the same run (hb-apple, RECORD). The same list as PhoneRun.heightIDs in
+# UITests/HeightChecks.swift; the UI test judges each item itself.
+HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
+              "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
+              "hb-card", "hb-cancel"]
 # K1b: the whole-field read, Replace and Undo (times recorded), wr-<host>-<case>. The test writes PASS or FAIL itself
 # (UITests/WholeReadChecks.swift); the same lists as WholeChecks there. Native hosts: the UITextView screen (uikit) and
 # the SwiftUI field (swiftui), plus a 3975-unit Replace and Undo (r4k) and Cancel mid-read (cancel) on the UITextView;
@@ -83,12 +90,6 @@ WHOLE_CANCELLED = {("native", "cancel")}
 # The test polls the field every 0.2 s, reading a long field takes a few hundred ms more, and the keyboard's clock starts
 # a little after the test's tap; the race this check is for opened the gate 6-11 s before the host was done (run 172).
 WHOLE_HOST_SLACK_MS = 2000
-# K2 (report P2, the keyboard height keeps changing): the band above the bar on every presentation path, against
-# Apple's band measured in the same run (hb-apple, RECORD). The same list as PhoneRun.heightIDs in
-# UITests/HeightChecks.swift; the UI test judges each item itself.
-HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
-              "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
-              "hb-card", "hb-cancel"]
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
                 + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of

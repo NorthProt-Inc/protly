@@ -1476,5 +1476,6 @@ class HeightTests(unittest.TestCase):
             self.assertIn("runs only in a filtered run (deadline)", final[i].evidence)
         self.assertFalse(any(c.status == "FAIL" for c in final.values()))
 
+
 if __name__ == "__main__":
     unittest.main()
