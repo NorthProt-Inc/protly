@@ -316,6 +316,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         let call = nextCall()
         mode.strip = StripState(call: call, action: action, label: tapped ?? BarAction.call(action, text: ""))
         readingCall = call
+        timing = (call, now, nil, nil, -1)  // F02c baseline: main's read and call, timed as on the branch
         actionTask = Task { [weak self] in
             guard let self else { return }
             defer { if readingCall == call { readingCall = nil } }
@@ -459,11 +460,15 @@ final class KeyboardViewController: KeyboardInputViewController {
         let strip = StripState(call: call, action: action, label: label, deep: deep)
         if mode.strip != strip { mode.strip = strip }
         actionTask?.cancel()
+        if timing?.call == call { timing?.startedAt = now }
         actionTask = Task { [weak self] in
             // self is bound per update, never before the loop: a torn-down controller is not held for up to 240 s. The
             // cancel check stops a late update from bringing a card back after Cancel or after a Retry replaced this task.
             for await update in ActionClient.run(action, text: sent.text, profile: sent.profile) {
                 guard let self, !Task.isCancelled else { return }
+                if let t = timing, t.call == call, t.apiMS < 0, let started = t.startedAt {
+                    timing?.apiMS = Int((now - started) * 1000)
+                }
                 show(update, feed: callFeed, card: CardState(call: call, action: action, label: label, original: original,
                                                          isSelection: isSelection, deep: deep, shownAt: now))
                 // At most 20 redraws of the card's text a second: meanwhile the stream keeps only the newest partial
@@ -478,12 +483,16 @@ final class KeyboardViewController: KeyboardInputViewController {
         }
     }
 
+    /// F02c baseline timing (FieldText.logCall): the field action tapped last.
+    private var timing: (call: Int, tappedAt: Double, firstAt: Double?, startedAt: Double?, apiMS: Int)?
+
     /// `card` is the card to open if none is open yet. mode.panel changes at the first text and at the end only.
     private func show(_ update: ActionUpdate, feed: ResultFeed, card fresh: CardState) {
         switch update {
         case .partial(let text):
             feed.partial = text
             if openCard != nil { return }
+            if timing?.call == fresh.call, timing?.firstAt == nil { timing?.firstAt = now }
             // A card read from a selection opens copy-only: it never writes.
             var card = fresh
             card.copyOnly = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: nil)
@@ -498,6 +507,11 @@ final class KeyboardViewController: KeyboardInputViewController {
                 card.action, original: card.original, isSelection: card.isSelection, field: observed())
             mode.strip = nil
             mode.panel = .card(card)
+            if let t = timing, t.call == card.call {
+                let ms = { (at: Double) in Int((at - t.tappedAt) * 1000) }
+                FieldText.logCall(first: ms(t.firstAt ?? now), done: ms(now), api: t.apiMS, spec: "none")
+                timing = nil
+            }
         case .failed(let error):
             guard var card = openCard else {
                 // No text yet: the error replaces the strip's label, the keys stay, no card opens.
@@ -543,7 +557,9 @@ final class KeyboardViewController: KeyboardInputViewController {
             p.insertText(result)
             lastInsert = (result, "")
         } else {
+            let tapped = ProcessInfo.processInfo.systemUptime
             FieldText.replace(card.original, with: result, p)
+            FieldText.logWrite("replace", keys: Int((ProcessInfo.processInfo.systemUptime - tapped) * 1000), held: true)
             lastInsert = (result, card.original)
         }
         cursorReturn.clear()
@@ -584,8 +600,10 @@ final class KeyboardViewController: KeyboardInputViewController {
             refreshField()  // the bar stops offering Undo
             return
         }
+        let tapped = now
         for _ in l.inserted { textDocumentProxy.deleteBackward() }
         textDocumentProxy.insertText(l.original)
+        if !l.original.isEmpty { FieldText.logWrite("undo", keys: Int((now - tapped) * 1000), held: true) }
         watch.forget()
         endUndo()
         refreshField()

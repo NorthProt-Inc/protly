@@ -1,10 +1,23 @@
 import ProtlyCore
 import UIKit
+import os
 
 /// Reads and replaces the whole field through the text document proxy.
 /// The proxy only shows text around the cursor, so the cursor goes to the end first.
 @MainActor
 enum FieldText {
+    /// F02c baseline (diag only): the same timing lines as the branch's FieldText.logCall and logWrite.
+    private static let log = Logger(subsystem: "com.northprot.protly", category: "read")
+
+    static func logCall(first: Int, done: Int, api: Int, spec: String) {
+        log.debug("call done first=\(first, privacy: .public) done=\(done, privacy: .public) api=\(api, privacy: .public) spec=\(spec, privacy: .public)")
+    }
+
+    static func logWrite(_ kind: String, keys: Int, held: Bool) {
+        let ok = held ? 1 : 0
+        log.debug("write \(kind, privacy: .public) keys=\(keys, privacy: .public) held=\(ok, privacy: .public)")
+    }
+
     /// One cursor step of a read, for Cancel (CursorReturn): sent to the host, then shown by it (with the
     /// before-context it shows now) or given up on.
     enum Move {
