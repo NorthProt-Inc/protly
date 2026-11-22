@@ -3,7 +3,8 @@
 docs/plans/2026-10-30-typing-fixes.md, Sprint 004: dark-1, ret-*, menu-*, pad-*, and
 docs/plans/2026-10-30-keyboard-ui.md, Task 3.5: card-*, mem-stream, hit-1, bar-*, app-*, and
 fix/double-space-period and fix/pick-space (K4E), docs/research/2026-11-17-keyboard-diagnosis.md P4: dsp-*, and
-fix/keyboard-height (K2, P2): hb-*).
+fix/keyboard-height (K2, P2): hb-*, and
+K1b (fix/whole-field-read), the keyboard reads the whole field: wr-*).
 
 Usage: checks.py <dir> [--network-key] [--ran <entry>,<entry>...]
 
@@ -25,6 +26,7 @@ checks-raw.txt and rewrites checks.txt with the final lines. Prints `CHECKS`, th
 `CHECKS pass N fail N record N skip N` (plus ` not-run N` when any ID is NOT-RUN). Exit 1 when any line is FAIL.
 """
 
+import datetime
 import os
 import re
 import sys
@@ -59,8 +61,42 @@ PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
 HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
               "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
               "hb-card", "hb-cancel"]
+# K1b: the whole-field read, Replace and Undo (times recorded), wr-<host>-<case>. The test writes PASS or FAIL itself
+# (UITests/WholeReadChecks.swift); the same lists as WholeChecks there. Native hosts: the UITextView screen (uikit) and
+# the SwiftUI field (swiftui), plus a 3975-unit Replace and Undo (r4k) and Cancel mid-read (cancel) on the UITextView;
+# web hosts: the read page's textarea and Lexical-shaped field. Text with emoji (emoji) is read on native hosts and
+# refused on web hosts (they move by characters).
+# F02c: short drafts the proxy window shows whole (swin 39 units at the end, smid in the middle, ssel select all, s3 93
+# units of three sentences on one line), a partial selection at the start up to a line feed (shead: a copy-only card
+# of the selection), and a lone emoji ending the line after a mid-text cursor (etail, native only).
+WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead", "etail")
+WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead")
+WHOLE_WEB_HOSTS = ("textarea", "lexical")
+WHOLE_TRIES = {"win": 2, "long": 2}
+WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r4k", "wr-uikit-cancel"]
+                    + [f"wr-swiftui-{c}" for c in WHOLE_NATIVE_CASES])
+WHOLE_WEB_IDS = [f"wr-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in WHOLE_WEB_CASES]
+# What the keyboard's own log (keyboard-log.txt, category `read`) must say for each wr- try, between the try's MARK
+# (wr-<host>-<case>-t<n> in ui-log.txt) and the next MARK: a refusal case its refusal reason (`<walk>:<why>`; the web
+# drafts with emoji are refused for the emoji, the native 14 055-unit one at the read's 4000-unit cap or, as in run
+# a6de577-162 on both native hosts, at its second step back, where the host's move fit one more unit per emoji crossed
+# (probe run 150 saw 11 such native steps in 14 038-unit walks)), an accepted
+# case the read accepted and Replace and Undo both proven by the keyboard (`replace ... held=1`, twice), with the
+# keyboard's check beginning no earlier than WHOLE_HOST_SLACK_MS before the test saw the field hold the result
+# (`quietms` against the test's replace= and undo=): a check that moves the cursor while the host is still deleting
+# can prove only the proxy's own copy of the field, and moved the Lexical-shaped page's text away in run 172.
+# wr-uikit-cancel (Cancel on the strip mid-read) needs `outcome=cancelled`.
+WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong", "b1:characters", "b1:badStep"),
+                  ("web", "x14k"): ("b1:characters", "b1:badStep"),
+                  ("web", "emoji"): ("b1:characters", "b1:badStep")}
+WHOLE_CANCELLED = {("native", "cancel")}
+# A partial selection: the keyboard sends the selection (`reason=selection`) and writes nothing.
+WHOLE_SELECTION = {"shead"}
+# The test polls the field every 0.2 s, reading a long field takes a few hundred ms more, and the keyboard's clock starts
+# a little after the test's tap; the race this check is for opened the gate 6-11 s before the host was done (run 172).
+WHOLE_HOST_SLACK_MS = 2000
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
-                + PERIOD_IDS + HEIGHT_IDS)
+                + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -76,14 +112,19 @@ METHOD_IDS = {
     "test5d_card": CARD_IDS,
     "test5e_bar": BAR_IDS,
     "test5f_period": PERIOD_IDS,
+    "test5g_wholenative": WHOLE_NATIVE_IDS,
+    "test5h_wholeweb": WHOLE_WEB_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
     "test9_height": HEIGHT_IDS,
 }
 # Methods that run only in a filtered run: without FILTERED=1 (run-shots.sh sets it with a `[shots:...]` filter) they
-# throw XCTSkip, so a full run marks their IDs NOT-RUN with this reason. test5f_period takes about 15 minutes, and full
-# runs already come close to run-shots.sh's MAIN_TEST_DEADLINE.
+# throw XCTSkip, so a full run marks their IDs NOT-RUN with this reason. test5f_period takes about 15 minutes, the
+# whole-read methods about 15 to 25 minutes each (reads of up to 20 s), and full runs already come close to
+# run-shots.sh's MAIN_TEST_DEADLINE.
 FILTERED_ONLY = {"test5f_period": "runs only in a filtered run (deadline)",
+                 "test5g_wholenative": "runs only in a filtered run (deadline)",
+                 "test5h_wholeweb": "runs only in a filtered run (deadline)",
                  "test9_height": "runs only in a filtered run (deadline)"}
 # Methods that write no ID of their own (Full Access, the probe) and the layout test.
 OTHER_METHODS ={"PhoneChecksUITests": ("test0_access", "test0_probe"), "KeyboardShotsUITests": ("testScenarios",)}
@@ -1250,6 +1291,113 @@ RESOLVERS = {"6.8-9": resolve_relaunch, "6.8-10": resolve_memory, **{i: resolve_
 NO_KEY = "no network key"
 
 
+KB_READ_LINE = re.compile(r"^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d+) .*\[com\.northprot\.protly:read\] (.*)$")
+
+
+def parse_kb_read(text):
+    """(epoch seconds, line) for each keyboard `read` log line; `log show` prints UTC on the CI runner."""
+    out = []
+    for raw in (text or "").splitlines():
+        m = KB_READ_LINE.match(raw)
+        if not m:
+            continue
+        t = datetime.datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=datetime.timezone.utc)
+        out.append((t.timestamp(), m.group(2)))
+    return out
+
+
+def kv(line, name):
+    m = re.search(r"(?:^| )" + re.escape(name) + r"=(\S+)", line)
+    return m.group(1) if m else None
+
+
+def resolve_whole_log(check, marks, kb_text):
+    """K1b: the keyboard's log for each try of a wr- line the test wrote (see WHOLE_REFUSALS). A PASS without the log
+    lines it needs is a FAIL; a FAIL stays one and gains the log's words."""
+    host, case = check.id.split("-", 2)[1:]
+    kind = "web" if host in WHOLE_WEB_HOSTS else "native"
+    refusal = WHOLE_REFUSALS.get((kind, case))
+    if kb_text is None:
+        problems, notes = ["no keyboard-log.txt"], []
+    else:
+        events = parse_kb_read(kb_text)
+        problems, notes = [], []
+        for t in range(1, WHOLE_TRIES.get(case, 1) + 1):
+            start = marks.get(f"{check.id}-t{t}")
+            if start is None:
+                problems.append(f"t{t}:no MARK")
+                continue
+            end = min((m for m in marks.values() if m > start), default=float("inf"))
+            lines = [line for at, line in events if start - 0.5 <= at < end]
+            done = [line for line in lines if line.startswith("read done ")]
+            if len(done) != 1:
+                problems.append(f"t{t}:no read done" if not done else f"t{t}:{len(done)} reads")
+                continue
+            outcome, reason, took = kv(done[0], "outcome"), kv(done[0], "reason"), kv(done[0], "ms")
+            if (kind, case) in WHOLE_CANCELLED:
+                notes.append(f"t{t}:{outcome}/{took}ms")
+                if outcome != "cancelled":
+                    problems.append(f"t{t}:{outcome}/{reason} want cancelled")
+                continue
+            if case in WHOLE_SELECTION:
+                notes.append(f"t{t}:{outcome}/{reason}")
+                writes = [line for line in lines if line.startswith("replace ")]
+                if outcome != "accepted" or reason != "selection" or writes:
+                    problems.append(f"t{t}:{outcome}/{reason} writes={len(writes)} want accepted/selection, no write")
+                continue
+            if refusal:
+                notes.append(f"t{t}:{outcome}/{reason}")
+                if outcome != "refused" or reason not in refusal:
+                    problems.append(f"t{t}:{outcome}/{reason} want refused/{'|'.join(refusal)}")
+                continue
+            held = [kv(line, "held") for line in lines if line.startswith("replace ")]
+            if outcome != "accepted":
+                notes.append(f"t{t}:{outcome}/{reason}")
+                problems.append(f"t{t}:{outcome}/{reason}")
+                continue
+            notes.append(f"t{t}:{outcome}/{took}ms/held={','.join(held)}")
+            if held != ["1", "1"]:
+                problems.append(f"t{t}:held={','.join(held) or 'none'} want 1,1 (Replace, Undo)")
+                continue
+            # The check's first move goes out at `quietms` (the gate): it may not come before the field held the result
+            # (silent-failure review, round 2: a move sent while the host was still deleting left run 172's Lexical-
+            # shaped page empty; `heldms`, the check's end, would hide that).
+            starts = [kv(line, "quietms") for line in lines if line.startswith("replace ")]
+            host_ends = [kv(line, "lastev") for line in lines if line.startswith("replace ")]
+            tries = [kv(line, "tries") for line in lines if line.startswith("replace ")]
+            if any(n not in (None, "1") for n in tries):
+                notes.append(f"t{t}:tries={','.join(n or '?' for n in tries)}")
+            ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
+            for name, ms_text, last_text in zip(("replace", "undo"), starts, host_ends):
+                seen = kv(ui.group(1), name) if ui else None
+                try:
+                    host_ms, kb_ms = float(seen) * 1000, int(ms_text)
+                except (TypeError, ValueError):
+                    # No time on either side (`undo=timeout`: the field never held it): nothing to hold the keyboard's
+                    # claim against, which is a FAIL, not a crash (silent-failure review).
+                    problems.append(f"t{t}:{name}={seen} quietms={ms_text}: no time to hold the check against")
+                    continue
+                if kb_ms + WHOLE_HOST_SLACK_MS >= host_ms:
+                    continue
+                # A native host's own callbacks follow its edits (runs 181, 185: the last one before the UI test saw
+                # the result). A check that began after the host had been quiet for the gate's 0.5 s is after the
+                # host, also when the UI test saw the field late (uikit sel, runs 185 and 189: 7.0-7.1 s, while the
+                # host's last callback came at 1.2-1.5 s, as in win and mid). Web hosts send none: the UI time rules.
+                try:
+                    last = int(last_text)
+                except (TypeError, ValueError):
+                    last = -1
+                if last >= 0 and kb_ms >= last + 500:
+                    notes.append(f"t{t}:{name} ui-late={seen}s host-last={last}ms began={ms_text}ms")
+                else:  # also a NaN
+                    problems.append(f"t{t}:{name} check began at {ms_text}ms, the field held it at {seen}s")
+    evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
+    if problems:
+        evidence += " log-problems=" + ",".join(problems)
+    status = "FAIL" if problems or check.status != "PASS" else "PASS"
+    return Check(check.id, status, evidence)
+
+
 def guard_network(c, network_key):
     """A RULES item passes only through its model output; with the key a missing key is the CI's failure."""
     if c.id in RULES and c.status == "PASS":
@@ -1289,6 +1437,12 @@ def assemble(checks_text, log_text, mem_text, network_key=False, ran=None, run_d
         resolver = RESOLVERS.get(check_id)
         by_id[check_id] = (resolver(c, marks, samples, run_dir) if resolver
                            else unreadable(check_id, f"unresolved PENDING {c.evidence}"))
+    if run_dir is not None:
+        kb_text = read(os.path.join(run_dir, "keyboard-log.txt"))
+        for check_id, c in list(by_id.items()):
+            if check_id in WHOLE_NATIVE_IDS + WHOLE_WEB_IDS and c.status in ("PASS", "FAIL") \
+                    and not c.evidence.startswith("unreadable"):
+                by_id[check_id] = resolve_whole_log(c, marks, kb_text)
     for check_id, c in list(by_id.items()):
         if c.evidence.startswith("unreadable") or c.status not in ("PASS", "SKIP"):
             continue
