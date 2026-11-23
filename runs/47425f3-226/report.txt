@@ -1,0 +1,418 @@
+STATUS test-failed
+source 47425f30d90ee961e78c1116910d403f323bbaf4
+xcode Xcode 26.6 Build version 17F113 
+network key: present (CI key); DerivedData cache: restore only, not saved in this run
+runtime iOS 26.5 (com.apple.CoreSimulator.SimRuntime.iOS-26-5)
+device iPhone-13-Pro (814D8D74-0B20-493B-B34F-70A00568E4B1), 390 pt wide
+build ok
+AppleKeyboards ("com.northprot.protly.cihost.keyboard","emoji@sw=Emoji","en_US@sw=QWERTY;hw=Automatic")
+appearance dark
+memory sampler pid 15127, probe 0, network 1
+looks helper: 20 requests, 20 done
+test failures (1 lines, test-failures.txt):
+  /Users/runner/work/protly/protly/ios-app/CI/UITests/Driver.swift:155: error: -[ProtlyCIUITests.KeyboardShotsUITests testScenarios] : failed - 05-after-second-emoji: expected protly, found english
+web-events.txt: 988 lines
+tests failed (xcodebuild exit 65)
+screen 1170x2532 px, 390 pt wide, scale 3.00
+01-apple: top 509.00 row1 561.00 band 52.00 pitch 54.00 key 43.00 bar-text-centers 65.00(85) 194.83(14) 325.00(41)
+02-first-open: top 512.00 row1 564.00 band 52.00 pitch 54.00 key 43.00 bar-text-centers none
+03-after-emoji: top 512.00 row1 564.00 band 52.00 pitch 54.00 key 43.00 bar-text-centers none
+04-after-background: top 512.00 row1 564.00 band 52.00 pitch 54.00 key 43.00 bar-text-centers none
+05-after-second-emoji: top 509.00 row1 561.00 band 52.00 pitch 54.00 key 43.00 bar-text-centers 65.33(1) 194.83(28) 325.17(20)
+06-word-typed: top 495.00 row1 564.00 band 69.00 pitch 54.00 key 43.00 bar-text-centers 65.33(38) 131.17(0) 195.17(88)
+07-empty-left-slot: top 512.00 row1 564.00 band 52.00 pitch 54.00 key 43.00 bar-text-centers 195.17(88)
+CHECK top-edge FAIL range 495.00..512.00 (17.00 pt)
+CHECK band-02-first-open PASS 52.00 vs apple 52.00 (+0.00)
+CHECK band-03-after-emoji PASS 52.00 vs apple 52.00 (+0.00)
+CHECK band-04-after-background PASS 52.00 vs apple 52.00 (+0.00)
+CHECK band-05-after-second-emoji PASS 52.00 vs apple 52.00 (+0.00)
+CHECK band-06-word-typed FAIL 69.00 vs apple 52.00 (+17.00)
+CHECK band-07-empty-left-slot PASS 52.00 vs apple 52.00 (+0.00)
+CHECK pitch-02-first-open PASS 54.00 vs 54.00
+CHECK key-02-first-open PASS 43.00 vs 43.00
+CHECK pitch-03-after-emoji PASS 54.00 vs 54.00
+CHECK key-03-after-emoji PASS 43.00 vs 43.00
+CHECK pitch-04-after-background PASS 54.00 vs 54.00
+CHECK key-04-after-background PASS 43.00 vs 43.00
+CHECK pitch-05-after-second-emoji PASS 54.00 vs 54.00
+CHECK key-05-after-second-emoji PASS 43.00 vs 43.00
+CHECK pitch-06-word-typed PASS 54.00 vs 54.00
+CHECK key-06-word-typed PASS 43.00 vs 43.00
+CHECK pitch-07-empty-left-slot PASS 54.00 vs 54.00
+CHECK key-07-empty-left-slot PASS 43.00 vs 43.00
+CHECK bar-center-07 PASS text center 195.17 vs 195.00 (+0.17), words 1
+RESULT FAIL
+CHECKS
+CHECK 6.8-1 PASS field="i dont think its ok teh." right="the" want "the" after-tap="the "
+CHECK 6.8-2 PASS right="receive" want "receive" field="recieve."
+CHECK 6.8-3 PASS right="tomorrow" want "tomorrow" after-tap="tomorrow "
+CHECK 6.8-4 PASS right="안녕" want starts with "안녕" typed="안녕ㅎ" after-tap="안녕하세요 "
+CHECK 6.8-5 RECORD right="" ink 0 after-space="omw "
+CHECK 6.8-6 SKIP no contacts in the simulator
+CHECK 6.8-7 PASS context="안녕" field="걍 가자 " field="걔 진짜 웃겨 " field="얘 뭐야 " field="꽤 좋다 " field="I need to get rid of it "
+CHECK 6.8-8 PASS typed="죵" after-flip="wyd" again="wyd "
+CHECK 6.8-9 RECORD same process: field='wyd ' pid 22478 -> 22478
+CHECK 6.8-10 RECORD start 64.0 MB end 64.0 MB growth +0.0 MB over presentations=30/30 (footprint, pid 22478; macOS-side, not the phone's limit; footprint prints whole MB, so growth under 1 MB reads as zero)
+CHECK 6.8-11 PASS left="ghk" ink 1088 after-flip="내일 qhk" context="안녕" busy#1=yes seconds#1=7.5 first#1=7.5 out#1="Thanks so much for today." => out#1 ok
+CHECK 7.7-1 PASS paste="tap, Paste" counter=58 want 58 copied="Copied" confirm-center="Read" confirm-paste="tapped Allow Paste in SpringBoard" confirm="Save as your About me note" in "Save as your About me note (58 characters)? Translate and Polish send it with every draft. Save only a note you copied in the Protly app. I run Moonbeam Kiln (문빔 킬른), a pottery studio in Victoria." confirm="(58 characters)" in "Save as your About me note (58 characters)? Translate and Polish send it with every draft. Save only a note you copied in the Protly app. I run Moonbeam Kiln (문빔 킬른), a pottery studio in Victoria." saved="About me saved" in "About me saved: 58 characters." saved="58 characters" in "About me saved: 58 characters." bar=keys back, panel region "ㅈ [ H - ~ 히 ㅗ ㅓ ㅏ ㅋ E ㅊㅍ ㅠ ㅜ 123" bar-center="" ink 0
+CHECK 7.7-2 PASS context="안녕" busy#1=yes seconds#1=4.1 first#1=4.1 out#1="Moonbeam Kiln opens next week." => out#1 ok
+CHECK 7.7-3 PASS read-center="Read" read-paste="tapped Allow Paste in SpringBoard" panel#1="어제 찍은 사진 좀 보내줄 수 있어?" test-note-center="Read" test-note-paste="tapped Allow Paste in SpringBoard" four="Save as your About me note (4 characters)? Translate and Polish send it with every draft. Save only a note you copied in the Protly app. test" context="안녕" busy#1=yes seconds#1=3.6 first#1=3.6 out#1="Moonbeam Kiln opens next week" => panel#1 ok; out#1 ok
+CHECK 7.7-4 RECORD try1=4.1s try2=3.6s (7.7-2 and 7.7-3's repeat; tap to the finished card, tree poll every 0.5 s)
+CHECK 7.7-5 PASS clear="Select All, Cut" counter-clear=0 want 0 copied-clear="Copied" confirm-clear-center="Y Read" confirm-clear-paste="tapped Allow Paste in SpringBoard" confirm-clear="Clear your About me note" in "Clear your About me note? Translate and Polish will send no note." saved-clear="About me cleared" in "About me cleared." bar-clear=keys back, panel region "H ㅈ [ H 2 ㆆ ㅗ ㅓ ㅏ ㅋ E ㅊ ㅍ ㅠ ㅜ 123" bar-center-clear="" ink 0 paste-again="tap, Paste" counter-again=58 want 58 copied-again="Copied" confirm-again-center="Y Read" confirm-again-paste="tapped Allow Paste in SpringBoard" confirm-again="Save as your About me note" in "Save as your About me note (58 characters)? Translate and Polish send it with every draft. Save only a note you copied in the Protly app. I run Moonbeam Kiln (문빔 킬른), a pottery studio in Victoria." confirm-again="(58 characters)" in "Save as your About me note (58 characters)? Translate and Polish send it with every draft. Save only a note you copied in the Protly app. I run Moonbeam Kiln (문빔 킬른), a pottery studio in Victoria." saved-again="About me saved" in "About me saved: 58 characters." saved-again="58 characters" in "About me saved: 58 characters." bar-again=keys back, panel region "H ㅈ [ H 2 ㆆ ㅗ ㅓ ㅏ ㅋ E ㅊ ㅍ ㅠ ㅜ 123" bar-center-again="" ink 0
+CHECK 7.7-6 SKIP needs a phone reinstall
+CHECK 8.5-1 PASS context="안녕" ru="겨" flip ru-after-flip="ru" busy#1="Translating" first#1=4.7 try#1=no result in 30 s, card "Спасибо за конспекты! Ты меня спасла. " strip "Translating, →, Русский, … Translating → Русский … Still translating…" ru="겨" flip ru-after-flip="ru" busy#2="Translating" seconds#2=7.0 first#2=7.0 out#2="Спасибо за конспекты, ты меня спасла." back#1=none back#2=hangul undo-slot="5 Undo" ink 36429 undo="ru: 누나 노트 고마워 누나 덕분에 살았다 " => out#2 ok
+CHECK 8.5-1o PASS ru=latin field="ru: 누나 노트 고마워 누나 덕분에 살았다 " center="→ Русский" want "Русский"
+CHECK 8.5-2o RECORD ru-again="겨" zh="코" flip zh-after-flip="zh" taught="zh: 안녕 " zh-space="zh "
+CHECK 8.5-3 PASS context="안녕" ja=latin busy#1=yes seconds#1=7.1 first#1=7.1 out#1="明日ひま？一緒にご飯食べようw" shown#1="明日ひま？一緒にご飯食べようw 내일 시간 있어? 같이 밥 먹자 ㅋㅋ" => out#1 ok
+CHECK 8.5-4 PASS context="안녕" es=latin busy#1=yes seconds#1=3.2 first#1=3.2 out#1="Hoy estoy muy cansado" shown#1="Hoy estoy muy cansado 나 오늘 너무 피곤해" => out#1 ok
+CHECK 8.5-5 PASS context="안녕" busy#1=yes seconds#1=3.7 first#1=3.7 out#1="See you tomorrow at 3" shown#1="See you tomorrow at 3 내일 3시에 보자" => out#1 ok
+CHECK 8.5-6 PASS context="안녕" ok=latin busy#1=yes seconds#1=3.0 first#1=3.0 out#1="ok: see you tomorrow" shown#1="ok: see you tomorrow ok: 내일 봐" => out#1 ok
+CHECK 8.5-6o PASS ok=latin field="ok: 내일 봐 " center="• English" want "English"
+CHECK 8.5-7 PASS context="안녕" ko=latin busy#1="Polishing" seconds#1=5.5 first#1=5.5 out#1="낼 시간 돼? 같이 밥 먹자 ㅋㅋ 안 되면 말해 줘" shown#1="낼 시간 돼? 같이 밥 먹자 ㅋㅋ 안 되면 말해 줘 되? -> 돼? (맞춤법)\n밥먹자 -> 밥 먹자 (띄어쓰기)\n말해죠 -> 말해 줘 (맞춤법)" => out#1 ok
+CHECK 8.5-7o PASS ko=latin field="ko: 낼 시간되? 같이 밥먹자 ㅋㅋ 안되면 말해죠 " center="한 Polish" want "Polish"
+CHECK 8.5-8 PASS context="안녕" ko=latin busy#1="Polishing" seconds#1=6.7 first#1=6.7 out#1="오늘 진짜 길었어\n\n내일 아침에 전화할게\n\n늦으면 미안해 ㅠㅠ" shown#1="한 Polish 맞춤법 수정: 낼 -> 내일 (표준어)\n늦으면 미안 -> 늦으면 미안해 (문장 완결)" => out#1 ok
+CHECK 8.5-8o RECORD ko=latin field="ko: 오늘 진짜 길었어\n\n낼 아침에 전화할게\n\n늦으면 미안 ㅠㅠ" center="한 Polish" ink 22452
+CHECK 8.5-9 PASS context="솓" flip context-after-flip="the" busy#1=yes seconds#1=3.8 first#1=3.8 out#1="Me encanta el color de tu chaqueta, ¿dónde la compraste? jaja" shown#1="Me encanta el color de tu chaqueta, ¿dónde la compraste? jaja conprastes -> compraste (철자 및 활용 수정)\ndonde -> dónde, ¿ 추가 (의문사 강세와 물음표)\n문장 시작 대문자 Me" => out#1 ok
+CHECK 8.5-9o PASS context="솓" flip context-after-flip="the" field="me encanta el color de tu chaqueta, donde la conprastes? jaja " center="Polish" want "Polish"
+CHECK 8.5-10 RECORD context="안녕" ru="겨" flip ru-after-flip="ru" try1=7.0s try2=3.7s (tap to the finished card; tree poll every 0.5 s)
+CHECK app-dark PASS hero=1 shot1="c-app-dark-1.png" shot2="c-app-dark-2.png" look=dark => background (26, 31, 46)
+CHECK app-light PASS hero=1 shot1="c-app-light-1.png" shot2="c-app-light-2.png" look=light => background (245, 240, 230)
+CHECK bar-dark PASS shot1="c-bar-dark-1.png" slot1={131.2,527.5,127.6,32.0} center1="Polish" shot2="c-bar-dark-2.png" slot2={131.2,527.5,127.6,32.0} center2="→, English" look=dark points=390 => shot1 paper 11111 ink 1599 px, keyboard luma 44; shot2 paper 16070 ink 2275 px, keyboard luma 44
+CHECK bar-light PASS shot1="c-bar-light-1.png" slot1={131.2,527.5,127.6,32.0} center1="Polish" shot2="c-bar-light-2.png" slot2={131.2,527.5,127.6,32.0} center2="→, English" look=light points=390 => shot1 paper 1585 ink 11121 px, keyboard luma 192; shot2 paper 2261 ink 16080 px, keyboard luma 192
+CHECK bar-xxl RECORD base-h=20.3 ms-button={131.3,512.0,127.3,46.7} ms-slot={131.2,527.5,127.6,32.0} ms-texts="→ {152.8,521.3,19.0,25.3}|Bahasa Melayu {175.8,524.0,61.3,20.0}" ms-want="Bahasa Melayu" ms-ocr="〉 Bahas..." ar-button={131.3,512.0,127.3,46.7} ar-slot={131.2,527.5,127.6,32.0} ar-texts="→ {155.7,521.3,19.0,25.3}|العربية {178.7,521.3,55.7,25.3}" ar-want="العربية" ar-ocr="العربية →" => ms ocr '〉 Bahas...'; ms: the name is cut short on screen; ar ocr 'العربية →'
+CHECK card-cancel PASS center="→, English" look=dark side={0.5,533.5,2.5,20.0} card-before=1 xmark=44.0x44.0 card-after=0 strip-after=0 keys=1 card-late=0 field="protly-stub ok 오늘 정말 고마워" want-field="protly-stub ok 오늘 정말 고마워" => ok
+CHECK card-done-dark PASS look=dark side={0.5,533.5,2.5,20.0} text="Thanks so much for today, it really helped me out." back="오늘 정말 고마워, 큰 도움이 됐어." want="Thanks so much for today, it really helped me out." want-back="오늘 정말 고마워, 큰 도움이 됐어." header="→ English" texts=2 buttons="Cancel 68.7x44.0,Deep 56.7x44.0,Copy 56.0x44.0,Replace 79.7x44.0" strip=0 after="Thanks so much for today, it really helped me out." want-after="Thanks so much for today, it really helped me out." => ok
+CHECK card-done-light PASS look=light side={0.5,533.5,2.5,20.0} text="Thanks so much for today, it really helped me out." back="오늘 정말 고마워, 큰 도움이 됐어." want="Thanks so much for today, it really helped me out." want-back="오늘 정말 고마워, 큰 도움이 됐어." header="→ English" texts=2 buttons="Cancel 68.7x44.0,Deep 56.7x44.0,Copy 56.0x44.0,Replace 79.7x44.0" strip=0 copied=1 closed=1 after="protly-stub ok 오늘 정말 고마워" want-after="protly-stub ok 오늘 정말 고마워" => ok
+CHECK card-err0-dark PASS center="→, English" look=dark side={0.5,533.5,2.5,20.0} strip="The API is overloaded. Try again in a moment." cancel=44.0x44.0 card=0 want-error="The API is overloaded. Try again in a moment." retry=44.0x44.0 closed=1 => ok
+CHECK card-err0-light PASS center="→, English" look=light side={0.5,533.5,2.5,20.0} strip="The API is overloaded. Try again in a moment." cancel=44.0x44.0 card=0 want-error="The API is overloaded. Try again in a moment." retry=44.0x44.0 closed=1 => ok
+CHECK card-err1-dark PASS center="→, English" look=dark side={0.5,533.5,2.5,20.0} kept="Thanks so much for today" want-kept="Thanks so much for today" error="The API is overloaded. Try again in a moment." want-error="The API is overloaded. Try again in a moment." header="→ English" texts=2 buttons="Cancel 68.7x44.0,Retry 56.7x44.0,Copy 56.0x44.0" strip=0 closed=1 => ok
+CHECK card-err1-light PASS center="→, English" look=light side={0.5,533.5,2.5,20.0} kept="Thanks so much for today" want-kept="Thanks so much for today" error="The API is overloaded. Try again in a moment." want-error="The API is overloaded. Try again in a moment." header="→ English" texts=2 buttons="Cancel 68.7x44.0,Retry 56.7x44.0,Copy 56.0x44.0" strip=0 closed=1 => ok
+CHECK card-mid-dark PASS look=dark side={0.5,533.5,2.5,20.0} text="Thanks so much " final="Thanks so much for today, it really helped me out." copy=disabled header="→ English" texts=1 buttons="Cancel 68.7x44.0,Copy 56.0x44.0 disabled,Replace 77.0x44.0 disabled" strip=1 => ok
+CHECK card-mid-light PASS look=light side={0.5,533.5,2.5,20.0} text="Thanks so much " final="Thanks so much for today, it really helped me out." copy=disabled header="→ English" texts=1 buttons="Cancel 68.7x44.0,Copy 56.0x44.0 disabled,Replace 77.0x44.0 disabled" strip=1 => ok
+CHECK card-slow PASS center="→, English" look=dark side={0.5,533.5,2.5,20.0} strip="Translating, →, English, … Translating → English … Still translating…" cancel=44.0x44.0 card=0 at=9.0s => ok
+CHECK card-wait-dark PASS center="→, English" strip="Translating, →, English, … Translating → English …" cancel=44.0x44.0 card=0 look=dark side={0.5,533.5,2.5,20.0} => ok
+CHECK card-wait-light PASS center="→, English" strip="Translating, →, English, … Translating → English …" cancel=44.0x44.0 card=0 look=light side={0.5,533.5,2.5,20.0} => ok
+CHECK dark-1 PASS typing="c-dark-1-1-typing.png" space="c-dark-1-2-space.png" rect=12.0,157.0,256.0,32.0 points=390 want="안녕" before="안녕" after="안녕 " => ink typing 1300 space 1300, tone 599/599, longest run 30 of 81 px
+CHECK dsp-composer-en NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-fast NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-ko NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-kofast NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-kopick2 NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-pick1 NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-pick2 NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-pickmid NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-pickmove NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-composer-word NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-en NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-fast NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-ko NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-kofast NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-kopick2 NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-pick1 NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-pick2 NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-pickmid NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-pickmove NOT-RUN runs only in a filtered run (deadline)
+CHECK dsp-uikit-word NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-apple NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-cancel NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-card NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-emoji NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-globe NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-hide-emoji NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-hide-fresh NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-hide-globe NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-hide-long NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-hide-switch NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-kill-hidden NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-kill-up NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-launch NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-switch NOT-RUN runs only in a filtered run (deadline)
+CHECK hb-switch-hidden NOT-RUN runs only in a filtered run (deadline)
+CHECK hit-1 PASS slots="left 127.3x46.7 \"ㅅ도\", center 127.3x46.7 \"Polish\", right 127.3x46.7 \"the\"" => ok
+CHECK icon RECORD {296.0,163.0,68.0,90.7} found on page 1 (c-icon.png, c-icon-home.png)
+CHECK lat-lexical-smid NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-lexical-ssel NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-lexical-swin NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-swiftui-smid NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-swiftui-ssel NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-swiftui-swin NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-textarea-smid NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-textarea-ssel NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-textarea-swin NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-uikit-smid NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-uikit-ssel NOT-RUN runs only in a filtered run (deadline)
+CHECK lat-uikit-swin NOT-RUN runs only in a filtered run (deadline)
+CHECK mem-stream PASS first=seen done=seen => before 69.0 MB, peak 70.0 MB over 7 samples during the stream, growth +1.0 MB (footprint, pid 22478; macOS-side footprint; the 40 MB limit is judged on the phone)
+CHECK menu-0 PASS menu="Copy,Cut,Look Up" sel="0,5" field="hello there" keyboard=english => ok
+CHECK menu-1 PASS menu="Copy,Cut,Look Up" sel="3,2" marked="no" field="안녕 오늘" after="안녕 오늘" => ok
+CHECK menu-4 PASS field="안녕 ㅎ" sel-before="3,2" sel="4,0" => ok
+CHECK pad-1 PASS want="hello world hello world " field="hello world hello world " sel0=24 sel1="5,0" marked="no" drag=-90,0 speed=120 => moved 19
+CHECK pad-2 PASS want="hello world hello world " field="hello world hello world " sel0=24 sel1="9,0" marked="no" asked="hello world hello world " typing-tries=2 drag=-90,-80 speed=120 ref=19 => moved 15
+CHECK pad-3 PASS want="안녕" field="안녕" sel0=2 sel1="1,0" marked="no" drag=-20,0 speed=60 want-sel=1 => moved 1
+CHECK ret-1-composer RECORD want="안녕" before="안녕" value="" sent-count=1 sent="안녕" submit-count=0 asked-gap=0.05 gap=0.60s ev="c:keydown/녀:0 c:keypress/녀:45376 c:beforeinput/insertText c:input/insertText c:keyup/녀:0 c:keydown/Backspace:8 c:beforeinput/deleteContentBackward c:input/deleteContentBackward c:keyup/Backspace:8 c:keydown/녕:0 c:keypress/녕:45397 c:beforeinput/insertText c:input/insertText c:keyup/녕:0 c:keydown/Enter:13 c:keyup/Enter:13" => not at once: Return 0.60 s after the last key (XCUITest's tap time)
+CHECK ret-1-input RECORD want="안녕" before="안녕" value="안녕" sent-count=0 submit-count=1 submitted="안녕" asked-gap=0.05 gap=0.59s ev="i:input/insertText i:keyup/녀:0 i:keydown/Backspace:8 i:beforeinput/deleteContentBackward i:input/deleteContentBackward i:keyup/Backspace:8 i:keydown/녕:0 i:keypress/녕:45397 i:beforeinput/insertText i:input/insertText i:keyup/녕:0 i:keydown/Enter:13 i:keypress/Enter:13 i:change i:submit i:keyup/Enter:13" => not at once: Return 0.59 s after the last key (XCUITest's tap time)
+CHECK ret-1-textarea RECORD want="안녕" before="안녕" value="안녕\n" sent-count=0 submit-count=0 asked-gap=0.05 gap=0.59s ev="t:input/insertText t:keyup/녀:0 t:keydown/Backspace:8 t:beforeinput/deleteContentBackward t:input/deleteContentBackward t:keyup/Backspace:8 t:keydown/녕:0 t:keypress/녕:45397 t:beforeinput/insertText t:input/insertText t:keyup/녕:0 t:keydown/Enter:13 t:keypress/Enter:13 t:beforeinput/insertLineBreak t:input/insertLineBreak t:keyup/Enter:13" => not at once: Return 0.59 s after the last key (XCUITest's tap time)
+CHECK ret-2-composer RECORD want="hello 안녕" before="hello 안녕" value="" sent-count=1 sent="hello 안녕" submit-count=0 asked-gap=0.05 gap=0.74s ev="c:keydown/녀:0 c:keypress/녀:45376 c:beforeinput/insertText c:input/insertText c:keyup/녀:0 c:keydown/Backspace:8 c:beforeinput/deleteContentBackward c:input/deleteContentBackward c:keyup/Backspace:8 c:keydown/녕:0 c:keypress/녕:45397 c:beforeinput/insertText c:input/insertText c:keyup/녕:0 c:keydown/Enter:13 c:keyup/Enter:13" => not at once: Return 0.74 s after the last key (XCUITest's tap time)
+CHECK ret-2-input RECORD want="hello 안녕" before="hello 안녕" value="hello 안녕" sent-count=0 submit-count=1 submitted="hello 안녕" asked-gap=0.05 gap=0.93s ev="i:input/insertText i:keyup/녀:0 i:keydown/Backspace:8 i:beforeinput/deleteContentBackward i:input/deleteContentBackward i:keyup/Backspace:8 i:keydown/녕:0 i:keypress/녕:45397 i:beforeinput/insertText i:input/insertText i:keyup/녕:0 i:keydown/Enter:13 i:keypress/Enter:13 i:change i:submit i:keyup/Enter:13" => not at once: Return 0.93 s after the last key (XCUITest's tap time)
+CHECK ret-2-textarea RECORD want="hello 안녕" before="hello 안녕" value="hello 안녕\n" sent-count=0 submit-count=0 asked-gap=0.05 gap=0.66s ev="t:input/insertText t:keyup/녀:0 t:keydown/Backspace:8 t:beforeinput/deleteContentBackward t:input/deleteContentBackward t:keyup/Backspace:8 t:keydown/녕:0 t:keypress/녕:45397 t:beforeinput/insertText t:input/insertText t:keyup/녕:0 t:keydown/Enter:13 t:keypress/Enter:13 t:beforeinput/insertLineBreak t:input/insertLineBreak t:keyup/Enter:13" => not at once: Return 0.66 s after the last key (XCUITest's tap time)
+CHECK ret-3-composer RECORD want="hello 안녕 " before="hello 안녕 " value="" sent-count=1 sent="hello 안녕 " submit-count=0 asked-gap=0.05 gap=0.72s ev="c:keydown/Backspace:8 c:beforeinput/deleteContentBackward c:input/deleteContentBackward c:keyup/Backspace:8 c:keydown/녕:0 c:keypress/녕:45397 c:beforeinput/insertText c:input/insertText c:keyup/녕:0 c:keydown/ :32 c:keypress/ :32 c:beforeinput/insertText c:input/insertText c:keyup/ :32 c:keydown/Enter:13 c:keyup/Enter:13" => not at once: Return 0.72 s after the last key (XCUITest's tap time)
+CHECK ret-3-input RECORD want="hello 안녕 " before="hello 안녕 " value="hello 안녕 " sent-count=0 submit-count=1 submitted="hello 안녕 " asked-gap=0.05 gap=0.96s ev="i:keyup/Backspace:8 i:keydown/녕:0 i:keypress/녕:45397 i:beforeinput/insertText i:input/insertText i:keyup/녕:0 i:keydown/ :32 i:keypress/ :32 i:beforeinput/insertText i:input/insertText i:keyup/ :32 i:keydown/Enter:13 i:keypress/Enter:13 i:change i:submit i:keyup/Enter:13" => not at once: Return 0.96 s after the last key (XCUITest's tap time)
+CHECK ret-3-textarea RECORD want="hello 안녕 " before="hello 안녕 " value="hello 안녕 \n" sent-count=0 submit-count=0 asked-gap=0.05 gap=0.75s ev="t:keyup/Backspace:8 t:keydown/녕:0 t:keypress/녕:45397 t:beforeinput/insertText t:input/insertText t:keyup/녕:0 t:keydown/ :32 t:keypress/ :32 t:beforeinput/insertText t:input/insertText t:keyup/ :32 t:keydown/Enter:13 t:keypress/Enter:13 t:beforeinput/insertLineBreak t:input/insertLineBreak t:keyup/Enter:13" => not at once: Return 0.75 s after the last key (XCUITest's tap time)
+CHECK ret-4-composer PASS want="hello 안녕" before="hello 안녕" value="" sent-count=1 sent="hello 안녕" submit-count=0 asked-gap=0.30 gap=0.95s ev="c:keydown/녀:0 c:keypress/녀:45376 c:beforeinput/insertText c:input/insertText c:keyup/녀:0 c:keydown/Backspace:8 c:beforeinput/deleteContentBackward c:input/deleteContentBackward c:keyup/Backspace:8 c:keydown/녕:0 c:keypress/녕:45397 c:beforeinput/insertText c:input/insertText c:keyup/녕:0 c:keydown/Enter:13 c:keyup/Enter:13" => ok
+CHECK ret-4-input PASS want="hello 안녕" before="hello 안녕" value="hello 안녕" sent-count=0 submit-count=1 submitted="hello 안녕" asked-gap=0.30 gap=1.06s ev="i:input/insertText i:keyup/녀:0 i:keydown/Backspace:8 i:beforeinput/deleteContentBackward i:input/deleteContentBackward i:keyup/Backspace:8 i:keydown/녕:0 i:keypress/녕:45397 i:beforeinput/insertText i:input/insertText i:keyup/녕:0 i:keydown/Enter:13 i:keypress/Enter:13 i:change i:submit i:keyup/Enter:13" => ok
+CHECK ret-4-textarea PASS want="hello 안녕" before="hello 안녕" value="hello 안녕\n" sent-count=0 submit-count=0 asked-gap=0.30 gap=0.99s ev="t:input/insertText t:keyup/녀:0 t:keydown/Backspace:8 t:beforeinput/deleteContentBackward t:input/deleteContentBackward t:keyup/Backspace:8 t:keydown/녕:0 t:keypress/녕:45397 t:beforeinput/insertText t:input/insertText t:keyup/녕:0 t:keydown/Enter:13 t:keypress/Enter:13 t:beforeinput/insertLineBreak t:input/insertLineBreak t:keyup/Enter:13" => ok
+CHECK ret-5-composer RECORD want="ㅇㅋ" before="ㅇㅋ" value="" sent-count=1 sent="ㅇㅋ" submit-count=0 asked-gap=0.05 gap=0.69s ev="c:keydown/ㅇ:0 c:keypress/ㅇ:12615 c:beforeinput/insertText c:input/insertText c:keyup/ㅇ:0 c:keydown/ㅋ:0 c:keypress/ㅋ:12619 c:beforeinput/insertText c:input/insertText c:keyup/ㅋ:0 c:keydown/Enter:13 c:keyup/Enter:13" => not at once: Return 0.69 s after the last key (XCUITest's tap time)
+CHECK ret-5-input RECORD want="ㅇㅋ" before="ㅇㅋ" value="ㅇㅋ" sent-count=0 submit-count=1 submitted="ㅇㅋ" asked-gap=0.05 gap=0.74s ev="i:keydown/ㅇ:0 i:keypress/ㅇ:12615 i:beforeinput/insertText i:input/insertText i:keyup/ㅇ:0 i:keydown/ㅋ:0 i:keypress/ㅋ:12619 i:beforeinput/insertText i:input/insertText i:keyup/ㅋ:0 i:keydown/Enter:13 i:keypress/Enter:13 i:change i:submit i:keyup/Enter:13" => not at once: Return 0.74 s after the last key (XCUITest's tap time)
+CHECK ret-5-textarea RECORD want="ㅇㅋ" before="ㅇㅋ" value="ㅇㅋ\n" sent-count=0 submit-count=0 asked-gap=0.05 gap=0.92s ev="t:keydown/ㅇ:0 t:keypress/ㅇ:12615 t:beforeinput/insertText t:input/insertText t:keyup/ㅇ:0 t:keydown/ㅋ:0 t:keypress/ㅋ:12619 t:beforeinput/insertText t:input/insertText t:keyup/ㅋ:0 t:keydown/Enter:13 t:keypress/Enter:13 t:beforeinput/insertLineBreak t:input/insertLineBreak t:keyup/Enter:13" => not at once: Return 0.92 s after the last key (XCUITest's tap time)
+CHECK wr-lexical-emoji NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-long NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-mid NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-s3 NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-sel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-smid NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-ssel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-swin NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-win NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-lexical-x14k NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-emoji NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-etail NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-long NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-mid NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-s3 NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-sel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-shead NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-smid NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-ssel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-swin NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-win NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-swiftui-x14k NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-emoji NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-long NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-mid NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-s3 NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-sel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-smid NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-ssel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-swin NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-win NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-textarea-x14k NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-cancel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-emoji NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-etail NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-long NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-mid NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-r4k NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-s3 NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-sel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-shead NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-smid NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-ssel NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-swin NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-win NOT-RUN runs only in a filtered run (deadline)
+CHECK wr-uikit-x14k NOT-RUN runs only in a filtered run (deadline)
+CHECK ws-1 PASS left-ocr="-]T" left-label="ㅗ디ㅣㅐ" ink 1326 left="ㅗ디ㅣㅐ" want Hangul after-tap="ㅗ디ㅣㅐ " want the Korean reading plus a space
+CHECK ws-2 PASS field="hello. " left=ocr "" ink 0 (c-ws-2-1-left.png)
+CHECK ws-3 PASS field="hello\n" left=ocr "" ink 0 (c-ws-3-1-left.png)
+CHECKS pass 54 fail 0 record 21 skip 2 not-run 93
+--- last 200 lines of test.log
+    t =   335.28s Requesting snapshot of accessibility hierarchy for app with pid 92256
+    t =   335.71s Tap Application 'com.northprot.protly.ciapp'[0.00, 0.00] -> (41.8, 735.3)
+    t =   335.71s     Wait for com.northprot.protly.ciapp to idle
+    t =   335.72s     Find the Application 'com.northprot.protly.ciapp'
+    t =   335.83s     Check for interrupting elements affecting "Protly" Application
+    t =   335.94s     Synthesize event
+    t =   335.95s         Find the Application 'com.northprot.protly.ciapp'
+    t =   336.06s         Find the Application 'com.northprot.protly.ciapp'
+    t =   336.16s         Find the Application 'com.northprot.protly.ciapp'
+    t =   336.52s     Wait for com.northprot.protly.ciapp to idle
+    t =   339.66s Checking existence of `"q" Key`
+    t =   339.77s Checking existence of `"Q" Key`
+    t =   339.88s Checking existence of `Any (First Match)`
+    t =   340.15s Checking existence of `Key (First Match)`
+    t =   340.84s Waiting 3.0s for Any (First Match) to exist
+    t =   341.86s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   341.86s         Checking existence of `Any (First Match)`
+    t =   341.97s Waiting 5.0s for Any (First Match) to exist
+    t =   343.03s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   343.03s         Checking existence of `Any (First Match)`
+    t =   343.18s Tap Any (First Match)
+    t =   343.18s     Wait for com.northprot.protly.ciapp to idle
+    t =   343.19s     Find the Any (First Match)
+    t =   343.32s     Check for interrupting elements affecting "Who you are, in a few facts" TextField
+    t =   343.41s     Synthesize event
+    t =   343.44s         Scroll element to visible
+    t =   343.44s         Find the "Who you are, in a few facts" TextField
+    t =   343.71s         Computed hit point {33, 293.66666666666652} after scrolling to visible
+    t =   344.00s     Wait for com.northprot.protly.ciapp to idle
+    t =   345.02s Find the "Who you are, in a few facts" TextField
+    t =   345.12s Tap "Who you are, in a few facts" TextField
+    t =   345.12s     Wait for com.northprot.protly.ciapp to idle
+    t =   345.12s     Find the "Who you are, in a few facts" TextField
+    t =   345.22s     Check for interrupting elements affecting "Who you are, in a few facts" TextField
+    t =   345.29s     Synthesize event
+    t =   345.60s     Wait for com.northprot.protly.ciapp to idle
+    t =   346.83s Waiting 1.5s for "Paste" MenuItem to exist
+    t =   347.87s     Checking `Expect predicate `existsNoRetry == 1` for object "Paste" MenuItem`
+    t =   347.87s         Checking existence of `"Paste" MenuItem`
+    t =   347.98s Tap "Paste" MenuItem
+    t =   347.98s     Wait for com.northprot.protly.ciapp to idle
+    t =   347.98s     Find the "Paste" MenuItem
+    t =   348.09s     Check for interrupting elements affecting "Paste" MenuItem
+    t =   348.20s     Synthesize event
+    t =   348.52s     Wait for com.northprot.protly.ciapp to idle
+    t =   349.63s Waiting 3.0s for StaticText (First Match) to exist
+    t =   350.64s     Checking `Expect predicate `existsNoRetry == 1` for object StaticText (First Match)`
+    t =   350.64s         Checking existence of `StaticText (First Match)`
+    t =   350.74s Find the StaticText (First Match)
+    t =   350.84s Waiting 3.0s for "Copy for the keyboard" Button to exist
+    t =   351.86s     Checking `Expect predicate `existsNoRetry == 1` for object "Copy for the keyboard" Button`
+    t =   351.86s         Checking existence of `"Copy for the keyboard" Button`
+    t =   351.96s Find the "Copy for the keyboard" Button
+    t =   352.04s Tap "Copy for the keyboard" Button
+    t =   352.04s     Wait for com.northprot.protly.ciapp to idle
+    t =   352.04s     Find the "Copy for the keyboard" Button
+    t =   352.12s     Check for interrupting elements affecting "Copy for the keyboard" Button
+    t =   352.18s     Synthesize event
+    t =   352.50s     Wait for com.northprot.protly.ciapp to idle
+    t =   353.31s Waiting 2.0s for "Copied" Button to exist
+    t =   354.33s     Checking `Expect predicate `existsNoRetry == 1` for object "Copied" Button`
+    t =   354.33s         Checking existence of `"Copied" Button`
+    t =   354.44s Waiting 3.0s for Any (First Match) to exist
+    t =   355.44s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   355.44s         Checking existence of `Any (First Match)`
+    t =   355.55s Waiting 3.0s for Any (First Match) to exist
+    t =   356.58s     Checking `Expect predicate `existsNoRetry == 1` for object Any (First Match)`
+    t =   356.58s         Checking existence of `Any (First Match)`
+    t =   356.69s Find the Any (First Match)
+    t =   356.81s Press Application 'com.northprot.protly.ciapp'[0.00, 0.00] -> (195.0, 220.0) for 0.1 seconds, then drag to Application 'com.northprot.protly.ciapp'[0.00, 0.00] -> (195.0, 340.0) with velocity of 500.00 pixels per second, and then hold for 0.0 seconds 
+    t =   356.81s     Wait for com.northprot.protly.ciapp to idle
+    t =   356.81s     Find the Application 'com.northprot.protly.ciapp'
+    t =   356.87s     Check for interrupting elements affecting "Protly" Application
+    t =   356.94s     Synthesize event
+    t =   356.95s         Find the Application 'com.northprot.protly.ciapp'
+    t =   357.01s         Find the Application 'com.northprot.protly.ciapp'
+    t =   357.09s         Find the Application 'com.northprot.protly.ciapp'
+    t =   357.15s         Find the Application 'com.northprot.protly.ciapp'
+    t =   357.21s         Find the Application 'com.northprot.protly.ciapp'
+    t =   357.88s     Wait for com.northprot.protly.ciapp to idle
+    t =   360.36s Find the "Type here" TextField
+    t =   360.46s Tap "Type here" TextField
+    t =   360.46s     Wait for com.northprot.protly.ciapp to idle
+    t =   360.46s     Find the "Type here" TextField
+    t =   360.62s     Check for interrupting elements affecting "Type here" TextField
+    t =   360.74s     Synthesize event
+    t =   361.06s     Wait for com.northprot.protly.ciapp to idle
+    t =   362.51s Checking existence of `"q" Key`
+    t =   362.60s Checking existence of `"Q" Key`
+    t =   362.67s Checking existence of `Any (First Match)`
+    t =   363.05s Checking existence of `Key (First Match)`
+    t =   363.46s Checking existence of `"q" Key`
+    t =   363.62s Checking existence of `"Q" Key`
+    t =   363.76s Checking existence of `Any (First Match)`
+    t =   364.20s Checking existence of `Key (First Match)`
+    t =   366.21s Checking existence of `"q" Key`
+    t =   366.33s Checking existence of `"Q" Key`
+    t =   366.44s Checking existence of `Any (First Match)`
+    t =   366.72s Checking existence of `Key (First Match)`
+    t =   367.59s Tap Application 'com.northprot.protly.ciapp'[0.00, 0.00] -> (195.0, 544.0)
+    t =   367.59s     Wait for com.northprot.protly.ciapp to idle
+    t =   367.60s     Find the Application 'com.northprot.protly.ciapp'
+    t =   367.69s     Check for interrupting elements affecting "Protly" Application
+    t =   367.78s     Synthesize event
+    t =   367.79s         Find the Application 'com.northprot.protly.ciapp'
+    t =   367.86s         Find the Application 'com.northprot.protly.ciapp'
+    t =   367.96s         Find the Application 'com.northprot.protly.ciapp'
+    t =   368.32s     Wait for com.northprot.protly.ciapp to idle
+    t =   368.83s Checking existence of `"Allow Paste" Button`
+    t =   368.86s Ignoring failure to get hierarchy for remote element in process 93087 (Error getting main window kAXErrorServerNotFound)
+    t =   368.87s Ignoring failure to get hierarchy for remote element in process 93087 (Error getting main window kAXErrorServerNotFound)
+    t =   368.87s Tap "Allow Paste" Button
+    t =   368.87s     Wait for com.apple.springboard to idle
+    t =   368.88s     Find the "Allow Paste" Button
+    t =   368.91s Ignoring failure to get hierarchy for remote element in process 93087 (Error getting main window kAXErrorServerNotFound)
+    t =   368.91s Ignoring failure to get hierarchy for remote element in process 93087 (Error getting main window kAXErrorServerNotFound)
+    t =   368.91s     Check for interrupting elements affecting "Allow Paste" Button
+    t =   368.95s Ignoring failure to get hierarchy for remote element in process 93087 (Error getting main window kAXErrorServerNotFound)
+    t =   368.95s Ignoring failure to get hierarchy for remote element in process 93087 (Error getting main window kAXErrorServerNotFound)
+    t =   368.97s     Synthesize event
+    t =   369.26s     Wait for com.apple.springboard to idle
+    t =   369.64s Waiting 3.0s for "Allow Paste" Button to not exist
+    t =   370.67s     Checking `Expect predicate `existsNoRetry == 0` for object "Allow Paste" Button`
+    t =   370.67s         Checking existence of `"Allow Paste" Button`
+    t =   370.70s Ignoring failure to get hierarchy for remote element in process 93087 (Error getting main window kAXErrorServerNotFound)
+    t =   370.70s Ignoring failure to get hierarchy for remote element in process 93087 (Error getting main window kAXErrorServerNotFound)
+    t =   370.72s Requesting snapshot of accessibility hierarchy for app with pid 92256
+    t =   371.68s Requesting snapshot of accessibility hierarchy for app with pid 92256
+    t =   372.86s Tap Application 'com.northprot.protly.ciapp'[0.00, 0.00] -> (349.1, 735.3)
+    t =   372.86s     Wait for com.northprot.protly.ciapp to idle
+    t =   372.87s     Find the Application 'com.northprot.protly.ciapp'
+    t =   372.96s     Check for interrupting elements affecting "Protly" Application
+    t =   373.05s     Synthesize event
+    t =   373.06s         Find the Application 'com.northprot.protly.ciapp'
+    t =   373.22s         Find the Application 'com.northprot.protly.ciapp'
+    t =   373.42s         Find the Application 'com.northprot.protly.ciapp'
+    t =   373.86s     Wait for com.northprot.protly.ciapp to idle
+    t =   373.87s Requesting snapshot of accessibility hierarchy for app with pid 92256
+    t =   374.58s Requesting snapshot of accessibility hierarchy for app with pid 92256
+    t =   375.09s Tap Application 'com.northprot.protly.ciapp'[0.00, 0.00] -> (41.8, 735.3)
+    t =   375.09s     Wait for com.northprot.protly.ciapp to idle
+    t =   375.09s     Find the Application 'com.northprot.protly.ciapp'
+    t =   375.20s     Check for interrupting elements affecting "Protly" Application
+    t =   375.34s     Synthesize event
+    t =   375.34s         Find the Application 'com.northprot.protly.ciapp'
+    t =   375.66s         Find the Application 'com.northprot.protly.ciapp'
+    t =   375.77s         Find the Application 'com.northprot.protly.ciapp'
+    t =   376.16s     Wait for com.northprot.protly.ciapp to idle
+    t =   379.87s Checking existence of `"q" Key`
+    t =   380.04s Checking existence of `"Q" Key`
+    t =   380.19s Checking existence of `Any (First Match)`
+    t =   381.40s Checking existence of `Key (First Match)`
+    t =   383.62s Terminate com.northprot.protly.ciapp:92256
+    t =   384.63s Open com.northprot.protly.cihost
+    t =   384.63s     Launch com.northprot.protly.cihost
+    t =   384.63s         Terminate com.northprot.protly.cihost:81166
+2026-11-22 23:59:45.955 xcodebuild[15133:50830] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-22 23:59:45.955 xcodebuild[15133:50830] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =   391.77s         Setting up automation session
+    t =   393.68s         Wait for com.northprot.protly.cihost to idle
+    t =   395.20s Find the Window (First Match)
+    t =   395.50s Checking existence of `"q" Key`
+    t =   395.72s Checking existence of `"Q" Key`
+    t =   396.05s Checking existence of `Any (First Match)`
+    t =   396.23s Checking existence of `Key (First Match)`
+    t =   396.51s Checking existence of `"q" Key`
+    t =   396.61s Checking existence of `"Q" Key`
+    t =   396.68s Checking existence of `Any (First Match)`
+    t =   396.82s Checking existence of `Key (First Match)`
+    t =   397.05s Checking existence of `"q" Key`
+    t =   397.10s Checking existence of `"Q" Key`
+    t =   397.15s Checking existence of `Any (First Match)`
+    t =   397.30s Checking existence of `Key (First Match)`
+    t =   397.81s Tear Down
+Test Case '-[ProtlyCIUITests.PhoneChecksUITests test7_77]' passed (398.418 seconds).
+Test Case '-[ProtlyCIUITests.PhoneChecksUITests test9_height]' started.
+    t =     0.00s Start Test at 2026-11-22 23:59:53.707
+    t =     0.09s Set Up
+/Users/runner/work/protly/protly/ios-app/CI/UITests/PhoneChecksUITests.swift:158: -[ProtlyCIUITests.PhoneChecksUITests test9_height] : Test skipped - runs only in a filtered run (deadline)
+    t =     0.11s Tear Down
+Test Case '-[ProtlyCIUITests.PhoneChecksUITests test9_height]' skipped (0.278 seconds).
+Test Suite 'PhoneChecksUITests' passed at 2026-11-22 23:59:53.985.
+	 Executed 18 tests, with 5 tests skipped and 0 failures (0 unexpected) in 3393.296 (3393.322) seconds
+Test Suite 'ProtlyCIUITests.xctest' failed at 2026-11-22 23:59:53.986.
+	 Executed 19 tests, with 5 tests skipped and 1 failure (0 unexpected) in 3495.586 (3495.616) seconds
+Test Suite 'All tests' failed at 2026-11-22 23:59:53.987.
+	 Executed 19 tests, with 5 tests skipped and 1 failure (0 unexpected) in 3495.586 (3495.617) seconds
+2026-11-23 00:00:27.153 xcodebuild[15133:50830] [MT] IDETestOperationsObserverDebug: 3559.184 elapsed -- Testing started completed.
+2026-11-23 00:00:27.154 xcodebuild[15133:50830] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-23 00:00:27.154 xcodebuild[15133:50830] [MT] IDETestOperationsObserverDebug: 3559.185 sec, +3559.185 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/protly-shots-work/Tests.xcresult
+
+Failing tests:
+	KeyboardShotsUITests.testScenarios()
+
+** TEST EXECUTE FAILED **
+
+Testing started
+LEAK-GUARD pass: no key prefix in 196 files
