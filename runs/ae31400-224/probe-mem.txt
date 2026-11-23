@@ -1,24 +1,24 @@
 memsample: process name ProtlyCIKeyboard, interval 2.0 s
-memsample: started at 1795388561.817 after '== PhoneChecksUITests.test5g_wholenative' in /Users/runner/work/_temp/shots/ui-log.txt
-pgrep -x ProtlyCIKeyboard: 12889
-footprint: `footprint -p 12889` exit 0 value_kb 55296
+memsample: started at 1795391128.032 after '== PhoneChecksUITests.test5g_wholenative' in /Users/runner/work/_temp/shots/ui-log.txt
+pgrep -x ProtlyCIKeyboard: 19730
+footprint: `footprint -p 19730` exit 0 value_kb 53248
     ======================================================================
-    ProtlyCIKeyboard [12889]: 64-bit    Footprint: 54 MB (16384 bytes per page)
+    ProtlyCIKeyboard [19730]: 64-bit    Footprint: 52 MB (16384 bytes per page)
+    ======================================================================
+    
+      Dirty      Clean  Reclaimable    Regions    Category
+        ---        ---          ---        ---    ---
+      16 MB        0 B          0 B         72    dyld private memory
+      13 MB        0 B        16 MB          9    MALLOC_SMALL
+sudo-footprint: `sudo -n footprint -p 19730` exit 0 value_kb 54272
+    ======================================================================
+    ProtlyCIKeyboard [19730]: 64-bit    Footprint: 53 MB (16384 bytes per page)
     ======================================================================
     
       Dirty      Clean  Reclaimable    Regions    Category
         ---        ---          ---        ---    ---
       16 MB        0 B          0 B         73    dyld private memory
-      14 MB        0 B        17 MB          9    MALLOC_SMALL
-sudo-footprint: `sudo -n footprint -p 12889` exit 0 value_kb 55296
-    ======================================================================
-    ProtlyCIKeyboard [12889]: 64-bit    Footprint: 54 MB (16384 bytes per page)
-    ======================================================================
-    
-      Dirty      Clean  Reclaimable    Regions    Category
-        ---        ---          ---        ---    ---
-      16 MB        0 B          0 B         73    dyld private memory
-      14 MB        0 B        17 MB          9    MALLOC_SMALL
-rss: `ps -o rss= -p 12889` exit 0 value_kb 321200
-    321200
+      13 MB        0 B        16 MB          9    MALLOC_SMALL
+rss: `ps -o rss= -p 19730` exit 0 value_kb 317072
+    317072
 chosen footprint method: footprint
