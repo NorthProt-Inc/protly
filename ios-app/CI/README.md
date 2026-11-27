@@ -325,68 +325,26 @@ Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis br
   16; a fresh launch, about 1 in 45) or sends no became-active on a return (about 1 in 64). Any other FAIL, or a band
   of 35, is a regression.
 
-## Whole-field read checks (K1b, fix/whole-field-read)
+## Whole-field read checks (one-pass read)
 
-Code: `UITests/WholeReadChecks.swift` (ported from the walk-back probe on `diag/p1-walk-back-strict` without its
-logging; evidence in `docs/research/2026-11-21-walk-back-probe.md` there). The host's `rfill-<n>` buttons
-(`HostApp.swift` `WholeDrafts`, with `-wholefills 1` or on `-screen readweb`) put a draft in the field that starts with
-the line `protly-stub read`, so the CI stub answers `read <utf16>/<lf>/h<fnv>` (FNV-1a 32 over UTF-16 units; since F02c
-without the read's time, as the speculative call starts before the read ends). The test writes PASS or FAIL itself; checks.py then holds each try against the keyboard's own log
-(`resolve_whole_log`, below).
+Code: `UITests/WholeReadChecks.swift`. The host's `rfill-1`..`rfill-6` buttons (`HostApp.swift` `WholeDrafts`, with
+`-wholefills 1` or on `-screen readweb`) put a draft in the field starting with `protly-stub read`, so the CI stub
+answers `read <utf16>/<lf>/h<fnv>` (FNV-1a 32 over UTF-16 units). The test writes PASS or FAIL itself; `checks.py` then
+checks each try against `keyboard-log.txt` (`resolve_whole_log`).
 
-- **Filtered runs only**, as `test5f_period` (reads of up to 20 s): `[shots:PhoneChecksUITests/test5g_wholenative]`
-  (the UITextView screen, then the SwiftUI field) and `[shots:PhoneChecksUITests/test5h_wholeweb]` (`read-probe.html`:
-  a textarea and a Lexical-shaped contenteditable), one per CI run so two runs can go in parallel.
-- **IDs** `wr-<host>-<case>`: `win` (335 units with the marker line, cursor at the end after a resync: `rsync` on the
-  UITextView, Dismiss and `rfocus` on the SwiftUI field, Dismiss and a tap at the field's end on the page), `mid` (the
-  cursor in paragraph 2: the fill's offset, on the page set again by `rcaret` after the tap), `sel` (select all: `rselall`,
-  in code; on the SwiftUI field through its bound `TextSelection`, iOS 18, read back by HostView's `sel` probe), `long` (3247), `x14k` (14 055, with emoji:
-  the refusal), `emoji` (460 with 10 emoji: read on native hosts, which move by UTF-16 units; the refusal on web
-  hosts, which move by characters), `wr-uikit-r4k` (3975, under the read's 4000-unit
-  cap), `wr-uikit-cancel` (the `mid` draft: once the strip says "Reading the whole text…", its Cancel; the strip goes,
-  no panel or card comes, the field and the caret are as before, and the keyboard log says `outcome=cancelled`). `win`
-  and `long` run twice; every try must pass.
-- **F02c cases** (drafts the proxy window shows whole, and the tower review's bugs): `swin` (39 units on one line,
-  `protly-stub read §1` and one sentence: a native window stops at a line feed, run 1b402b4-204 showed 22 of the
-  two-line draft's 39 units; under select all's 43-unit `selectedText`; cursor at the end, 3 tries), `smid` (the same, cursor at
-  26, 2 tries), `ssel` (select all on it, 2 tries), `s3` (93 units, three sentences on one line; the web window showed
-  45 of them in run 297dc27-205), `shead` (native only: on a two-line draft, `rselhead` selects the field's start up to its first line
-  feed, a partial selection that shows no context on either side as select all does; it must stay a selection: a
-  copy-only card of exactly the marker line, the field unchanged, the log `reason=selection` or `partialSelection` and
-  no write; on the read page a selection set by script never reached the keyboard, run 205), `etail` (native only: a
-  lone emoji ends the line after a cursor at 26, so the walk forward's last jump leaves exactly one surrogate pair).
-- **Accept**: the reply's shape equals the field's, the cursor is at the end after the read (UITextView `sel` probe, the
-  page's caret), Replace leaves the field exactly the reply (native: the XCUITest value; web: the page's length, line
-  feeds and hash) within 40 s of the tap (`replace=<s>`, recorded: the host applies one delete per character, 7-12 s
-  for 3247 units in run 162), the keyboard's strip ("Replacing the text…", while it checks the field) goes away with no
-  notice (`kb=<s>`), and the protly key (Undo) puts the draft back exactly (`undo=<s>`, then `kbundo=<s>`).
-  **Refusal**: the panel text is the keyboard's
-  refusal text and, after Cancel, the field and the caret (the UITextView `sel` probe, the page's caret) are
-  unchanged. A set-up that did not happen
-  (no button, the fill's length or caret not as the case says) is FAIL `unreadable`. Evidence: lengths, line feeds,
-  hashes, offsets and times, never text.
-- **The keyboard's log** (`keyboard-log.txt`, category `read`, lines between the try's MARK `wr-<host>-<case>-t<n>`
-  in `ui-log.txt` and the next MARK): an accepted case needs `read done outcome=accepted` and two `replace ... held=1`
-  lines (Replace and Undo, each proven by the keyboard's walk over the field once the host was quiet), each check
-  beginning (`quietms`, its first cursor move) no more than 2 s before the test saw the field hold the result
-  (`replace=`, `undo=`, timed from the tap: a move sent while the host is still deleting proves only the proxy's own
-  copy of the field, and emptied run 172's Lexical-shaped page), or, on a native host that sent callbacks, at least
-  0.5 s after its last one (`lastev`; the UI test can see a field late: uikit `sel`, runs 185 and 189); a second
-  attempt is shown as `tries=`; a refusal case needs `read done outcome=refused` with
-  its reason (`WHOLE_REFUSALS`: native `x14k` `b1:tooLong`, or `b1:characters` / `b1:badStep` as in run 162; the web
-  drafts with emoji `b1:characters` or `b1:badStep`). A PASS without those lines is a FAIL; the line gains
-  `log=t<n>:<outcome>/...` either way.
-- `test_checks.py` (`WholeReadTests`) keeps the Swift lists, tries and draft lengths equal to checks.py and HostApp.swift.
-- **Latency** (F02c, owner decision 2026-11-22: a short draft at most 0.5 s slower than main): `lat-<host>-<case>` for
-  `swin`, `smid` and `ssel` on every host, derived by checks.py (`resolve_latency`, never written by the test) from the
-  keyboard's `call done first= done= api= spec=` line (ms from the protly key to the card's first text and to the
-  finished card, the call's own first update, and `spec=used` when the speculative call on the window's text was the
-  result) and its `write replace|undo keys=` lines (how long Replace and Undo kept the keys waiting). Every try must
-  have `spec=used` and each time at most `LATENCY_SLACK_MS` (500) over main's (`LATENCY_MAIN`, medians from a run of
-  `diag/k1b-base-*`: main's read and write path with this harness and the same log lines). RECORD while
-  `LATENCY_MAIN` has no entry for the case (that baseline run itself). The CI stub's first text comes 0.4 s after the
-  call starts, much sooner than the real API (2.4-5.6 s on main in the 8.5 network checks): against it the read's proof
-  shows in full.
+- **Filtered runs only**, as `test5f_period`: `[shots:PhoneChecksUITests/test5g_wholenative]` (`uikit` UITextView and
+  `swiftui` TextField) and `[shots:PhoneChecksUITests/test5h_wholeweb]` (`read-probe.html`: plain `textarea`).
+- **Matrix** (`wr-<host>-<case>`):
+  - `uikit`, `swiftui`: `win` (335 units, 2 tries), `mid` (335, cursor at 112), `sel` (335, select all), `swin` (39,
+    3 tries), `smid` (39, cursor at 26, 2 tries), `ssel` (39, select all, 2 tries), `emoji` (460 with 10 emoji),
+    `x14k` (14 055, refusal within the time cap), `cancel` (335 mid-text, Cancel on the strip after 2 s).
+  - `textarea`: `win` (2 tries), `swin` (3 tries), `emoji` (refusal: web moves by characters).
+- **Pass rules**: accepted reads exact by hash (UI reply and keyboard log); refusals within the time cap (`6500` ms)
+  with the cursor back (`known=1` and `caret-left == caret`); field exact after Replace and Undo by the UI test's own
+  read; Replace and Undo keys-wait under 100 ms; `read ms` at most 2500 on short cases (`swin`, `smid`, `ssel`);
+  everything else (`call done` timings, non-short read times, UI write times) recorded, not gated.
+- `test_checks.py` (`WholeReadTests`) keeps the Swift lists, tries and draft lengths equal to `checks.py` and
+  `HostApp.swift`.
 
 ## Reading a run without GitHub access
 

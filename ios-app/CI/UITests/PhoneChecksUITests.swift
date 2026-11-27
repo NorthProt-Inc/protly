@@ -118,9 +118,9 @@ final class PhoneChecksUITests: XCTestCase {
         try PhoneRun(test: self, name: "test5f_period", arguments: ["-screen", "uikit"]).checksPeriod()
     }
 
-    /// K1b, the whole-field read (WholeReadChecks.swift): the read, Replace and Undo on the UITextView screen and the
-    /// SwiftUI field, from the host's whole-read drafts (`-wholefills 1`). Offline (the CI stub's `read` marker). Only in
-    /// a filtered run, as test5f_period: up to 20 s a read would push a full run past MAIN_TEST_DEADLINE.
+    /// One-pass whole-field read (WholeReadChecks.swift): the read, Replace and Undo on the UITextView screen and the
+    /// SwiftUI field, from the host's whole-read drafts (`-wholefills 1`). Offline (the CI stub's `read` marker). Only
+    /// in a filtered run, as test5f_period.
     @MainActor
     func test5g_wholenative() throws {
         guard ProcessInfo.processInfo.environment["FILTERED"] == "1" else {
@@ -130,7 +130,7 @@ final class PhoneChecksUITests: XCTestCase {
             .checksWholeNative()
     }
 
-    /// K1b: the same on the read page's textarea and Lexical-shaped field (`-screen readweb`). Only in a filtered run.
+    /// One-pass whole-field read on the read page's textarea (`-screen readweb`). Only in a filtered run.
     @MainActor
     func test5h_wholeweb() throws {
         guard ProcessInfo.processInfo.environment["FILTERED"] == "1" else {

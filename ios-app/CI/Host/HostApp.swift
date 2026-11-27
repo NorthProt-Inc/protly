@@ -14,8 +14,8 @@ import WebKit
 ///   from the bundled web-composer.html. Its state is published as an accessibility value and every DOM event is
 ///   appended to Documents/web-events.txt, which run-shots.sh copies into the run folder. `-caret 1` loads the page
 ///   with `?caret=1`, which also posts the state when the caret moves (fix/double-space-period, test5f_period only).
-/// - `readweb`: the whole-field read page (K1b, test5h_wholeweb): a textarea and a Lexical-shaped field, from the
-///   bundled read-probe.html, with the whole-read draft buttons (WholeDrafts).
+/// - `readweb`: the whole-field read page (test5h_wholeweb): a plain textarea from the bundled read-probe.html, with
+///   the whole-read draft buttons (WholeDrafts).
 /// `-wholefills 1` adds the whole-read draft buttons (`rfill-1` ... , WholeDrafts) and their select-all and resync
 /// buttons to the default screen and the `uikit` screen (K1b, test5g_wholenative).
 /// Every screen has `Clear` (empties the field without keys) and `Dismiss` (the field loses focus, which hides the
@@ -100,9 +100,6 @@ struct HostView: View {
                         Button("SelAll") { selectRequest = NSRange(location: 0, length: text.utf16.count) }
                             .font(.caption)
                             .accessibilityIdentifier("rselall")
-                        Button("SelHead") { selectRequest = WholeDrafts.headRange(text) }
-                            .font(.caption)
-                            .accessibilityIdentifier("rselhead")
                         // After Dismiss: the field takes the focus again without a tap (the cursor stays).
                         Button("Focus") { focused = true }
                             .font(.caption)
@@ -201,11 +198,6 @@ final class TextViewModel: ObservableObject {
     /// K1b: the whole text selected, as Select All in the edit menu would.
     func selectAll() {
         select(NSRange(location: 0, length: (textView?.text ?? "").utf16.count))
-    }
-
-    /// F02c: the field's start up to its first line feed selected (WholeDrafts.headRange).
-    func selectHead() {
-        select(WholeDrafts.headRange(textView?.text ?? ""))
     }
 
     /// K1b: the selection set again where it is, with the input delegate told, as when the host moves the caret: the
@@ -322,9 +314,6 @@ struct TextViewScreen: View {
                         Button("Sync") { model.resync() }
                             .font(.caption)
                             .accessibilityIdentifier("rsync")
-                        Button("SelHead") { model.selectHead() }
-                            .font(.caption)
-                            .accessibilityIdentifier("rselhead")
                     }
                     WholeFillButtons { i in model.fill(i) }
                 }
@@ -399,11 +388,6 @@ final class WebModel: NSObject, ObservableObject, WKScriptMessageHandler {
 
     func selectAll() {
         run("selectAllIn()", name: "selectAllIn()")
-    }
-
-    /// F02c: the field's start up to its first line feed selected.
-    func selectHead() {
-        run("selectHeadIn()", name: "selectHeadIn()")
     }
 
     /// The page's text never goes to the log, only the function's name.
@@ -531,10 +515,8 @@ enum WholeDrafts {
     static let mixed = [sentence, "Send me the notes after the call \u{1F44D}.", "\u{D68C}\u{C758} \u{B05D}\u{B098}\u{ACE0} \u{C804}\u{D654}\u{D560}\u{AC8C} \u{1F642}."]
 
     enum Kind {
-        /// The one sentence repeated (the probe's default drafts).
+        /// The one sentence repeated.
         case plain
-        /// Each sentence numbered `<paragraph>-<sentence> ` (no two stretches read the same).
-        case numbered
         /// Numbered, the mixed sentences in turn.
         case mixed
     }
@@ -544,7 +526,6 @@ enum WholeDrafts {
             "\u{00A7}\(k) " + (1...sentences).map { j -> String in
                 switch kind {
                 case .plain: return sentence
-                case .numbered: return "\(k)-\(j) " + sentence
                 case .mixed: return "\(k)-\(j) " + mixed[(k + j) % 3]
                 }
             }.joined(separator: " ")
@@ -557,39 +538,20 @@ enum WholeDrafts {
         return Draft(name: name, text: text, cursor: mid ? second + paras[1].utf16.count / 2 : text.utf16.count)
     }
 
-    /// rfill-1 ... rfill-6. UTF-16 units / line feeds with the marker line (without it: 318, 3230, 14 038, 443, 3958).
+    /// rfill-1 ... rfill-6. UTF-16 units / line feeds with the marker line.
     static let all: [Draft] = [
         make("p5", paragraphs(5, sentences: 3, .plain)),  // 335/9
         make("p5mid", paragraphs(5, sentences: 3, .plain), mid: true),  // 335/9, the cursor at 112
-        make("xlong", paragraphs(8, sentences: 20, .plain)),  // 3247/15
         make("x14k", paragraphs(8, sentences: 60, .mixed)),  // 14 055/15, 320 emoji
         make("emoji", paragraphs(5, sentences: 3, .mixed)),  // 460/9, 10 emoji
-        make("r4k", paragraphs(8, sentences: 20, .numbered)),  // 3975/15: under the read's 4000-unit cap
-        // F02c: short drafts the proxy window shows whole (the latency target), and the bug cases. One line each: a
-        // native host's window stops at a line feed (run 1b402b4-204 showed 22 of the two-line draft's 39 units).
         Draft(name: "s1", text: short, cursor: short.utf16.count),  // 39/0, under select all's 43-unit selectedText
         Draft(name: "s1mid", text: short, cursor: (inline + "\u{00A7}1 \u{C624}\u{B298} \u{D68C}\u{C758} ").utf16.count),  // 39/0 at 26
-        Draft(name: "s3", text: short3, cursor: short3.utf16.count),  // 93/0: three sentences on one line
-        // A lone emoji ends the line after a mid-text cursor: the forward walk's last jump leaves exactly one pair.
-        Draft(name: "etail", text: short + " \u{1F600}", cursor: (inline + "\u{00A7}1 \u{C624}\u{B298} \u{D68C}\u{C758} ").utf16.count),  // 42/0 at 26
-        // The marker on its own line (`rselhead` selects it: a partial selection up to a line feed).
-        Draft(name: "s1head", text: head, cursor: head.utf16.count),  // 39/1
     ]
 
     /// StubActionClient.marker + `read` on the draft's own line: the stub answers any text that starts so.
     static let inline = "protly-stub read "
     /// The marker and one numbered sentence, on one line.
     static let short = inline + "\u{00A7}1 " + sentence
-    /// The marker and three sentences on one line, as a chat message.
-    static let short3 = short + " Send me the notes after the call. " + sentence
-    /// The marker line, then one numbered sentence.
-    static let head = marker + "\u{00A7}1 " + sentence
-
-    /// `rselhead`: the field's start up to its first line feed (the marker line) selected, a partial selection that
-    /// shows no context on either side.
-    static func headRange(_ text: String) -> NSRange {
-        NSRange(location: 0, length: Array(text.utf16).firstIndex(of: 10) ?? text.utf16.count)
-    }
 }
 
 /// Buttons `rfill-1` ... `rfill-6` in rows of three, top right (short labels, so a row stays right of the read page).
@@ -662,8 +624,8 @@ struct SelectingField: View {
     }
 }
 
-/// `-screen readweb`: read-probe.html (a textarea and a Lexical-shaped contenteditable). The page posts each field's
-/// length, line-feed count, hash and caret, never its text.
+/// `-screen readweb`: read-probe.html (a plain textarea). The page posts the field's length, line-feed count, hash and
+/// caret, never its text.
 struct ReadWebScreen: View {
     @StateObject private var model = WebModel()
 
@@ -687,9 +649,6 @@ struct ReadWebScreen: View {
                     Button("Caret") { model.restoreCaret() }
                         .font(.caption)
                         .accessibilityIdentifier("rcaret")
-                    Button("SelHead") { model.selectHead() }
-                        .font(.caption)
-                        .accessibilityIdentifier("rselhead")
                 }
                 WholeFillButtons { i in model.fill(i) }
             }

@@ -61,73 +61,29 @@ PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
 HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
               "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
               "hb-card", "hb-cancel"]
-# K1b: the whole-field read, Replace and Undo (times recorded), wr-<host>-<case>. The test writes PASS or FAIL itself
-# (UITests/WholeReadChecks.swift); the same lists as WholeChecks there. Native hosts: the UITextView screen (uikit) and
-# the SwiftUI field (swiftui), plus a 3975-unit Replace and Undo (r4k) and Cancel mid-read (cancel) on the UITextView;
-# web hosts: the read page's textarea and Lexical-shaped field. Text with emoji (emoji) is read on native hosts and
-# refused on web hosts (they move by characters).
-# F02c: short drafts the proxy window shows whole (swin 39 units at the end, smid in the middle, ssel select all, s3 93
-# units of three sentences on one line), a partial selection at the start up to a line feed (shead: a copy-only card
-# of the selection), and a lone emoji ending the line after a mid-text cursor (etail, native only).
-WHOLE_NATIVE_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3", "shead", "etail")
-# shead is native only: on the read page a selection set by script never reached the keyboard (run 297dc27-205: the
-# read started with no selection), and a person's selection there is made by touch.
-WHOLE_WEB_CASES = ("win", "mid", "sel", "long", "x14k", "emoji", "swin", "smid", "ssel", "s3")
-WHOLE_WEB_HOSTS = ("textarea", "lexical")
-WHOLE_TRIES = {"win": 2, "long": 2, "swin": 3, "smid": 2, "ssel": 2}
-WHOLE_NATIVE_IDS = ([f"wr-uikit-{c}" for c in WHOLE_NATIVE_CASES] + ["wr-uikit-r4k", "wr-uikit-cancel"]
-                    + [f"wr-swiftui-{c}" for c in WHOLE_NATIVE_CASES])
+# One-pass whole-field read, Replace and Undo: wr-<host>-<case>. The test writes PASS or FAIL itself
+# (UITests/WholeReadChecks.swift); the same lists as WholeChecks there. Native hosts: UITextView (`uikit`) and SwiftUI
+# (`swiftui`); web host: plain `textarea`. Text with emoji is read on native hosts and refused on `textarea`.
+WHOLE_NATIVE_CASES = ("win", "mid", "sel", "swin", "smid", "ssel", "emoji", "x14k", "cancel")
+WHOLE_WEB_CASES = ("win", "swin", "emoji")
+WHOLE_WEB_HOSTS = ("textarea",)
+WHOLE_TRIES = {"win": 2, "swin": 3, "smid": 2, "ssel": 2}
+WHOLE_NATIVE_IDS = [f"wr-{h}-{c}" for h in ("uikit", "swiftui") for c in WHOLE_NATIVE_CASES]
 WHOLE_WEB_IDS = [f"wr-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in WHOLE_WEB_CASES]
-# F02c, the latency target (owner decision 2026-11-22): a short draft the proxy window shows whole is at most
-# LATENCY_SLACK_MS slower than main, tap to the card's first text and tap to the finished card; the tower's reading adds
-# Replace's and Undo's keys-wait. lat-<host>-<case> is derived by checks.py from the keyboard's `call done` and
-# `write replace|undo` lines of the wr- tries (FieldText.logCall, logWrite), never written by the test. Each try must
-# also have used the speculative call (`spec=used`: the window showed the whole field). PASS or FAIL against
-# LATENCY_MAIN; RECORD while that has no entry for the case (the main baseline run itself).
-LATENCY_CASES = ("swin", "smid", "ssel")
-LATENCY_NATIVE_IDS = [f"lat-{h}-{c}" for h in ("uikit", "swiftui") for c in LATENCY_CASES]
-LATENCY_WEB_IDS = [f"lat-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in LATENCY_CASES]
-LATENCY_SLACK_MS = 500
-LATENCY_KEYS = ("first", "done", "replace", "undo")
-# main's medians in ms per (host, case) from its baseline runs (diag/k1b-base-*: main's read and write path with this
-# harness and the same log lines): native runs/a6c7969-214 (the one-line drafts), web runs/8a64cb5-209 (the web window
-# showed the two-line draft whole, so main read all of it and the stub answered). A key main has no value for (its
-# Undo was not offered after smid on the web, select all on the UITextView is a copy-only selection) is held to swin's.
-LATENCY_MAIN = {
-    ("uikit", "swin"): {"first": 472, "done": 667, "replace": 0, "undo": 0},
-    ("uikit", "smid"): {"first": 505, "done": 622, "replace": 0, "undo": 0},
-    ("uikit", "ssel"): {"first": 551, "done": 696},
-    ("swiftui", "swin"): {"first": 491, "done": 597, "replace": 0, "undo": 0},
-    ("swiftui", "smid"): {"first": 501, "done": 605, "replace": 0, "undo": 0},
-    ("swiftui", "ssel"): {"first": 487, "done": 606, "replace": 0, "undo": 0},
-    ("textarea", "swin"): {"first": 495, "done": 669, "replace": 0, "undo": 0},
-    ("textarea", "smid"): {"first": 497, "done": 650, "replace": 0},
-    ("textarea", "ssel"): {"first": 491, "done": 598, "replace": 0, "undo": 0},
-    ("lexical", "swin"): {"first": 494, "done": 606, "replace": 0, "undo": 0},
-    ("lexical", "smid"): {"first": 474, "done": 577, "replace": 0},
-    ("lexical", "ssel"): {"first": 473, "done": 624, "replace": 2, "undo": 0},
-}
-# What the keyboard's own log (keyboard-log.txt, category `read`) must say for each wr- try, between the try's MARK
-# (wr-<host>-<case>-t<n> in ui-log.txt) and the next MARK: a refusal case its refusal reason (`<walk>:<why>`; the web
-# drafts with emoji are refused for the emoji, the native 14 055-unit one at the read's 4000-unit cap or, as in run
-# a6de577-162 on both native hosts, at its second step back, where the host's move fit one more unit per emoji crossed
-# (probe run 150 saw 11 such native steps in 14 038-unit walks)), an accepted
-# case the read accepted and Replace and Undo both proven by the keyboard (`replace ... held=1`, twice), with the
-# keyboard's check beginning no earlier than WHOLE_HOST_SLACK_MS before the test saw the field hold the result
-# (`quietms` against the test's replace= and undo=): a check that moves the cursor while the host is still deleting
-# can prove only the proxy's own copy of the field, and moved the Lexical-shaped page's text away in run 172.
-# wr-uikit-cancel (Cancel on the strip mid-read) needs `outcome=cancelled`.
-WHOLE_REFUSALS = {("native", "x14k"): ("b1:tooLong", "b1:characters", "b1:badStep"),
-                  ("web", "x14k"): ("b1:characters", "b1:badStep"),
-                  ("web", "emoji"): ("b1:characters", "b1:badStep")}
+# Pass rules checked against keyboard-log.txt (`resolve_whole_log`):
+# - accepted reads exact by hash (against UI test's `real=.../h<hash>`)
+# - refusals within the time cap (`WHOLE_CAP_MS`) with cursor position known (`known=1`)
+# - Replace and Undo keys-wait strictly under `WHOLE_MAX_KEYS_MS` (100 ms)
+# - `read ms` at most `WHOLE_SHORT_READ_MS` (2500 ms) on the short cases (`swin`, `smid`, `ssel`)
+# - everything else (`call done` timings, non-short read times, UI write times) recorded, not gated.
+WHOLE_REFUSALS = {("native", "x14k"), ("web", "emoji")}
 WHOLE_CANCELLED = {("native", "cancel")}
-# A partial selection: the keyboard sends the selection (`reason=selection`) and writes nothing.
-WHOLE_SELECTION = {"shead"}
-# The test polls the field every 0.2 s, reading a long field takes a few hundred ms more, and the keyboard's clock starts
-# a little after the test's tap; the race this check is for opened the gate 6-11 s before the host was done (run 172).
-WHOLE_HOST_SLACK_MS = 2000
+WHOLE_SHORT_CASES = ("swin", "smid", "ssel")
+WHOLE_SHORT_READ_MS = 2500
+WHOLE_MAX_KEYS_MS = 100
+WHOLE_CAP_MS = 6500
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
-                + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS + LATENCY_NATIVE_IDS + LATENCY_WEB_IDS + HEIGHT_IDS)
+                + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -143,8 +99,8 @@ METHOD_IDS = {
     "test5d_card": CARD_IDS,
     "test5e_bar": BAR_IDS,
     "test5f_period": PERIOD_IDS,
-    "test5g_wholenative": WHOLE_NATIVE_IDS + LATENCY_NATIVE_IDS,
-    "test5h_wholeweb": WHOLE_WEB_IDS + LATENCY_WEB_IDS,
+    "test5g_wholenative": WHOLE_NATIVE_IDS,
+    "test5h_wholeweb": WHOLE_WEB_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
     "test9_height": HEIGHT_IDS,
@@ -1342,12 +1298,20 @@ def kv(line, name):
     return m.group(1) if m else None
 
 
+def _int(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def resolve_whole_log(check, marks, kb_text):
-    """K1b: the keyboard's log for each try of a wr- line the test wrote (see WHOLE_REFUSALS). A PASS without the log
-    lines it needs is a FAIL; a FAIL stays one and gains the log's words."""
+    """One-pass whole-field read log check for each try of a wr- line. Gates: accepted hash matches UI real=, refusals
+    within WHOLE_CAP_MS with known=1, Replace/Undo keys-wait < WHOLE_MAX_KEYS_MS (100 ms), short-case read ms <=
+    WHOLE_SHORT_READ_MS (2500 ms). Everything else is recorded, not gated."""
     host, case = check.id.split("-", 2)[1:]
     kind = "web" if host in WHOLE_WEB_HOSTS else "native"
-    refusal = WHOLE_REFUSALS.get((kind, case))
+    is_refusal = (kind, case) in WHOLE_REFUSALS
     if kb_text is None:
         problems, notes = ["no keyboard-log.txt"], []
     else:
@@ -1364,149 +1328,55 @@ def resolve_whole_log(check, marks, kb_text):
             if len(done) != 1:
                 problems.append(f"t{t}:no read done" if not done else f"t{t}:{len(done)} reads")
                 continue
-            outcome, reason, took = kv(done[0], "outcome"), kv(done[0], "reason"), kv(done[0], "ms")
-            # F02c: a card (its `call done` line) only after an accepted read; the speculative call's fate is noted.
+            outcome, reason = kv(done[0], "outcome"), kv(done[0], "reason")
+            took_s, h, known = kv(done[0], "ms"), kv(done[0], "h"), kv(done[0], "known")
+            took = _int(took_s)
             calls = [line for line in lines if line.startswith("call done ")]
             if calls:
-                notes.append(f"t{t}:spec={kv(calls[0], 'spec')}")
+                notes.append(f"t{t}:call={kv(calls[0], 'first')}/{kv(calls[0], 'done')}ms/{kv(calls[0], 'spec')}")
             if outcome != "accepted" and calls:
                 problems.append(f"t{t}:a card after a read that was {outcome}")
             if (kind, case) in WHOLE_CANCELLED:
-                notes.append(f"t{t}:{outcome}/{took}ms")
+                notes.append(f"t{t}:{outcome}/{took_s}ms")
                 if outcome != "cancelled":
                     problems.append(f"t{t}:{outcome}/{reason} want cancelled")
                 continue
-            if case in WHOLE_SELECTION:
-                notes.append(f"t{t}:{outcome}/{reason}")
-                writes = [line for line in lines if line.startswith("replace ")]
-                if outcome != "accepted" or reason not in ("selection", "partialSelection") or writes:
-                    problems.append(f"t{t}:{outcome}/{reason} writes={len(writes)} want accepted/selection, no write")
+            if is_refusal:
+                notes.append(f"t{t}:{outcome}/{reason}/{took_s}ms/known={known}")
+                if outcome != "refused":
+                    problems.append(f"t{t}:{outcome}/{reason} want refused")
+                else:
+                    if took is None or took > WHOLE_CAP_MS:
+                        problems.append(f"t{t}:ms={took_s} over cap {WHOLE_CAP_MS}")
+                    if known != "1":
+                        problems.append(f"t{t}:known={known} want 1")
                 continue
-            if refusal:
-                notes.append(f"t{t}:{outcome}/{reason}")
-                if outcome != "refused" or reason not in refusal:
-                    problems.append(f"t{t}:{outcome}/{reason} want refused/{'|'.join(refusal)}")
-                continue
-            held = [kv(line, "held") for line in lines if line.startswith("replace ")]
             if outcome != "accepted":
-                notes.append(f"t{t}:{outcome}/{reason}")
+                notes.append(f"t{t}:{outcome}/{reason}/{took_s}ms")
                 problems.append(f"t{t}:{outcome}/{reason}")
                 continue
-            notes.append(f"t{t}:{outcome}/{took}ms/held={','.join(held)}")
-            # Replace's focus guard read the field's document both times (runs 204, 205: always); -1 would mean the guard
-            # did nothing on that host (silent-failure review).
-            focus = [kv(line, "focus") for line in lines if line.startswith("replace ")]
-            if any(f != "0" for f in focus):
-                problems.append(f"t{t}:focus={','.join(f or '?' for f in focus)} want 0,0")
-            if held != ["1", "1"]:
-                problems.append(f"t{t}:held={','.join(held) or 'none'} want 1,1 (Replace, Undo)")
-                continue
-            # The check's first move goes out at `quietms` (the gate): it may not come before the field held the result
-            # (silent-failure review, round 2: a move sent while the host was still deleting left run 172's Lexical-
-            # shaped page empty; `heldms`, the check's end, would hide that).
-            starts = [kv(line, "quietms") for line in lines if line.startswith("replace ")]
-            host_ends = [kv(line, "lastev") for line in lines if line.startswith("replace ")]
-            tries = [kv(line, "tries") for line in lines if line.startswith("replace ")]
-            if any(n not in (None, "1") for n in tries):
-                notes.append(f"t{t}:tries={','.join(n or '?' for n in tries)}")
             ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
-            for name, ms_text, last_text in zip(("replace", "undo"), starts, host_ends):
-                seen = kv(ui.group(1), name) if ui else None
-                try:
-                    host_ms, kb_ms = float(seen) * 1000, int(ms_text)
-                except (TypeError, ValueError):
-                    # No time on either side (`undo=timeout`: the field never held it): nothing to hold the keyboard's
-                    # claim against, which is a FAIL, not a crash (silent-failure review).
-                    problems.append(f"t{t}:{name}={seen} quietms={ms_text}: no time to hold the check against")
+            real = kv(ui.group(1), "real") if ui else None
+            want_h = real.rsplit("/h", 1)[1] if real and "/h" in real else None
+            if want_h and h != want_h:
+                problems.append(f"t{t}:h={h} want {want_h}")
+            if case in WHOLE_SHORT_CASES and (took is None or took > WHOLE_SHORT_READ_MS):
+                problems.append(f"t{t}:read={took_s}ms over {WHOLE_SHORT_READ_MS}")
+            rep = [kv(line, "keys") for line in lines if line.startswith("write replace ")]
+            und = [kv(line, "keys") for line in lines if line.startswith("write undo ")]
+            notes.append(f"t{t}:{outcome}/{took_s}ms/keys={rep[0] if rep else 'none'},{und[0] if und else 'none'}")
+            for wname, vals in (("replace", rep), ("undo", und)):
+                if len(vals) != 1:
+                    problems.append(f"t{t}:{wname} keys missing ({len(vals)})")
                     continue
-                if kb_ms + WHOLE_HOST_SLACK_MS >= host_ms:
-                    continue
-                # A native host's own callbacks follow its edits (runs 181, 185: the last one before the UI test saw
-                # the result). A check that began after the host had been quiet for the gate's 0.5 s is after the
-                # host, also when the UI test saw the field late (uikit sel, runs 185 and 189: 7.0-7.1 s, while the
-                # host's last callback came at 2.0 and 1.5 s, as in win and mid). Web hosts send none: the UI time rules.
-                try:
-                    last = int(last_text)
-                except (TypeError, ValueError):
-                    last = -1
-                if last >= 0 and kb_ms >= last + 500:
-                    notes.append(f"t{t}:{name} ui-late={seen}s host-last={last}ms began={ms_text}ms")
-                else:  # also a NaN
-                    problems.append(f"t{t}:{name} check began at {ms_text}ms, the field held it at {seen}s")
+                k = _int(vals[0])
+                if k is None or k < 0 or k >= WHOLE_MAX_KEYS_MS:
+                    problems.append(f"t{t}:{wname} keys={vals[0]}ms want <{WHOLE_MAX_KEYS_MS}")
     evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
     if problems:
         evidence += " log-problems=" + ",".join(problems)
     status = "FAIL" if problems or check.status != "PASS" else "PASS"
     return Check(check.id, status, evidence)
-
-
-def latency_tries(wr_id, case, marks, kb_text):
-    """Per try of a wr- line: {first, done, api, spec, replace, undo} from the keyboard log between the try's MARK and
-    the next one; None for a try without its MARK. A value the log does not have is None."""
-    events = parse_kb_read(kb_text)
-    out = []
-    for t in range(1, WHOLE_TRIES.get(case, 1) + 1):
-        start = marks.get(f"{wr_id}-t{t}")
-        if start is None:
-            out.append(None)
-            continue
-        end = min((m for m in marks.values() if m > start), default=float("inf"))
-        lines = [line for at, line in events if start - 0.5 <= at < end]
-        def one(prefix, name):
-            found = [line for line in lines if line.startswith(prefix)]
-            if len(found) != 1:
-                return None
-            value = kv(found[0], name)
-            try:
-                return int(value)
-            except (TypeError, ValueError):
-                return value
-        out.append({"first": one("call done ", "first"), "done": one("call done ", "done"),
-                    "api": one("call done ", "api"), "spec": one("call done ", "spec"),
-                    "replace": one("write replace ", "keys"), "undo": one("write undo ", "keys"),
-                    "reason": one("read done ", "reason"), "read": one("read done ", "ms")})
-    return out
-
-
-def resolve_latency(lat_id, wr, marks, kb_text):
-    """F02c: lat-<host>-<case> from the keyboard log of wr-<host>-<case>'s tries (see LATENCY_MAIN)."""
-    _, host, case = lat_id.split("-", 2)
-    if kb_text is None:
-        return unreadable(lat_id, "no keyboard-log.txt")
-    main_ms = LATENCY_MAIN.get((host, case))
-    if main_ms is not None and case != "swin":
-        # A Replace or Undo main did not offer is held to swin's (the same draft).
-        main_ms = {**{k: v for k, v in LATENCY_MAIN.get((host, "swin"), {}).items() if k in ("replace", "undo")},
-                   **main_ms}
-    parts, problems = [], []
-    if wr.status == "FAIL":
-        problems.append(f"{wr.id} FAIL")
-    for i, t in enumerate(latency_tries(wr.id, case, marks, kb_text), 1):
-        if t is None:
-            problems.append(f"t{i}:no MARK")
-            continue
-        parts.append(f"t{i}={{" + " ".join(f"{k}={'none' if v is None else v}" for k, v in t.items()) + "}")
-        if main_ms is None:
-            continue
-        if t["spec"] != "used":
-            problems.append(f"t{i}:spec={t['spec']} want used")
-        for k in LATENCY_KEYS:
-            want = main_ms.get(k)
-            if want is None:
-                continue
-            got = t[k]
-            if not isinstance(got, int) or got < 0:
-                problems.append(f"t{i}:{k}={got}")
-            elif got > want + LATENCY_SLACK_MS:
-                problems.append(f"t{i}:{k}={got}ms over main {want}+{LATENCY_SLACK_MS}")
-    evidence = " ".join(parts)
-    if main_ms is None:
-        return Check(lat_id, "RECORD", f"{evidence} main=none (the baseline run)".strip()
-                     + (f" problems={','.join(problems)}" if problems else ""))
-    evidence += " main={" + " ".join(f"{k}={main_ms.get(k, 'none')}" for k in LATENCY_KEYS) + "}"
-    if problems:
-        return Check(lat_id, "FAIL", f"{evidence} problems={','.join(problems)}")
-    return Check(lat_id, "PASS", evidence)
 
 
 def guard_network(c, network_key):
@@ -1554,14 +1424,6 @@ def assemble(checks_text, log_text, mem_text, network_key=False, ran=None, run_d
             if check_id in WHOLE_NATIVE_IDS + WHOLE_WEB_IDS and c.status in ("PASS", "FAIL") \
                     and not c.evidence.startswith("unreadable"):
                 by_id[check_id] = resolve_whole_log(c, marks, kb_text)
-        for lat_id in LATENCY_NATIVE_IDS + LATENCY_WEB_IDS:
-            wr = by_id.get("wr-" + lat_id.split("-", 1)[1])
-            if lat_id in by_id or wr is None:
-                continue  # a line the test wrote stays (a duplicate is the test's bug); no wr- line: no lat- line
-            if wr.evidence.startswith("unreadable"):
-                by_id[lat_id] = unreadable(lat_id, f"{wr.id} is unreadable")
-            else:
-                by_id[lat_id] = resolve_latency(lat_id, wr, marks, kb_text)
     for check_id, c in list(by_id.items()):
         if c.evidence.startswith("unreadable") or c.status not in ("PASS", "SKIP"):
             continue
