@@ -32,11 +32,7 @@ final class FieldGuardTests: XCTestCase {
         XCTAssertFalse(FieldGuard.canReplace(long, before: "", after: ""))
         // A window that starts inside a character (a combining mark after its base) agrees on its UTF-16 units.
         XCTAssertTrue(FieldGuard.canReplace("Cafe\u{301} au lait", before: "\u{301} au lait", after: ""))
-        // The check after Replace uses the same rule on the result.
-        XCTAssertTrue(FieldGuard.holdsResult("read 335/9/h6d75860b t4210", before: "read 335/9/h6d75860b t4210", after: ""))
-        XCTAssertFalse(FieldGuard.holdsResult("read 335/9/h6d75860b t4210", before: "x read 335/9/h6d75860b t4210", after: ""))
-        XCTAssertFalse(FieldGuard.holdsResult("abc", before: "abc", after: "left over"))
-        // Undo of a long Replace (proven whole when it ended): the window shows the result's end.
+        // Undo of a long Replace: the window shows the result's end.
         XCTAssertTrue(FieldGuard.canUndoReplace(long, before: String(long.suffix(50)), after: "", selected: ""))
         XCTAssertFalse(FieldGuard.canUndoReplace(long, before: "", after: "", selected: ""))
     }
@@ -171,49 +167,5 @@ final class FieldGuardTests: XCTestCase {
     func testCopyOnlyLines() {
         XCTAssertEqual(FieldGuard.CopyOnly.fieldChanged.message, "The text changed while this ran. Copy the result instead.")
         XCTAssertEqual(FieldGuard.CopyOnly.selection.message, "Protly does not type over selected text. Copy the result instead.")
-    }
-}
-
-/// Tower review of f0533ae, bugs 2 and 4: the two decisions FieldText makes on the proxy, as pure rules.
-final class FieldDecisionTests: XCTestCase {
-    /// Bug 4: the user tapped another field between Replace's deletes and its insert (up to WholeRead.moveWait): the
-    /// insert would land there. Only a known, different document says so; with none from iOS the insert goes ahead (as
-    /// before K1b: nothing better is known).
-    func testTheInsertWaitsForTheSameField() {
-        let a = UUID(), b = UUID()
-        XCTAssertEqual(FieldGuard.focus(before: a, now: a), .same)
-        XCTAssertEqual(FieldGuard.focus(before: a, now: b), .other)
-        XCTAssertEqual(FieldGuard.focus(before: nil, now: b), .unknown)
-        XCTAssertEqual(FieldGuard.focus(before: a, now: nil), .unknown)
-        XCTAssertEqual(FieldGuard.focus(before: a, now: b).logValue, 1)
-        XCTAssertEqual(FieldGuard.focus(before: a, now: a).logValue, 0)
-        XCTAssertEqual(FieldGuard.focus(before: nil, now: nil).logValue, -1)
-    }
-
-    /// Bug 2: a selection at the field's start that reaches a line feed shows both contexts empty, as select all
-    /// does. After the +1 collapse, select all leaves nothing before the end; text the walk to the end crossed means a
-    /// partial selection. Its card shows selectedText, which can hold only the selection's first units (43 after a
-    /// select all, P1a cause 3), so it counts only when the before-context back at the collapse point, which starts at
-    /// the field's start, is exactly that text (silent-failure review). A resync alone (a move that named no unit:
-    /// the contexts were stale) is neither: refused (code review: it sent select all's first 43 units as a selection).
-    func testACollapsedSelectionWithTextAfterItWasPartial() {
-        let head = Array("Title".utf16)
-        let rest = Array("private notes".utf16)
-        XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: false, selected: head, whole: head), .selectAll)
-        // The collapse landed past the line feed (run 1b402b4-204: caret 17 after a 16-unit selection): the walk to the
-        // end crossed the rest; the walk back from the end read the selection, the line feed and the rest.
-        XCTAssertEqual(WholeRead.collapsed(crossed: rest, resynced: false, selected: head, whole: head + [10] + rest),
-                       .partial)
-        // The collapse landed at the selection's end: the walk to the end crossed the line feed first.
-        XCTAssertEqual(WholeRead.collapsed(crossed: [10] + rest, resynced: false, selected: head,
-                                           whole: head + [10] + rest), .partial)
-        // selectedText held only the selection's first units: the field read whole is longer. Refused.
-        XCTAssertEqual(WholeRead.collapsed(crossed: rest, resynced: false, selected: Array("Titl".utf16),
-                                           whole: head + [10] + rest), .unknown)
-        // Text before the selection (its before-context only looked empty): refused.
-        XCTAssertEqual(WholeRead.collapsed(crossed: rest, resynced: false, selected: head,
-                                           whole: Array("x".utf16) + head + [10] + rest), .unknown)
-        // Stale contexts: the first step resynced and crossed nothing it could name.
-        XCTAssertEqual(WholeRead.collapsed(crossed: [], resynced: true, selected: head, whole: head), .unknown)
     }
 }

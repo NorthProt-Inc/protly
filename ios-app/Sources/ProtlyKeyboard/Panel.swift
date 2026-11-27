@@ -12,8 +12,6 @@ enum PanelState: Equatable {
     case confirmNote(String, shownAt: Double)
     /// A message with no action, such as the about-me note being saved.
     case notice(String)
-    /// K1b: Replace or its Undo was not shown to have finished; Copy original copies the text that was read.
-    case unsure(String, original: String)
 }
 
 struct PanelView: View {
@@ -21,7 +19,6 @@ struct PanelView: View {
     let feed: ResultFeed
     let insert: () -> Void
     let copy: () -> Bool
-    let copyOriginal: (String) -> Void
     let close: () -> Void
     let retry: (ActionMode) -> Void
     let deep: () -> Void
@@ -56,11 +53,6 @@ struct PanelView: View {
                 Text(message).foregroundStyle(.secondary).frame(maxWidth: .infinity)
                 Spacer()
                 buttons(primary: nil, closeLabel: "Done")
-            case let .unsure(message, original):
-                Spacer()
-                Text(message).foregroundStyle(.secondary).frame(maxWidth: .infinity)
-                Spacer()
-                buttons(primary: ("Copy original", { copyOriginal(original) }), closeLabel: "Done")
             }
         }
         .font(.body)

@@ -71,12 +71,9 @@ final class KeyboardSourceRulesTests: XCTestCase {
         let calls = matches(#"\blog\.(debug|info|notice|error|fault|log)\("#, in: text)
         XCTAssertGreaterThanOrEqual(calls.count, 4)
         // Numbers, 0/1 flags and fixed words (tags, outcomes, reasons) only.
-        let values = Set(["tag", "count", "lf", "hash", "reason", "steps", "took", "outcome", "units", "deleted",
-                          "inserted", "sent", "heldMS", "ok", "position", "known", "retries", "resyncs", "why", "k",
-                          "b0", "a0", "b1", "a1", "fb", "fa", "ch", "sb", "sa", "ss", "quietMS", "gate", "changes",
-                          "seen", "lb", "la", "ends", "late", "firstMS", "cancelled",
-                          "emptyMS", "empty", "lastChange", "firstEvent", "lastEvent", "tries",
-                          "focus", "deletedNow", "pr", "tot", "lk", "seenMS", "first", "done", "api", "spec", "kind", "keys"])
+        let values = Set(["tag", "count", "lf", "hash", "reason", "steps", "took", "outcome", "units",
+                          "position", "known", "why", "k", "b0", "a0", "b1", "a1", "fb", "fa", "ch", "sb", "sa", "ss",
+                          "firstMS", "pr", "tot", "seenMS", "first", "done", "api", "spec", "kind", "keys"])
         for range in calls {
             let line = lineText(ns, range)
             for m in matches(#"\\\(([A-Za-z_][A-Za-z0-9_.]*)"#, in: line) {
@@ -158,8 +155,7 @@ final class KeyboardSourceRulesTests: XCTestCase {
                       uses.joined())
     }
 
-    /// keyboard-ui 003: the one write is an assignment inside writeClipboard(), which Copy on the result card and (K1b)
-    /// Copy original after a Replace that was not proven call.
+    /// keyboard-ui 003: the one write, Copy on the result card, is an assignment inside copyResult().
     func testTheClipboardStringIsReadOnlyInReadClipboard() throws {
         var writes: [String] = []
         for (name, text) in try sources() {
@@ -173,12 +169,12 @@ final class KeyboardSourceRulesTests: XCTestCase {
             guard let read = body(of: "private func readClipboard()", in: ns) else {
                 XCTFail("\(name): readClipboard not found"); continue
             }
-            let copy = body(of: "private func writeClipboard(", in: ns)
+            let copy = body(of: "func copyResult()", in: ns)
             for r in uses {
                 let rest = ns.substring(from: r.location + r.length)
                 if rest.range(of: #"^\s*=(?!=)"#, options: .regularExpression) != nil {
                     XCTAssertTrue(copy.map { NSLocationInRange(r.location, $0) } == true,
-                                  "\(name): clipboard write outside writeClipboard: \(lineText(ns, r))")
+                                  "\(name): clipboard write outside copyResult: \(lineText(ns, r))")
                     writes.append("\(name): \(lineText(ns, r))")
                 } else {
                     XCTAssertTrue(NSLocationInRange(r.location, read),
@@ -650,21 +646,52 @@ final class KeyboardSourceRulesTests: XCTestCase {
         }
     }
 
-    /// K1b: the keys wait during the whole-field read, so the read runs on WholeRead's clock (20 s in all, a started
-    /// step always settles) instead of a fixed count of steps, and a cancel stops it only between steps.
+    /// One-pass whole-field read: the keys wait during the read, so it runs on WholeRead's clock (one time cap, a
+    /// started step always settles), cancels only between steps, and decides acceptance through WholeRead.accept.
     func testTheFieldReadIsCapped() throws {
         guard let text = try sources().first(where: { $0.name == "FieldText.swift" })?.text else {
             return XCTFail("FieldText.swift not found")
         }
         let ns = text as NSString
         let walk = body(of: "private static func walk(", in: ns).map { ns.substring(with: $0) } ?? ""
-        for needle in ["WholeRead.canStart(elapsed:", "if Task.isCancelled { return end(.cancelled) }", "BackWalk(cap:",
-                       "ForwardWalk(cap:"] {
+        for needle in ["WholeRead.canStart(elapsed:", "if Task.isCancelled { return end(.cancelled) }", "BackWalk()",
+                       "ForwardWalk()"] {
             XCTAssertTrue(walk.contains(needle), "FieldText.walk: \(needle)")
         }
         let read = body(of: "static func read(", in: ns).map { ns.substring(with: $0) } ?? ""
-        XCTAssertTrue(read.contains("WholeRead.refusal("), "FieldText.read: accepts only agreeing walks")
+        XCTAssertTrue(read.contains("WholeRead.accept("), "FieldText.read: decides acceptance through WholeRead.accept")
         XCTAssertTrue(matches(#"for _ in 0\.\.<\d"#, in: read + walk).isEmpty, "FieldText: a fixed count of steps or polls")
+    }
+
+    /// One-pass rework (Codex bug 4 gone by construction): Replace and Undo send N deleteBackward and one insertText
+    /// in a single synchronous block with no await, no timer, no check walk and no key lock.
+    func testReplaceIsSynchronousWithNoAwait() throws {
+        let all = try sources()
+        guard let fieldText = all.first(where: { $0.name == "FieldText.swift" })?.text,
+              let controller = all.first(where: { $0.name == "KeyboardViewController.swift" })?.text else {
+            return XCTFail("FieldText.swift or KeyboardViewController.swift not found")
+        }
+        let fns = fieldText as NSString
+        guard let replaceRange = body(of: "static func replace(", in: fns) else {
+            return XCTFail("FieldText.replace not found")
+        }
+        let replace = fns.substring(with: replaceRange)
+        XCTAssertFalse(replace.contains("async"), "FieldText.replace must be synchronous")
+        XCTAssertFalse(replace.contains("await"), "FieldText.replace must have no await between deletes and insert")
+        let del = (replace as NSString).range(of: "deleteBackward()")
+        let ins = (replace as NSString).range(of: "insertText(")
+        XCTAssertTrue(del.location != NSNotFound && ins.location != NSNotFound && del.location < ins.location,
+                      "FieldText.replace must send deletes then insert in one block")
+
+        let cns = controller as NSString
+        XCTAssertTrue(controller.contains("var isReadingField: Bool { readingCall != nil }"),
+                      "keys must never wait on Replace or Undo")
+        for declaration in ["func insertResult()", "func undoInsert()"] {
+            let fn = body(of: declaration, in: cns).map { cns.substring(with: $0) } ?? ""
+            XCTAssertFalse(fn.isEmpty, "\(declaration) not found")
+            XCTAssertFalse(fn.contains("await"), "\(declaration) must not await")
+            XCTAssertFalse(fn.contains("Task {"), "\(declaration) must not spawn an async write task")
+        }
     }
 
     private func lineText(_ ns: NSString, _ r: NSRange) -> String {

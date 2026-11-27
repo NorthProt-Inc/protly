@@ -12,10 +12,8 @@ struct StripState: Equatable {
     var deep = false
     /// The call failed before any text: the error line replaces the label, the glow stops.
     var error: ActionError?
-    /// K1b: the whole-field read has run past WholeRead.progressAfter (2 s); the keys still wait.
+    /// The whole-field read has run past WholeRead.progressAfter (2 s); the keys still wait.
     var readingLong = false
-    /// K1b: Replace (or its Undo) is writing and checking the field; the keys wait, and nothing can stop the deletes.
-    var writing = false
 }
 
 /// The progress strip in the bar's band (design Part 3, step 1): the operation and its target, an `xmark`, and a thin
@@ -38,8 +36,6 @@ struct ProgressStrip: View {
                     Text(error.message(deep: state.deep))
                         .font(.subheadline)
                         .lineLimit(2)
-                } else if state.writing {
-                    Text(verbatim: "Replacing the text…").font(.subheadline.weight(.medium))
                 } else {
                     label.font(.subheadline.weight(.medium)).accessibilityElement(children: .combine)
                     if state.readingLong {
@@ -62,14 +58,11 @@ struct ProgressStrip: View {
                     Text("Deep").fontWeight(.semibold).frame(minWidth: 44, minHeight: 44).contentShape(.rect)
                 }
             }
-            // The 44 pt frame is inside the label: with the plain style only the label takes taps. No Cancel while
-            // Replace writes: the deletes are already on their way.
-            if !state.writing {
-                Button(action: close) {
-                    Image(systemName: "xmark").frame(width: 44, height: 44).contentShape(.rect)
-                }
-                .accessibilityLabel("Cancel")
+            // The 44 pt frame is inside the label: with the plain style only the label takes taps.
+            Button(action: close) {
+                Image(systemName: "xmark").frame(width: 44, height: 44).contentShape(.rect)
             }
+            .accessibilityLabel("Cancel")
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("protly-strip")  // the simulator checks find the strip's texts by it (not spoken)
