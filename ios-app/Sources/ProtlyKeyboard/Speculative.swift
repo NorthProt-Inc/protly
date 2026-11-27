@@ -2,10 +2,10 @@ import Foundation
 import ProtlyCore
 
 /// F02c (owner decision 2026-11-22, speculative send): the call on the text the proxy's window shows, started at the
-/// tap while the whole-field read walks the cursor. Nothing it returns is shown or used until the read is proven whole
-/// and equal to `units`: then `relay` is the call's stream, its buffered updates first (partials are cumulative, so the
-/// newest one and the end are all that is kept). Otherwise it is cancelled at once, which ends the download (tokens
-/// saved). A long draft may therefore be billed twice; that is accepted.
+/// tap while the one-pass whole-field read walks the cursor. Nothing it returns is shown or used until the read is
+/// accepted whole and equals `units`: then `relay` is the call's stream, its buffered updates first (partials are
+/// cumulative, so the newest one and the end are all that is kept). Otherwise it runs until the read ends (up to
+/// WholeRead.total, 6 s) and is then cancelled. A long draft may therefore be billed twice; that is accepted.
 @MainActor
 final class Speculative {
     let mode: ActionMode

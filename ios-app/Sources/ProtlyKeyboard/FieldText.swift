@@ -12,10 +12,11 @@ enum FieldText {
     /// The read's record of the cursor (CursorReturn). Every change goes to `report` at once for Cancel.
     @MainActor
     final class Track {
-        private(set) var cursor = CursorReturn()
+        private(set) var cursor: CursorReturn
         private let report: (CursorReturn) -> Void
 
-        init(report: @escaping (CursorReturn) -> Void) {
+        init(cursor: CursorReturn = CursorReturn(), report: @escaping (CursorReturn) -> Void) {
+            self.cursor = cursor
             self.report = report
             report(cursor)
         }
@@ -91,6 +92,7 @@ enum FieldText {
 
     private enum WalkEnd {
         case done([UInt16])
+        case late
         case failed(String)
         case cancelled
     }
@@ -103,10 +105,11 @@ enum FieldText {
     /// One walk to the end (`back` false) or the start (`back` true). Stops on the first sign of lag, blank, misfit
     /// or timeout; `singleStep` runs only one step (FM's +1 probe at the end).
     private static func walk(_ p: UITextDocumentProxy, back: Bool, tag: String, start t0: TimeInterval,
-                             track: Track, progress: () -> Void, singleStep: Bool = false) async -> WalkEnd {
+                             track: Track, progress: () -> Void, singleStep: Bool = false,
+                             stopOnLate: Bool = true) async -> WalkEnd {
         var bw = BackWalk()
         var fw = ForwardWalk()
-        var steps = 0, firstMS = -1
+        var steps = 0, firstMS = -1, late = 0
         let w0 = uptime()
         func fits(_ wait: TimeInterval) -> Bool {
             WholeRead.canStart(elapsed: uptime() - t0, wait: stepCost(wait))
@@ -115,11 +118,12 @@ enum FieldText {
             let units: [UInt16], reason: String
             switch e {
             case .done(let u): units = u; reason = "done"
+            case .late: units = back ? bw.units : fw.units; reason = "late"
             case .failed(let why): units = back ? bw.units : fw.units; reason = why
             case .cancelled: units = []; reason = "cancelled"
             }
             let count = units.count, lf = WholeRead.lineFeeds(units), took = ms(since: w0)
-            log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) first=\(firstMS, privacy: .public)")
+            log.debug("read walk \(tag, privacy: .public) units=\(count, privacy: .public) lf=\(lf, privacy: .public) reason=\(reason, privacy: .public) steps=\(steps, privacy: .public) ms=\(took, privacy: .public) first=\(firstMS, privacy: .public) late=\(late, privacy: .public)")
             return e
         }
         func logStep(_ why: String, k: Int, from c: Ctx, to s: (changed: Bool, c: Ctx, seen: Int), ms took: Int) {
@@ -150,18 +154,24 @@ enum FieldText {
             track.sending()
             let s0 = uptime()
             let s = await step(p, by: back ? -k : k, wait: wait)
-            if steps == 1 { firstMS = ms(since: s0) }
+            let elapsed = uptime() - s0
+            let tot = Int(elapsed * 1000)
+            if steps == 1 { firstMS = tot }
+            let stepLate = s.changed && WholeRead.isLate(elapsed: elapsed)
+            if stepLate { late += 1 }
             let r = back ? bw.landed(changed: s.changed, before: s.c.before, after: s.c.after)
                 : fw.landed(changed: s.changed, before: s.c.before, after: s.c.after)
-            let pr = probing ? 1 : 0, ch = s.changed ? 1 : 0, tot = ms(since: s0), seenMS = s.seen
+            let pr = probing ? 1 : 0, ch = s.changed ? 1 : 0, seenMS = s.seen
             log.debug("read st \(tag, privacy: .public) s=\(steps, privacy: .public) k=\(k, privacy: .public) pr=\(pr, privacy: .public) ch=\(ch, privacy: .public) seen=\(seenMS, privacy: .public) tot=\(tot, privacy: .public)")
             if case .failed(let why, _) = r { logStep(why, k: k, from: c, to: s, ms: tot) }
             switch r {
             case .moved(let d):
                 track.landed(d, s.c.b)
+                if stopOnLate, stepLate { return end(.late) }
                 if singleStep { return end(.done(back ? bw.units : fw.units)) }
             case .done:
                 if back { track.landed(0, s.c.b) } else { track.reachedEnd(s.c.b) }
+                if stopOnLate, stepLate { return end(.late) }
                 return end(.done(back ? bw.units : fw.units))
             case .failed(let why, let moved):
                 track.landed(moved, s.c.b)
@@ -183,11 +193,11 @@ enum FieldText {
     }
 
     /// One-pass whole-field read (F, B1, R1, FM), decided purely by WholeRead.accept.
-    static func read(_ p: UITextDocumentProxy, record: @escaping (CursorReturn) -> Void,
-                     progress: () -> Void) async -> Outcome {
+    static func read(_ p: UITextDocumentProxy, cursor: CursorReturn = CursorReturn(),
+                     record: @escaping (CursorReturn) -> Void, progress: () -> Void) async -> Outcome {
         let t0 = uptime()
         let c0 = ctx(p)
-        let track = Track(report: record)
+        let track = Track(cursor: cursor, report: record)
         let sb = c0.before.count, sa = c0.after.count, ss = c0.s.utf16.count
         log.debug("read start b=\(sb, privacy: .public) a=\(sa, privacy: .public) s=\(ss, privacy: .public)")
         func finish(_ o: Outcome, _ reason: String, _ units: [UInt16] = []) -> Outcome {
@@ -207,7 +217,8 @@ enum FieldText {
         /// the keyboard can put the cursor back.
         func refuse(_ reason: String) async -> Outcome {
             if !track.cursor.isKnown, track.cursor.hasEnd, !Task.isCancelled {
-                if case .cancelled = await walk(p, back: false, tag: "fr", start: t0, track: track, progress: progress) {
+                if case .cancelled = await walk(p, back: false, tag: "fr", start: t0, track: track, progress: progress,
+                                                stopOnLate: false) {
                     return finish(.cancelled, "cancelled")
                 }
             }
@@ -227,6 +238,7 @@ enum FieldText {
         var pass = WholeRead.OnePass(first: .failed("unrun"), fromSelection: fromSelection)
         switch await walk(p, back: false, tag: "f", start: t0, track: track, progress: progress) {
         case .cancelled: return finish(.cancelled, "cancelled")
+        case .late: pass.clean = false
         case .failed(let why): pass.first = .failed(why)
         case .done(let first):
             pass.first = .done(first)
@@ -234,6 +246,7 @@ enum FieldText {
                 let end = ctx(p)
                 switch await walk(p, back: true, tag: "b1", start: t0, track: track, progress: progress) {
                 case .cancelled: return finish(.cancelled, "cancelled")
+                case .late: pass.clean = false
                 case .failed(let why): pass.back = .failed(why)
                 case .done(let back1):
                     pass.back = .done(back1)
@@ -245,6 +258,7 @@ enum FieldText {
                             switch await walk(p, back: false, tag: "fm", start: t0, track: track, progress: progress,
                                               singleStep: true) {
                             case .cancelled: return finish(.cancelled, "cancelled")
+                            case .late: pass.clean = false
                             case .failed(let why): pass.endProbe = .failed(why)
                             case .done(let mid): pass.endProbe = .done(mid)
                             }

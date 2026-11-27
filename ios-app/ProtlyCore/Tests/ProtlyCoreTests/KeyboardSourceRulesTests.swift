@@ -73,7 +73,7 @@ final class KeyboardSourceRulesTests: XCTestCase {
         // Numbers, 0/1 flags and fixed words (tags, outcomes, reasons) only.
         let values = Set(["tag", "count", "lf", "hash", "reason", "steps", "took", "outcome", "units",
                           "position", "known", "why", "k", "b0", "a0", "b1", "a1", "fb", "fa", "ch", "sb", "sa", "ss",
-                          "firstMS", "pr", "tot", "seenMS", "first", "done", "api", "spec", "kind", "keys"])
+                          "firstMS", "late", "pr", "tot", "seenMS", "first", "done", "api", "spec", "kind", "keys"])
         for range in calls {
             let line = lineText(ns, range)
             for m in matches(#"\\\(([A-Za-z_][A-Za-z0-9_.]*)"#, in: line) {
@@ -676,8 +676,9 @@ final class KeyboardSourceRulesTests: XCTestCase {
             return XCTFail("FieldText.replace not found")
         }
         let replace = fns.substring(with: replaceRange)
-        XCTAssertFalse(replace.contains("async"), "FieldText.replace must be synchronous")
-        XCTAssertFalse(replace.contains("await"), "FieldText.replace must have no await between deletes and insert")
+        let forbidden = #"\b(async|asyncAfter|Task|Timer|await)\b"#
+        XCTAssertTrue(matches(forbidden, in: replace).isEmpty,
+                      "FieldText.replace must be synchronous with no deferral")
         let del = (replace as NSString).range(of: "deleteBackward()")
         let ins = (replace as NSString).range(of: "insertText(")
         XCTAssertTrue(del.location != NSNotFound && ins.location != NSNotFound && del.location < ins.location,
@@ -689,9 +690,39 @@ final class KeyboardSourceRulesTests: XCTestCase {
         for declaration in ["func insertResult()", "func undoInsert()"] {
             let fn = body(of: declaration, in: cns).map { cns.substring(with: $0) } ?? ""
             XCTAssertFalse(fn.isEmpty, "\(declaration) not found")
-            XCTAssertFalse(fn.contains("await"), "\(declaration) must not await")
-            XCTAssertFalse(fn.contains("Task {"), "\(declaration) must not spawn an async write task")
+            XCTAssertTrue(matches(forbidden, in: fn).isEmpty,
+                          "\(declaration) must contain no async, asyncAfter, Task, Timer or await")
         }
+    }
+
+    /// Pins Codex bug 2 (`fromSelection`), late-step `clean` wiring and `late=` logging, Retry cursor continuation,
+    /// and Read clipboard exemption from `isWriteSettling`.
+    func testFieldReadWiresSelectionLateCursorAndReadClipboard() throws {
+        let all = try sources()
+        guard let fieldText = all.first(where: { $0.name == "FieldText.swift" })?.text,
+              let controller = all.first(where: { $0.name == "KeyboardViewController.swift" })?.text else {
+            return XCTFail("FieldText.swift or KeyboardViewController.swift not found")
+        }
+        let fns = fieldText as NSString
+        let read = body(of: "static func read(", in: fns).map { fns.substring(with: $0) } ?? ""
+        XCTAssertTrue(read.contains("let fromSelection = !c0.s.isEmpty"),
+                      "FieldText.read must derive fromSelection from the initial selection")
+        XCTAssertFalse(matches(#"WholeRead\.OnePass\([^\n]*fromSelection:\s*fromSelection"#, in: read).isEmpty,
+                       "FieldText.read must pass fromSelection into WholeRead.OnePass")
+        XCTAssertTrue(read.contains("pass.clean = false"),
+                      "FieldText.read must mark OnePass.clean false on a late walk")
+        let walk = body(of: "private static func walk(", in: fns).map { fns.substring(with: $0) } ?? ""
+        XCTAssertTrue(walk.contains("WholeRead.isLate("), "FieldText.walk must check WholeRead.isLate")
+        XCTAssertTrue(walk.contains(#"late=\(late"#), "FieldText.walk must log late= per walk")
+
+        let cns = controller as NSString
+        let act = body(of: "func act(", in: cns).map { cns.substring(with: $0) } ?? ""
+        XCTAssertTrue(act.contains("cursorReturn.begin(before:"),
+                      "act must continue cursorReturn on Retry with begin(before:)")
+        XCTAssertTrue(act.contains("cursor: cursorReturn"),
+                      "act must pass cursorReturn into FieldText.read")
+        XCTAssertTrue(act.contains("mode.protlyKey == .read"),
+                      "act must exempt the protly key's Read clipboard from isWriteSettling")
     }
 
     private func lineText(_ ns: NSString, _ r: NSRange) -> String {

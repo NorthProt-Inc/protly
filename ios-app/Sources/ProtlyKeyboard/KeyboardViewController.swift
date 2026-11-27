@@ -314,9 +314,11 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     /// requested nil = the protly key: the action that fits the field, or the clipboard when it is empty.
     func act(_ requested: ActionMode?) {
-        if requested != .in, isWriteSettling { return }  // no new field read while a write settles
+        let isReadClipboard = requested == .in
+            || (requested == nil && mode.protlyKey == .read && !proxyHasSelection && !textDocumentProxy.hasText)
+        if !isReadClipboard, isWriteSettling { return }  // no new field read while a write settles; Read never walks
         guard beginCall() else { return }
-        if requested == .in {
+        if isReadClipboard {
             readClipboard()
             return
         }
@@ -339,8 +341,10 @@ final class KeyboardViewController: KeyboardInputViewController {
             if f0.selected.isEmpty, !w0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 speculative = (call, Speculative(mode: ActionAPI.mode(forDraft: w0), text: w0))
             }
+            cursorReturn.begin(before: f0.before)
             let outcome = await FieldText.read(
-                textDocumentProxy, record: { [weak self] cursor in self?.cursorReturn = cursor },
+                textDocumentProxy, cursor: cursorReturn,
+                record: { [weak self] cursor in self?.cursorReturn = cursor },
                 progress: { [weak self] in self?.showReadProgress(call) })
             readEndedAt = now
             guard !Task.isCancelled else {
