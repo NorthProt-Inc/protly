@@ -1,0 +1,116 @@
+<!doctype html>
+<!--
+  Whole-field read page (HostApp.swift `-screen readweb`, UITests/WholeReadChecks.swift test5h_wholeweb). Offline.
+  One plain <textarea>. The host's buttons call fill(text, cursor) (a draft in the textarea, the caret at a UTF-16
+  offset, scrolled to its bottom), restoreCaret() (the caret back at the last fill's offset) and selectAllIn() (the
+  whole field selected). The page posts the textarea's UTF-16 length, line-feed count, FNV-1a hash and caret, never
+  its text.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="color-scheme" content="dark">
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; background: #000; color: #f2f2f2; overflow: hidden; }
+  body { font: 15px -apple-system, system-ui, sans-serif; }
+  .f {
+    display: block; box-sizing: border-box; width: 234px; height: 140px; margin: 6px 8px; padding: 4px 6px;
+    background: #000; color: #f2f2f2; border: 1px solid #333; border-radius: 6px; outline: none;
+    font: 15px -apple-system, system-ui, sans-serif; overflow-y: auto; resize: none;
+  }
+</style>
+</head>
+<body>
+<textarea id="textarea" class="f" aria-label="read textarea" autocapitalize="off" autocorrect="off"
+  spellcheck="false"></textarea>
+<script>
+"use strict";
+const field = document.getElementById("textarea");
+let fillCursor = 0;
+
+function post(msg) {
+  try { window.webkit.messageHandlers.protly.postMessage(msg); } catch (e) { /* not in the host */ }
+}
+
+// FNV-1a (32 bit) over UTF-16 units, 8 hex digits, as ProtlyCore WholeRead.fnv and WholeReadChecks.swift.
+function fnv(t) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < t.length; i++) {
+    h ^= t.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return (h >>> 0).toString(16).padStart(8, "0");
+}
+
+function caret() {
+  if (document.activeElement !== field) return null;
+  return [field.selectionStart, field.selectionEnd];
+}
+
+function shape() {
+  const t = field.value;
+  let lf = 0;
+  for (let i = 0; i < t.length; i++) if (t.charCodeAt(i) === 10) lf++;
+  return { len: t.length, lf, h: fnv(t), caret: caret() };
+}
+
+function rects() {
+  const b = field.getBoundingClientRect();
+  return { textarea: [b.left, b.top, b.width, b.height] };
+}
+
+let pending = false;
+function state() {
+  if (pending) return;
+  pending = true;
+  setTimeout(() => { pending = false; postState(); }, 30);
+}
+
+function postState() {
+  const s = { focus: (document.activeElement && document.activeElement.id) || "", textarea: shape() };
+  post({ kind: "state", json: JSON.stringify(s), rects: rects() });
+}
+
+field.addEventListener("focus", state);
+field.addEventListener("blur", state);
+field.addEventListener("input", state);
+document.addEventListener("selectionchange", state);
+setInterval(postState, 700);
+
+function fill(draft, cursor) {
+  fillCursor = cursor;
+  field.value = draft;
+  field.focus();
+  field.setSelectionRange(cursor, cursor);
+  // A tap at the field's bottom-right corner then lands at the end of the text.
+  field.scrollTop = field.scrollHeight;
+  state();
+  return true;
+}
+
+function restoreCaret() {
+  field.focus();
+  field.setSelectionRange(fillCursor, fillCursor);
+  state();
+  return true;
+}
+
+function selectAllIn() {
+  field.focus();
+  field.setSelectionRange(0, field.value.length);
+  state();
+  return true;
+}
+
+function clearAll() {
+  field.value = "";
+  postState();
+  return true;
+}
+
+window.addEventListener("load", postState);
+</script>
+</body>
+</html>

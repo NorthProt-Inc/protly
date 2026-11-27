@@ -3,7 +3,8 @@
 docs/plans/2026-10-30-typing-fixes.md, Sprint 004: dark-1, ret-*, menu-*, pad-*, and
 docs/plans/2026-10-30-keyboard-ui.md, Task 3.5: card-*, mem-stream, hit-1, bar-*, app-*, and
 fix/double-space-period and fix/pick-space (K4E), docs/research/2026-11-17-keyboard-diagnosis.md P4: dsp-*, and
-fix/keyboard-height (K2, P2): hb-*).
+fix/keyboard-height (K2, P2): hb-*, and
+K1b (fix/whole-field-read), the keyboard reads the whole field: wr-*).
 
 Usage: checks.py <dir> [--network-key] [--ran <entry>,<entry>...]
 
@@ -25,6 +26,7 @@ checks-raw.txt and rewrites checks.txt with the final lines. Prints `CHECKS`, th
 `CHECKS pass N fail N record N skip N` (plus ` not-run N` when any ID is NOT-RUN). Exit 1 when any line is FAIL.
 """
 
+import datetime
 import os
 import re
 import sys
@@ -59,8 +61,29 @@ PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
 HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
               "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
               "hb-card", "hb-cancel"]
+# One-pass whole-field read, Replace and Undo: wr-<host>-<case>. The test writes PASS or FAIL itself
+# (UITests/WholeReadChecks.swift); the same lists as WholeChecks there. Native hosts: UITextView (`uikit`) and SwiftUI
+# (`swiftui`); web host: plain `textarea`. Text with emoji is read on native hosts and refused on `textarea`.
+WHOLE_NATIVE_CASES = ("win", "mid", "sel", "swin", "smid", "ssel", "emoji", "x14k", "cancel")
+WHOLE_WEB_CASES = ("win", "swin", "emoji")
+WHOLE_WEB_HOSTS = ("textarea",)
+WHOLE_TRIES = {"win": 2, "swin": 3, "smid": 2, "ssel": 2}
+WHOLE_NATIVE_IDS = [f"wr-{h}-{c}" for h in ("uikit", "swiftui") for c in WHOLE_NATIVE_CASES]
+WHOLE_WEB_IDS = [f"wr-{h}-{c}" for h in WHOLE_WEB_HOSTS for c in WHOLE_WEB_CASES]
+# Pass rules checked against keyboard-log.txt (`resolve_whole_log`):
+# - accepted reads exact by hash (against UI test's `real=.../h<hash>`)
+# - refusals within the time cap (`WHOLE_CAP_MS`) with cursor position known (`known=1`)
+# - Replace and Undo keys-wait strictly under `WHOLE_MAX_KEYS_MS` (100 ms)
+# - `read ms` at most `WHOLE_SHORT_READ_MS` (2500 ms) on the short cases (`swin`, `smid`, `ssel`)
+# - everything else (`call done` timings, non-short read times, UI write times) recorded, not gated.
+WHOLE_REFUSALS = {("native", "x14k"), ("web", "emoji")}
+WHOLE_CANCELLED = {("native", "cancel")}
+WHOLE_SHORT_CASES = ("swin", "smid", "ssel")
+WHOLE_SHORT_READ_MS = 2500
+WHOLE_MAX_KEYS_MS = 100
+WHOLE_CAP_MS = 6500
 EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
-                + PERIOD_IDS + HEIGHT_IDS)
+                + PERIOD_IDS + WHOLE_NATIVE_IDS + WHOLE_WEB_IDS + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -76,14 +99,19 @@ METHOD_IDS = {
     "test5d_card": CARD_IDS,
     "test5e_bar": BAR_IDS,
     "test5f_period": PERIOD_IDS,
+    "test5g_wholenative": WHOLE_NATIVE_IDS,
+    "test5h_wholeweb": WHOLE_WEB_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
     "test9_height": HEIGHT_IDS,
 }
 # Methods that run only in a filtered run: without FILTERED=1 (run-shots.sh sets it with a `[shots:...]` filter) they
-# throw XCTSkip, so a full run marks their IDs NOT-RUN with this reason. test5f_period takes about 15 minutes, and full
-# runs already come close to run-shots.sh's MAIN_TEST_DEADLINE.
+# throw XCTSkip, so a full run marks their IDs NOT-RUN with this reason. test5f_period takes about 15 minutes, the
+# whole-read methods about 15 to 25 minutes each (reads of up to 20 s), and full runs already come close to
+# run-shots.sh's MAIN_TEST_DEADLINE.
 FILTERED_ONLY = {"test5f_period": "runs only in a filtered run (deadline)",
+                 "test5g_wholenative": "runs only in a filtered run (deadline)",
+                 "test5h_wholeweb": "runs only in a filtered run (deadline)",
                  "test9_height": "runs only in a filtered run (deadline)"}
 # Methods that write no ID of their own (Full Access, the probe) and the layout test.
 OTHER_METHODS ={"PhoneChecksUITests": ("test0_access", "test0_probe"), "KeyboardShotsUITests": ("testScenarios",)}
@@ -1250,6 +1278,153 @@ RESOLVERS = {"6.8-9": resolve_relaunch, "6.8-10": resolve_memory, **{i: resolve_
 NO_KEY = "no network key"
 
 
+KB_READ_LINE = re.compile(r"^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d+) .*\[com\.northprot\.protly:read\] (.*)$")
+
+
+def parse_kb_read(text):
+    """(epoch seconds, line) for each keyboard `read` log line; `log show` prints UTC on the CI runner."""
+    out = []
+    for raw in (text or "").splitlines():
+        m = KB_READ_LINE.match(raw)
+        if not m:
+            continue
+        t = datetime.datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=datetime.timezone.utc)
+        out.append((t.timestamp(), m.group(2)))
+    return out
+
+
+def kv(line, name):
+    m = re.search(r"(?:^| )" + re.escape(name) + r"=(\S+)", line)
+    return m.group(1) if m else None
+
+
+def _int(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def whole_shape(text):
+    """`<utf16 len>/<line feeds>/h<fnv>` of a text, as WholeChecks.Shape in UITests/WholeReadChecks.swift."""
+    raw = text.encode("utf-16-le")
+    h = 0x811C9DC5
+    for i in range(0, len(raw), 2):
+        h = ((h ^ int.from_bytes(raw[i:i + 2], "little")) * 0x01000193) & 0xFFFFFFFF
+    return f"{len(raw) // 2}/{text.count(chr(10))}/h{h:08x}"
+
+
+UI_MISS = re.compile(r"\(not as expected\)")
+WEB_UNDO_MISS = re.compile(r"(?:^| )t(\d+)=undo=timeout field=(\S+) \(not as expected\)")
+
+
+def web_undo_refusals(check):
+    """Tries whose only UI failure is an Undo that never came while the field kept the Replace result exactly.
+    WebKit shows a long Replace to the keyboard seconds late (run 597be68-225: 6-8 s for 335 units), so Undo's guard
+    sees the old text and refuses. Known limit, owner's choice 2026-11-27 (refuse, no new rule or wait). Returns the
+    set of such tries, or None when any other UI failure is in the line."""
+    found = set()
+    for m in WEB_UNDO_MISS.finditer(check.evidence):
+        t = m.group(1)
+        ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
+        reply = kv(ui.group(1), "reply") if ui else None
+        if not reply or m.group(2) != whole_shape("read " + reply):
+            return None
+        found.add(int(t))
+    return found if len(UI_MISS.findall(check.evidence)) == len(found) else None
+
+
+def resolve_whole_log(check, marks, kb_text):
+    """One-pass whole-field read log check for each try of a wr- line. Gates: accepted hash matches UI real=, refusals
+    within WHOLE_CAP_MS with known=1, Replace/Undo keys-wait < WHOLE_MAX_KEYS_MS (100 ms), short-case read ms <=
+    WHOLE_SHORT_READ_MS (2500 ms). Everything else is recorded, not gated. On web hosts an Undo refused with the Replace
+    result intact (`web_undo_refusals`) is recorded, not failed."""
+    host, case = check.id.split("-", 2)[1:]
+    kind = "web" if host in WHOLE_WEB_HOSTS else "native"
+    is_refusal = (kind, case) in WHOLE_REFUSALS
+    ui_ok = check.status == "PASS"
+    undo_refused = set()
+    if not ui_ok and kind == "web":
+        found = web_undo_refusals(check)
+        if found:
+            ui_ok, undo_refused = True, found
+    if kb_text is None:
+        problems, notes = ["no keyboard-log.txt"], []
+    else:
+        events = parse_kb_read(kb_text)
+        problems, notes = [], []
+        for t in range(1, WHOLE_TRIES.get(case, 1) + 1):
+            start = marks.get(f"{check.id}-t{t}")
+            if start is None:
+                problems.append(f"t{t}:no MARK")
+                continue
+            end = min((m for m in marks.values() if m > start), default=float("inf"))
+            lines = [line for at, line in events if start - 0.5 <= at < end]
+            done = [line for line in lines if line.startswith("read done ")]
+            if len(done) != 1:
+                problems.append(f"t{t}:no read done" if not done else f"t{t}:{len(done)} reads")
+                continue
+            outcome, reason = kv(done[0], "outcome"), kv(done[0], "reason")
+            took_s, h, known = kv(done[0], "ms"), kv(done[0], "h"), kv(done[0], "known")
+            took = _int(took_s)
+            calls = [line for line in lines if line.startswith("call done ")]
+            if calls:
+                notes.append(f"t{t}:call={kv(calls[0], 'first')}/{kv(calls[0], 'done')}ms/{kv(calls[0], 'spec')}")
+            if outcome != "accepted" and calls:
+                problems.append(f"t{t}:a card after a read that was {outcome}")
+            if (kind, case) in WHOLE_CANCELLED:
+                notes.append(f"t{t}:{outcome}/{took_s}ms")
+                if outcome != "cancelled":
+                    problems.append(f"t{t}:{outcome}/{reason} want cancelled")
+                continue
+            if is_refusal:
+                notes.append(f"t{t}:{outcome}/{reason}/{took_s}ms/known={known}")
+                if outcome != "refused":
+                    problems.append(f"t{t}:{outcome}/{reason} want refused")
+                else:
+                    if took is None or took > WHOLE_CAP_MS:
+                        problems.append(f"t{t}:ms={took_s} over cap {WHOLE_CAP_MS}")
+                    if known != "1":
+                        problems.append(f"t{t}:known={known} want 1")
+                continue
+            if outcome != "accepted":
+                notes.append(f"t{t}:{outcome}/{reason}/{took_s}ms")
+                problems.append(f"t{t}:{outcome}/{reason}")
+                continue
+            ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
+            real = kv(ui.group(1), "real") if ui else None
+            want_h = real.rsplit("/h", 1)[1] if real and "/h" in real else None
+            if not want_h:
+                problems.append(f"t{t}:no real hash")
+            elif h != want_h:
+                problems.append(f"t{t}:h={h} want {want_h}")
+            if case in WHOLE_SHORT_CASES and (took is None or took > WHOLE_SHORT_READ_MS):
+                problems.append(f"t{t}:read={took_s}ms over {WHOLE_SHORT_READ_MS}")
+            rep = [kv(line, "keys") for line in lines if line.startswith("write replace ")]
+            und = [kv(line, "keys") for line in lines if line.startswith("write undo ")]
+            notes.append(f"t{t}:{outcome}/{took_s}ms/keys={rep[0] if rep else 'none'},{und[0] if und else 'none'}")
+            if t in undo_refused:
+                if und:
+                    problems.append(f"t{t}:undo ran ({len(und)}) but the field kept the Replace result")
+                else:
+                    notes.append(f"t{t}:undo refused (web host lag, Replace result intact)")
+                    und = None
+            for wname, vals in (("replace", rep), ("undo", und)):
+                if vals is None:
+                    continue
+                if len(vals) != 1:
+                    problems.append(f"t{t}:{wname} keys missing ({len(vals)})")
+                    continue
+                k = _int(vals[0])
+                if k is None or k < 0 or k >= WHOLE_MAX_KEYS_MS:
+                    problems.append(f"t{t}:{wname} keys={vals[0]}ms want <{WHOLE_MAX_KEYS_MS}")
+    evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
+    if problems:
+        evidence += " log-problems=" + ",".join(problems)
+    status = "FAIL" if problems or not ui_ok else "PASS"
+    return Check(check.id, status, evidence)
+
+
 def guard_network(c, network_key):
     """A RULES item passes only through its model output; with the key a missing key is the CI's failure."""
     if c.id in RULES and c.status == "PASS":
@@ -1289,6 +1464,12 @@ def assemble(checks_text, log_text, mem_text, network_key=False, ran=None, run_d
         resolver = RESOLVERS.get(check_id)
         by_id[check_id] = (resolver(c, marks, samples, run_dir) if resolver
                            else unreadable(check_id, f"unresolved PENDING {c.evidence}"))
+    if run_dir is not None:
+        kb_text = read(os.path.join(run_dir, "keyboard-log.txt"))
+        for check_id, c in list(by_id.items()):
+            if check_id in WHOLE_NATIVE_IDS + WHOLE_WEB_IDS and c.status in ("PASS", "FAIL") \
+                    and not c.evidence.startswith("unreadable"):
+                by_id[check_id] = resolve_whole_log(c, marks, kb_text)
     for check_id, c in list(by_id.items()):
         if c.evidence.startswith("unreadable") or c.status not in ("PASS", "SKIP"):
             continue

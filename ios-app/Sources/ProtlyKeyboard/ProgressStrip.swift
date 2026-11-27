@@ -12,6 +12,8 @@ struct StripState: Equatable {
     var deep = false
     /// The call failed before any text: the error line replaces the label, the glow stops.
     var error: ActionError?
+    /// The whole-field read has run past WholeRead.progressAfter (2 s); the keys still wait.
+    var readingLong = false
 }
 
 /// The progress strip in the bar's band (design Part 3, step 1): the operation and its target, an `xmark`, and a thin
@@ -36,7 +38,9 @@ struct ProgressStrip: View {
                         .lineLimit(2)
                 } else {
                     label.font(.subheadline.weight(.medium)).accessibilityElement(children: .combine)
-                    if slow, let line = state.label.slowLine(deep: state.deep) {
+                    if state.readingLong {
+                        Text(verbatim: "Reading the whole text…").font(.footnote).foregroundStyle(.secondary)
+                    } else if slow, let line = state.label.slowLine(deep: state.deep) {
                         Text(line).font(.footnote).foregroundStyle(.secondary)
                     }
                 }

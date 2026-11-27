@@ -56,6 +56,10 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// would land mid-text and join the text sent.
     private var readingCall: Int?
     var isReadingField: Bool { readingCall != nil }
+    /// The user typed or moved the cursor since the read ended: Replace becomes copy-only.
+    private var touchedSinceRead = false
+    /// systemUptime when the last field read ended: host callbacks for the read's own moves come right after it.
+    private var readEndedAt: Double = 0
     /// Cancel or a hide came while a read step was on its way: the read lets it settle, then puts the cursor back.
     private var restoreWhenReadEnds = false
     /// Read clipboard's text for the call on screen: Retry sends it again instead of reading the clipboard, which may
@@ -70,6 +74,9 @@ final class KeyboardViewController: KeyboardInputViewController {
     private var cursorReturn = CursorReturn()
     /// Text protly inserted and what it replaced, for Undo.
     private var lastInsert: (inserted: String, original: String)?
+    /// The last synchronous write (Replace, Undo, Insert): no new field read starts and host callbacks count as the
+    /// write's echo until WholeRead.replaceSettle passes.
+    private var lastWrite: (at: Double, deletes: Int, inserted: Int)?
     /// LearnedWords.changes at the last save (Words.swift). Per controller: each one loads its own copy.
     var savedChanges = 0
 
@@ -82,6 +89,7 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     deinit {
         actionTask?.cancel()
+        // A speculative call still held goes with the controller: Speculative's deinit cancels it.
     }
 
     override func viewDidLoad() {
@@ -158,6 +166,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     // MARK: Typing
 
     func typeLetter(_ letter: Character) {
+        noteTouched(byHost: false)
         dismissFailedStrip()
         endUndo()
         noticeFieldMoved()
@@ -305,8 +314,11 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     /// requested nil = the protly key: the action that fits the field, or the clipboard when it is empty.
     func act(_ requested: ActionMode?) {
+        let isReadClipboard = requested == .in
+            || (requested == nil && mode.protlyKey == .read && !proxyHasSelection && !textDocumentProxy.hasText)
+        if !isReadClipboard, isWriteSettling { return }  // no new field read while a write settles; Read never walks
         guard beginCall() else { return }
-        if requested == .in {
+        if isReadClipboard {
             readClipboard()
             return
         }
@@ -316,12 +328,25 @@ final class KeyboardViewController: KeyboardInputViewController {
         let call = nextCall()
         mode.strip = StripState(call: call, action: action, label: tapped ?? BarAction.call(action, text: ""))
         readingCall = call
+        timing = CallTiming(call: call, tappedAt: now)
         actionTask = Task { [weak self] in
             guard let self else { return }
             defer { if readingCall == call { readingCall = nil } }
             guard !Task.isCancelled else { return }  // Cancel or a hide came first: never move the cursor
-            cursorReturn.begin(before: textDocumentProxy.documentContextBeforeInput ?? "")
-            let field = await FieldText.read(textDocumentProxy) { [weak self] move in self?.record(move) }
+            touchedSinceRead = false
+            defer { dropSpeculative(of: call) }
+            // Speculative call on the window at the tap; adopted iff the accepted read equals it, else cancelled.
+            let f0 = observed()
+            let w0 = f0.before + f0.after
+            if f0.selected.isEmpty, !w0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                speculative = (call, Speculative(mode: ActionAPI.mode(forDraft: w0), text: w0))
+            }
+            cursorReturn.begin(before: f0.before)
+            let outcome = await FieldText.read(
+                textDocumentProxy, cursor: cursorReturn,
+                record: { [weak self] cursor in self?.cursorReturn = cursor },
+                progress: { [weak self] in self?.showReadProgress(call) })
+            readEndedAt = now
             guard !Task.isCancelled else {
                 // Cancelled mid-step: the step has settled now, so the cursor can go back over exactly what landed.
                 if restoreWhenReadEnds {
@@ -330,29 +355,75 @@ final class KeyboardViewController: KeyboardInputViewController {
                 }
                 return
             }
-            guard let field else {
-                // Nothing to send: put back what the read moved over (whitespace) at once, no Cancel will.
-                restoreCursor()
+            let field: (text: String, isSelection: Bool)
+            switch outcome {
+            case .text(let text, let isSelection):
+                field = (text, isSelection)
+            case .cancelled:
+                putCursorBack()
+                return
+            case .empty:
+                putCursorBack()
                 mode.strip = nil
                 if requested == nil { readClipboard() }
                 return
-            }
-            if field.isSelection { cursorReturn.clear() }
-            // The action comes from the text read here (the whole field or the selection), not from the bar's view of it.
-            let action = ActionAPI.mode(forDraft: field.text)
-            // Text left after the cursor = only a prefix was read: Replace would glue the result to the rest. No advice
-            // to select: a selection read is cut too, and its card only copies (FieldGuard.copyOnly).
-            if !field.isSelection, !(textDocumentProxy.documentContextAfterInput ?? "").isEmpty {
+            case .refused:
+                putCursorBack()
                 mode.strip = nil
-                mode.panel = .failed("Could not read the whole text.", retry: action)
+                mode.panel = .failed(Self.refusedText, retry: action)
                 return
             }
-            run(ActionCall(mode: action, text: field.text, original: field.text, isSelection: field.isSelection), call: call)
+            if field.isSelection { cursorReturn.clear() }
+            let draftAction = ActionAPI.mode(forDraft: field.text)
+            let sent = ActionCall(mode: draftAction, text: field.text, original: field.text, isSelection: field.isSelection)
+            if let held = speculative, held.call == call, !field.isSelection, held.spec.mode == draftAction,
+               held.spec.matches(field.text) {
+                speculative = nil
+                timing?.spec = "used"
+                timing?.speculative = held.spec
+                run(sent, call: call, adopting: held.spec)
+            } else {
+                dropSpeculative(of: call)
+                run(sent, call: call)
+            }
         }
     }
 
+    /// Timing for the CI logs (FieldText.logCall), recorded and not gated.
+    private struct CallTiming {
+        let call: Int
+        let tappedAt: Double
+        var firstAt: Double?
+        var startedAt: Double?
+        var apiMS = -1
+        var speculative: Speculative?
+        var spec = "none"
+    }
+
+    private var timing: CallTiming?
+    private var speculative: (call: Int, spec: Speculative)?
+
+    /// Cancels the speculative call (of `call` only, when given) when it is not adopted.
+    private func dropSpeculative(of call: Int? = nil) {
+        guard let held = speculative, call == nil || held.call == call else { return }
+        held.spec.cancel()
+        speculative = nil
+        if timing?.call == held.call, timing?.spec == "none" { timing?.spec = "cancelled" }
+    }
+
+    /// The panel after a read that could not be accepted whole. Never "Select all": selectedText holds only about
+    /// 43 units of a select all (P1a cause 3).
+    static let refusedText = "Could not read the whole text. Copy it, then use Read clipboard."
+
+    /// The strip's second line once the read runs past WholeRead.progressAfter (set once per call).
+    private func showReadProgress(_ call: Int) {
+        guard var strip = mode.strip, strip.call == call, !strip.readingLong else { return }
+        strip.readingLong = true
+        mode.strip = strip
+    }
+
     /// Retry on the strip, a panel or the card: the same call again. Read sends the same text again; the field
-    /// actions read the field again (a Retry after a cut-short read continues from where it stopped, CursorReturn).
+    /// actions read the whole field again.
     /// A failed Deep retries deep, on the same text.
     func retry(_ action: ActionMode) {
         if let again = onScreen?.deepRetry, again.mode == action {
@@ -385,6 +456,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         refreshMode()
         // Every path after this shows its own strip or panel: a request still running must not replace it later.
         actionTask?.cancel()
+        dropSpeculative()
         if mode.panel != nil { mode.panel = nil }
         guard hasFullAccess else {
             // F1: say why instead of a failed call (the bar shows the outlined lock pill).
@@ -394,15 +466,6 @@ final class KeyboardViewController: KeyboardInputViewController {
             return false
         }
         return true
-    }
-
-    /// One move of the field read, into the record Cancel uses.
-    private func record(_ move: FieldText.Move) {
-        switch move {
-        case .sending(let chunk): cursorReturn.sending(chunk)
-        case .applied(let before): cursorReturn.applied(before: before)
-        case .notApplied: cursorReturn.notApplied()
-        }
     }
 
     /// Typing after a call failed before any text: the error has been read, the bar comes back. The cursor is the
@@ -447,7 +510,9 @@ final class KeyboardViewController: KeyboardInputViewController {
     }
 
     /// One call: the strip at once, the card at the first text, the result or the error at the end (design Part 3).
-    private func run(_ sent: ActionCall, call: Int? = nil) {
+    /// `adopting`: the speculative call whose updates are this call's (F02c), instead of a new call. The task holds it
+    /// while it reads them.
+    private func run(_ sent: ActionCall, call: Int? = nil, adopting: Speculative? = nil) {
         let call = call ?? nextCall()
         onScreen = sent
         let action = sent.mode, original = sent.original, isSelection = sent.isSelection, deep = sent.profile == .deep
@@ -459,11 +524,18 @@ final class KeyboardViewController: KeyboardInputViewController {
         let strip = StripState(call: call, action: action, label: label, deep: deep)
         if mode.strip != strip { mode.strip = strip }
         actionTask?.cancel()
+        if adopting == nil, timing?.call == call { timing?.startedAt = now }
         actionTask = Task { [weak self] in
+            // An adopted call's download stops with this task, however it ends (code review: Cancel between two updates
+            // left it running, its relay still held by the timing record).
+            defer { adopting?.cancel() }
             // self is bound per update, never before the loop: a torn-down controller is not held for up to 240 s. The
             // cancel check stops a late update from bringing a card back after Cancel or after a Retry replaced this task.
-            for await update in ActionClient.run(action, text: sent.text, profile: sent.profile) {
+            for await update in adopting?.relay ?? ActionClient.run(action, text: sent.text, profile: sent.profile) {
                 guard let self, !Task.isCancelled else { return }
+                if let t = timing, t.call == call, t.apiMS < 0, let started = t.startedAt {
+                    timing?.apiMS = Int((now - started) * 1000)
+                }
                 show(update, feed: callFeed, card: CardState(call: call, action: action, label: label, original: original,
                                                          isSelection: isSelection, deep: deep, shownAt: now))
                 // At most 20 redraws of the card's text a second: meanwhile the stream keeps only the newest partial
@@ -484,6 +556,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         case .partial(let text):
             feed.partial = text
             if openCard != nil { return }
+            if timing?.call == fresh.call, timing?.firstAt == nil { timing?.firstAt = now }
             // A card read from a selection opens copy-only: it never writes.
             var card = fresh
             card.copyOnly = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: nil)
@@ -495,9 +568,15 @@ final class KeyboardViewController: KeyboardInputViewController {
             card.phase = .done
             // P10: typed or moved during the call, or text selected: the result stays, only Copy is offered.
             card.copyOnly = FieldGuard.copyOnly(
-                card.action, original: card.original, isSelection: card.isSelection, field: observed())
+                card.action, original: card.original, isSelection: card.isSelection, field: observed()) ?? touchedCopyOnly(card)
             mode.strip = nil
             mode.panel = .card(card)
+            if let t = timing, t.call == card.call {
+                let ms = { (at: Double) in Int((at - t.tappedAt) * 1000) }
+                FieldText.logCall(first: ms(t.firstAt ?? now), done: ms(now), api: t.speculative?.firstMS ?? t.apiMS,
+                                  spec: t.spec)
+                timing = nil
+            }
         case .failed(let error):
             guard var card = openCard else {
                 // No text yet: the error replaces the strip's label, the keys stay, no card opens.
@@ -531,7 +610,8 @@ final class KeyboardViewController: KeyboardInputViewController {
         guard var card = openCard, card.primary != nil, AboutMe.canSave(shownAt: card.shownAt, now: now) else { return }
         // The user may have moved the cursor, edited or selected since: never delete the wrong text (P10), never type
         // over a selection (P1a cause 3). A selection card never gets here (no primary), but the check covers it too.
-        if let why = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: observed()) {
+        if let why = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: observed())
+            ?? touchedCopyOnly(card) {
             card.copyOnly = why
             mode.panel = .card(card)
             return
@@ -541,9 +621,13 @@ final class KeyboardViewController: KeyboardInputViewController {
         if card.action == .in {
             // Read: the reply goes in at the cursor (no selection: the check above).
             p.insertText(result)
+            lastWrite = (self.now, 0, result.utf16.count)
             lastInsert = (result, "")
         } else {
+            let t0 = self.now
             FieldText.replace(card.original, with: result, p)
+            FieldText.logWrite("replace", keys: Int((self.now - t0) * 1000))
+            lastWrite = (self.now, card.original.count, result.utf16.count)
             lastInsert = (result, card.original)
         }
         cursorReturn.clear()
@@ -552,6 +636,17 @@ final class KeyboardViewController: KeyboardInputViewController {
         mode.panel = nil
         readInput = nil
         refreshField()
+    }
+
+    /// The user typed or moved the cursor after the read: Replace would act on the window only.
+    private func touchedCopyOnly(_ card: CardState) -> FieldGuard.CopyOnly? {
+        card.action != .in && !card.isSelection && touchedSinceRead ? .fieldChanged : nil
+    }
+
+    /// A key, or a host callback that is not the read's own (more than 1 s after it ended), after the read.
+    private func noteTouched(byHost: Bool) {
+        guard !isReadingField, !byHost || !WriteGrace.isReadEcho(elapsed: now - readEndedAt) else { return }
+        touchedSinceRead = true
     }
 
     /// Copy on the card: the one write to the pasteboard. false when the tap came too soon after the card appeared.
@@ -579,15 +674,25 @@ final class KeyboardViewController: KeyboardInputViewController {
     func undoInsert() {
         guard let l = lastInsert else { return }
         let field = observed()
-        guard FieldGuard.canUndo(l.inserted, before: field.before, selected: field.selected) else {
+        // A Replace left the cursor at the field's end: Undo needs it there still.
+        let can = l.original.isEmpty ? FieldGuard.canUndo(l.inserted, before: field.before, selected: field.selected)
+            : FieldGuard.canUndoReplace(l.inserted, before: field.before, after: field.after, selected: field.selected)
+        guard can else {
             endUndo()  // the cursor moved, the text changed or text is selected since Insert
             refreshField()  // the bar stops offering Undo
             return
         }
-        for _ in l.inserted { textDocumentProxy.deleteBackward() }
-        textDocumentProxy.insertText(l.original)
-        watch.forget()
         endUndo()
+        if l.original.isEmpty {
+            for _ in l.inserted { textDocumentProxy.deleteBackward() }
+            lastWrite = (now, l.inserted.count, 0)
+        } else {
+            let t0 = now
+            FieldText.replace(l.inserted, with: l.original, textDocumentProxy)
+            FieldText.logWrite("undo", keys: Int((now - t0) * 1000))
+            lastWrite = (now, l.inserted.count, l.original.utf16.count)
+        }
+        watch.forget()
         refreshField()
     }
 
@@ -605,6 +710,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     private func restoreCursor() {
         actionTask?.cancel()
         actionTask = nil
+        dropSpeculative()
         if isReadingField, cursorReturn.isMoving {
             // A step is on its way: moving back now could count a step the host drops, or miss one it applies late.
             // The read settles it (at most 1 s, the keys still wait) and then puts the cursor back.
@@ -615,18 +721,30 @@ final class KeyboardViewController: KeyboardInputViewController {
         putCursorBack()
     }
 
-    /// Back over the read's settled steps, while the text they moved over is still just before the cursor.
+    /// Back to where the user had the cursor, while the read's record knows where that is and the field is unchanged.
     private func putCursorBack() {
         let back = cursorReturn.back(before: textDocumentProxy.documentContextBeforeInput ?? "")
+        let known = cursorReturn.isKnown
         cursorReturn.clear()
-        guard back > 0 else { return }
-        FieldText.restore(back, textDocumentProxy)
+        FieldText.restore(back, known: known, textDocumentProxy)
+        guard back != 0 else { return }
         watch.forget()
     }
 
     private func endUndo() {
         lastInsert = nil
         if mode.canUndo { mode.canUndo = false }
+    }
+
+    private var isWriteSettling: Bool {
+        guard let w = lastWrite else { return false }
+        return WriteGrace.isOwn(elapsed: now - w.at, deletes: w.deletes, inserted: w.inserted)
+    }
+
+    /// A host callback after protly's own write has settled: the user or host changed the field, so Undo ends.
+    private func endUndoIfTouched() {
+        guard lastInsert != nil, !isWriteSettling else { return }
+        endUndo()
     }
 
     /// Which action the bar and the protly key offer for the field text around the cursor, and whether new text was
@@ -684,6 +802,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     // MARK: KeyboardKit text calls: commit the word first
 
     override func insertText(_ text: String) {
+        noteTouched(byHost: false)
         dismissFailedStrip()
         commitWord()  // Return after a word: the word is already in the field, so only "\n" follows it
         let overSelection = proxyHasSelection
@@ -695,6 +814,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     }
 
     override func deleteBackward() {
+        noteTouched(byHost: false)
         dismissFailedStrip()
         commitWord()
         session.forgetLast()
@@ -711,6 +831,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     }
 
     override func deleteBackward(times: Int) {
+        noteTouched(byHost: false)
         dismissFailedStrip()
         commitWord()
         session.forgetLast()
@@ -733,6 +854,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     }
 
     override func adjustTextPosition(by offset: Int) {
+        noteTouched(byHost: false)
         commitWord()
         session.forgetLast()
         endUndo()
@@ -787,12 +909,16 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     override func textDidChange(_ textInput: UITextInput?) {
         super.textDidChange(textInput)
+        endUndoIfTouched()
+        noteTouched(byHost: true)
         noticeFieldMoved()
         refreshField()
     }
 
     override func selectionDidChange(_ textInput: UITextInput?) {
         super.selectionDidChange(textInput)
+        endUndoIfTouched()
+        noteTouched(byHost: true)
         noticeFieldMoved()
         refreshField()
     }

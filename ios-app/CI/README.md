@@ -69,9 +69,9 @@ After the layout scenarios, `UITests/PhoneChecksUITests.swift` runs the phone ch
 `test0_access`, `test0_probe` (only with `[probe]` in the commit message; Sprint 002's probe since then), `test1_68`,
 `test2_ws`, `test3_85offline`, `test4_memory`, `test5_icon`, the typing-fixes methods `test5a_web`, `test5b_menu` and
 `test5c_pad`, the keyboard-ui methods `test5d_card` and `test5e_bar` (below), `test5f_period` (the double-space
-period, below; only in a filtered run), then the network groups `test6_85net` and `test7_77` (below), and
-`test9_height` (the keyboard's height on every presentation path, below; only in a filtered run); learned words carry
-over between them.
+period, below; only in a filtered run), `test5g_wholenative` and `test5h_wholeweb` (the whole-field read, below; only
+in a filtered run), then the network groups `test6_85net` and `test7_77` (below), and `test9_height` (the keyboard's
+height on every presentation path, below; only in a filtered run); learned words carry over between them.
 
 - `UITests/Driver.swift`: the shared helpers. Text is typed by coordinate: Hangul as its Dubeolsik keys
   (ProtlyCore `KeyEncoder`, linked into the UI tests), capitals and shifted jamo with a shift tap, symbols on the
@@ -138,8 +138,9 @@ and the container app's about-me note: 6.8-11 (its Translate part runs inside `t
   (case-insensitive: Vision reads the semibold `Insert` as `insert`) stays the fallback.
 - **Deadlines.** Each method has an XCTest time allowance (`PhoneChecksUITests.allowance`, `-test-timeouts-enabled`),
   the network groups stop starting items two minutes before theirs, `run-shots.sh` stops the main test run after
-  65 minutes (`with_deadline`; run 53, on a slow runner, ran past the earlier 50 in test7_77), and the build
-  step's 85-minute timeout (job: 95) leaves the publish steps time to run. The
+  75 minutes (`with_deadline`; run 53, on a slow runner, ran past the earlier 50 in test7_77; K1b's whole-field read
+  adds a few seconds a call, and run 7cdefa4-180 reached 65 in test7_77), and the build step's 95-minute timeout
+  (job: 105) leaves the publish steps time to run. The
   step log prints each method, each CHECK's ID and status, request counts and a heartbeat.
 - **Allow Paste.** The prompt is a SpringBoard alert. The test taps `Allow Paste` in SpringBoard and touches nothing
   of the app under test meanwhile: the keyboard is blocked in its clipboard read until the prompt is answered, and a
@@ -323,6 +324,32 @@ Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis br
   when iOS changes its look with nothing the keyboard can see (a hide and show after an Emoji round trip, about 1 in
   16; a fresh launch, about 1 in 45) or sends no became-active on a return (about 1 in 64). Any other FAIL, or a band
   of 35, is a regression.
+
+## Whole-field read checks (one-pass read)
+
+Code: `UITests/WholeReadChecks.swift`. The host's `rfill-1`..`rfill-6` buttons (`HostApp.swift` `WholeDrafts`, with
+`-wholefills 1` or on `-screen readweb`) put a draft in the field starting with `protly-stub read`, so the CI stub
+answers `read <utf16>/<lf>/h<fnv>` (FNV-1a 32 over UTF-16 units). The test writes PASS or FAIL itself; `checks.py` then
+checks each try against `keyboard-log.txt` (`resolve_whole_log`).
+
+- **Filtered runs only**, as `test5f_period`: `[shots:PhoneChecksUITests/test5g_wholenative]` (`uikit` UITextView and
+  `swiftui` TextField) and `[shots:PhoneChecksUITests/test5h_wholeweb]` (`read-probe.html`: plain `textarea`).
+- **Matrix** (`wr-<host>-<case>`):
+  - `uikit`, `swiftui`: `win` (335 units, 2 tries), `mid` (335, cursor at 112), `sel` (335, select all), `swin` (39,
+    3 tries), `smid` (39, cursor at 26, 2 tries), `ssel` (39, select all, 2 tries), `emoji` (460 with 10 emoji),
+    `x14k` (14 055, refusal within the time cap), `cancel` (335 mid-text, Cancel on the strip after 2 s).
+  - `textarea`: `win` (2 tries), `swin` (3 tries), `emoji` (refusal: web moves by characters).
+- **Pass rules**: accepted reads exact by hash (UI reply and keyboard log); refusals within the time cap (`6500` ms)
+  with the cursor back (`known=1` and `caret-left == caret`); field exact after Replace and Undo by the UI test's own
+  read; Replace and Undo keys-wait under 100 ms; `read ms` at most 2500 on short cases (`swin`, `smid`, `ssel`);
+  everything else (`call done` timings, non-short read times, UI write times) recorded, not gated.
+- **Known limit, web Undo** (owner's choice 2026-11-27: refuse, no new rule or wait): WebKit shows a long Replace to
+  the keyboard seconds late (run 597be68-225: 6-8 s for 335 units), so Undo's guard sees the old text and refuses
+  (run 1013a0a-228, `wr-textarea-win`). On `textarea` an Undo timeout PASSes only when the field still holds exactly
+  the Replace result (`read <reply>`) and the keyboard logged no `write undo`; any other UI failure stays a FAIL
+  (`web_undo_refusals`).
+- `test_checks.py` (`WholeReadTests`) keeps the Swift lists, tries and draft lengths equal to `checks.py` and
+  `HostApp.swift`.
 
 ## Reading a run without GitHub access
 
