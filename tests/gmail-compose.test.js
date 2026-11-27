@@ -123,6 +123,27 @@ test('a failure keeps the Korean and names the problem', async () => {
   assert.match(note().textContent, /Native host not reachable/);
 });
 
+test('the write check reads every line before the signature: a typed line left next to it fails the check, the draft comes back', async () => {
+  const { inline, reply, note } = setup();
+  // Enter after the last line: the signature's block starts with the empty line the caret sat on.
+  inline.innerHTML = '가나다<div>라마바</div><div>사아자</div><div><br><div><br></div><span class="gmail_signature_prefix">-- </span><br><div class="gmail_signature">Sig</div></div>';
+  const sigBlock = inline.lastChild;
+  const prefix = sigBlock.querySelector('.gmail_signature_prefix');
+  // A typed line the write did not take, next to the signature when the translation lands.
+  const left = document.createTextNode('남은 줄');
+  inline.addEventListener('input', () => sigBlock.prepend(left, document.createElement('br')), { once: true });
+  translate(inline);
+  await reply(ok('EN1\nEN2\nEN3'));
+  assert.match(note().textContent, /Could not write the translation into the email/);
+  const text = nodesToText([inline]);
+  assert.doesNotMatch(text, /EN\d/);
+  assert.match(text, /^가나다\n라마바\n사아자\n/);
+  // The restore takes out only what the write put in: the line the check caught stays where it was.
+  assert.match(text, /남은 줄/);
+  assert.equal(left.parentNode, sigBlock);
+  assert.ok(left.compareDocumentPosition(prefix) & left.DOCUMENT_POSITION_FOLLOWING); // still before the signature
+});
+
 test('a failed Opus retry keeps the preview controls', async () => {
   const { inline, reply, note, buttonIn } = setup();
   translate(inline);

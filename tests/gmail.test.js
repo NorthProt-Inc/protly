@@ -20,7 +20,20 @@ test('composeOf finds the inline reply and the dialog compose', () => {
   assert.ok(composeOf(inline).querySelector(GSEL.send));
 });
 
-import { userNodes, nodesToText, textToNodes, replaceUserNodes, hasMedia } from '../src/content/gmail/body.js';
+import { userNodes, nodesToText, textToNodes, replaceUserNodes, hasMedia, textBeforeBoundary } from '../src/content/gmail/body.js';
+
+test('textBeforeBoundary reads the whole body in document order up to the first quote or signature block', () => {
+  const at = (html) => textBeforeBoundary(new JSDOM(`<body><div id="b">${html}</div></body>`).window.document.getElementById('b'));
+  const norm = (s) => s.replace(/\s+/g, ' ').trim();
+  // The last line in the signature's block (Chrome, no Enter after it) is read too.
+  assert.equal(norm(at('가나다<div>라마바</div><div>사아자<br><div><br></div><span class="gmail_signature_prefix">-- </span><br><div class="gmail_signature">Sig</div></div>')), '가나다 라마바 사아자');
+  assert.equal(norm(at('가나다<div>라마바<br><div class="gmail_quote">old 인용</div></div>')), '가나다 라마바');
+  // Leaving a block ends its line: text after it is a line of its own.
+  assert.equal(norm(at('<div>가나다</div>라마바<br><div class="gmail_quote">old</div>')), '가나다 라마바');
+  // No boundary: the whole body. Script and style are not text.
+  assert.equal(norm(at('하나<div>둘<style>p{}</style><script>x()</script></div>')), '하나 둘');
+  assert.equal(at('<br>'), '\n');
+});
 
 test('user part stops before the signature and its blank separator lines', () => {
   const body = load().querySelector(GSEL.body);

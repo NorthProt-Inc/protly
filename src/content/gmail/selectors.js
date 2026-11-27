@@ -8,7 +8,8 @@ export const GSEL = {
   account: 'a[aria-label^="Google Account:"]',
   // Blocks in a compose body that are not the user's own text and must never be rewritten. A bare
   // <blockquote> is not one: Gmail's "Indent more" wraps the user's own paragraph in it.
-  boundary: '.gmail_quote, .gmail_signature, .gmail_signature_prefix',
+  // Quote and signature blocks. Not a bare blockquote: Gmail's Indent makes one inside the user's own text.
+  boundary: '.gmail_quote, .gmail_signature, .gmail_signature_prefix, [data-smartmail="gmail_signature"], .gmail_extra, .gmail_attr, blockquote[type="cite"]',
   // Stripped from received messages when reading the thread (other mail clients quote with <blockquote>).
   quoted: '.gmail_quote, blockquote, .gmail_signature, .gmail_signature_prefix',
 };
