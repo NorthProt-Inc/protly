@@ -79,9 +79,16 @@ class AssembleTests(unittest.TestCase):
         self.assertIn("unreadable", final["ws-2"].evidence)
 
     def test_missing_file_fails_every_id(self):
+        # Every ID but those of the methods that run only in a filtered run (NOT-RUN in a full run: PeriodTests).
         final = checks.assemble(None, None, None)
         self.assertEqual(len(final), len(checks.EXPECTED_IDS))
-        self.assertTrue(all(c.status == "FAIL" and "unreadable" in c.evidence for c in final))
+        filtered_only = {i for m in checks.FILTERED_ONLY for i in checks.METHOD_IDS[m]}
+        self.assertTrue(filtered_only)
+        for c in final:
+            if c.id in filtered_only:
+                self.assertEqual(c.status, checks.NOT_RUN, c.id)
+            else:
+                self.assertTrue(c.status == "FAIL" and "unreadable" in c.evidence, c.id)
 
     def test_duplicate_id_is_fail(self):
         # A later PASS must not hide an earlier FAIL (or a malformed line for the same ID).
@@ -782,6 +789,352 @@ class PrefsDumpTests(unittest.TestCase):
         self.assertEqual(code, 0)
         with open(out, encoding="utf-8") as f:
             self.assertIn("~ x: 1 -> 2", f.read())
+
+
+def pick_readings(kind, texts, picks=None, moves=None):
+    """The readings inside the tries of a pick kind: the field after each pick (p<i>, by default the try before's text
+    with `the ` in front of the text after the cursor) and for pickmove the caret after each move (away<i>, back<i>,
+    by default 0 and the end of the pick). `picks`/`moves` replace them; None entries leave a reading out."""
+    if kind not in checks.PERIOD_PICK:
+        return ""
+    after = checks.PERIOD_AFTER.get(kind, "")
+    if picks is None:
+        picks = [t[:len(t) - len(after)] + "the " + after for t in texts[:-1]]
+    out = "".join(f' p{i}="{p}"' for i, p in enumerate(picks, 1) if p is not None)
+    if kind in checks.PERIOD_MOVES:
+        if moves is None:
+            moves = [("0", str(len(p) - len(after))) for p in picks]
+        for i, (away, back) in enumerate(moves, 1):
+            out += f' away{i}="{away}" back{i}="{back}"'
+    return out
+
+
+def period(check_id, texts, extra="", picks=None, moves=None):
+    """One dsp-* PENDING line as UITests/PhoneChecksUITests.swift writes it, resolved through assemble()."""
+    kind = check_id.split("-", 2)[2]
+    readings = " ".join(f't{i}="{t}"' for i, t in enumerate(texts)) + pick_readings(kind, texts, picks, moves)
+    line = f"CHECK {check_id} PENDING kind={kind} tries={len(texts) - 1} {readings}{extra}\n"
+    return {c.id: c for c in checks.assemble(line, "", "", ran=checks.covered_ids([PERIOD_METHOD]))}[check_id]
+
+
+PERIOD_METHOD = "PhoneChecksUITests/test5f_period"
+
+
+class PeriodTests(unittest.TestCase):
+    """fix/double-space-period (docs/research/2026-11-17-keyboard-diagnosis.md, P4): two space taps after a word give
+    ". ", also with a word right after the cursor (case D: `hello| world`)."""
+
+    WORD = ["world"] + ["hello. " * i + "world" for i in range(1, 7)]
+    # The caret before the first try: the UITextView's `location,length`, the web composer's offset.
+    UIKIT_SEL = ' sel0="0,0"'
+    WEB_SEL = ' sel0="0"'
+
+    def test_every_id_is_expected_has_a_method_and_a_rule(self):
+        kinds = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2", "pickmid", "pickmove")
+        ids = [f"dsp-{f}-{k}" for f in ("uikit", "composer") for k in kinds]
+        self.assertEqual(checks.METHOD_IDS["test5f_period"], ids)
+        for i in ids:
+            self.assertIn(i, checks.EXPECTED_IDS)
+            self.assertIn(i, checks.RESOLVERS)
+        self.assertTrue(checks.known_entry(PERIOD_METHOD))
+
+    def test_the_ui_test_runs_the_same_kinds_with_enough_tries(self):
+        # PhoneRun.periodCases is the other half of PERIOD_IDS: a kind missing there is a FAIL `no CHECK line` in CI.
+        with open(os.path.join(HERE, "UITests", "PhoneChecksUITests.swift"), encoding="utf-8") as f:
+            swift = f.read()
+        block = swift[swift.index("static let periodCases"):]
+        cases = re.findall(r'\("(\w+)", (\d+)\)', block[:block.index("]\n")])
+        self.assertEqual([k for k, _ in cases], list(checks.PERIOD_KINDS))
+        for kind, tries in cases:
+            self.assertIn(kind, checks.PERIOD_UNIT)
+            self.assertGreaterEqual(int(tries), checks.PERIOD_MIN_TRIES.get(kind, checks.PERIOD_DEFAULT_TRIES), kind)
+
+    def test_a_filtered_period_run_marks_the_other_ids_not_run(self):
+        ran = checks.covered_ids(["PhoneChecksUITests/test0_access", PERIOD_METHOD])
+        final = {c.id: c for c in checks.assemble("", "", "", ran=ran)}
+        self.assertEqual(final["pad-1"].status, checks.NOT_RUN)
+        self.assertEqual(final["dsp-composer-word"].status, "FAIL")
+        self.assertIn("no CHECK line", final["dsp-composer-word"].evidence)
+
+    def test_a_full_run_marks_the_period_ids_not_run(self):
+        # test5f_period skips itself outside a filtered run (MAIN_TEST_DEADLINE): its IDs are NOT-RUN, not FAIL.
+        final = {c.id: c for c in checks.assemble(every_id_but(*checks.PERIOD_IDS), "", "")}
+        for i in checks.PERIOD_IDS:
+            self.assertEqual(final[i].status, checks.NOT_RUN, i)
+            self.assertIn("runs only in a filtered run (deadline)", final[i].evidence)
+        self.assertFalse(any(c.status == "FAIL" for c in final.values()))
+
+    def test_a_full_run_still_fails_the_other_missing_ids(self):
+        final = {c.id: c for c in checks.assemble(every_id_but("ws-2", *checks.PERIOD_IDS), "", "")}
+        self.assertEqual(final["ws-2"].status, "FAIL")
+        self.assertEqual(final["dsp-uikit-en"].status, checks.NOT_RUN)
+
+    def test_a_full_run_still_judges_the_period_lines_it_has(self):
+        line = ('CHECK dsp-uikit-en PENDING kind=en tries=3 t0="" t1="hello  " t2="hello  hello  " '
+                't3="hello  hello  hello  "\n')
+        final ={c.id: c for c in checks.assemble(every_id_but(*checks.PERIOD_IDS) + line, "", "")}
+        self.assertEqual(final["dsp-uikit-en"].status, "FAIL")
+        self.assertEqual(final["dsp-composer-en"].status, checks.NOT_RUN)
+
+    def test_main_without_a_filter_counts_the_period_ids_not_run(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "checks.txt"), "w", encoding="utf-8") as f:
+                f.write(every_id_but(*checks.PERIOD_IDS))
+            out = subprocess.run([sys.executable, os.path.join(HERE, "checks.py"), d], capture_output=True, text=True)
+            self.assertEqual(out.returncode, 0, out.stdout)
+            self.assertTrue(out.stdout.splitlines()[-1].endswith(f" not-run {len(checks.PERIOD_IDS)}"), out.stdout)
+
+    def test_word_after_the_cursor_gets_the_period(self):
+        for check_id, sel in [("dsp-uikit-word", self.UIKIT_SEL), ("dsp-composer-word", self.WEB_SEL)]:
+            c = period(check_id, self.WORD, sel)
+            self.assertEqual(c.status, "PASS", c.evidence)
+            self.assertIn("6/6", c.evidence)
+
+    def test_two_spaces_before_the_word_fail(self):
+        # Protly before the fix (report run 125 pr-word): KeyboardKit's endSentence left both spaces.
+        c = period("dsp-composer-word", ["world", "hello  world"] + self.WORD[2:], self.WEB_SEL)
+        self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+        self.assertIn("try 1", c.evidence)
+
+    def test_a_lost_space_before_the_word_fails(self):
+        c = period("dsp-uikit-word", ["world", "hello.world", "hello.hello. world"] + self.WORD[3:], self.UIKIT_SEL)
+        self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+
+    def test_a_caret_that_is_not_at_the_word_start_is_unreadable(self):
+        for check_id, sel in [("dsp-composer-word", ' sel0="5"'), ("dsp-composer-word", ' sel0="-1"'),
+                              ("dsp-composer-word", ""), ("dsp-composer-word", " sel0=<unreadable>"),
+                              ("dsp-uikit-word", ' sel0="5,0"')]:
+            c = period(check_id, self.WORD, sel)
+            self.assertEqual(c.status, "FAIL", f"{check_id}{sel}")
+            self.assertIn("unreadable", c.evidence)
+            self.assertIn("caret not at word start", c.evidence)
+
+    def test_word_needs_six_tries(self):
+        c = period("dsp-uikit-word", self.WORD[:6], self.UIKIT_SEL)
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+        self.assertIn("at least 6", c.evidence)
+
+    def test_a_setup_that_did_not_type_the_word_is_unreadable(self):
+        c = period("dsp-uikit-word", ["wrld"] + self.WORD[1:], self.UIKIT_SEL)
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+
+    def test_a_missing_reading_is_unreadable(self):
+        line = 'CHECK dsp-uikit-en PENDING kind=en tries=3 t0="" t1="hello. " t3="hello. hello. hello. "\n'
+        c = {c.id: c for c in checks.assemble(line, "", "")}["dsp-uikit-en"]
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+
+    def test_end_of_text_kinds(self):
+        for check_id, unit in [("dsp-uikit-en", "hello. "), ("dsp-composer-en", "hello. "),
+                               ("dsp-uikit-ko", "안녕. "), ("dsp-composer-ko", "안녕. "),
+                               ("dsp-uikit-pick2", "the. "), ("dsp-composer-pick2", "the. ")]:
+            c = period(check_id, [unit * i for i in range(4)])
+            self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
+
+    def test_end_of_text_needs_three_tries(self):
+        c = period("dsp-uikit-en", ["", "hello. ", "hello. hello. "])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+
+    def test_nfd_hangul_counts(self):
+        nfd = [unicodedata.normalize("NFD", "안녕. " * i) for i in range(4)]
+        self.assertEqual(period("dsp-composer-ko", nfd).status, "PASS")
+
+    def test_end_of_text_without_the_period_fails(self):
+        c = period("dsp-composer-en", ["", "hello. ", "hello. hello  ", "hello. hello  hello. "])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("try 2", c.evidence)
+
+    # K4E (report P4 case E): one tap after a pick from the bar adds nothing, as on Apple's keyboard (4/4).
+
+    def test_one_tap_after_a_pick_adds_nothing(self):
+        for check_id in ("dsp-uikit-pick1", "dsp-composer-pick1"):
+            c = period(check_id, ["the " * i for i in range(5)])
+            self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
+            self.assertIn("4/4 tries added 'the ' at the end", c.evidence)
+
+    def test_one_tap_after_a_pick_that_types_a_second_space_fails(self):
+        # Protly before K4E (report run 121 pick1, 18/18): the pick's space and the tap's.
+        c = period("dsp-uikit-pick1", ["the  " * i for i in range(5)])
+        self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+        self.assertIn("try 1", c.evidence)
+
+    def test_one_tap_after_a_pick_never_ends_the_sentence(self):
+        # From the code: a space typed less than 3 s before the pick made that one tap a period.
+        c = period("dsp-composer-pick1", ["", "the ", "the the. ", "the the. the ", "the the. the the "])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("try 2", c.evidence)
+        self.assertNotIn("try 3", c.evidence)
+
+    def test_one_tap_after_a_pick_needs_four_tries(self):
+        c = period("dsp-uikit-pick1", ["the " * i for i in range(4)])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("unreadable", c.evidence)
+        self.assertIn("at least 4", c.evidence)
+
+    def test_a_pick_reading_that_does_not_show_the_pick_is_unreadable(self):
+        texts = ["the " * i for i in range(5)]
+        for picks in (["the ", "the ", "the the the ", "the the the the "], [None, "the the ", "the the the ", None]):
+            c = period("dsp-uikit-pick1", texts, picks=picks)
+            self.assertEqual(c.status, "FAIL", picks)
+            self.assertIn("unreadable", c.evidence)
+            self.assertIn("the field after the pick", c.evidence)
+
+    def test_the_pick_reading_is_named_in_the_verdict(self):
+        c = period("dsp-composer-pick1", ["the " * i for i in range(5)])
+        self.assertIn("the field showed the pick 'the ' before each tap", c.evidence)
+
+    # The pick in front of a word (pickmid): one tap after it adds nothing, so `world` gets `the ` and one space.
+    MID = ["world"] + ["the " * i + "world" for i in range(1, 5)]
+
+    def test_one_tap_after_a_pick_in_front_of_a_word_adds_nothing(self):
+        for check_id, sel in [("dsp-uikit-pickmid", self.UIKIT_SEL), ("dsp-composer-pickmid", self.WEB_SEL)]:
+            c = period(check_id, self.MID, sel)
+            self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
+            self.assertIn("4/4 tries added 'the ' before 'world'", c.evidence)
+
+    def test_a_pick_in_front_of_a_word_whose_tap_types_a_second_space_fails(self):
+        # The pick kept no text after the cursor (`after: ""`): the field never shows it, so the tap types.
+        texts = ["world"] + ["the  " * i + "world" for i in range(1, 5)]
+        c = period("dsp-uikit-pickmid", texts, self.UIKIT_SEL)
+        self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+        self.assertIn("try 1: 'world' became 'the  world', want 'the world'", c.evidence)
+
+    def test_a_pick_in_front_of_a_word_needs_the_caret_there_and_four_tries(self):
+        c = period("dsp-uikit-pickmid", self.MID, ' sel0="5,0"')
+        self.assertIn("caret not at word start", c.evidence)
+        c = period("dsp-uikit-pickmid", self.MID[:4], self.UIKIT_SEL)
+        self.assertIn("at least 4", c.evidence)
+        c = period("dsp-composer-pickmid", ["the " * i for i in range(5)], self.WEB_SEL)
+        self.assertIn("the field started as ''", c.evidence)
+
+    # A caret moved away and back between the pick and the tap (pickmove): the tap types its space.
+    MOVE = ["the  " * i for i in range(4)]
+
+    def test_a_tap_after_the_caret_moved_types_a_space(self):
+        for check_id in ("dsp-uikit-pickmove", "dsp-composer-pickmove"):
+            c = period(check_id, self.MOVE)
+            self.assertEqual(c.status, "PASS", f"{check_id}: {c.evidence}")
+            self.assertIn("3/3 tries added 'the  ' at the end", c.evidence)
+
+    def test_a_pick_that_outlives_a_caret_move_fails(self):
+        # The host's callback for the move did not end the pick: the tap after the caret came back typed nothing.
+        c = period("dsp-uikit-pickmove", ["the " * i for i in range(4)])
+        self.assertEqual(c.status, "FAIL")
+        self.assertNotIn("unreadable", c.evidence)
+        self.assertIn("try 1: '' became 'the ', want 'the  '", c.evidence)
+
+    def test_a_caret_that_did_not_move_is_unreadable(self):
+        picks = ["the ", "the  the ", "the  the  the "]
+        for moves in ([("0", "4"), ("4", "9"), ("0", "14")],  # never left
+                      [("0", "4"), ("0", "0"), ("0", "14")],  # never came back
+                      [("0", "4"), ("0,0", "9,0"), ("<unreadable>", "14")]):
+            c = period("dsp-uikit-pickmove", self.MOVE, picks=picks, moves=moves)
+            self.assertEqual(c.status, "FAIL", moves)
+            self.assertIn("unreadable", c.evidence)
+        c = period("dsp-uikit-pickmove", self.MOVE, picks=picks, moves=[("0,0", "4,0"), ("0,0", "9,0"), ("0,0", "14,0")])
+        self.assertEqual(c.status, "PASS", c.evidence)
+
+    def test_fast_double_taps_and_the_korean_pick_end_the_sentence(self):
+        for field in ("uikit", "composer"):
+            for kind, unit in [("fast", "hello. "), ("kofast", "안녕. "), ("kopick2", "안녕. ")]:
+                c = period(f"dsp-{field}-{kind}", [unit * i for i in range(4)])
+                self.assertEqual(c.status, "PASS", f"{field}-{kind}: {c.evidence}")
+
+    def test_a_fast_double_tap_without_the_period_fails(self):
+        c = period("dsp-uikit-fast", ["", "hello. ", "hello. hello  ", "hello. hello  hello. "])
+        self.assertEqual(c.status, "FAIL")
+        self.assertIn("try 2", c.evidence)
+
+    def test_caret_posts_are_gated_to_the_period_check(self):
+        # The web page posts its state on a caret move only with `?caret=1` (HostApp `-caret 1`), which only
+        # test5f_period asks for: test5a_web's ret-* timings and every other web check see the page as on main.
+        def read(*parts):
+            with open(os.path.join(HERE, *parts), encoding="utf-8") as f:
+                return f.read()
+        page = read("Host", "web-composer.html")
+        code = [ln.strip() for ln in page.splitlines() if not ln.strip().startswith("//")]
+        self.assertIn('const caretPosts = new URLSearchParams(location.search).get("caret") === "1";', code)
+        listeners = [ln for ln in code if "selectionchange" in ln]
+        self.assertEqual(listeners, ['if (caretPosts) document.addEventListener("selectionchange", state);'])
+        # The edit count and times (the double tap's spacing) are gated the same way.
+        self.assertEqual([ln for ln in code if "caretPosts" in ln and "selectionchange" not in ln],
+                         ['if (caretPosts) s.edits = { n: editCount, t: editTimes.slice() };',
+                          'if (!caretPosts || name !== "composer" || e.type !== "input") return;',
+                          'const caretPosts = new URLSearchParams(location.search).get("caret") === "1";'])
+        self.assertEqual([ln for ln in code if "editTimes.push(" in ln], ["editTimes.push(Math.round(performance.now()));"])
+        host = read("Host", "HostApp.swift")
+        gate = host.index('UserDefaults.standard.string(forKey: "caret") == "1"')
+        self.assertLess(gate, host.index('URLQueryItem(name: "caret", value: "1")'))
+        self.assertEqual(host.count("URLQueryItem("), 1)
+        users = {name: read("UITests", name).count('"-caret"') for name in os.listdir(os.path.join(HERE, "UITests"))}
+        self.assertEqual({n: c for n, c in users.items() if c}, {"PhoneChecksUITests.swift": 1})
+        swift = read("UITests", "PhoneChecksUITests.swift")
+        period = swift[swift.index("func checksPeriod()"):]
+        self.assertIn('d.launch(arguments: ["-screen", "web", "-caret", "1"])', period[:period.index("\n    }\n")])
+        self.assertIn('d.launch(arguments: ["-screen", "web"])', read("UITests", "TypingChecks.swift"))
+
+    def test_a_driver_problem_stays_fail(self):
+        line = 'CHECK dsp-uikit-en FAIL unreadable: problems="no keyboard to type on" kind=en\n'
+        c = {c.id: c for c in checks.assemble(line, "", "")}["dsp-uikit-en"]
+        self.assertEqual(c.status, "FAIL")
+
+
+HEIGHT_METHOD = "PhoneChecksUITests/test9_height"
+
+
+class HeightTests(unittest.TestCase):
+    """fix/keyboard-height (K2, report P2): the band above the bar on every presentation path (UITests/HeightChecks.swift)."""
+
+    def test_every_id_is_expected_and_has_a_method(self):
+        ids = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
+               "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
+               "hb-card", "hb-cancel"]
+        self.assertEqual(checks.HEIGHT_IDS, ids)
+        self.assertEqual(checks.METHOD_IDS["test9_height"], ids)
+        for i in ids:
+            self.assertIn(i, checks.EXPECTED_IDS)
+        self.assertTrue(checks.known_entry(HEIGHT_METHOD))
+
+    def test_the_ui_test_writes_the_same_ids(self):
+        with open(os.path.join(HERE, "UITests", "HeightChecks.swift"), encoding="utf-8") as f:
+            swift = f.read()
+        block = swift[swift.index("static let heightIDs"):]
+        self.assertEqual(re.findall(r'"(hb-[\w-]+)"', block[:block.index("]")]), checks.HEIGHT_IDS)
+
+    def test_the_ui_test_skips_itself_outside_a_filtered_run(self):
+        with open(os.path.join(HERE, "UITests", "PhoneChecksUITests.swift"), encoding="utf-8") as f:
+            swift = f.read()
+        method = swift[swift.index("func test9_height()"):]
+        method = method[:method.index("\n    }\n")]
+        self.assertIn('environment["FILTERED"] == "1"', method)
+        self.assertIn("XCTSkip", method)
+
+    def test_the_test_judges_pass_and_fail_and_checks_keeps_them(self):
+        lines = ('CHECK hb-hide-switch PASS shots="52.00@512.00/564.00" band=52.00..52.00 apple=52.00 wrong=0\n'
+                 'CHECK hb-globe FAIL shots="69.00@495.00/564.00" band=69.00..69.00 apple=52.00 wrong=1 (not as expected)\n'
+                 'CHECK hb-apple RECORD shots="52.00@509.00/561.00/english" band=52.00..52.00 apple=5/5\n')
+        final = {c.id: c for c in checks.assemble(lines, "", "", ran=checks.covered_ids([HEIGHT_METHOD]))}
+        self.assertEqual(final["hb-hide-switch"].status, "PASS")
+        self.assertEqual(final["hb-globe"].status, "FAIL")
+        self.assertEqual(final["hb-apple"].status, "RECORD")
+        # Every other height ID without a line is FAIL, and the other methods' IDs are NOT-RUN.
+        self.assertEqual(final["hb-switch"].status, "FAIL")
+        self.assertIn("no CHECK line", final["hb-switch"].evidence)
+        self.assertEqual(final["pad-1"].status, checks.NOT_RUN)
+
+    def test_a_full_run_marks_the_height_ids_not_run(self):
+        final = {c.id: c for c in checks.assemble(every_id_but(*checks.PERIOD_IDS, *checks.HEIGHT_IDS), "", "")}
+        for i in checks.HEIGHT_IDS:
+            self.assertEqual(final[i].status, checks.NOT_RUN, i)
+            self.assertIn("runs only in a filtered run (deadline)", final[i].evidence)
+        self.assertFalse(any(c.status == "FAIL" for c in final.values()))
 
 
 if __name__ == "__main__":

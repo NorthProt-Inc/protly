@@ -32,7 +32,9 @@ checks the same thing, but the keyboard has not learned the words earlier method
 result with a full run before calling it fixed. The memory sampler starts at the first selected phone method. A new
 push with either tag cancels a run in progress on the branch, and the workflow sees a tag anywhere in the head
 commit message: a message that only describes the syntax starts a run too (b784f28 did: `bad-filter`, and it
-cancelled the full run in progress). Name the syntax in a commit message without its opening bracket.
+cancelled the full run in progress). Name the syntax in a commit message without its opening bracket. The push
+trigger has a paths filter (`ios-app/**` and the workflow file), so the tagged head commit must change a file there:
+an empty commit, or one that touches only other paths, starts no run at all.
 
 Runner image `macos-26` (GitHub-hosted, arm64): Xcode 26.6 by default and iOS 26.x simulator runtimes. The
 script takes the newest iOS 26 runtime and an iPhone 13 Pro (else the first 390 pt wide iPhone it can create).
@@ -66,8 +68,10 @@ script takes the newest iOS 26 runtime and an iPhone 13 Pro (else the first 390 
 After the layout scenarios, `UITests/PhoneChecksUITests.swift` runs the phone checklists in the order
 `test0_access`, `test0_probe` (only with `[probe]` in the commit message; Sprint 002's probe since then), `test1_68`,
 `test2_ws`, `test3_85offline`, `test4_memory`, `test5_icon`, the typing-fixes methods `test5a_web`, `test5b_menu` and
-`test5c_pad`, the keyboard-ui methods `test5d_card` and `test5e_bar` (below), then the network groups `test6_85net` and
-`test7_77` (below); learned words carry over between them.
+`test5c_pad`, the keyboard-ui methods `test5d_card` and `test5e_bar` (below), `test5f_period` (the double-space
+period, below; only in a filtered run), then the network groups `test6_85net` and `test7_77` (below), and
+`test9_height` (the keyboard's height on every presentation path, below; only in a filtered run); learned words carry
+over between them.
 
 - `UITests/Driver.swift`: the shared helpers. Text is typed by coordinate: Hangul as its Dubeolsik keys
   (ProtlyCore `KeyEncoder`, linked into the UI tests), capitals and shifted jamo with a shift tap, symbols on the
@@ -232,6 +236,93 @@ methods after `test5c_pad`; every line is `PENDING` with its readings and `check
   name; RECORD when the OCR shows the long name cut short or the text did not grow), `app-dark` and `app-light`
   (`ProtlyCIApp`'s guide screen: the hero line, and an ink or paper background; `c-app-<look>-1.png` and `-2.png` one
   screen down).
+
+## Double-space period checks (fix/double-space-period, fix/pick-space)
+
+Cause and cases: `docs/research/2026-11-17-keyboard-diagnosis.md`, P4 (on the diagnosis branch until it lands). Code:
+`checksPeriod` in `UITests/PhoneChecksUITests.swift`, ported from the probe on `diag/p4-double-space` without its
+logging. Every line is `PENDING` with the field before the first try (`t0`) and after each try (`t1`...);
+`resolve_period` in checks.py decides (unit-tested in `test_checks.py`, `PeriodTests`).
+
+- **Filtered runs only.** `test5f_period` takes about 15 minutes, and full runs already come close to
+  `MAIN_TEST_DEADLINE`. run-shots.sh passes `FILTERED=1` to the tests when a `[shots:...]` filter is active (as
+  `PROBE` reaches `test0_probe`); without it the method throws `XCTSkip`, and checks.py (`FILTERED_ONLY`) marks its IDs
+  `NOT-RUN` with `runs only in a filtered run (deadline)`, not FAIL. Run it with
+  `[shots:PhoneChecksUITests/test5f_period]` in the head commit message.
+- **IDs** `dsp-<field>-<kind>`, fields `uikit` (`-screen uikit`, the UITextView) and `composer` (`-screen web`, the
+  contenteditable), kinds:
+  - `word` (case D, 6 tries): `world`, the caret tapped in front of it, then `hello` and two spaces. Each try must add
+    `hello. ` in front of `world`, so the text grows to `hello. hello. world`. `sel0` is the caret before the first
+    try: the UITextView's `sel` probe, or the composer's offset, `caret` in `web-state`. The page posts its state on
+    `selectionchange` only when loaded with `?caret=1` (the host's `-caret 1`, which only this method passes), so
+    `test5a_web` and the other web checks see the page post exactly as before. A caret that is not at 0 makes the
+    line FAIL `unreadable` ("caret not at word start"): the set-up failed, not the fix.
+  - `en`, `ko` (3 tries): `hello` / `안녕` and two spaces at the end of the text; each try adds `hello. ` / `안녕. `.
+  - `pick2` (3 tries): `teh`, the bar's right slot, then two spaces; each try adds `the. `. `kopick2` (3 tries): the
+    same with `안녀` and the slot's `안녕`; each try adds `안녕. `.
+  - `pick1` (4 tries, K4E, case E): `teh`, the bar's right slot, the field read (`p<i>`), then one space. The pick's
+    space takes the tap's place, as on Apple's keyboard, so each try adds `the ` (two spaces, or a period, FAIL).
+  - `pickmid` (4 tries, K4E): `pick1` in front of a word, set up as `word` (`world`, the caret in front of it,
+    `sel0`); each try adds `the ` before `world` (`the world`, one space). The pick waits with the text after the
+    cursor; a pick that kept none would let the tap type a second space.
+  - `pickmove` (3 tries, K4E): `pick1`, but between the pick and the tap the caret is tapped in front of the first
+    word (`away<i>`, must be 0) and back to the end (`back<i>`, the end of the pick). The host's callback for the move
+    ends the pick, so the tap types its space and each try adds `the  `. Each try first waits out KeyboardKit's 3 s
+    double-space window, so that space stays plain.
+  - `fast`, `kofast` (3 tries, K4E): `hello` / `안녕`, then a double tap on space by coordinate
+    (`XCUICoordinate.doubleTap`, its taps 46-75 ms apart in the probe); each try adds `hello. ` / `안녕. `. `gaps` is
+    the spacing of the two taps as the host saw its edits (the longest wait between two edits in a row; `edits` lists
+    each edit's ms after the first, from the UITextView screen's `edits` probe or the page's `edits` state, which it
+    posts only with `?caret=1`; -1 when the host saw fewer than two edits), and `calls` the doubleTap call's own
+    duration as XCTest saw it. Neither is judged.
+  A field that did not start empty (or as `world`), a missing reading, a pick reading (`p<i>`) that does not show the
+  pick, a pickmove caret that did not go to 0 and back, or fewer tries than these is FAIL `unreadable`.
+  `test_checks.py` also checks that `PhoneRun.periodCases` lists the same kinds as checks.py, with enough tries.
+- The probe's held space (the trackpad, which types nothing by design) stays out: K4E leaves the 0.4 s hold and the
+  3.0 s window as they are.
+
+## Height checks (fix/keyboard-height, K2)
+
+Cause: `docs/research/2026-11-17-keyboard-diagnosis.md`, P2 (on the diagnosis branch until it lands). Fix: ProtlyCore
+`HostLook` (its header lists the rules and their runs). Code: `UITests/HeightChecks.swift`, method
+`PhoneChecksUITests/test9_height`, ported from the probe on `diag/p2-height`.
+
+- **Filtered runs only**, like `test5f_period` (about 25 minutes): run it with
+  `[shots:PhoneChecksUITests/test9_height]`. A full run marks its IDs `NOT-RUN` (`FILTERED_ONLY` in checks.py).
+- **Every shot** is measured the way measure.py measures the layout scenarios: the glass top and row 1's top along
+  the second key's column, band = row 1 - top. ui-log.txt has `HEIGHT <id> <n> <band>@<top>/<row1>[/<board>]
+  [/unreached][/picked][/problems<n>]/ph<top>+<height>` and `MARK <id>-<n> <epoch>` (for keyboard-log.txt). `ph` is
+  iOS's own placeholder for the keyboard on the host's side (the element `inputView`): its top is 17 pt below the
+  glass top in both of iOS's looks, and its height is Protly's view plus the dock, 17 pt less when iOS draws no
+  margin above the keyboard.
+- **IDs.** `hb-apple` (RECORD): Apple's English keyboard, 5 shots, the reference band (the median). Each other ID
+  collects one path's shots across the sections (each starts with a relaunch), and PASSes only when every judged shot
+  has its band within 1 pt of Apple's and row 1 within 1 pt of 564 (iPhone 13 Pro):
+  - `hb-launch`: the relaunch at each section's start. `hb-hide-fresh`: hide and show in a fresh host, 1 s and 5 s
+    hidden.
+  - `hb-globe`: Protly picked right after Apple's English keyboard. `hb-hide-globe`: hide and show after it.
+  - `hb-emoji`: the Emoji round trip in a fresh host, after the globe pick and after an app switch. `hb-hide-emoji`:
+    hide and show after it.
+  - `hb-switch`: an app switch back with the keyboard up. `hb-hide-switch`: hide and show after it.
+    `hb-hide-long` (RECORD): after an app switch, a 12 s hide without leaving the host, the other side of HostLook's
+    10 s guess (iOS keeps its margin there, so 69 is what the guess costs).
+  - `hb-switch-hidden`: after an app switch and a hide and show, an app switch with the keyboard hidden, 13 s away,
+    then the field tapped. `hb-kill-up`, `hb-kill-hidden`: after an app switch, the host left with the keyboard up,
+    or hidden and 13 s away, terminated in the background and launched again.
+  - `hb-card`: a stub Translate's finished card in a fresh host, judged by the glass top (it covers row 1); a card
+    that did not finish FAILs. `hb-cancel`: the keys after the card's Cancel. One more card after an app switch is
+    not judged: the test cannot read the bar at the 240 pt pin (iOS reports the center button's frame at y -8.7,
+    run de8574c-184), and its tree goes to `tree-hb-card-after-switch.txt`.
+- **Skipped shots** are listed, not judged: a shot that came up on another keyboard (a system stand-in, or English),
+  one after a failed step (Emoji or English not reached: `problems<n>=`), one whose step did not reach Protly, and a
+  relaunch that still needed a globe pick after three launches (iOS brings back the keyboard last used, so a relaunch
+  that came up elsewhere picks Protly and launches again). Fewer than 5 judged shots, or no Apple band, is FAIL
+  `unreadable`.
+- **Expected FAILs.** `hb-globe` and `hb-hide-globe` FAIL on every run at 69: Protly picked right after Apple's
+  keyboard looks to the keyboard like a return from Emoji, and it assumes Emoji. Single shots at 69 elsewhere happen
+  when iOS changes its look with nothing the keyboard can see (a hide and show after an Emoji round trip, about 1 in
+  16; a fresh launch, about 1 in 45) or sends no became-active on a return (about 1 in 64). Any other FAIL, or a band
+  of 35, is a regression.
 
 ## Reading a run without GitHub access
 

@@ -39,6 +39,8 @@ final class KeyboardViewController: KeyboardInputViewController {
     private var written = ""
     /// Protly's model of the text before the cursor from its own writes: whether the field still holds the word.
     private var watch = FieldWatch(known: false)
+    /// K4E: the space the last pick typed, standing in for the next space tap (ProtlyActionHandler takes it).
+    private var pickSpace = PickSpace()
 
     let english = ProtlyLayoutService(alphabeticInputSet: .qwerty, numericInputSet: .numeric, symbolicInputSet: .symbolic)
     let korean = ProtlyLayoutService(alphabeticInputSet: .dubeolsik, numericInputSet: .numeric, symbolicInputSet: .symbolic)
@@ -67,7 +69,7 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// What the field reads moved the cursor over, for Cancel (P6).
     private var cursorReturn = CursorReturn()
     /// Text protly inserted and what it replaced, for Undo.
-    private var lastInsert: (inserted: String, original: String, isSelection: Bool)?
+    private var lastInsert: (inserted: String, original: String)?
     /// LearnedWords.changes at the last save (Words.swift). Per controller: each one loads its own copy.
     var savedChanges = 0
 
@@ -133,11 +135,17 @@ final class KeyboardViewController: KeyboardInputViewController {
         refreshField()
     }
 
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        ProtlyHeight.disappeared(self)
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         // The word is already plain text in the field: only the session state goes, so the next key starts a new
         // word. The abandoned word's language carries to the next message.
         abandonWord()
+        pickSpace.end()
         // Hiding mid-call counts as Cancel: the call stops and the cursor goes back too.
         restoreCursor()
         if mode.panel != nil { mode.panel = nil }
@@ -190,18 +198,32 @@ final class KeyboardViewController: KeyboardInputViewController {
         refreshMode()
     }
 
-    /// The bar's right slot: the word becomes the suggestion, then a space typed like any other.
+    /// The bar's right slot: the word becomes the suggestion, then a space. As on Apple's keyboard (K4E), that space
+    /// stands in for the next space tap: one tap adds nothing, two end the sentence (`the. `).
     func pickSuggestion() {
         let shown = mode.suggestion  // what the user tapped, before noticeFieldMoved can refresh the bar
         noticeFieldMoved()
         // If the suggestion changed since the bar showed it, do nothing.
-        guard session.suggestion == shown, let edit = session.accept() else { return }
+        guard let shown, session.suggestion == shown, let edit = session.accept() else { return }
         guard apply(edit) else {
             refreshMode()  // the field moved: the word was abandoned, nothing written
             return
         }
         savePrevious()
         insertText(" ")
+        pickSpace.picked(shown, after: textDocumentProxy.documentContextAfterInput ?? "", at: now)
+    }
+
+    /// A space release (ProtlyActionHandler): true when the space the last pick typed takes this tap's place, so the
+    /// tap types nothing. typing false: the release ends a trackpad hold. Every release ends the pick (PickSpace).
+    func takePickSpace(typing: Bool) -> Bool {
+        guard pickSpace.isWaiting else { return false }
+        return pickSpace.spaceReleased(types: typing, observed(), now: now)
+    }
+
+    /// Any other key: the next space types as usual.
+    func endPickSpace() {
+        pickSpace.end()
     }
 
     /// The host changed the field under protly (a chat app sent the message and cleared the field with the
@@ -211,7 +233,9 @@ final class KeyboardViewController: KeyboardInputViewController {
     /// text now, and WebKit reports hasText false right after each edit, which would split every word.
     /// Called from host callbacks: it only reads the field and decides, never writes (KeyboardSourceRulesTests).
     private func noticeFieldMoved() {
-        switch watch.decide(observed(), composing: session.isComposing, lastTail: session.lastTail, now: now) {
+        let o = observed()
+        pickSpace.noticed(o, now: now)  // a field that no longer shows the pick ends it (K4E)
+        switch watch.decide(o, composing: session.isComposing, lastTail: session.lastTail, now: now) {
         case .keep: return
         case .abandon: abandonWord()
         case .forgetLast: session.forgetLast()
@@ -316,10 +340,11 @@ final class KeyboardViewController: KeyboardInputViewController {
             if field.isSelection { cursorReturn.clear() }
             // The action comes from the text read here (the whole field or the selection), not from the bar's view of it.
             let action = ActionAPI.mode(forDraft: field.text)
-            // Text left after the cursor = only a prefix was read: Replace would glue the result to the rest.
+            // Text left after the cursor = only a prefix was read: Replace would glue the result to the rest. No advice
+            // to select: a selection read is cut too, and its card only copies (FieldGuard.copyOnly).
             if !field.isSelection, !(textDocumentProxy.documentContextAfterInput ?? "").isEmpty {
                 mode.strip = nil
-                mode.panel = .failed("Could not read the whole text. Select all, then tap again.", retry: action)
+                mode.panel = .failed("Could not read the whole text.", retry: action)
                 return
             }
             run(ActionCall(mode: action, text: field.text, original: field.text, isSelection: field.isSelection), call: call)
@@ -355,6 +380,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         onScreen = nil
         commitWord()
         session.forgetLast()  // the field is about to change: the bar's flip must not reach into it
+        pickSpace.end()  // and the next space types as usual
         watch.forget()  // reading the field moves the cursor
         refreshMode()
         // Every path after this shows its own strip or panel: a request still running must not replace it later.
@@ -458,14 +484,18 @@ final class KeyboardViewController: KeyboardInputViewController {
         case .partial(let text):
             feed.partial = text
             if openCard != nil { return }
-            mode.panel = .card(fresh)
+            // A card read from a selection opens copy-only: it never writes.
+            var card = fresh
+            card.copyOnly = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: nil)
+            mode.panel = .card(card)
         case .done(let result):
             feed.partial = result.translation
             feed.back = result.backTranslation
             var card = openCard ?? fresh
             card.phase = .done
-            // P10: typed or moved during the call: the result stays, only Copy is offered.
-            card.copyOnly = card.action != .in && !fieldHolds(card.original, isSelection: card.isSelection)
+            // P10: typed or moved during the call, or text selected: the result stays, only Copy is offered.
+            card.copyOnly = FieldGuard.copyOnly(
+                card.action, original: card.original, isSelection: card.isSelection, field: observed())
             mode.strip = nil
             mode.panel = .card(card)
         case .failed(let error):
@@ -487,14 +517,6 @@ final class KeyboardViewController: KeyboardInputViewController {
         return nil
     }
 
-    /// The field still holds what the read returned (the selection, or the whole text with the cursor at its end).
-    private func fieldHolds(_ original: String, isSelection: Bool) -> Bool {
-        let p = textDocumentProxy
-        return isSelection
-            ? p.selectedText == original
-            : FieldGuard.canReplace(original, before: p.documentContextBeforeInput ?? "", after: p.documentContextAfterInput ?? "")
-    }
-
     /// Replace (Translate, Polish) and Insert (Read) on the card, and Save on the About me confirm panel: the panel's
     /// insert button is the only caller.
     func insertResult() {
@@ -507,22 +529,22 @@ final class KeyboardViewController: KeyboardInputViewController {
             return
         }
         guard var card = openCard, card.primary != nil, AboutMe.canSave(shownAt: card.shownAt, now: now) else { return }
+        // The user may have moved the cursor, edited or selected since: never delete the wrong text (P10), never type
+        // over a selection (P1a cause 3). A selection card never gets here (no primary), but the check covers it too.
+        if let why = FieldGuard.copyOnly(card.action, original: card.original, isSelection: card.isSelection, field: observed()) {
+            card.copyOnly = why
+            mode.panel = .card(card)
+            return
+        }
         let result = feed.partial
         let p = textDocumentProxy
         if card.action == .in {
-            // Read: the reply goes in at the cursor, over the selection if there is one; Undo puts that back.
-            let selected = p.selectedText ?? ""
+            // Read: the reply goes in at the cursor (no selection: the check above).
             p.insertText(result)
-            lastInsert = (result, selected, !selected.isEmpty)
+            lastInsert = (result, "")
         } else {
-            // The user may have moved the cursor or edited since: never delete the wrong text (P10).
-            guard fieldHolds(card.original, isSelection: card.isSelection) else {
-                card.copyOnly = true
-                mode.panel = .card(card)
-                return
-            }
-            FieldText.replace(card.original, isSelection: card.isSelection, with: result, p)
-            lastInsert = (result, card.original, card.isSelection)
+            FieldText.replace(card.original, with: result, p)
+            lastInsert = (result, card.original)
         }
         cursorReturn.clear()
         watch.forget()
@@ -556,8 +578,9 @@ final class KeyboardViewController: KeyboardInputViewController {
 
     func undoInsert() {
         guard let l = lastInsert else { return }
-        guard FieldGuard.canUndo(l.inserted, before: textDocumentProxy.documentContextBeforeInput ?? "") else {
-            endUndo()  // the cursor moved or the text changed since Insert
+        let field = observed()
+        guard FieldGuard.canUndo(l.inserted, before: field.before, selected: field.selected) else {
+            endUndo()  // the cursor moved, the text changed or text is selected since Insert
             refreshField()  // the bar stops offering Undo
             return
         }
@@ -624,8 +647,10 @@ final class KeyboardViewController: KeyboardInputViewController {
             && pb.changeCount != d.integer(forKey: Self.clipboardKey) && pb.hasStrings
         if mode.clipboardIsNew != isNew { mode.clipboardIsNew = isNew }
 
-        // @Published fires on every write; an unchanged write would rebuild the keyboard on each key.
-        let center = BarAction.center(text: text, canUndo: mode.canUndo, clipboardIsNew: isNew)
+        // @Published fires on every write; an unchanged write would rebuild the keyboard on each key. No Undo is offered
+        // while text is selected: the tap would refuse it.
+        let center = BarAction.center(
+            text: text, canUndo: FieldGuard.offersUndo(mode.canUndo, selected: p.selectedText ?? ""), clipboardIsNew: isNew)
         if mode.center != center { mode.center = center }
         let key = center ?? .read  // BarAction.protlyKey, without a second scan of the field
         if mode.protlyKey != key { mode.protlyKey = key }
@@ -713,6 +738,7 @@ final class KeyboardViewController: KeyboardInputViewController {
         endUndo()
         super.adjustTextPosition(by: offset)
         watch.forget()  // the cursor moved
+        pickSpace.end()  // the space trackpad: the next space types as usual (K4E)
         refreshMode()
     }
 
@@ -733,11 +759,19 @@ final class KeyboardViewController: KeyboardInputViewController {
             before: SpaceTrackpad.textBefore(context: context, written: word, committed: committed), after: after)
     }
 
+    /// The double-space period. KeyboardKit's own endSentence (not called) does nothing when a word follows the cursor
+    /// (`hello  |world`: isCursorAtTheEndOfTheCurrentWord is false), where Apple's keyboard gives `hello. world`
+    /// (docs/research/2026-11-17-keyboard-diagnosis.md, P4 case D). So the spaces before the cursor are deleted and the
+    /// text inserted here, through the proxy as KeyboardKit did, whatever follows the cursor. The spaces are counted
+    /// once, so a context that lags behind the deletes can neither loop nor delete past them.
     override func endSentence(withText text: String) {
         commitWord()
         session.forgetLast()
-        super.endSentence(withText: text)
-        watch.forget()  // KeyboardKit may delete a space first
+        let proxy = textDocumentProxy
+        let spaces = (proxy.documentContextBeforeInput ?? "").reversed().prefix { $0 == " " }.count
+        for _ in 0..<spaces { proxy.deleteBackward() }
+        proxy.insertText(text)
+        watch.forget()  // spaces deleted and text inserted outside FieldWatch's model
         refreshMode()
     }
 

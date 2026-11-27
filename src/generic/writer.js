@@ -1,30 +1,15 @@
+import { cutsShort, editableText, insertAll } from '../lib/editable.js';
+
 // Reads and writes a text box on any site. textarea/input: setRangeText plus an input event, which React-style
-// controlled inputs notice (their value tracker sees the change). contenteditable: select all and
-// execCommand('insertText'), the path the Instagram writer uses, so the editor's own undo and state stay in sync.
+// controlled inputs notice (their value tracker sees the change). contenteditable: select all and insertAll() (a paste
+// on Lexical, Draft.js and Slate, execCommand('insertText') elsewhere), the path the Instagram writer uses, so the
+// editor's own undo and state stay in sync.
 export const SELECT_SETTLE_MS = 60; // editors such as Lexical sync their selection on selectionchange
 export const VERIFY_MS = 300; // Slate and Draft.js cancel beforeinput and render the text a tick later
 const POLL_MS = 20;
 
 const norm = (s) => (s ?? '').replace(/\s+/g, ' ').trim();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const BLOCK = /^(ADDRESS|ARTICLE|ASIDE|BLOCKQUOTE|DD|DIV|DL|DT|FIGCAPTION|FIGURE|FOOTER|H[1-6]|HEADER|HR|LI|MAIN|OL|P|PRE|SECTION|TABLE|TR|UL)$/;
-const SKIP = /^(SCRIPT|STYLE|TEMPLATE)$/;
-
-// One \n between blocks and per <br>. innerText puts a blank line between <p>s (ProseMirror, Quill, Lexical).
-function editableText(root) {
-  let out = '';
-  const walk = (n) => {
-    if (n.nodeType === 3) { out += n.textContent; return; }
-    if (n.nodeType !== 1 || SKIP.test(n.nodeName)) return;
-    if (n.nodeName === 'BR') { out += '\n'; return; }
-    const block = BLOCK.test(n.nodeName);
-    if (block && out && !out.endsWith('\n')) out += '\n';
-    n.childNodes.forEach(walk);
-    if (block && !out.endsWith('\n')) out += '\n';
-  };
-  root.childNodes.forEach(walk);
-  return out.replace(/\n$/, '');
-}
 
 export function readBox(t) {
   if (t.kind === 'text') return t.el.value;
@@ -55,8 +40,9 @@ function setValue(el, text) {
   el.dispatchEvent(new Ev('input', { bubbles: true, inputType: 'insertReplacementText', data: text }));
 }
 
-// true when the box ends up holding text, false when the write failed (the caller restores), null when
-// stillOk() said no right before writing (nothing was written). textarea/input are written without focusing.
+// true when the box ends up holding text, false when the write failed (the caller restores) or was refused with the
+// box untouched (a Lexical draft cutsShort() turns down), null when stillOk() said no right before writing (nothing
+// was written). textarea/input are written without focusing.
 export async function writeBox(t, text, { settleMs = SELECT_SETTLE_MS, verifyMs = VERIFY_MS, stillOk = () => true } = {}) {
   const { el } = t;
   if (!el.isConnected) return false;
@@ -64,13 +50,14 @@ export async function writeBox(t, text, { settleMs = SELECT_SETTLE_MS, verifyMs 
     if (!stillOk()) return null;
     setValue(el, text);
   } else {
+    if (cutsShort(el)) return false;
     el.focus();
     el.ownerDocument.getSelection().selectAllChildren(el);
     await sleep(settleMs);
     if (!el.isConnected) return false;
     if (!stillOk()) return null;
     el.focus();
-    el.ownerDocument.execCommand('insertText', false, text);
+    insertAll(el, text);
   }
   return boxHolds(t, text, verifyMs);
 }

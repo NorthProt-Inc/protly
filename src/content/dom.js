@@ -1,5 +1,6 @@
 import { SEL, senderOf, findViewerName } from './selectors.js';
 import { trusted } from '../ui/trust.js';
+import { cutsShort, editableText, insertAll } from '../lib/editable.js';
 
 export const findThreadRoot = (doc) => doc.querySelector(SEL.threadRoot);
 export const findComposer = (doc) => doc.querySelector(SEL.composer);
@@ -86,8 +87,10 @@ export function setHoverOriginal(m, korean) {
   m.textEl.setAttribute('data-pl-title', '');
 }
 
+// The draft as the writers write it back: one \n between blocks and per <br>. Not innerText, which puts a blank line
+// between <p>s: a paste into rich Lexical makes one <p> per line, so each Enter and Alt+Z cycle gained a blank line.
 export function getComposerText(el) {
-  return (el.innerText || '').replace(/\n$/, '');
+  return editableText(el);
 }
 
 // Lexical syncs its selection on `selectionchange`, so it needs a moment between selecting and inserting,
@@ -95,10 +98,11 @@ export function getComposerText(el) {
 // via execCommand; callers only write non-empty text.
 export const SELECT_SETTLE_MS = 60;
 // stillOk() is re-checked after the settle; false aborts the insert (thread switched, write superseded).
-// Returns true when the text was inserted.
+// Returns true when the text was inserted; false, with the box untouched, for a draft cutsShort() refuses.
 // Focus coming in from elsewhere (WhatsApp's Reply leaves it on the message row) makes Lexical restore its own caret a
 // moment later, which collapses the first select-all; then insertText would append. Select once more if so.
 export async function setComposerText(el, text, stillOk = () => true) {
+  if (cutsShort(el)) return false;
   const sel = el.ownerDocument.getSelection();
   const flat = (t) => t.replace(/\s+/g, '');
   const selectsAll = () => !flat(el.innerText || el.textContent || '')
@@ -112,6 +116,6 @@ export async function setComposerText(el, text, stillOk = () => true) {
   if (el.isConnected && stillOk() && !selectsAll()) await select();
   if (!el.isConnected || !stillOk()) return false;
   el.focus();
-  el.ownerDocument.execCommand('insertText', false, text);
+  insertAll(el, text);
   return true;
 }

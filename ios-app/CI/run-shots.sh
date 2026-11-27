@@ -84,8 +84,12 @@ if ! filter="$(python3 "$here/shotsfilter.py" 2> "$work/filter.err")"; then
 fi
 only_args=()
 layout=1
+# FILTERED=1 reaches the tests in a debug run: test5f_period and test9_height run only then (they would push a full
+# run past MAIN_TEST_DEADLINE; in a full run they skip themselves and checks.py marks their IDs NOT-RUN).
+filtered=0
 if [ -n "$filter" ]; then
   layout=0
+  filtered=1
   while IFS= read -r entry; do
     only_args+=("-only-testing:ProtlyCIUITests/$entry")
     case "$entry" in KeyboardShotsUITests*) layout=1 ;; esac
@@ -322,7 +326,7 @@ looks_helper > /dev/null 2>&1 &
 looks_pid=$!
 main_deadline="${MAIN_TEST_DEADLINE:-3900}"
 with_deadline "$main_deadline" env TEST_RUNNER_SHOTS_DIR="$out" TEST_RUNNER_PROBE="${PROBE:-0}" \
-  TEST_RUNNER_OCR_FALLBACK="${OCR_FALLBACK:-0}" TEST_RUNNER_NETWORK="$network" \
+  TEST_RUNNER_OCR_FALLBACK="${OCR_FALLBACK:-0}" TEST_RUNNER_NETWORK="$network" TEST_RUNNER_FILTERED="$filtered" \
   xcodebuild test-without-building \
   -project "$here/ProtlyCI.xcodeproj" -scheme ProtlyCI \
   -destination "platform=iOS Simulator,id=$udid" \
@@ -373,8 +377,9 @@ for test in manifest:
                 shutil.copy(os.path.join(src, a["exportedFileName"]), os.path.join(dst, scenario + ".png"))
 EOF
 fi
-# The keyboard's own height log (ProtlyHeight.swift), for what iOS did between the screenshots.
-xcrun simctl spawn "$udid" log show --last 30m --debug --info --style compact \
+# The keyboard's own height log (ProtlyHeight.swift), for what iOS did between the screenshots. 120 minutes: with 30,
+# a full run's log started after the layout test (docs/research/2026-11-17-keyboard-diagnosis.md, P2).
+xcrun simctl spawn "$udid" log show --last 120m --debug --info --style compact \
   --predicate 'subsystem == "com.northprot.protly"' > "$out/keyboard-log.txt" 2>&1
 # The web composer's DOM event log (typing-fixes 004, HostApp.swift `-screen web`): the host appends it in its
 # Documents folder; it goes into the run folder next to the ret-* lines.

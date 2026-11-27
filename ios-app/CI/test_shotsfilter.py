@@ -234,7 +234,7 @@ class RunShotsBlockTests(unittest.TestCase):
             script = (f'set -uo pipefail\nhere={HERE}; work={work}; status=measured\n'
                       'note() { echo "note: $1"; }\nfinish() { echo "finish $status"; exit 0; }\n'
                       f'{block}\nprintf "arg: %s\\n" ${{only_args[@]+"${{only_args[@]}}"}}\n'
-                      'echo "layout=$layout"; echo "mem_wait=$mem_wait"\n')
+                      'echo "layout=$layout"; echo "filtered=$filtered"; echo "mem_wait=$mem_wait"\n')
             env = dict(os.environ, SHOTS_MESSAGE=message)
             return subprocess.run(["bash", "-c", script], capture_output=True, text=True, env=env, timeout=30).stdout
 
@@ -243,7 +243,27 @@ class RunShotsBlockTests(unittest.TestCase):
         self.assertNotIn("FILTER", out)
         self.assertNotIn("-only-testing", out)
         self.assertIn("layout=1", out)
+        self.assertIn("filtered=0", out)
         self.assertIn("mem_wait=== PhoneChecksUITests.test1", out)
+
+    def test_filtered_only_method_gets_the_flag(self):
+        # test5f_period skips itself without FILTERED=1 (MAIN_TEST_DEADLINE); a debug run selecting it sets the flag.
+        out = self.run_block("fix [shots:PhoneChecksUITests/test5f_period]")
+        self.assertIn("arg: -only-testing:ProtlyCIUITests/PhoneChecksUITests/test5f_period\n", out)
+        self.assertIn("filtered=1", out)
+
+    def test_the_main_test_run_receives_the_flag(self):
+        with open(os.path.join(HERE, "run-shots.sh"), encoding="utf-8") as f:
+            src = f.read()
+        main = src[src.index('with_deadline "$main_deadline"'):]
+        main = main[:main.index("test_code=$?")]
+        self.assertIn('TEST_RUNNER_FILTERED="$filtered"', main)
+        with open(os.path.join(HERE, "UITests", "PhoneChecksUITests.swift"), encoding="utf-8") as f:
+            swift = f.read()
+        method = swift[swift.index("func test5f_period()"):]
+        method = method[:method.index("\n    }\n")]
+        self.assertIn('environment["FILTERED"] == "1"', method)
+        self.assertIn("XCTSkip", method)
 
     def test_phone_method(self):
         out = self.run_block("fix [shots:PhoneChecksUITests/test7_77]")
@@ -251,6 +271,7 @@ class RunShotsBlockTests(unittest.TestCase):
         self.assertIn("arg: -only-testing:ProtlyCIUITests/PhoneChecksUITests/test0_access\n"
                       "arg: -only-testing:ProtlyCIUITests/PhoneChecksUITests/test7_77\n", out)
         self.assertIn("layout=0", out)
+        self.assertIn("filtered=1", out)
         self.assertIn("mem_wait=== PhoneChecksUITests.test7_77", out)
 
     def test_layout_only(self):

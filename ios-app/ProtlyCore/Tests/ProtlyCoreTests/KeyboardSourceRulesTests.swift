@@ -76,16 +76,42 @@ final class KeyboardSourceRulesTests: XCTestCase {
         }
     }
 
-    /// Tower decision D-E: the host's became-active notice can come just before the new controller pins (run 59: 32 ms),
-    /// so every pin remembers it and a pin made soon after takes the drop itself.
-    func testTheHeightPinCatchesAHostReturnThatCameJustBefore() throws {
-        guard let text = try sources().first(where: { $0.name == "ProtlyHeight.swift" })?.text else { return }
+    /// K2: the height rules live in ProtlyCore's HostLook (HostLookTests; tower decision D-E, a return just before the
+    /// pin, is `testAReturnJustBeforeLoadingMeansTheMargin`). The keyboard feeds it every event it uses and pins what
+    /// it asks for.
+    func testTheHeightPinFeedsHostLook() throws {
+        let all = try sources()
+        guard let text = all.first(where: { $0.name == "ProtlyHeight.swift" })?.text,
+              let controller = all.first(where: { $0.name == "KeyboardViewController.swift" })?.text else { return }
         let ns = text as NSString
-        let became = body(of: "@objc private func hostBecameActive(", in: ns).map { ns.substring(with: $0) } ?? ""
-        XCTAssertTrue(became.contains("Self.lastHostBecameActive = "), "hostBecameActive records the time for the next pin")
-        let initBody = body(of: "private init(_ controller: KeyboardInputViewController)", in: ns).map { ns.substring(with: $0) } ?? ""
-        XCTAssertTrue(initBody.contains("Self.lastHostBecameActive"), "a new pin checks the host's last return")
-        XCTAssertTrue(initBody.contains("< Self.earlyWindow"), "only a return just before the pin counts")
+        for (declaration, call) in [
+            ("static func pin(", "look.loaded(at: now)"),
+            ("static func presented(", "look.appeared(document: document(controller), at: now)"),
+            ("static func disappeared(", "look.disappeared(document: document(controller), at: now)"),
+            ("private static func observeHost()", ".NSExtensionHostWillResignActive"),
+            ("private static func observeHost()", "$0.hostWillResignActive(at: $1)"),
+            ("private static func observeHost()", ".NSExtensionHostDidBecomeActive"),
+            ("private static func observeHost()", "$0.hostBecameActive(at: $1)"),
+            ("private static func follow(", "look.pin(content:"),
+        ] {
+            let body = body(of: declaration, in: ns).map { ns.substring(with: $0) } ?? ""
+            XCTAssertTrue(body.contains(call), "\(declaration) calls \(call)")
+        }
+        // documentIdentifier traps on nil when read as Swift's non-optional UUID (runs 170 and 173): only through the
+        // Objective-C getter in document(_:).
+        XCTAssertTrue(matches(#"\.documentIdentifier\b"#, in: text).isEmpty, "documentIdentifier read as a UUID")
+        for (name, other) in all where name != "ProtlyHeight.swift" {
+            XCTAssertTrue(matches(#"\.documentIdentifier\b"#, in: other).isEmpty, "\(name) reads documentIdentifier")
+        }
+        let vc = controller as NSString
+        for (declaration, call) in [
+            ("override func viewDidLoad()", "ProtlyHeight.pin(self)"),
+            ("override func viewWillAppear(", "ProtlyHeight.presented(self)"),
+            ("override func viewDidDisappear(", "ProtlyHeight.disappeared(self)"),
+        ] {
+            let body = body(of: declaration, in: vc).map { vc.substring(with: $0) } ?? ""
+            XCTAssertTrue(body.contains(call), "KeyboardViewController.\(declaration) calls \(call)")
+        }
     }
 
     func testTheKeyGoesOnlyIntoTheRequest() throws {
@@ -309,6 +335,61 @@ final class KeyboardSourceRulesTests: XCTestCase {
         XCTAssertTrue(controller.contains("hapticConfiguration = .disabled"), "haptics must stay off")
     }
 
+    /// K4E: the space a pick types stands in for the next space tap (PickSpace in ProtlyCore). That tap types nothing
+    /// but still runs KeyboardKit's flow, whose double-space clock then starts at it; any other key, a cursor move, a
+    /// hide, an action or a host change ends the pick. No vendor change: `lastSpaceTap` is not Protly's to set.
+    func testPickSpaceWiring() throws {
+        let all = try sources()
+        guard let handler = all.first(where: { $0.name == "ProtlyActionHandler.swift" })?.text,
+              let controller = all.first(where: { $0.name == "KeyboardViewController.swift" })?.text else {
+            return XCTFail("ProtlyActionHandler.swift or KeyboardViewController.swift not found")
+        }
+        let hns = handler as NSString, cns = controller as NSString
+        func code(_ declaration: String, _ ns: NSString) -> String {
+            body(of: declaration, in: ns).map { ns.substring(with: $0) } ?? ""
+        }
+        let action = code("override func action(for gesture:", hns)
+        XCTAssertTrue(action.contains("if takenByPick, gesture == .release, action == .space { return { _ in } }"),
+                      "only the taken space release types nothing")
+        XCTAssertTrue(action.contains("return super.action(for: gesture, on: action)"), "every other action is KeyboardKit's")
+        let handle = code("override func handle(_ gesture:", hns)
+        let take = (handle as NSString).range(of: "takenByPick = host.takePickSpace(typing: !keyboardContext.isSpaceDragGestureActive)")
+        let run = (handle as NSString).range(of: "super.handle(gesture, on: action, replaced: replaced)")
+        let reset = (handle as NSString).range(of: "takenByPick = false")
+        XCTAssertTrue(take.location != NSNotFound && run.location != NSNotFound && reset.location != NSNotFound
+                      && take.location < run.location && run.location < reset.location,
+                      "the space release is decided before KeyboardKit's flow and cleared after it")
+        XCTAssertTrue(handle.contains("} else if action != .space, gesture == .press {\n                host?.endPickSpace()"),
+                      "any other key ends the pick")
+        // Only the release takes the pick: the press would spend it, and the release would then type a second space.
+        XCTAssertEqual(matches(#"if action == \.space, gesture == \.release, let host \{\s*takenByPick = host\.takePickSpace\("#,
+                               in: handle).count, 1, "only a space release takes the pick")
+        XCTAssertEqual(matches(#"takePickSpace\("#, in: handler).count, 1)
+        XCTAssertEqual(matches(#"takenByPick = true"#, in: handler).count, 0)
+        XCTAssertFalse(handler.contains("lastSpaceTap"), "KeyboardKit's double-space clock stays KeyboardKit's")
+
+        let pick = code("func pickSuggestion()", cns)
+        let typed = (pick as NSString).range(of: "insertText(\" \")")
+        let waits = (pick as NSString).range(of: "pickSpace.picked(")
+        XCTAssertTrue(typed.location != NSNotFound && waits.location != NSNotFound && typed.location < waits.location,
+                      "the pick waits only once its space is typed")
+        // A pick in front of a word waits with that word: without it the tap is never taken there (`the  world`).
+        XCTAssertTrue(pick.contains("pickSpace.picked(shown, after: textDocumentProxy.documentContextAfterInput ?? \"\", at: now)"),
+                      "the pick keeps the text after the cursor")
+        // Before FieldWatch's decision: between words it is always `.keep`, which returns early, so a host change
+        // checked after it would never end the pick.
+        let notice = code("private func noticeFieldMoved()", cns) as NSString
+        let noticed = notice.range(of: "pickSpace.noticed(o, now: now)")
+        let decide = notice.range(of: "switch watch.decide(")
+        XCTAssertTrue(noticed.location != NSNotFound && decide.location != NSNotFound && noticed.location < decide.location,
+                      "every host callback reaches the pick before FieldWatch decides")
+        for declaration in ["override func adjustTextPosition(by offset: Int)", "override func viewWillDisappear(",
+                            "private func beginCall()", "func endPickSpace()"] {
+            XCTAssertTrue(code(declaration, cns).contains("pickSpace.end()"), "\(declaration) does not end the pick")
+        }
+        XCTAssertTrue(code("func takePickSpace(typing: Bool) -> Bool", cns).contains("pickSpace.spaceReleased(types: typing,"))
+    }
+
     /// keyboard-ui 001: the bar and the protly key read their labels only through BarAction (ProtlyCore), so a label
     /// cannot drift from the request again. Longer strings (the Full Access notice, the panel's "Polishing") stay
     /// allowed; the container app has its own copy. The pill's motion has a Reduce Motion form.
@@ -485,9 +566,54 @@ final class KeyboardSourceRulesTests: XCTestCase {
         // Every Retry goes through retry(_:), which sends Read's own text again instead of reading the clipboard.
         XCTAssertEqual(matches(#"retry: \{ \[unowned host\] in host\.retry\(\$0\) \}"#, in: controller).count, 2)
         XCTAssertEqual(matches(#"retry: \{ \[unowned host\] in host\.act\("#, in: controller).count, 0)
-        // Read's Insert keeps what it typed over, so Undo can put a selection back.
-        let insert = body(of: "func insertResult()", in: cns).map { cns.substring(with: $0) } ?? ""
-        XCTAssertTrue(insert.contains("lastInsert = (result, selected, !selected.isEmpty)"), "Read's Insert drops the selection")
+    }
+
+    private func controllerSource() throws -> String {
+        guard let text = try sources().first(where: { $0.name == "KeyboardViewController.swift" })?.text else {
+            XCTFail("KeyboardViewController.swift not found")
+            return ""
+        }
+        return text
+    }
+
+    /// P1a cause 3 (track K1a): protly never types over a selection, because `selectedText` can hold only the start of
+    /// it. FieldGuard decides: a card opens with copyOnly applied, a finished card checks the field with it, insertResult
+    /// acts on its answer before the first write, and Undo is neither offered nor run with text selected.
+    func testProtlyNeverTypesOverASelection() throws {
+        let controller = try controllerSource()
+        let cns = controller as NSString
+        func fn(_ declaration: String) -> String { body(of: declaration, in: cns).map { cns.substring(with: $0) } ?? "" }
+        // insertResult binds the answer for the field as it is now: an ignored answer or `field: nil` would let it write.
+        let insert = fn("func insertResult()")
+        let check = matches(#"if let \w+ = FieldGuard\.copyOnly\([^)]*field: observed\(\)\)"#, in: insert).first
+        XCTAssertNotNil(check, "insertResult: if let ... = FieldGuard.copyOnly(..., field: observed())")
+        for write in [#"\binsertText\("#, #"\bFieldText\.replace\("#] {
+            let at = matches(write, in: insert).first
+            XCTAssertTrue(at != nil && check != nil && check!.location < at!.location,
+                          "insertResult asks FieldGuard.copyOnly before \(write)")
+        }
+        // The card opens with the rule, and checks the field once done, wherever in the controller that code lives.
+        XCTAssertFalse(matches(#"FieldGuard\.copyOnly\([^)]*field: nil\)"#, in: controller).isEmpty,
+                       "a card opens with the rule applied")
+        XCTAssertGreaterThanOrEqual(matches(#"FieldGuard\.copyOnly\([^)]*field: observed\(\)\)"#, in: controller).count, 2,
+                                    "a finished card checks the field with the rule, as insertResult does")
+        XCTAssertFalse(controller.contains("selectedText =="), "selectedText cannot be checked against the real selection")
+        // Undo: refused with text selected, and the bar does not offer it then.
+        let undo = fn("func undoInsert()")
+        XCTAssertFalse(matches(#"FieldGuard\.canUndo\([^)]*selected: "#, in: undo).isEmpty, "undoInsert passes the selection")
+        XCTAssertTrue(undo.contains("observed()"), "undoInsert reads the field as it is now")
+        XCTAssertFalse(matches(#"BarAction\.center\([^)]*canUndo: FieldGuard\.offersUndo\("#, in: controller).isEmpty,
+                       "the bar offers Undo through FieldGuard.offersUndo")
+    }
+
+    /// P1a cause 3 (track K1a): a selection is read cut short too, so the cut-short panel no longer sends the user to
+    /// Select all, and no other text does. Retry stays.
+    func testTheCutShortPanelDoesNotSendUsersToSelectAll() throws {
+        let controller = try controllerSource()
+        XCTAssertTrue(controller.contains(#".failed("Could not read the whole text.", retry: action)"#), "the cut-short panel")
+        for (name, text) in try sources() {
+            XCTAssertFalse(text.lowercased().contains("select all"), "\(name): sends the user to Select all")
+        }
     }
 
     /// Tower decision D-B: the keys wait during the field read, so the read runs on FieldReadBudget's clock (2 s in all,

@@ -8,6 +8,8 @@ final class ProtlyActionHandler: KeyboardAction.StandardActionHandler {
     weak var host: KeyboardViewController?
     /// The space bar trackpad of the drag in progress (typing-fixes 003).
     private var drag = SpaceDrag()
+    /// Set during KeyboardKit's flow for the one space release whose space the last pick already typed (PickSpace).
+    private var takenByPick = false
 
     override func handle(_ gesture: Keyboard.Gesture, on action: KeyboardAction, replaced: Bool) {
         // KeyboardKit calls this from button gestures, always on the main thread.
@@ -19,6 +21,15 @@ final class ProtlyActionHandler: KeyboardAction.StandardActionHandler {
             if action == .space, gesture == .press || gesture == .release || gesture == .end {
                 drag.reset()  // a new press or the end of a drag: the next trackpad takes a new snapshot
             }
+            if action == .space, gesture == .release, let host {
+                // K4E: the space the last pick typed takes this tap's place, as on Apple's keyboard. The tap types
+                // nothing (action(for:on:) below) but runs KeyboardKit's flow, so its double-space clock starts here
+                // and the next tap ends the sentence. A release that ends a trackpad hold types nothing anyway, and
+                // ends the pick too.
+                takenByPick = host.takePickSpace(typing: !keyboardContext.isSpaceDragGestureActive)
+            } else if action != .space, gesture == .press {
+                host?.endPickSpace()  // any other key: the next space types as usual
+            }
             if case .shift = action, gesture == .release, let host, host.mode.korean, !host.mode.manualShift,
                keyboardContext.keyboardCase == .uppercased {
                 // Auto-capital is invisible on Korean keycaps, so this tap means "shift on" (ㅃㅉㄸ), not off.
@@ -28,6 +39,7 @@ final class ProtlyActionHandler: KeyboardAction.StandardActionHandler {
             if !handleInWord(gesture, on: action) {
                 super.handle(gesture, on: action, replaced: replaced)
             }
+            takenByPick = false
             guard let host else { return }
             var manual = host.mode.manualShift
             if case .shift = action {
@@ -41,6 +53,13 @@ final class ProtlyActionHandler: KeyboardAction.StandardActionHandler {
             // @Published fires on every write; an unchanged write would rebuild the keyboard on each key.
             if host.mode.manualShift != manual { host.mode.manualShift = manual }
         }
+    }
+
+    /// K4E: the space release taken by the pick (handle above) types nothing; every other part of KeyboardKit's flow
+    /// runs as for any space tap. KeyboardKit also asks this for feedback, so it only reads the flag.
+    override func action(for gesture: Keyboard.Gesture, on action: KeyboardAction) -> KeyboardAction.GestureAction? {
+        if takenByPick, gesture == .release, action == .space { return { _ in } }
+        return super.action(for: gesture, on: action)
     }
 
     /// Once space is held (typing-fixes 003), Protly's SpaceTrackpad moves the cursor instead of KeyboardKit's drag

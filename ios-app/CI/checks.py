@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """Assembles the phone checks of one CI run (docs/plans/2026-10-30-sim-phone-checks.md, Tasks 1.2-1.6 and 2.3, and
 docs/plans/2026-10-30-typing-fixes.md, Sprint 004: dark-1, ret-*, menu-*, pad-*, and
-docs/plans/2026-10-30-keyboard-ui.md, Task 3.5: card-*, mem-stream, hit-1, bar-*, app-*).
+docs/plans/2026-10-30-keyboard-ui.md, Task 3.5: card-*, mem-stream, hit-1, bar-*, app-*, and
+fix/double-space-period and fix/pick-space (K4E), docs/research/2026-11-17-keyboard-diagnosis.md P4: dsp-*, and
+fix/keyboard-height (K2, P2): hb-*).
 
 Usage: checks.py <dir> [--network-key] [--ran <entry>,<entry>...]
 
 --network-key: the run had the CI key (run-shots.sh passes it with HAS_KEY=true), so a `SKIP no network key` line
 means the key did not reach the tests and is FAIL unreadable.
---ran: a filtered run's -only-testing entries (shotsfilter.py); the IDs of methods outside them are NOT-RUN.
+--ran: a filtered run's -only-testing entries (shotsfilter.py); the IDs of methods outside them are NOT-RUN. Without
+it (a full run) the IDs of the FILTERED_ONLY methods are NOT-RUN: those methods skip themselves outside a filtered run.
 
 Reads from <dir>:
 - checks.txt: `CHECK <id> PASS|FAIL|RECORD|SKIP|PENDING <evidence>` lines written by UITests/PhoneChecksUITests.swift.
@@ -19,7 +22,7 @@ PENDING lines (model output as `<group>#<try>="..."`) with the script rules in R
 (ret-*, menu-*, pad-* from their quoted readings; dark-1 from its two screenshots in <dir>, with Pillow); adds a FAIL `unreadable`
 line for every expected ID without a line (and for every malformed line), sorts by ID, keeps the test's own lines in
 checks-raw.txt and rewrites checks.txt with the final lines. Prints `CHECKS`, the lines and
-`CHECKS pass N fail N record N skip N` (plus ` not-run N` in a filtered run). Exit 1 when any line is FAIL.
+`CHECKS pass N fail N record N skip N` (plus ` not-run N` when any ID is NOT-RUN). Exit 1 when any line is FAIL.
 """
 
 import os
@@ -43,7 +46,21 @@ CARD_LOOKS = ("dark", "light")
 CARD_STATES = ("wait", "mid", "done", "err0", "err1")
 CARD_IDS = [f"card-{s}-{look}" for look in CARD_LOOKS for s in CARD_STATES] + ["card-slow", "card-cancel", "mem-stream"]
 BAR_IDS = ["hit-1", "bar-dark", "bar-light", "bar-xxl", "app-dark", "app-light"]
-EXPECTED_IDS = OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
+# fix/double-space-period (report P4): two space taps after a word end the sentence, also with a word right after the
+# cursor (case D); K4E (case E): one tap after a pick from the bar adds nothing, also in front of a word (pickmid), a
+# caret moved after the pick ends it (pickmove), a fast double tap still ends the sentence. The same list as
+# PhoneRun.periodIDs in UITests/PhoneChecksUITests.swift.
+PERIOD_FIELDS = ("uikit", "composer")
+PERIOD_KINDS = ("en", "word", "ko", "pick2", "pick1", "fast", "kofast", "kopick2", "pickmid", "pickmove")
+PERIOD_IDS = [f"dsp-{f}-{k}" for f in PERIOD_FIELDS for k in PERIOD_KINDS]
+# K2 (report P2, the keyboard height keeps changing): the band above the bar on every presentation path, against
+# Apple's band measured in the same run (hb-apple, RECORD). The same list as PhoneRun.heightIDs in
+# UITests/HeightChecks.swift; the UI test judges each item itself.
+HEIGHT_IDS = ["hb-apple", "hb-launch", "hb-hide-fresh", "hb-globe", "hb-hide-globe", "hb-emoji", "hb-hide-emoji",
+              "hb-switch", "hb-hide-switch", "hb-hide-long", "hb-switch-hidden", "hb-kill-up", "hb-kill-hidden",
+              "hb-card", "hb-cancel"]
+EXPECTED_IDS = (OFFLINE_IDS + [i for i in NETWORK_IDS if i not in OFFLINE_IDS] + TYPING_IDS + CARD_IDS + BAR_IDS
+                + PERIOD_IDS + HEIGHT_IDS)
 # The PhoneChecksUITests method that writes each ID. A filtered run (`[shots:...]`, shotsfilter.py) marks the IDs of
 # methods it did not select NOT-RUN. Items inside one method depend on each other (6.8-9 on 6.8-8's learned word,
 # 8.5-10 and 7.7-4 on earlier timings), so a method is the smallest unit a filter selects.
@@ -58,11 +75,18 @@ METHOD_IDS = {
     "test5c_pad": ["pad-1", "pad-2", "pad-3"],
     "test5d_card": CARD_IDS,
     "test5e_bar": BAR_IDS,
+    "test5f_period": PERIOD_IDS,
     "test6_85net": [f"8.5-{i}" for i in (1, 3, 4, 5, 6, 7, 8, 9, 10)],
     "test7_77": [f"7.7-{i}" for i in range(1, 7)],
+    "test9_height": HEIGHT_IDS,
 }
+# Methods that run only in a filtered run: without FILTERED=1 (run-shots.sh sets it with a `[shots:...]` filter) they
+# throw XCTSkip, so a full run marks their IDs NOT-RUN with this reason. test5f_period takes about 15 minutes, and full
+# runs already come close to run-shots.sh's MAIN_TEST_DEADLINE.
+FILTERED_ONLY = {"test5f_period": "runs only in a filtered run (deadline)",
+                 "test9_height": "runs only in a filtered run (deadline)"}
 # Methods that write no ID of their own (Full Access, the probe) and the layout test.
-OTHER_METHODS = {"PhoneChecksUITests": ("test0_access", "test0_probe"), "KeyboardShotsUITests": ("testScenarios",)}
+OTHER_METHODS ={"PhoneChecksUITests": ("test0_access", "test0_probe"), "KeyboardShotsUITests": ("testScenarios",)}
 NOT_RUN = "NOT-RUN"
 
 STATUSES = ("PASS", "FAIL", "RECORD", "SKIP", "PENDING")
@@ -1137,8 +1161,90 @@ CARD_RESOLVERS = {
 }
 
 
+# fix/double-space-period (docs/research/2026-11-17-keyboard-diagnosis.md, P4). UITests/PhoneChecksUITests.swift
+# (checksPeriod) writes dsp-<field>-<kind> PENDING with the field's text before the first try (t0) and after each try
+# (t1...). What each try must add, right before the text after the cursor (`world` for case D and pickmid, else
+# nothing). pick1 and pickmid are K4E: one tap after a pick adds nothing to the pick's `the ` (Apple's keyboard, report
+# P4 case E); pickmove: a caret moved away and back between the pick and the tap ends the pick, so the tap types a
+# space.
+PERIOD_UNIT = {"word": "hello. ", "en": "hello. ", "ko": "안녕. ", "pick2": "the. ", "pick1": "the ",
+               "fast": "hello. ", "kofast": "안녕. ", "kopick2": "안녕. ", "pickmid": "the ", "pickmove": "the  "}
+PERIOD_AFTER = {"word": "world", "pickmid": "world"}
+# The kinds whose tries read the field between the pick and the tap (p<i>): it must show the pick, `the ` added in
+# front of the text after the cursor.
+PERIOD_PICK = {"pick1": "the ", "pickmid": "the ", "pickmove": "the "}
+# The kinds whose tries move the caret between the pick and the tap: in front of the first word (away<i>, 0), then
+# back to the end of the pick (back<i>).
+PERIOD_MOVES = ("pickmove",)
+# The fewest tries that count (the fixes' done-when: case D at least 6 tries per field, one tap after a pick 4).
+PERIOD_MIN_TRIES = {"word": 6, "pick1": 4, "pickmid": 4}
+PERIOD_DEFAULT_TRIES = 3
+
+
+def caret_at(value):
+    """The caret's character offset from a sel0 reading (`location,length` on the UITextView screen, an offset in the
+    web composer), or None."""
+    m = re.fullmatch(r"\s*(-?\d+)(?:,\d+)?\s*", value or "")
+    return int(m.group(1)) if m else None
+
+
+def resolve_period(check, marks=None, samples=None, run_dir=None):
+    """dsp-<field>-<kind>: each try adds exactly its unit (`hello. `, `안녕. `, `the. `, and `the ` for one tap after a
+    pick) before the text after the cursor, which stays as it was (case D: `hello. world`, one space after the period
+    and none lost before the word).
+    FAIL unreadable when the set-up did not happen: a missing reading, a field that did not start as the case set it
+    up (`world`, or empty), for case D and pickmid a caret that was not at the start of `world` before the first try
+    (sel0), for the pick kinds a field that did not show the pick before the tap (p<i>), and for pickmove a caret that
+    did not go to the start and back to the pick (away<i>, back<i>)."""
+    kind = check.id.split("-", 2)[2]
+    ev = check.evidence
+    unit, after = PERIOD_UNIT[kind], PERIOD_AFTER.get(kind, "")
+    least = PERIOD_MIN_TRIES.get(kind, PERIOD_DEFAULT_TRIES)
+    n = int_field(ev, "tries")
+    if n is None or n < least:
+        return unreadable(check.id, f"{n} tries, want at least {least}: {ev[:300]!r}")
+    texts = [quoted_field(ev, f"t{i}") for i in range(n + 1)]
+    if any(t is None for t in texts):
+        missing = [f"t{i}" for i, t in enumerate(texts) if t is None]
+        return unreadable(check.id, f"no reading {', '.join(missing)}: {ev[:300]!r}")
+    texts = [unicodedata.normalize("NFC", t) for t in texts]
+    if texts[0] != after:
+        return unreadable(check.id, f"the field started as {texts[0]!r}, not {after!r}: {ev[:300]!r}")
+    if after:
+        sel0 = quoted_field(ev, "sel0")
+        if caret_at(sel0) != 0:
+            return unreadable(check.id, f"caret not at word start before the first try (sel0={sel0!r}): {ev[:300]!r}")
+    pick = PERIOD_PICK.get(kind)
+    for i in range(1, n + 1):
+        prev = texts[i - 1]
+        if pick is None or not prev.endswith(after):
+            continue  # no pick reading, or the try before already broke the field (a FAIL below)
+        # The field between the pick and the tap: a pick that did not happen (no `the `) is no K4E try.
+        shown = prev[:len(prev) - len(after)] + pick + after
+        p = quoted_field(ev, f"p{i}")
+        if p is None or unicodedata.normalize("NFC", p) != shown:
+            return unreadable(check.id, f"try {i}: the field after the pick was {p!r}, not {shown!r}: {ev[:300]!r}")
+        end = len(shown) - len(after)  # the caret right after the pick
+        if kind in PERIOD_MOVES:
+            away, back = quoted_field(ev, f"away{i}"), quoted_field(ev, f"back{i}")
+            if caret_at(away) != 0 or caret_at(back) != end:
+                return unreadable(check.id, f"try {i}: the caret did not move to the start and back to the pick "
+                                            f"(away={away!r}, back={back!r}, want 0 and {end}): {ev[:300]!r}")
+    problems = []
+    for i in range(1, n + 1):
+        prev, cur = texts[i - 1], texts[i]
+        want = prev[:len(prev) - len(after)] + unit + after if prev.endswith(after) else None
+        if cur != want:
+            problems.append(f"try {i}: {prev!r} became {cur!r}, want {want!r}")
+    where = f" before {after!r}" if after else " at the end"
+    notes = [f"{n - len(problems)}/{n} tries added {unit!r}{where}"]
+    if pick is not None:
+        notes.append(f"the field showed the pick {pick!r} before each tap")
+    return verdict(check, problems, notes)
+
+
 RESOLVERS = {"6.8-9": resolve_relaunch, "6.8-10": resolve_memory, **{i: resolve_rules for i in RULES},
-             **TYPING_RESOLVERS, **CARD_RESOLVERS}
+             **TYPING_RESOLVERS, **CARD_RESOLVERS, **{i: resolve_period for i in PERIOD_IDS}}
 
 
 NO_KEY = "no network key"
@@ -1155,8 +1261,9 @@ def guard_network(c, network_key):
 
 def assemble(checks_text, log_text, mem_text, network_key=False, ran=None, run_dir=None):
     """The final, sorted lines. None for checks_text means the test wrote no checks.txt. `ran` (covered_ids) is the
-    set of IDs a filtered run selected: an expected ID outside it without a line is NOT-RUN, not FAIL. `run_dir`: the
-    run folder, for the resolvers that read a screenshot (dark-1)."""
+    set of IDs a filtered run selected: an expected ID outside it without a line is NOT-RUN, not FAIL. None is a full
+    run, where an ID of a FILTERED_ONLY method without a line is NOT-RUN. `run_dir`: the run folder, for the resolvers
+    that read a screenshot (dark-1)."""
     by_id = {}
     extra = []
     if checks_text is None:
@@ -1189,9 +1296,12 @@ def assemble(checks_text, log_text, mem_text, network_key=False, ran=None, run_d
         if c.status == "PASS" and " => " in c.evidence:
             continue
         by_id[check_id] = guard_network(c, network_key)
+    filtered_only = {i: why for m, why in FILTERED_ONLY.items() for i in METHOD_IDS[m]}
     for check_id in EXPECTED_IDS:
         if check_id not in by_id and ran is not None and check_id not in ran:
             by_id[check_id] = Check(check_id, NOT_RUN, "filtered run: its test method was not selected")
+        elif check_id not in by_id and ran is None and check_id in filtered_only:
+            by_id[check_id] = Check(check_id, NOT_RUN, filtered_only[check_id])
         elif check_id not in by_id:
             why = "no checks.txt" if checks_text is None else "no CHECK line"
             by_id[check_id] = unreadable(check_id, why)

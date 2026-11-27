@@ -8,13 +8,27 @@ function isEditable(el) {
   return !!c && c.getAttribute('contenteditable').toLowerCase() !== 'false';
 }
 
+// An element's shadow root, open or closed. chrome.dom reaches a closed root (a web component's field, another
+// extension's injected UI) from a content script, also one run by executeScript (checked in Chrome 156); outside
+// an extension only open roots are seen.
+function rootOf(el) {
+  try {
+    return globalThis.chrome?.dom?.openOrClosedShadowRoot?.(el) ?? el.shadowRoot ?? null;
+  } catch {
+    return el.shadowRoot ?? null;
+  }
+}
+
 // The focused element, through open shadow roots and same-origin iframes. A cross-origin frame gives
-// { el: null, blocked: true }: this frame cannot see inside it.
-export function deepActive(doc) {
+// { el: null, blocked: true }: this frame cannot see inside it. { closed: true } also enters closed roots, for the
+// write guard only: a box in a closed root is not a target, since its events reach protly's listeners retargeted
+// to the host (composedPath leaves the box out), so the card could not tell the box from the page.
+export function deepActive(doc, { closed = false } = {}) {
   let d = doc;
   let el = d.activeElement;
   for (let i = 0; i < MAX_DEPTH && el; i++) {
-    if (el.shadowRoot?.activeElement) { el = el.shadowRoot.activeElement; continue; }
+    const root = closed ? rootOf(el) : el.shadowRoot;
+    if (root?.activeElement) { el = root.activeElement; continue; }
     if (el.tagName !== 'IFRAME' && el.tagName !== 'FRAME') break;
     let inner = null;
     try { inner = el.contentDocument; } catch {}

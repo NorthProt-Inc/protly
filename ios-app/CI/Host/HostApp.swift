@@ -12,7 +12,8 @@ import WebKit
 ///   first and last word frames are published as accessibility values for XCUITest.
 /// - `web`: a dark web composer (typing-fixes 004: Return in web fields, the word's ink on a dark page) in a WKWebView,
 ///   from the bundled web-composer.html. Its state is published as an accessibility value and every DOM event is
-///   appended to Documents/web-events.txt, which run-shots.sh copies into the run folder.
+///   appended to Documents/web-events.txt, which run-shots.sh copies into the run folder. `-caret 1` loads the page
+///   with `?caret=1`, which also posts the state when the caret moves (fix/double-space-period, test5f_period only).
 /// Every screen has `Clear` (empties the field without keys) and `Dismiss` (the field loses focus, which hides the
 /// keyboard) in the top-right corner, away from the field and the center column measure.py samples.
 @main
@@ -108,7 +109,21 @@ final class TextViewModel: ObservableObject {
     /// `x,y,w,h` in screen points: where a double-tap selects that word.
     @Published var firstWord = ""
     @Published var lastWord = ""
+    /// `<count>:<t>,<t>,...`: how many times the text changed (UITextView.textDidChangeNotification, the keyboard's
+    /// edits) and when the last 16 changes came, in ms of the host's uptime clock. test5f_period reads the spacing of a
+    /// double tap's two spaces from it. Counts and times only, never the text.
+    @Published var edits = "0:"
+    private var editCount = 0
+    private var editTimes: [Int] = []
+    var editObserver: NSObjectProtocol?
     weak var textView: UITextView?
+
+    func noteEdit() {
+        editCount += 1
+        editTimes.append(Int((ProcessInfo.processInfo.systemUptime * 1000).rounded()))
+        if editTimes.count > 16 { editTimes.removeFirst(editTimes.count - 16) }
+        edits = "\(editCount):" + editTimes.map(String.init).joined(separator: ",")
+    }
 
     func clear() {
         textView?.text = ""
@@ -182,6 +197,11 @@ struct TextViewField: UIViewRepresentable {
         tv.autocapitalizationType = .none
         tv.accessibilityIdentifier = "field"
         model.textView = tv
+        model.editObserver = NotificationCenter.default.addObserver(
+            forName: UITextView.textDidChangeNotification, object: tv, queue: .main
+        ) { [weak model] _ in
+            MainActor.assumeIsolated { model?.noteEdit() }
+        }
         return tv
     }
 
@@ -208,6 +228,7 @@ struct TextViewScreen: View {
                 Probe(id: "marked", value: model.marked)
                 Probe(id: "first-word", value: model.firstWord)
                 Probe(id: "last-word", value: model.lastWord)
+                Probe(id: "edits", value: model.edits)
             }
             .tint(.white)
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -307,7 +328,14 @@ struct WebComposer: UIViewRepresentable {
         web.accessibilityIdentifier = "web"
         model.webView = web
         if let url = Bundle.main.url(forResource: "web-composer", withExtension: "html") {
-            web.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+            // `-caret 1` (the period check only): the page also posts its state when the caret moves.
+            var page = url
+            if UserDefaults.standard.string(forKey: "caret") == "1",
+               var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                parts.queryItems = [URLQueryItem(name: "caret", value: "1")]
+                page = parts.url ?? url
+            }
+            web.loadFileURL(page, allowingReadAccessTo: url.deletingLastPathComponent())
         } else {
             let model = model
             Task { @MainActor in model.fail("web-composer.html is not in the bundle") }
