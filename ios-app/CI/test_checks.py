@@ -1308,6 +1308,11 @@ class WholeReadTests(unittest.TestCase):
         final = self.assemble_with_logs(line, ui, bad_h)["wr-uikit-mid"]
         self.assertEqual(final.status, "FAIL")
         self.assertIn("t1:h=deadbeef want 49b6f226", final.evidence)
+        # Missing real= hash on an accepted try fails rather than passing silently.
+        no_real = "CHECK wr-uikit-mid PASS t1={reply=335/9/h49b6f226 replace=1.40 undo=1.10}\n"
+        final = self.assemble_with_logs(no_real, ui, good)["wr-uikit-mid"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t1:no real hash", final.evidence)
         # Keys-wait >= 100 ms fails.
         slow_keys = self.kb(("10", "05.000", self.ACCEPTED), ("10", "08.000", "write replace keys=100"),
                             ("10", "10.000", self.WRITE_UNDO))

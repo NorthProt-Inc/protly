@@ -1358,7 +1358,9 @@ def resolve_whole_log(check, marks, kb_text):
             ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
             real = kv(ui.group(1), "real") if ui else None
             want_h = real.rsplit("/h", 1)[1] if real and "/h" in real else None
-            if want_h and h != want_h:
+            if not want_h:
+                problems.append(f"t{t}:no real hash")
+            elif h != want_h:
                 problems.append(f"t{t}:h={h} want {want_h}")
             if case in WHOLE_SHORT_CASES and (took is None or took > WHOLE_SHORT_READ_MS):
                 problems.append(f"t{t}:read={took_s}ms over {WHOLE_SHORT_READ_MS}")
