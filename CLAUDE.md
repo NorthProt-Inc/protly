@@ -19,7 +19,8 @@ that types Korean and English on one QWERTY grid and offers Translate / Polish /
 ## Layout
 
 - Chrome extension: `src/`, `tests/`, `manifest.json`, build `scripts/build.mjs`. Native host: `host/`.
-  `host/protly_edit.py` is the Claude Code editor shim (Ctrl+G turns a Korean prompt draft into English), enabled
+  `host/protly_edit.py` is the Claude Code editor shim (Ctrl+G translates a Korean prompt draft into English and
+  polishes an English one), enabled
   by `env.EDITOR` in `~/.claude/settings.json`.
 - iPhone: `ios-app/` (xtool app: container `Protly`, extension `ProtlyKeyboard`), logic in the Swift package
   `ios-app/ProtlyCore`, KeyboardKit 9.9.1 vendored at `ios-app/Vendor/KeyboardKit` (every change from upstream

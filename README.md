@@ -26,10 +26,10 @@ host/install.sh <extension-id>
 
 ## Claude Code prompt (terminal)
 
-`host/protly_edit.py` is an editor shim. With it set as the editor for Claude Code, Ctrl+G on a prompt draft that
-contains Hangul rewrites the draft in English in place (Opus, low effort, the same API key as the host). A draft
-without Hangul, or any other file, opens in the real editor (`$PROTLY_EDITOR`, default `nano`). On a failure the
-draft is kept. Works in any terminal. Enable it in `~/.claude/settings.json`:
+`host/protly_edit.py` is an editor shim. With it set as the editor for Claude Code, Ctrl+G on a prompt draft
+rewrites it in English in place (Opus, low effort, the same API key as the host): a draft that contains Hangul is
+translated, an English draft is polished. A blank draft, or any other file, opens in the real editor
+(`$PROTLY_EDITOR`, default `nano`). On a failure the draft is kept. Works in any terminal. Enable it in `~/.claude/settings.json`:
 
 ```json
 { "env": { "EDITOR": "/path/to/protly/host/protly_edit.py" } }
