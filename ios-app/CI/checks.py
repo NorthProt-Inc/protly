@@ -1305,13 +1305,49 @@ def _int(value):
         return None
 
 
+def whole_shape(text):
+    """`<utf16 len>/<line feeds>/h<fnv>` of a text, as WholeChecks.Shape in UITests/WholeReadChecks.swift."""
+    raw = text.encode("utf-16-le")
+    h = 0x811C9DC5
+    for i in range(0, len(raw), 2):
+        h = ((h ^ int.from_bytes(raw[i:i + 2], "little")) * 0x01000193) & 0xFFFFFFFF
+    return f"{len(raw) // 2}/{text.count(chr(10))}/h{h:08x}"
+
+
+UI_MISS = re.compile(r"\(not as expected\)")
+WEB_UNDO_MISS = re.compile(r"(?:^| )t(\d+)=undo=timeout field=(\S+) \(not as expected\)")
+
+
+def web_undo_refusals(check):
+    """Tries whose only UI failure is an Undo that never came while the field kept the Replace result exactly.
+    WebKit shows a long Replace to the keyboard seconds late (run 597be68-225: 6-8 s for 335 units), so Undo's guard
+    sees the old text and refuses. Known limit, owner's choice 2026-11-27 (refuse, no new rule or wait). Returns the
+    set of such tries, or None when any other UI failure is in the line."""
+    found = set()
+    for m in WEB_UNDO_MISS.finditer(check.evidence):
+        t = m.group(1)
+        ui = re.search(rf"(?:^| )t{t}=\{{([^}}]*)\}}", check.evidence)
+        reply = kv(ui.group(1), "reply") if ui else None
+        if not reply or m.group(2) != whole_shape("read " + reply):
+            return None
+        found.add(int(t))
+    return found if len(UI_MISS.findall(check.evidence)) == len(found) else None
+
+
 def resolve_whole_log(check, marks, kb_text):
     """One-pass whole-field read log check for each try of a wr- line. Gates: accepted hash matches UI real=, refusals
     within WHOLE_CAP_MS with known=1, Replace/Undo keys-wait < WHOLE_MAX_KEYS_MS (100 ms), short-case read ms <=
-    WHOLE_SHORT_READ_MS (2500 ms). Everything else is recorded, not gated."""
+    WHOLE_SHORT_READ_MS (2500 ms). Everything else is recorded, not gated. On web hosts an Undo refused with the Replace
+    result intact (`web_undo_refusals`) is recorded, not failed."""
     host, case = check.id.split("-", 2)[1:]
     kind = "web" if host in WHOLE_WEB_HOSTS else "native"
     is_refusal = (kind, case) in WHOLE_REFUSALS
+    ui_ok = check.status == "PASS"
+    undo_refused = set()
+    if not ui_ok and kind == "web":
+        found = web_undo_refusals(check)
+        if found:
+            ui_ok, undo_refused = True, found
     if kb_text is None:
         problems, notes = ["no keyboard-log.txt"], []
     else:
@@ -1367,7 +1403,15 @@ def resolve_whole_log(check, marks, kb_text):
             rep = [kv(line, "keys") for line in lines if line.startswith("write replace ")]
             und = [kv(line, "keys") for line in lines if line.startswith("write undo ")]
             notes.append(f"t{t}:{outcome}/{took_s}ms/keys={rep[0] if rep else 'none'},{und[0] if und else 'none'}")
+            if t in undo_refused:
+                if und:
+                    problems.append(f"t{t}:undo ran ({len(und)}) but the field kept the Replace result")
+                else:
+                    notes.append(f"t{t}:undo refused (web host lag, Replace result intact)")
+                    und = None
             for wname, vals in (("replace", rep), ("undo", und)):
+                if vals is None:
+                    continue
                 if len(vals) != 1:
                     problems.append(f"t{t}:{wname} keys missing ({len(vals)})")
                     continue
@@ -1377,7 +1421,7 @@ def resolve_whole_log(check, marks, kb_text):
     evidence = f"{check.evidence} log={' '.join(notes)}".rstrip()
     if problems:
         evidence += " log-problems=" + ",".join(problems)
-    status = "FAIL" if problems or check.status != "PASS" else "PASS"
+    status = "FAIL" if problems or not ui_ok else "PASS"
     return Check(check.id, status, evidence)
 
 

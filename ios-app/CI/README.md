@@ -343,6 +343,11 @@ checks each try against `keyboard-log.txt` (`resolve_whole_log`).
   with the cursor back (`known=1` and `caret-left == caret`); field exact after Replace and Undo by the UI test's own
   read; Replace and Undo keys-wait under 100 ms; `read ms` at most 2500 on short cases (`swin`, `smid`, `ssel`);
   everything else (`call done` timings, non-short read times, UI write times) recorded, not gated.
+- **Known limit, web Undo** (owner's choice 2026-11-27: refuse, no new rule or wait): WebKit shows a long Replace to
+  the keyboard seconds late (run 597be68-225: 6-8 s for 335 units), so Undo's guard sees the old text and refuses
+  (run 1013a0a-228, `wr-textarea-win`). On `textarea` an Undo timeout PASSes only when the field still holds exactly
+  the Replace result (`read <reply>`) and the keyboard logged no `write undo`; any other UI failure stays a FAIL
+  (`web_undo_refusals`).
 - `test_checks.py` (`WholeReadTests`) keeps the Swift lists, tries and draft lengths equal to `checks.py` and
   `HostApp.swift`.
 

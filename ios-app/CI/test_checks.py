@@ -1325,6 +1325,39 @@ class WholeReadTests(unittest.TestCase):
         self.assertEqual(final.status, "FAIL")
         self.assertIn("t1:undo keys missing (0)", final.evidence)
 
+    # Run 1013a0a-228, wr-textarea-win t1: Replace landed, Undo never ran, the field kept the Replace result exactly
+    # ("read 335/9/h49b6f226" = 20/0/h0eec839c).
+    WEB_UNDO_MISS = ("CHECK wr-textarea-win FAIL "
+                     "t1={real=335/9/h49b6f226 caret=335,0 reply=335/9/h49b6f226 replace=2.72 undo=timeout "
+                     "field=20/0/h0eec839c} t1=undo=timeout field=20/0/h0eec839c (not as expected) "
+                     "t2={real=335/9/h49b6f226 caret=335,0 reply=335/9/h49b6f226 replace=2.73 undo=timeout "
+                     "field=20/0/h0eec839c} t2=undo=timeout field=20/0/h0eec839c (not as expected)\n")
+
+    def test_web_undo_refused_with_the_replace_result_intact_is_a_known_limit(self):
+        ui = self.marks(("wr-textarea-win-t1", 10, 0), ("wr-textarea-win-t2", 11, 0), ("wr-textarea-swin-t1", 12, 0))
+        kb = self.kb(("10", "05.000", self.ACCEPTED), ("10", "08.000", self.WRITE_REP),
+                     ("11", "05.000", self.ACCEPTED), ("11", "08.000", self.WRITE_REP))
+        line = self.WEB_UNDO_MISS
+        final = self.assemble_with_logs(line, ui, kb)["wr-textarea-win"]
+        self.assertEqual(final.status, "PASS", final.evidence)
+        self.assertIn("t1:undo refused (web host lag, Replace result intact)", final.evidence)
+        self.assertIn("t2:undo refused (web host lag, Replace result intact)", final.evidence)
+        # Any other field after the timeout is text changed by Undo: still a FAIL.
+        moved = line.replace("t2=undo=timeout field=20/0/h0eec839c", "t2=undo=timeout field=20/0/hdeadbeef")
+        self.assertEqual(self.assemble_with_logs(moved, ui, kb)["wr-textarea-win"].status, "FAIL")
+        # An Undo that ran (a write undo line) but left the field unchanged is not a refusal.
+        ran = kb + self.kb(("11", "10.000", self.WRITE_UNDO))
+        final = self.assemble_with_logs(line, ui, ran)["wr-textarea-win"]
+        self.assertEqual(final.status, "FAIL")
+        self.assertIn("t2:undo ran (1) but the field kept the Replace result", final.evidence)
+        # Another UI failure next to it keeps the FAIL.
+        other = line.replace("(not as expected)\n", "(not as expected) t2=replace=timeout (not as expected)\n")
+        self.assertEqual(self.assemble_with_logs(other, ui, kb)["wr-textarea-win"].status, "FAIL")
+        # Native hosts get no such allowance.
+        native = line.replace("wr-textarea-win", "wr-uikit-win")
+        ui_n = self.marks(("wr-uikit-win-t1", 10, 0), ("wr-uikit-win-t2", 11, 0), ("wr-uikit-swin-t1", 12, 0))
+        self.assertEqual(self.assemble_with_logs(native, ui_n, kb)["wr-uikit-win"].status, "FAIL")
+
     def test_short_cases_gate_read_ms_at_2500(self):
         line = ("CHECK wr-uikit-smid PASS t1={real=39/0/h84d73b78 replace=0.5 undo=0.5} "
                 "t2={real=39/0/h84d73b78 replace=0.5 undo=0.5}\n")
