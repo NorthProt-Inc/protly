@@ -24,6 +24,19 @@ public struct CursorReturn: Sendable, Equatable {
     /// A read starts where the user has the cursor.
     public mutating func begin() { clear() }
 
+    /// A read starts at the cursor, whose before-context is `before`. A Retry from where the last read left the cursor
+    /// keeps its offset so Cancel still returns to the user's original place; anywhere else starts a fresh record.
+    public mutating func begin(before: String) {
+        let now = Array(before.utf16)
+        let same = offset != nil && offset != 0 && now.isEmpty == at.isEmpty && WholeRead.agree(now, at, atEnd: true)
+        if !same {
+            clear()
+        } else {
+            end = nil
+            inFlight = false
+        }
+    }
+
     /// The read is about to move the cursor.
     public mutating func sending() { inFlight = true }
 

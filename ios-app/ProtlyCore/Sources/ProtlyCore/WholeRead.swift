@@ -16,11 +16,17 @@ public enum WholeRead {
     public static let moveWait: TimeInterval = 1
     /// A probe step (one unit past an empty context): no change for this long is the end or the start.
     public static let probeWait: TimeInterval = 0.5
+    /// A step whose change takes longer than this marks the host slow: any silent probe after it cannot be trusted as
+    /// the start or end, so the read is marked unclean and refused (same threshold as K1b's slow-step flag).
+    public static let lateStep: TimeInterval = 0.2
     /// An empty before-context waits this long once before probing -1.
     public static let emptyWait: TimeInterval = 0.3
     /// The poll interval; a step has settled when two polls in a row agree, at most `settlePolls` more polls.
     public static let poll: TimeInterval = 0.02
     public static let settlePolls = 5
+
+    /// A changed step that took longer than `lateStep` is late (the host lagged).
+    public static func isLate(elapsed: TimeInterval) -> Bool { elapsed > lateStep }
 
     /// How long after a synchronous Replace, Undo or Insert the host may still be applying the edits: no new field
     /// read starts and host callbacks count as the write's own echo until this passes.
@@ -36,6 +42,8 @@ public enum WholeRead {
 
     static func isLow(_ x: UInt16) -> Bool { (0xDC00...0xDFFF).contains(x) }
 
+    static func hasPair(_ u: [UInt16]) -> Bool { u.contains(where: isLow) }
+
     /// The UTF-16 units the last `k` characters of `u` take, as a web view counts them (a surrogate pair is one); nil
     /// when `u` holds fewer.
     public static func charUnits(_ u: [UInt16], _ k: Int) -> Int? {
@@ -48,17 +56,31 @@ public enum WholeRead {
         return u.count - i
     }
 
+    /// The UTF-16 units the first `k` characters of `u` take (a surrogate pair is one); nil when `u` holds fewer.
+    static func charUnitsFront(_ u: [UInt16], _ k: Int) -> Int? {
+        var i = 0
+        for _ in 0..<k {
+            guard i < u.count else { return nil }
+            i += 1
+            if i < u.count, isLow(u[i]), (0xD800...0xDBFF).contains(u[i - 1]) { i += 1 }
+        }
+        return i
+    }
+
     /// The step for a context `u` that ends (back) or starts (forward) at the cursor: the largest k < u.count that is
     /// not a period of `u` (so the move must change the context) and does not land the cursor before a low surrogate.
-    /// 1, or 2 when 1 would split a pair, below that.
+    /// When `u` holds a surrogate pair, leaves at least 3 units of overlap under both the units and the characters
+    /// readings so a characters host cannot clamp past the window undetected. 1, or 2 when 1 would split a pair, below.
     public static func safeJump(_ u: [UInt16], back: Bool) -> Int {
         let n = u.count
         // One unit lands at index 1 either way: never there when it is a pair's low half (Codex bug 3: a forward step
         // over a lone emoji split it).
         guard n > 2 else { return n == 2 && isLow(u[1]) ? 2 : 1 }
-        var k = n - 1
+        let paired = hasPair(u)
+        var k = n - (paired ? 3 : 1)
         while k > 1 {
-            if !isLow(u[back ? n - k : k]) {
+            let charsOK = !paired || ((back ? charUnits(u, k) : charUnitsFront(u, k)).map { n - $0 >= 3 } ?? false)
+            if charsOK, !isLow(u[back ? n - k : k]) {
                 var periodic = true
                 for i in 0..<(n - k) where u[i] != u[i + k] {
                     periodic = false
@@ -151,6 +173,7 @@ public enum WholeRead {
     /// (Codex bug 2), B1 reached the start, R1 showed the end again, FM crossed nothing, B1 ends with what F crossed,
     /// and every step was clean (no late, blank, undone or misfit step). Anything else is refused at once.
     public static func accept(_ r: OnePass) -> ReadVerdict {
+        guard r.clean else { return .refuse("unclean") }
         let first: [UInt16]
         switch r.first {
         case .done(let u): first = u
@@ -166,7 +189,6 @@ public enum WholeRead {
         if back.isEmpty, first.isEmpty {
             return r.hasText ? .refuse("emptyHasText") : .empty
         }
-        guard r.clean else { return .refuse("unclean") }
         switch r.returned {
         case .atEnd: break
         case .timeUp: return .refuse("r1:timeUp")
@@ -201,7 +223,6 @@ public enum WalkStep: Equatable, Sendable {
 public struct BackWalk: Sendable {
     /// The pieces moved over, nearest the end first.
     private var pieces: [[UInt16]] = []
-    public private(set) var count = 0
     private var b0: [UInt16] = []
     private var a0: [UInt16] = []
     private var k = 0
@@ -230,29 +251,35 @@ public struct BackWalk: Sendable {
             return .failed("phantom", moved: nil)
         }
         guard changed else { return .failed("stuck", moved: nil) }
-        // A jump below the context's length always leaves text before the cursor, so an empty before-context is no
-        // evidence unless the after-context shows the piece crossed. A step over the whole context may reach the start.
-        let shown = Array(b0.suffix(k).prefix { $0 != 10 })
-        guard !b1.isEmpty || k >= b0.count || (!shown.isEmpty && !a1.isEmpty) else {
+        // A clamped pair move on a characters host cannot be reversed from k; report moved: nil so restore never overshoots.
+        let failMoved: Int? = WholeRead.hasPair(b0) && b1.isEmpty ? nil : -k
+        // A jump shorter than the context always leaves text before the cursor; an empty before-context refuses at once.
+        guard !b1.isEmpty || k >= b0.count else {
             fit = (false, a1.isEmpty)
-            return .failed("badStep", moved: -k)
+            return .failed("badStep", moved: failMoved)
         }
         func afterFits(_ c: Int) -> Bool {
             let piece = b0.suffix(c)
             let shown = Array(piece.prefix { $0 != 10 })
+            if !shown.isEmpty, a1.isEmpty { return false }
             return WholeRead.agree(a1, shown, atEnd: false) && (shown.count == piece.count || a1.count <= shown.count)
         }
         func fits(_ c: Int) -> Bool {
             WholeRead.agree(b1, Array(b0.prefix(b0.count - c)), atEnd: true) && afterFits(c)
         }
+        func fitsChars(_ c: Int) -> Bool {
+            guard fits(c) else { return false }
+            let pre = b0.prefix(b0.count - c)
+            let shown = b0.suffix(c).prefix { $0 != 10 }
+            return (!pre.isEmpty && !b1.isEmpty) || (!shown.isEmpty && !a1.isEmpty)
+        }
         fit = (WholeRead.agree(b1, Array(b0.prefix(b0.count - k)), atEnd: true), afterFits(k))
-        // A web view moves by characters: refused, never corrected, also when both readings fit (repeating emoji).
+        // A web view moves by characters: refused, never corrected, also when both readings fit with non-vacuous evidence.
         let chars = WholeRead.charUnits(b0, k)
-        let byChars = chars.map { $0 != k && fits($0) } ?? false
-        guard fits(k) else { return .failed(byChars ? "characters" : "badStep", moved: -k) }
-        if byChars { return .failed("characters", moved: -k) }
+        let byChars = chars.map { $0 != k && fitsChars($0) } ?? false
+        guard fits(k) else { return .failed(byChars ? "characters" : "badStep", moved: failMoved) }
+        if byChars { return .failed("characters", moved: failMoved) }
         pieces.append(Array(b0.suffix(k)))
-        count += k
         return .moved(-k)
     }
 }
@@ -292,9 +319,19 @@ public struct ForwardWalk: Sendable {
         } else {
             guard changed else { return .failed("stuck", moved: nil) }
             let piece = Array(a0.prefix(k))
+            let rest = Array(a0.dropFirst(k))
             fit = (!b1.isEmpty && WholeRead.agree(b1, piece, atEnd: true),
-                   WholeRead.agree(a1, Array(a0.dropFirst(k)), atEnd: false))
-            guard fit.before, fit.after else { return .failed("badStep", moved: k) }
+                   (rest.isEmpty || !a1.isEmpty) && WholeRead.agree(a1, rest, atEnd: false))
+            func fitsChars(_ c: Int) -> Bool {
+                let p = Array(a0.prefix(c)), r = Array(a0.dropFirst(c))
+                return !b1.isEmpty && WholeRead.agree(b1, p, atEnd: true)
+                    && (r.isEmpty || !a1.isEmpty) && a1.count <= r.count && WholeRead.agree(a1, r, atEnd: false)
+            }
+            let chars = WholeRead.charUnitsFront(a0, k)
+            let byChars = chars.map { $0 != k && fitsChars($0) } ?? false
+            let failMoved: Int? = WholeRead.hasPair(a0) && a1.isEmpty ? nil : k
+            guard fit.before, fit.after else { return .failed(byChars ? "characters" : "badStep", moved: failMoved) }
+            if byChars { return .failed("characters", moved: failMoved) }
             units += piece
         }
         return .moved(k)

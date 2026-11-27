@@ -267,11 +267,58 @@ final class WholeReadTests: XCTestCase {
         var w = BackWalk()
         XCTAssertEqual(w.plan(before: u("ab\ncd")), 4)
         XCTAssertEqual(w.landed(changed: true, before: [], after: []), .failed("badStep", moved: -4))
-        XCTAssertEqual(w.landed(changed: true, before: [], after: u("b")), .moved(-4))
+        // Fable 1a: a jump shorter than the context leaves text before the cursor; an empty before-context refuses at once.
+        XCTAssertEqual(w.landed(changed: true, before: [], after: u("b")), .failed("badStep", moved: -4))
         var x = BackWalk()
         XCTAssertEqual(x.plan(before: u("a\nbcd")), 4)
         XCTAssertEqual(x.landed(changed: true, before: [], after: u("zz")), .failed("badStep", moved: -4))
         XCTAssertEqual(x.landed(changed: true, before: u("a"), after: []), .moved(-4))
+    }
+
+    /// Fable 1a + 1b: a web (characters) host clamping at the start of "👍\n👍👍👍" or a blank before-context after a
+    /// short back jump must refuse at once instead of declaring the start and accepting a short read.
+    func testFable1_WebClampAndShortJumpBlankNeverAcceptShortRead() {
+        // F1a: "👍\n👍👍👍" on a characters host.
+        let emoji = u("\u{1F44D}\n\u{1F44D}\u{1F44D}\u{1F44D}")
+        var f = Field(text: emoji, pos: emoji.count, window: 300, byCharacters: true)
+        let bw = walkBack(&f)
+        if case .done = bw.step {
+            XCTAssertEqual(bw.units, emoji, "a read that finishes must be the whole field")
+        }
+        // Even if a host returns empty before-context with matching after-context after a short jump, refuse at once.
+        var w = BackWalk()
+        let b0 = u("Dear team, thanks for today.")
+        let k = w.plan(before: b0, after: [])
+        XCTAssertLessThan(k, b0.count)
+        let step = w.landed(changed: true, before: [], after: Array(b0.suffix(k)))
+        XCTAssertEqual(step, .failed("badStep", moved: -k))
+    }
+
+    /// Fable 2: native drafts with one emoji and a short or repeated first line must not be refused as b1:characters
+    /// due to vacuous before/after checks.
+    func testFable2_NativeDraftsWithOneEmojiAreRead() {
+        for s in ["네\n감사합니다 \u{1F64F}", "ㅋㅋㅋㅋ\n진짜 웃겨 \u{1F602}", "ㅠㅠ\n미안해 \u{1F64F}", "Hi\nSee you \u{1F44D}"] {
+            let t = u(s)
+            var f = Field(text: t, pos: t.count, window: 300, byCharacters: false)
+            let bw = walkBack(&f)
+            XCTAssertEqual(bw.step, .done, s)
+            XCTAssertEqual(bw.units, t, s)
+        }
+    }
+
+    /// Fable 4: a clamped misfit over a context holding a surrogate pair must report moved: nil so CursorReturn never
+    /// claims known=1 and restores the cursor to the wrong position.
+    func testFable4_ClampedPairMisfitReportsUnknownMove() {
+        // Forward clamp on "가😀👍가" from pos 1 (after first 가) -> web host clamps at end (a1 empty).
+        var fw = ForwardWalk()
+        _ = fw.plan(before: u("가"), after: u("\u{1F600}\u{1F44D}가"))
+        let fs = fw.landed(changed: true, before: u("가\u{1F600}\u{1F44D}가"), after: [])
+        XCTAssertEqual(fs, .failed("badStep", moved: nil))
+        // Back clamp on "👍\n👍👍" -> web host clamps at start (b1 empty).
+        var bw = BackWalk()
+        _ = bw.plan(before: u("\u{1F44D}\n\u{1F44D}\u{1F44D}"), after: [])
+        let bs = bw.landed(changed: true, before: [], after: u("\u{1F44D}"))
+        XCTAssertEqual(bs, .failed("badStep", moved: nil))
     }
 
     func testANonProbeStepThatChangesNothingIsStuck() {
@@ -384,6 +431,12 @@ final class OnePassAcceptTests: XCTestCase {
         let dirty = WholeRead.OnePass(first: .done([]), back: .done(text), returned: .atEnd, endProbe: .done([]),
                                       clean: false)
         XCTAssertEqual(WholeRead.accept(dirty), .refuse("unclean"))
+        // Stopping early on a late step sets clean=false without running later walks.
+        let earlyLate = WholeRead.OnePass(first: .done([]), clean: false)
+        XCTAssertEqual(WholeRead.accept(earlyLate), .refuse("unclean"))
+        XCTAssertEqual(WholeRead.lateStep, 0.2)
+        XCTAssertFalse(WholeRead.isLate(elapsed: 0.2))
+        XCTAssertTrue(WholeRead.isLate(elapsed: 0.201))
     }
 
     func testRefusesWhenB1DoesNotEndWithWhatFCrossed() {

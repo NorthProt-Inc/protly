@@ -136,4 +136,28 @@ final class CursorReturnTests: XCTestCase {
         c.begin()
         XCTAssertEqual(c.back(before: "abc"), 0)
     }
+
+    /// Fable 5: Retry after a failed call starts where the last read left the cursor, so it keeps the user's original
+    /// offset (Cancel after Retry still puts the cursor back). Starting anywhere else resets the record.
+    func testBeginWithBeforeContinuesRetryAtSamePlaceAndResetsElsewhere() {
+        var c = CursorReturn()
+        c.begin(before: "first ")
+        step(&c, 15, before: "first second end")
+        c.reachedEnd(before: "first second end")
+        XCTAssertEqual(c.back(before: "first second end"), -15)
+
+        // Retry from where the previous read left the cursor keeps the -15 offset, but forgets the old `end`.
+        c.begin(before: "second end")
+        XCTAssertFalse(c.hasEnd)
+        XCTAssertEqual(c.back(before: "first second end"), -15)
+        // A new read from the end (F=0, B1=-20, R1=+20) still restores to the original cursor (-15).
+        c.reachedEnd(before: "first second end")
+        step(&c, -20, before: "")
+        step(&c, 20, before: "first second end")
+        XCTAssertEqual(c.back(before: "first second end"), -15)
+
+        // Starting somewhere else resets to a fresh record.
+        c.begin(before: "somewhere else")
+        XCTAssertEqual(c.back(before: "somewhere else"), 0)
+    }
 }
