@@ -1,0 +1,856 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-11-27 07:31:20.069 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:31:20.069 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:31:20.102 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:31:21.402 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:31:21.958 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-27 07:31:22.112 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:31:40.373 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-27 07:31:40.888 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=513
+2026-11-27 07:31:40.888 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=514 first=513 late=0
+2026-11-27 07:31:41.084 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=22 tot=195
+2026-11-27 07:31:41.159 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=51 tot=74
+2026-11-27 07:31:41.240 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=59 tot=81
+2026-11-27 07:31:41.345 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=20 tot=103
+2026-11-27 07:31:41.450 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=82 tot=105
+2026-11-27 07:31:41.523 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=51 tot=72
+2026-11-27 07:31:41.592 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=46 tot=68
+2026-11-27 07:31:41.654 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=40 tot=62
+2026-11-27 07:31:41.771 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=94 tot=116
+2026-11-27 07:31:41.837 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=43 tot=66
+2026-11-27 07:31:41.895 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=35 tot=57
+2026-11-27 07:31:42.728 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=520
+2026-11-27 07:31:42.728 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1840 first=195 late=0
+2026-11-27 07:31:43.445 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=505
+2026-11-27 07:31:43.445 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=505 first=505 late=0
+2026-11-27 07:31:43.446 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=3073 known=1
+2026-11-27 07:31:44.301 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3587 done=4024 api=416 spec=cancelled
+2026-11-27 07:31:54.278 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:32:02.339 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:32:24.853 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-27 07:32:25.361 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=507
+2026-11-27 07:32:25.361 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=507 first=507 late=0
+2026-11-27 07:32:25.433 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=48 tot=72
+2026-11-27 07:32:25.547 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=40 tot=113
+2026-11-27 07:32:25.610 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=41 tot=62
+2026-11-27 07:32:25.678 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=44 tot=67
+2026-11-27 07:32:25.749 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=48 tot=71
+2026-11-27 07:32:25.803 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=32 tot=52
+2026-11-27 07:32:25.870 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=44 tot=66
+2026-11-27 07:32:25.928 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=36 tot=58
+2026-11-27 07:32:26.043 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=91 tot=114
+2026-11-27 07:32:26.105 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=39 tot=61
+2026-11-27 07:32:26.177 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=50 tot=72
+2026-11-27 07:32:27.029 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=513
+2026-11-27 07:32:27.029 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1668 first=72 late=0
+2026-11-27 07:32:27.662 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=514
+2026-11-27 07:32:27.662 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=514 first=514 late=0
+2026-11-27 07:32:27.663 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=2809 known=1
+2026-11-27 07:32:28.188 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3284 done=3387 api=422 spec=cancelled
+2026-11-27 07:32:32.762 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:32:36.521 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:33:03.682 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=52 a=12 s=0
+2026-11-27 07:33:03.786 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=10 pr=0 ch=1 seen=23 tot=103
+2026-11-27 07:33:03.865 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=2 k=1 pr=0 ch=1 seen=56 tot=78
+2026-11-27 07:33:03.916 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=3 k=1 pr=0 ch=1 seen=30 tot=51
+2026-11-27 07:33:03.975 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=4 k=18 pr=0 ch=1 seen=36 tot=59
+2026-11-27 07:33:04.028 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=5 k=1 pr=0 ch=1 seen=31 tot=53
+2026-11-27 07:33:04.095 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=6 k=1 pr=1 ch=1 seen=44 tot=66
+2026-11-27 07:33:04.143 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=7 k=1 pr=1 ch=1 seen=27 tot=47
+2026-11-27 07:33:04.194 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=8 k=22 pr=0 ch=1 seen=27 tot=50
+2026-11-27 07:33:04.247 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=9 k=1 pr=0 ch=1 seen=30 tot=53
+2026-11-27 07:33:04.292 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=10 k=19 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:33:04.340 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=11 k=1 pr=0 ch=1 seen=26 tot=48
+2026-11-27 07:33:04.387 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=12 k=18 pr=0 ch=1 seen=21 tot=46
+2026-11-27 07:33:04.446 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=13 k=1 pr=0 ch=1 seen=35 tot=58
+2026-11-27 07:33:04.491 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=14 k=1 pr=1 ch=1 seen=23 tot=45
+2026-11-27 07:33:04.541 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=15 k=1 pr=1 ch=1 seen=28 tot=49
+2026-11-27 07:33:04.585 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=16 k=22 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:33:04.631 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=17 k=1 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:33:04.676 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=18 k=19 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:33:04.721 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=19 k=1 pr=0 ch=1 seen=24 tot=45
+2026-11-27 07:33:04.766 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=20 k=18 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:33:04.817 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=21 k=1 pr=0 ch=1 seen=28 tot=50
+2026-11-27 07:33:04.875 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=22 k=1 pr=1 ch=1 seen=35 tot=57
+2026-11-27 07:33:04.924 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=23 k=1 pr=1 ch=1 seen=28 tot=48
+2026-11-27 07:33:04.972 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=24 k=22 pr=0 ch=1 seen=27 tot=48
+2026-11-27 07:33:05.030 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=25 k=1 pr=0 ch=1 seen=36 tot=57
+2026-11-27 07:33:05.084 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=26 k=19 pr=0 ch=1 seen=32 tot=53
+2026-11-27 07:33:05.133 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=27 k=1 pr=0 ch=1 seen=26 tot=48
+2026-11-27 07:33:05.185 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=28 k=18 pr=0 ch=1 seen=29 tot=51
+2026-11-27 07:33:05.233 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=29 k=1 pr=0 ch=1 seen=26 tot=47
+2026-11-27 07:33:05.736 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=30 k=1 pr=1 ch=0 seen=-1 tot=502
+2026-11-27 07:33:05.736 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=223 lf=6 reason=done steps=30 ms=2053 first=103 late=0
+2026-11-27 07:33:05.840 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=61 tot=103
+2026-11-27 07:33:05.910 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=48 tot=70
+2026-11-27 07:33:05.973 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=40 tot=62
+2026-11-27 07:33:06.029 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=33 tot=55
+2026-11-27 07:33:06.078 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=28 tot=49
+2026-11-27 07:33:06.127 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=26 tot=49
+2026-11-27 07:33:06.187 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=36 tot=59
+2026-11-27 07:33:06.237 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=27 tot=50
+2026-11-27 07:33:06.314 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=55 tot=76
+2026-11-27 07:33:06.377 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=41 tot=63
+2026-11-27 07:33:06.425 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=24 tot=47
+2026-11-27 07:33:07.252 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:33:07.252 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1515 first=103 late=0
+2026-11-27 07:33:07.853 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=500
+2026-11-27 07:33:07.853 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=500 first=500 late=0
+2026-11-27 07:33:07.853 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=4171 known=1
+2026-11-27 07:33:08.384 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=4635 done=4742 api=423 spec=cancelled
+2026-11-27 07:33:12.229 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:33:15.698 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:33:30.971 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=0 a=0 s=37
+2026-11-27 07:33:31.712 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=511
+2026-11-27 07:33:31.712 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=511 first=511 late=0
+2026-11-27 07:33:31.769 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=34 tot=56
+2026-11-27 07:33:31.827 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=36 tot=57
+2026-11-27 07:33:31.884 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=34 tot=57
+2026-11-27 07:33:31.945 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=39 tot=60
+2026-11-27 07:33:31.995 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:33:32.038 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=22 tot=43
+2026-11-27 07:33:32.086 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:33:32.150 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=40 tot=63
+2026-11-27 07:33:32.301 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=74 tot=151
+2026-11-27 07:33:32.361 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=37 tot=59
+2026-11-27 07:33:32.425 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=42 tot=64
+2026-11-27 07:33:33.231 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=500
+2026-11-27 07:33:33.231 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1518 first=56 late=0
+2026-11-27 07:33:33.814 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=505
+2026-11-27 07:33:33.814 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=505 first=505 late=0
+2026-11-27 07:33:33.815 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=2843 known=1
+2026-11-27 07:33:34.332 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3367 done=3474 api=410 spec=none
+2026-11-27 07:33:38.979 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=1
+2026-11-27 07:33:43.125 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:34:01.371 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:34:01.878 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:34:01.878 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=506 first=506 late=0
+2026-11-27 07:34:01.938 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=36 tot=59
+2026-11-27 07:34:02.023 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=26 tot=85
+2026-11-27 07:34:02.850 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=522
+2026-11-27 07:34:02.850 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=972 first=59 late=0
+2026-11-27 07:34:03.400 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=507
+2026-11-27 07:34:03.400 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=507 first=507 late=0
+2026-11-27 07:34:03.401 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2029 known=1
+2026-11-27 07:34:03.716 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2080 done=2395 api=413 spec=used
+2026-11-27 07:34:07.804 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:34:11.060 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:34:26.947 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:34:27.463 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=516
+2026-11-27 07:34:27.463 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=516 first=516 late=0
+2026-11-27 07:34:27.552 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=65 tot=88
+2026-11-27 07:34:27.674 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=22 tot=121
+2026-11-27 07:34:28.485 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=502
+2026-11-27 07:34:28.485 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=1021 first=88 late=0
+2026-11-27 07:34:29.068 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=503
+2026-11-27 07:34:29.068 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=503 first=503 late=0
+2026-11-27 07:34:29.068 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2121 known=1
+2026-11-27 07:34:29.168 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2183 done=2283 api=430 spec=used
+2026-11-27 07:34:32.828 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:34:35.248 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:34:57.511 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:34:58.023 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=511
+2026-11-27 07:34:58.023 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=511 first=511 late=0
+2026-11-27 07:34:58.074 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=29 tot=51
+2026-11-27 07:34:58.164 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=67 tot=89
+2026-11-27 07:34:58.979 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=501
+2026-11-27 07:34:58.979 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=956 first=51 late=0
+2026-11-27 07:34:59.543 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=504
+2026-11-27 07:34:59.543 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=504 first=504 late=0
+2026-11-27 07:34:59.543 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2032 known=1
+2026-11-27 07:34:59.648 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2109 done=2213 api=422 spec=used
+2026-11-27 07:35:11.012 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:35:13.425 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:35:30.259 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=26 a=13 s=0
+2026-11-27 07:35:30.357 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=12 pr=0 ch=1 seen=44 tot=97
+2026-11-27 07:35:30.420 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=2 k=1 pr=0 ch=1 seen=42 tot=62
+2026-11-27 07:35:30.934 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=3 k=1 pr=1 ch=0 seen=-1 tot=514
+2026-11-27 07:35:30.934 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=13 lf=0 reason=done steps=3 ms=674 first=97 late=0
+2026-11-27 07:35:30.981 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=25 tot=46
+2026-11-27 07:35:31.027 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:35:31.882 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=508
+2026-11-27 07:35:31.882 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=948 first=46 late=0
+2026-11-27 07:35:32.441 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:35:32.441 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=506 first=506 late=0
+2026-11-27 07:35:32.442 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2182 known=1
+2026-11-27 07:35:32.567 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2237 done=2362 api=416 spec=used
+2026-11-27 07:35:36.131 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:35:38.348 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:35:53.578 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=26 a=13 s=0
+2026-11-27 07:35:53.653 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=12 pr=0 ch=1 seen=53 tot=75
+2026-11-27 07:35:53.735 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=2 k=1 pr=0 ch=1 seen=59 tot=81
+2026-11-27 07:35:54.254 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=3 k=1 pr=1 ch=0 seen=-1 tot=519
+2026-11-27 07:35:54.254 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=13 lf=0 reason=done steps=3 ms=676 first=75 late=0
+2026-11-27 07:35:54.299 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:35:54.345 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=24 tot=45
+2026-11-27 07:35:55.189 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=505
+2026-11-27 07:35:55.189 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=934 first=44 late=0
+2026-11-27 07:35:55.753 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=515
+2026-11-27 07:35:55.753 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=515 first=515 late=0
+2026-11-27 07:35:55.753 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2174 known=1
+2026-11-27 07:35:55.847 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2211 done=2305 api=414 spec=used
+2026-11-27 07:35:59.045 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:36:01.574 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:36:16.648 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=0 a=0 s=39
+2026-11-27 07:36:17.286 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:36:17.286 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=506 first=506 late=0
+2026-11-27 07:36:17.391 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=82 tot=104
+2026-11-27 07:36:17.433 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=20 tot=42
+2026-11-27 07:36:18.267 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=507
+2026-11-27 07:36:18.267 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=981 first=104 late=0
+2026-11-27 07:36:18.829 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=505
+2026-11-27 07:36:18.829 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=505 first=505 late=0
+2026-11-27 07:36:18.829 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2181 known=1
+2026-11-27 07:36:19.356 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2627 done=2737 api=417 spec=none
+2026-11-27 07:36:23.795 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:36:25.826 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:36:41.579 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=0 a=0 s=39
+2026-11-27 07:36:42.156 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=513
+2026-11-27 07:36:42.156 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=513 first=513 late=0
+2026-11-27 07:36:42.336 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=61 tot=179
+2026-11-27 07:36:42.423 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=64 tot=86
+2026-11-27 07:36:43.249 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=521
+2026-11-27 07:36:43.249 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=1092 first=179 late=0
+2026-11-27 07:36:43.859 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=521
+2026-11-27 07:36:43.859 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=521 first=521 late=0
+2026-11-27 07:36:43.859 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2279 known=1
+2026-11-27 07:36:44.395 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2753 done=2861 api=427 spec=none
+2026-11-27 07:36:49.111 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:36:52.482 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:37:08.151 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=60 a=0 s=0
+2026-11-27 07:37:08.652 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=501
+2026-11-27 07:37:08.652 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=501 first=501 late=0
+2026-11-27 07:37:08.704 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=55 pr=0 ch=1 seen=31 tot=51
+2026-11-27 07:37:08.763 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=31 pr=0 ch=1 seen=36 tot=58
+2026-11-27 07:37:08.861 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=39 pr=0 ch=1 seen=76 tot=98
+2026-11-27 07:37:08.908 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=47 pr=0 ch=1 seen=25 tot=46
+2026-11-27 07:37:08.962 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=45 pr=0 ch=1 seen=32 tot=54
+2026-11-27 07:37:09.020 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=44 pr=0 ch=1 seen=35 tot=57
+2026-11-27 07:37:09.071 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=61 pr=0 ch=1 seen=28 tot=50
+2026-11-27 07:37:09.122 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=31 pr=0 ch=1 seen=28 tot=51
+2026-11-27 07:37:09.177 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=39 pr=0 ch=1 seen=33 tot=54
+2026-11-27 07:37:09.223 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=47 pr=0 ch=1 seen=25 tot=46
+2026-11-27 07:37:09.272 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=3 pr=0 ch=1 seen=26 tot=48
+2026-11-27 07:37:09.320 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=0 ch=1 seen=24 tot=47
+2026-11-27 07:37:09.387 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=13 k=1 pr=0 ch=1 seen=46 tot=67
+2026-11-27 07:37:09.434 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=14 k=15 pr=0 ch=1 seen=24 tot=46
+2026-11-27 07:37:09.481 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=15 k=1 pr=0 ch=1 seen=25 tot=46
+2026-11-27 07:37:10.295 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=16 k=1 pr=1 ch=0 seen=-1 tot=512
+2026-11-27 07:37:10.295 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=460 lf=9 reason=done steps=16 ms=1643 first=51 late=0
+2026-11-27 07:37:10.867 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=504
+2026-11-27 07:37:10.867 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=505 first=504 late=0
+2026-11-27 07:37:10.868 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=460 lf=9 h=0755cc33 ms=2716 known=1
+2026-11-27 07:37:11.395 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3191 done=3294 api=424 spec=cancelled
+2026-11-27 07:37:15.461 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:37:18.948 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:37:34.666 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-27 07:37:35.184 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=517
+2026-11-27 07:37:35.184 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=517 first=517 late=0
+2026-11-27 07:37:35.310 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=57 pr=0 ch=1 seen=72 tot=126
+2026-11-27 07:37:35.435 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=47 pr=0 ch=1 seen=31 tot=124
+2026-11-27 07:37:35.533 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=69 tot=97
+2026-11-27 07:37:35.615 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=46 pr=0 ch=1 seen=22 tot=81
+2026-11-27 07:37:35.723 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=42 pr=0 ch=1 seen=86 tot=108
+2026-11-27 07:37:35.773 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=46 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:37:35.819 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=42 pr=0 ch=1 seen=25 tot=46
+2026-11-27 07:37:35.871 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=46 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:37:35.924 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=42 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:37:35.970 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=46 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:37:36.023 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=42 pr=0 ch=1 seen=31 tot=52
+2026-11-27 07:37:36.073 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=46 pr=0 ch=1 seen=28 tot=50
+2026-11-27 07:37:36.119 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=13 k=42 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:37:36.174 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=14 k=46 pr=0 ch=1 seen=32 tot=55
+2026-11-27 07:37:36.225 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=15 k=42 pr=0 ch=1 seen=28 tot=50
+2026-11-27 07:37:36.273 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=16 k=46 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:37:36.336 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=17 k=42 pr=0 ch=1 seen=40 tot=62
+2026-11-27 07:37:36.409 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=18 k=46 pr=0 ch=1 seen=50 tot=72
+2026-11-27 07:37:36.464 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=19 k=42 pr=0 ch=1 seen=31 tot=54
+2026-11-27 07:37:36.540 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=20 k=46 pr=0 ch=1 seen=54 tot=76
+2026-11-27 07:37:36.592 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=21 k=42 pr=0 ch=1 seen=29 tot=51
+2026-11-27 07:37:36.642 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=22 k=46 pr=0 ch=1 seen=26 tot=49
+2026-11-27 07:37:36.695 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=23 k=42 pr=0 ch=1 seen=32 tot=53
+2026-11-27 07:37:36.756 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=24 k=46 pr=0 ch=1 seen=28 tot=60
+2026-11-27 07:37:36.809 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=25 k=42 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:37:36.863 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=26 k=46 pr=0 ch=1 seen=34 tot=54
+2026-11-27 07:37:36.908 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=27 k=42 pr=0 ch=1 seen=23 tot=44
+2026-11-27 07:37:36.993 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=28 k=46 pr=0 ch=1 seen=22 tot=85
+2026-11-27 07:37:37.126 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=29 k=42 pr=0 ch=1 seen=22 tot=132
+2026-11-27 07:37:37.200 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=30 k=46 pr=0 ch=1 seen=22 tot=73
+2026-11-27 07:37:37.248 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=31 k=42 pr=0 ch=1 seen=22 tot=47
+2026-11-27 07:37:37.248 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read step b1 s=31 why=characters k=42 b0=46 a0=17 b1=3 a1=60 fitb=0 fita=0 ch=1 ms=47
+2026-11-27 07:37:37.248 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=1336 lf=0 reason=characters steps=31 ms=2064 first=126 late=0
+2026-11-27 07:37:37.248 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=refused reason=b1:characters units=0 lf=0 h=811c9dc5 ms=2581 known=1
+2026-11-27 07:37:37.248 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=1378 known=1
+2026-11-27 07:37:40.427 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:37:58.820 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=52 a=12 s=0
+2026-11-27 07:37:58.890 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=10 pr=0 ch=1 seen=48 tot=70
+2026-11-27 07:37:58.940 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=2 k=1 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:37:58.995 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=3 k=1 pr=0 ch=1 seen=33 tot=54
+2026-11-27 07:37:59.046 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=4 k=18 pr=0 ch=1 seen=28 tot=51
+2026-11-27 07:37:59.091 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=5 k=1 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:37:59.179 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=6 k=1 pr=1 ch=1 seen=65 tot=87
+2026-11-27 07:37:59.260 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=7 k=1 pr=1 ch=1 seen=58 tot=81
+2026-11-27 07:37:59.328 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=8 k=22 pr=0 ch=1 seen=46 tot=67
+2026-11-27 07:37:59.377 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=9 k=1 pr=0 ch=1 seen=28 tot=48
+2026-11-27 07:37:59.433 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=10 k=19 pr=0 ch=1 seen=33 tot=55
+2026-11-27 07:37:59.511 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=11 k=1 pr=0 ch=1 seen=56 tot=78
+2026-11-27 07:37:59.560 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=12 k=18 pr=0 ch=1 seen=28 tot=48
+2026-11-27 07:37:59.607 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=13 k=1 pr=0 ch=1 seen=25 tot=46
+2026-11-27 07:37:59.662 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=14 k=1 pr=1 ch=1 seen=35 tot=55
+2026-11-27 07:37:59.710 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=15 k=1 pr=1 ch=1 seen=26 tot=47
+2026-11-27 07:37:59.769 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=16 k=22 pr=0 ch=1 seen=36 tot=59
+2026-11-27 07:37:59.840 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=17 k=1 pr=0 ch=1 seen=49 tot=71
+2026-11-27 07:37:59.885 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=18 k=19 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:37:59.955 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=19 k=1 pr=0 ch=1 seen=48 tot=69
+2026-11-27 07:38:00.015 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=20 k=18 pr=0 ch=1 seen=37 tot=59
+2026-11-27 07:38:00.100 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=21 k=1 pr=0 ch=1 seen=62 tot=85
+2026-11-27 07:38:00.160 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=22 k=1 pr=1 ch=1 seen=38 tot=60
+2026-11-27 07:38:00.211 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=23 k=1 pr=1 ch=1 seen=30 tot=51
+2026-11-27 07:38:00.258 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=24 k=22 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:38:00.311 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=25 k=1 pr=0 ch=1 seen=32 tot=52
+2026-11-27 07:38:00.368 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=26 k=19 pr=0 ch=1 seen=34 tot=56
+2026-11-27 07:38:00.423 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=27 k=1 pr=0 ch=1 seen=32 tot=55
+2026-11-27 07:38:00.475 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=28 k=18 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:38:00.523 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=29 k=1 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:38:01.038 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=30 k=1 pr=1 ch=0 seen=-1 tot=515
+2026-11-27 07:38:01.038 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=223 lf=6 reason=done steps=30 ms=2218 first=70 late=0
+2026-11-27 07:38:01.094 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=31 tot=55
+2026-11-27 07:38:01.150 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=35 tot=56
+2026-11-27 07:38:01.203 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:38:01.251 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=24 tot=47
+2026-11-27 07:38:01.321 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=47 tot=70
+2026-11-27 07:38:01.366 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=22 tot=45
+2026-11-27 07:38:01.411 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=24 tot=44
+2026-11-27 07:38:01.458 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=24 tot=46
+2026-11-27 07:38:01.510 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=29 tot=52
+2026-11-27 07:38:01.560 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:38:01.609 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=26 tot=48
+2026-11-27 07:38:02.423 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:38:02.423 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1384 first=55 late=0
+2026-11-27 07:38:02.992 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=519
+2026-11-27 07:38:02.992 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=519 first=519 late=0
+2026-11-27 07:38:02.992 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=cancelled reason=cancelled units=0 lf=0 h=811c9dc5 ms=4172 known=1
+2026-11-27 07:38:02.992 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=223 known=1
+2026-11-27 07:38:21.913 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:38:21.913 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:38:21.918 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:38:21.952 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:38:22.281 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-27 07:38:22.289 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:38:33.996 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:38:34.426 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:38:34.458 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:38:36.788 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:38:36.788 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:38:36.789 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:38:36.811 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:38:37.015 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:38:37.022 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:38:42.484 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-27 07:38:43.004 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=519
+2026-11-27 07:38:43.004 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=519 first=519 late=0
+2026-11-27 07:38:43.053 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:38:43.099 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=25 tot=46
+2026-11-27 07:38:43.171 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=35 tot=71
+2026-11-27 07:38:43.214 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=22 tot=42
+2026-11-27 07:38:43.259 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:38:43.306 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=26 tot=46
+2026-11-27 07:38:43.356 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:38:43.400 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=21 tot=44
+2026-11-27 07:38:43.446 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=23 tot=46
+2026-11-27 07:38:43.491 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:38:43.539 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:38:44.359 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=515
+2026-11-27 07:38:44.359 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1355 first=49 late=0
+2026-11-27 07:38:45.090 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=521
+2026-11-27 07:38:45.090 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=521 first=521 late=0
+2026-11-27 07:38:45.090 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=2605 known=1
+2026-11-27 07:38:45.621 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3053 done=3175 api=408 spec=cancelled
+2026-11-27 07:38:50.244 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:38:53.895 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:39:03.955 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:39:04.397 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:39:04.425 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:39:06.782 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:39:06.782 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:39:06.784 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:39:06.806 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:39:07.043 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:39:07.054 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:39:12.655 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-27 07:39:13.162 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:39:13.162 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=506 first=506 late=0
+2026-11-27 07:39:13.206 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:39:13.255 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=26 tot=49
+2026-11-27 07:39:13.330 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=25 tot=74
+2026-11-27 07:39:13.374 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:39:13.423 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=27 tot=48
+2026-11-27 07:39:13.473 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:39:13.516 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=21 tot=43
+2026-11-27 07:39:13.562 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=23 tot=46
+2026-11-27 07:39:13.609 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=24 tot=46
+2026-11-27 07:39:13.654 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=24 tot=44
+2026-11-27 07:39:13.698 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:39:14.527 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=517
+2026-11-27 07:39:14.527 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1364 first=44 late=0
+2026-11-27 07:39:15.097 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=517
+2026-11-27 07:39:15.097 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=517 first=517 late=0
+2026-11-27 07:39:15.097 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=2441 known=1
+2026-11-27 07:39:15.622 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2897 done=2998 api=423 spec=cancelled
+2026-11-27 07:39:19.277 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:39:22.930 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:39:35.696 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=52 a=12 s=0
+2026-11-27 07:39:35.761 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=10 pr=0 ch=1 seen=44 tot=65
+2026-11-27 07:39:35.809 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=2 k=1 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:39:35.859 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=3 k=1 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:39:35.909 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=4 k=18 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:39:35.975 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=5 k=1 pr=0 ch=1 seen=43 tot=65
+2026-11-27 07:39:36.025 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=6 k=1 pr=1 ch=1 seen=28 tot=50
+2026-11-27 07:39:36.073 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=7 k=1 pr=1 ch=1 seen=26 tot=47
+2026-11-27 07:39:36.125 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=8 k=22 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:39:36.174 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=9 k=1 pr=0 ch=1 seen=27 tot=48
+2026-11-27 07:39:36.222 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=10 k=19 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:39:36.268 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=11 k=1 pr=0 ch=1 seen=24 tot=46
+2026-11-27 07:39:36.314 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=12 k=18 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:39:36.385 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=13 k=1 pr=0 ch=1 seen=24 tot=71
+2026-11-27 07:39:36.428 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=14 k=1 pr=1 ch=1 seen=22 tot=42
+2026-11-27 07:39:36.475 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=15 k=1 pr=1 ch=1 seen=24 tot=47
+2026-11-27 07:39:36.523 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=16 k=22 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:39:36.568 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=17 k=1 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:39:36.613 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=18 k=19 pr=0 ch=1 seen=24 tot=45
+2026-11-27 07:39:36.659 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=19 k=1 pr=0 ch=1 seen=22 tot=45
+2026-11-27 07:39:36.706 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=20 k=18 pr=0 ch=1 seen=24 tot=47
+2026-11-27 07:39:36.756 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=21 k=1 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:39:36.801 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=22 k=1 pr=1 ch=1 seen=23 tot=45
+2026-11-27 07:39:36.847 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=23 k=1 pr=1 ch=1 seen=23 tot=45
+2026-11-27 07:39:36.893 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=24 k=22 pr=0 ch=1 seen=23 tot=46
+2026-11-27 07:39:36.941 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=25 k=1 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:39:37.023 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=26 k=19 pr=0 ch=1 seen=61 tot=82
+2026-11-27 07:39:37.068 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=27 k=1 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:39:37.128 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=28 k=18 pr=0 ch=1 seen=38 tot=59
+2026-11-27 07:39:37.172 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=29 k=1 pr=0 ch=1 seen=22 tot=43
+2026-11-27 07:39:37.677 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=30 k=1 pr=1 ch=0 seen=-1 tot=505
+2026-11-27 07:39:37.677 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=223 lf=6 reason=done steps=30 ms=1981 first=65 late=0
+2026-11-27 07:39:37.726 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:39:37.772 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=22 tot=45
+2026-11-27 07:39:37.822 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=28 tot=50
+2026-11-27 07:39:37.868 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:39:37.914 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=24 tot=45
+2026-11-27 07:39:37.959 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=23 tot=45
+2026-11-27 07:39:38.007 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:39:38.056 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=26 tot=48
+2026-11-27 07:39:38.118 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=41 tot=62
+2026-11-27 07:39:38.162 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=21 tot=43
+2026-11-27 07:39:38.207 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=22 tot=44
+2026-11-27 07:39:39.017 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=501
+2026-11-27 07:39:39.017 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1339 first=49 late=0
+2026-11-27 07:39:39.567 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=503
+2026-11-27 07:39:39.567 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=503 first=503 late=0
+2026-11-27 07:39:39.567 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=3871 known=1
+2026-11-27 07:39:40.091 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=4314 done=4420 api=417 spec=cancelled
+2026-11-27 07:39:44.127 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:39:47.323 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:40:02.260 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-27 07:40:02.767 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=507
+2026-11-27 07:40:02.767 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=507 first=507 late=0
+2026-11-27 07:40:02.823 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=33 tot=55
+2026-11-27 07:40:02.955 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=58 tot=132
+2026-11-27 07:40:03.013 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=36 tot=57
+2026-11-27 07:40:03.066 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:40:03.124 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=35 tot=57
+2026-11-27 07:40:03.187 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=40 tot=63
+2026-11-27 07:40:03.251 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=41 tot=63
+2026-11-27 07:40:03.301 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=27 tot=50
+2026-11-27 07:40:03.380 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=56 tot=78
+2026-11-27 07:40:03.433 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:40:03.481 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=26 tot=48
+2026-11-27 07:40:04.295 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=508
+2026-11-27 07:40:04.295 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1527 first=55 late=0
+2026-11-27 07:40:04.863 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=520
+2026-11-27 07:40:04.864 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=520 first=520 late=0
+2026-11-27 07:40:04.864 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=2603 known=1
+2026-11-27 07:40:05.396 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3076 done=3182 api=425 spec=cancelled
+2026-11-27 07:40:09.627 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:40:12.429 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:40:22.862 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:40:23.259 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:40:23.294 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:40:25.622 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:40:25.622 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:40:25.623 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:40:25.646 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:40:25.884 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:40:25.892 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:40:31.926 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:40:32.426 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=500
+2026-11-27 07:40:32.426 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=500 first=500 late=0
+2026-11-27 07:40:32.481 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=33 tot=54
+2026-11-27 07:40:32.536 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=32 tot=55
+2026-11-27 07:40:33.374 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=518
+2026-11-27 07:40:33.374 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=947 first=54 late=0
+2026-11-27 07:40:33.932 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=508
+2026-11-27 07:40:33.932 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=508 first=508 late=0
+2026-11-27 07:40:33.932 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2006 known=1
+2026-11-27 07:40:34.018 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2037 done=2123 api=416 spec=used
+2026-11-27 07:40:38.811 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:40:42.106 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:40:58.481 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:40:58.906 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:40:58.936 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:41:01.431 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:41:01.431 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:41:01.432 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:41:01.450 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:41:01.713 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:41:01.727 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:41:08.797 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:41:09.305 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=508
+2026-11-27 07:41:09.305 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=508 first=508 late=0
+2026-11-27 07:41:09.372 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=44 tot=66
+2026-11-27 07:41:09.428 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=33 tot=56
+2026-11-27 07:41:10.247 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=511
+2026-11-27 07:41:10.247 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=942 first=66 late=0
+2026-11-27 07:41:10.829 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=520
+2026-11-27 07:41:10.829 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=520 first=520 late=0
+2026-11-27 07:41:10.829 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2032 known=1
+2026-11-27 07:41:10.947 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2059 done=2176 api=442 spec=used
+2026-11-27 07:41:14.829 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:41:17.179 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:41:27.754 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:41:28.158 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:41:28.199 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:41:30.600 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:41:30.600 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:41:30.602 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:41:30.633 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:41:30.996 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:41:31.011 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:41:37.225 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:41:37.735 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=510
+2026-11-27 07:41:37.735 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=510 first=510 late=0
+2026-11-27 07:41:37.793 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=35 tot=57
+2026-11-27 07:41:37.844 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=27 tot=51
+2026-11-27 07:41:38.658 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=503
+2026-11-27 07:41:38.658 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=922 first=57 late=0
+2026-11-27 07:41:39.214 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=502
+2026-11-27 07:41:39.214 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=502 first=502 late=0
+2026-11-27 07:41:39.214 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=1989 known=1
+2026-11-27 07:41:39.296 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2049 done=2131 api=427 spec=used
+2026-11-27 07:41:43.044 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:41:45.686 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:41:59.740 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=26 a=13 s=0
+2026-11-27 07:41:59.841 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=12 pr=0 ch=1 seen=78 tot=100
+2026-11-27 07:41:59.908 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=2 k=1 pr=0 ch=1 seen=45 tot=66
+2026-11-27 07:42:00.418 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=3 k=1 pr=1 ch=0 seen=-1 tot=510
+2026-11-27 07:42:00.418 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=13 lf=0 reason=done steps=3 ms=678 first=100 late=0
+2026-11-27 07:42:00.467 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=26 tot=48
+2026-11-27 07:42:00.517 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:42:01.344 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=504
+2026-11-27 07:42:01.344 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=925 first=48 late=0
+2026-11-27 07:42:01.907 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=512
+2026-11-27 07:42:01.907 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=512 first=512 late=0
+2026-11-27 07:42:01.907 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2167 known=1
+2026-11-27 07:42:02.005 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2194 done=2291 api=409 spec=used
+2026-11-27 07:42:05.661 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:42:08.525 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:42:22.252 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=26 a=13 s=0
+2026-11-27 07:42:22.334 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=12 pr=0 ch=1 seen=59 tot=81
+2026-11-27 07:42:22.407 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=2 k=1 pr=0 ch=1 seen=50 tot=72
+2026-11-27 07:42:22.949 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=3 k=1 pr=1 ch=0 seen=-1 tot=542
+2026-11-27 07:42:22.949 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=13 lf=0 reason=done steps=3 ms=696 first=81 late=0
+2026-11-27 07:42:23.007 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=35 tot=57
+2026-11-27 07:42:23.062 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=32 tot=54
+2026-11-27 07:42:23.879 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:42:23.879 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=930 first=57 late=0
+2026-11-27 07:42:24.438 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=501
+2026-11-27 07:42:24.438 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=501 first=501 late=0
+2026-11-27 07:42:24.438 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2185 known=1
+2026-11-27 07:42:24.551 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2220 done=2333 api=417 spec=used
+2026-11-27 07:42:28.377 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:42:30.964 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:42:47.134 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:42:47.652 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=517
+2026-11-27 07:42:47.652 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=517 first=517 late=0
+2026-11-27 07:42:47.704 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=29 tot=51
+2026-11-27 07:42:47.750 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=24 tot=46
+2026-11-27 07:42:48.581 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=510
+2026-11-27 07:42:48.581 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=928 first=51 late=0
+2026-11-27 07:42:49.150 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=516
+2026-11-27 07:42:49.150 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=516 first=516 late=0
+2026-11-27 07:42:49.150 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2015 known=1
+2026-11-27 07:42:49.278 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2053 done=2180 api=415 spec=used
+2026-11-27 07:42:52.212 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:42:54.232 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:43:12.353 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:43:12.854 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=501
+2026-11-27 07:43:12.854 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=501 first=501 late=0
+2026-11-27 07:43:12.925 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=49 tot=70
+2026-11-27 07:43:13.002 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=54 tot=76
+2026-11-27 07:43:13.809 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:43:13.809 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=954 first=70 late=0
+2026-11-27 07:43:14.374 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=510
+2026-11-27 07:43:14.374 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=510 first=510 late=0
+2026-11-27 07:43:14.374 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2021 known=1
+2026-11-27 07:43:14.526 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2075 done=2226 api=407 spec=used
+2026-11-27 07:43:19.996 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:43:23.695 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:43:38.352 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:43:38.768 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:43:38.835 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:43:41.695 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:43:41.696 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:43:41.700 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:43:41.733 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document none, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:43:42.351 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:43:42.359 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:43:52.238 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=60 a=0 s=0
+2026-11-27 07:43:52.751 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=511
+2026-11-27 07:43:52.751 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=513 first=511 late=0
+2026-11-27 07:43:52.811 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=55 pr=0 ch=1 seen=38 tot=60
+2026-11-27 07:43:52.870 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=31 pr=0 ch=1 seen=36 tot=58
+2026-11-27 07:43:53.053 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=39 pr=0 ch=1 seen=22 tot=182
+2026-11-27 07:43:53.108 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=47 pr=0 ch=1 seen=33 tot=55
+2026-11-27 07:43:53.157 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=45 pr=0 ch=1 seen=26 tot=48
+2026-11-27 07:43:53.211 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=44 pr=0 ch=1 seen=33 tot=53
+2026-11-27 07:43:53.257 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=61 pr=0 ch=1 seen=22 tot=45
+2026-11-27 07:43:53.327 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=31 pr=0 ch=1 seen=48 tot=70
+2026-11-27 07:43:53.400 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=39 pr=0 ch=1 seen=50 tot=72
+2026-11-27 07:43:53.462 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=47 pr=0 ch=1 seen=40 tot=61
+2026-11-27 07:43:53.508 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=3 pr=0 ch=1 seen=23 tot=46
+2026-11-27 07:43:53.572 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=0 ch=1 seen=37 tot=63
+2026-11-27 07:43:53.688 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=13 k=1 pr=0 ch=1 seen=94 tot=116
+2026-11-27 07:43:53.756 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=14 k=15 pr=0 ch=1 seen=45 tot=67
+2026-11-27 07:43:53.823 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=15 k=1 pr=0 ch=1 seen=44 tot=66
+2026-11-27 07:43:54.658 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=16 k=1 pr=1 ch=0 seen=-1 tot=519
+2026-11-27 07:43:54.658 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=460 lf=9 reason=done steps=16 ms=1907 first=60 late=0
+2026-11-27 07:43:55.284 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=502
+2026-11-27 07:43:55.284 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=502 first=502 late=0
+2026-11-27 07:43:55.285 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=460 lf=9 h=0755cc33 ms=3047 known=1
+2026-11-27 07:43:55.813 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3535 done=3642 api=421 spec=cancelled
+2026-11-27 07:44:01.796 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:44:05.588 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:44:17.274 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:44:17.723 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:44:17.787 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:44:20.278 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:44:20.278 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:44:20.280 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:44:20.304 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document none, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:44:20.661 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:44:20.668 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:44:27.179 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=62 a=0 s=0
+2026-11-27 07:44:27.699 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=520
+2026-11-27 07:44:27.699 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=520 first=520 late=0
+2026-11-27 07:44:27.765 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=57 pr=0 ch=1 seen=43 tot=65
+2026-11-27 07:44:27.825 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=47 pr=0 ch=1 seen=38 tot=59
+2026-11-27 07:44:27.825 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read step b1 s=2 why=characters k=47 b0=51 a0=37 b1=3 a1=85 fitb=0 fita=0 ch=1 ms=59
+2026-11-27 07:44:27.825 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=57 lf=0 reason=characters steps=2 ms=126 first=65 late=0
+2026-11-27 07:44:27.825 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=refused reason=b1:characters units=0 lf=0 h=811c9dc5 ms=646 known=1
+2026-11-27 07:44:27.825 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=104 known=1
+2026-11-27 07:44:30.860 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:44:47.107 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=52 a=12 s=0
+2026-11-27 07:44:47.199 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=10 pr=0 ch=1 seen=71 tot=92
+2026-11-27 07:44:47.273 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=2 k=1 pr=0 ch=1 seen=51 tot=74
+2026-11-27 07:44:47.341 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=3 k=1 pr=0 ch=1 seen=45 tot=67
+2026-11-27 07:44:47.408 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=4 k=18 pr=0 ch=1 seen=44 tot=67
+2026-11-27 07:44:47.478 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=5 k=1 pr=0 ch=1 seen=46 tot=69
+2026-11-27 07:44:47.545 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=6 k=1 pr=1 ch=1 seen=46 tot=67
+2026-11-27 07:44:47.599 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=7 k=1 pr=1 ch=1 seen=33 tot=53
+2026-11-27 07:44:47.655 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=8 k=22 pr=0 ch=1 seen=34 tot=56
+2026-11-27 07:44:47.703 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=9 k=1 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:44:47.769 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=10 k=19 pr=0 ch=1 seen=45 tot=66
+2026-11-27 07:44:47.831 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=11 k=1 pr=0 ch=1 seen=39 tot=61
+2026-11-27 07:44:47.888 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=12 k=18 pr=0 ch=1 seen=33 tot=56
+2026-11-27 07:44:47.944 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=13 k=1 pr=0 ch=1 seen=34 tot=56
+2026-11-27 07:44:48.001 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=14 k=1 pr=1 ch=1 seen=34 tot=56
+2026-11-27 07:44:48.056 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=15 k=1 pr=1 ch=1 seen=32 tot=54
+2026-11-27 07:44:48.108 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=16 k=22 pr=0 ch=1 seen=29 tot=51
+2026-11-27 07:44:48.161 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=17 k=1 pr=0 ch=1 seen=31 tot=53
+2026-11-27 07:44:48.217 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=18 k=19 pr=0 ch=1 seen=34 tot=55
+2026-11-27 07:44:48.274 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=19 k=1 pr=0 ch=1 seen=36 tot=57
+2026-11-27 07:44:48.335 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=20 k=18 pr=0 ch=1 seen=37 tot=60
+2026-11-27 07:44:48.381 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=21 k=1 pr=0 ch=1 seen=25 tot=46
+2026-11-27 07:44:48.438 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=22 k=1 pr=1 ch=1 seen=35 tot=56
+2026-11-27 07:44:48.491 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=23 k=1 pr=1 ch=1 seen=30 tot=53
+2026-11-27 07:44:48.541 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=24 k=22 pr=0 ch=1 seen=28 tot=50
+2026-11-27 07:44:48.602 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=25 k=1 pr=0 ch=1 seen=37 tot=60
+2026-11-27 07:44:48.651 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=26 k=19 pr=0 ch=1 seen=28 tot=49
+2026-11-27 07:44:48.711 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=27 k=1 pr=0 ch=1 seen=39 tot=60
+2026-11-27 07:44:48.772 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=28 k=18 pr=0 ch=1 seen=37 tot=60
+2026-11-27 07:44:48.839 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=29 k=1 pr=0 ch=1 seen=44 tot=67
+2026-11-27 07:44:49.347 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=30 k=1 pr=1 ch=0 seen=-1 tot=508
+2026-11-27 07:44:49.347 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=223 lf=6 reason=done steps=30 ms=2240 first=92 late=0
+2026-11-27 07:44:49.415 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=61 pr=0 ch=1 seen=32 tot=67
+2026-11-27 07:44:49.483 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=63 pr=0 ch=1 seen=44 tot=67
+2026-11-27 07:44:49.536 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=42 pr=0 ch=1 seen=30 tot=52
+2026-11-27 07:44:49.629 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=43 pr=0 ch=1 seen=71 tot=93
+2026-11-27 07:44:49.681 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=44 pr=0 ch=1 seen=28 tot=51
+2026-11-27 07:44:49.729 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=63 pr=0 ch=1 seen=27 tot=48
+2026-11-27 07:44:49.780 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=1 pr=0 ch=1 seen=28 tot=51
+2026-11-27 07:44:49.835 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=1 pr=0 ch=1 seen=32 tot=54
+2026-11-27 07:44:49.926 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=1 pr=0 ch=1 seen=69 tot=91
+2026-11-27 07:44:49.980 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=15 pr=0 ch=1 seen=31 tot=53
+2026-11-27 07:44:50.035 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=32 tot=54
+2026-11-27 07:44:50.879 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=522
+2026-11-27 07:44:50.879 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1531 first=67 late=0
+2026-11-27 07:44:51.484 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=507
+2026-11-27 07:44:51.484 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=507 first=507 late=0
+2026-11-27 07:44:51.484 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=cancelled reason=cancelled units=0 lf=0 h=811c9dc5 ms=4377 known=1
+2026-11-27 07:44:51.485 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=223 known=1
+2026-11-27 07:45:13.074 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:13.074 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:13.077 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:13.197 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:45:13.566 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-27 07:45:13.625 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:45:30.190 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:30.190 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:30.191 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:30.213 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document none, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:45:30.573 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 444.000000 window 444.000000 pin 257.000000 active true
+2026-11-27 07:45:30.587 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:45:37.095 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:45:37.605 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:37.774 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:45:39.391 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:39.391 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:39.393 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:45:39.425 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:45:39.734 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:45:39.748 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:45:48.267 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:45:48.780 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=511
+2026-11-27 07:45:48.780 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=512 first=511 late=0
+2026-11-27 07:45:48.895 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=93 tot=114
+2026-11-27 07:45:49.030 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=38 pr=0 ch=1 seen=77 tot=134
+2026-11-27 07:45:49.099 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=37 pr=0 ch=1 seen=47 tot=69
+2026-11-27 07:45:49.147 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=33 pr=0 ch=1 seen=25 tot=47
+2026-11-27 07:45:49.204 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=37 pr=0 ch=1 seen=34 tot=57
+2026-11-27 07:45:49.260 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=38 pr=0 ch=1 seen=33 tot=55
+2026-11-27 07:45:49.319 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=31 pr=0 ch=1 seen=38 tot=59
+2026-11-27 07:45:49.377 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=39 pr=0 ch=1 seen=36 tot=57
+2026-11-27 07:45:49.432 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=31 pr=0 ch=1 seen=29 tot=54
+2026-11-27 07:45:49.500 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=12 pr=0 ch=1 seen=47 tot=68
+2026-11-27 07:45:49.553 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=32 tot=52
+2026-11-27 07:45:50.365 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=509
+2026-11-27 07:45:50.365 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1585 first=114 late=0
+2026-11-27 07:45:50.977 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=502
+2026-11-27 07:45:50.977 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=503 first=502 late=0
+2026-11-27 07:45:50.978 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=2710 known=1
+2026-11-27 07:45:51.523 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3183 done=3312 api=417 spec=cancelled
+2026-11-27 07:45:57.662 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:46:28.992 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:46:29.419 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:46:29.480 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:46:30.877 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:46:30.877 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:46:30.879 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:46:31.051 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:46:31.445 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:46:31.459 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:46:40.246 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:46:40.764 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=517
+2026-11-27 07:46:40.764 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=517 first=517 late=0
+2026-11-27 07:46:40.838 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=52 tot=74
+2026-11-27 07:46:40.954 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=38 pr=0 ch=1 seen=21 tot=115
+2026-11-27 07:46:41.011 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=37 pr=0 ch=1 seen=36 tot=56
+2026-11-27 07:46:41.078 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=4 k=33 pr=0 ch=1 seen=44 tot=66
+2026-11-27 07:46:41.143 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=5 k=37 pr=0 ch=1 seen=42 tot=65
+2026-11-27 07:46:41.206 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=6 k=38 pr=0 ch=1 seen=40 tot=62
+2026-11-27 07:46:41.274 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=7 k=31 pr=0 ch=1 seen=42 tot=67
+2026-11-27 07:46:41.345 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=8 k=39 pr=0 ch=1 seen=49 tot=70
+2026-11-27 07:46:41.395 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=9 k=31 pr=0 ch=1 seen=27 tot=49
+2026-11-27 07:46:41.459 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=10 k=12 pr=0 ch=1 seen=41 tot=63
+2026-11-27 07:46:41.510 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=11 k=1 pr=0 ch=1 seen=28 tot=51
+2026-11-27 07:46:42.317 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=12 k=1 pr=1 ch=0 seen=-1 tot=506
+2026-11-27 07:46:42.317 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=335 lf=9 reason=done steps=12 ms=1553 first=74 late=0
+2026-11-27 07:46:42.908 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=514
+2026-11-27 07:46:42.908 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=514 first=514 late=0
+2026-11-27 07:46:42.908 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=335 lf=9 h=49b6f226 ms=2662 known=1
+2026-11-27 07:46:43.431 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=3131 done=3235 api=418 spec=cancelled
+2026-11-27 07:46:47.645 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:47:17.619 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:47:18.055 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:47:18.142 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:47:19.717 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:47:19.717 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:47:19.718 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:47:19.757 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:47:20.195 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:47:20.203 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:47:27.523 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:47:28.027 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=504
+2026-11-27 07:47:28.027 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=504 first=504 late=0
+2026-11-27 07:47:28.104 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=54 tot=76
+2026-11-27 07:47:28.252 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=22 tot=148
+2026-11-27 07:47:29.065 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=504
+2026-11-27 07:47:29.065 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=1037 first=76 late=0
+2026-11-27 07:47:29.686 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=515
+2026-11-27 07:47:29.686 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=515 first=515 late=0
+2026-11-27 07:47:29.686 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2162 known=1
+2026-11-27 07:47:29.786 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2219 done=2319 api=431 spec=used
+2026-11-27 07:47:33.966 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=1
+2026-11-27 07:47:36.047 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:47:49.071 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:47:49.502 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:47:49.554 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:47:50.952 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:47:50.952 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:47:50.954 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:47:51.115 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:47:51.567 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:47:51.580 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:47:57.724 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:47:58.227 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=502
+2026-11-27 07:47:58.227 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=503 first=502 late=0
+2026-11-27 07:47:58.307 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=57 tot=79
+2026-11-27 07:47:58.388 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=23 tot=80
+2026-11-27 07:47:59.204 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=509
+2026-11-27 07:47:59.204 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=977 first=79 late=0
+2026-11-27 07:47:59.812 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=517
+2026-11-27 07:47:59.812 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=518 first=517 late=0
+2026-11-27 07:47:59.812 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2087 known=1
+2026-11-27 07:47:59.969 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2159 done=2317 api=414 spec=used
+2026-11-27 07:48:04.829 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:48:06.856 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:48:18.953 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:48:19.392 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:48:19.482 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:48:21.008 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:48:21.008 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:48:21.010 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:48:21.051 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:48:21.468 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:48:21.477 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:48:27.540 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=39 a=0 s=0
+2026-11-27 07:48:28.044 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=503
+2026-11-27 07:48:28.044 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=503 first=503 late=0
+2026-11-27 07:48:28.110 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=38 pr=0 ch=1 seen=44 tot=65
+2026-11-27 07:48:28.160 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=2 k=1 pr=0 ch=1 seen=29 tot=50
+2026-11-27 07:48:29.032 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=3 k=1 pr=1 ch=0 seen=-1 tot=554
+2026-11-27 07:48:29.032 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=39 lf=0 reason=done steps=3 ms=987 first=65 late=0
+2026-11-27 07:48:29.600 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st fm s=1 k=1 pr=1 ch=0 seen=-1 tot=510
+2026-11-27 07:48:29.601 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk fm units=0 lf=0 reason=done steps=1 ms=510 first=510 late=0
+2026-11-27 07:48:29.601 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=accepted reason=- units=39 lf=0 h=84d73b78 ms=2060 known=1
+2026-11-27 07:48:29.700 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] call done first=2100 done=2198 api=409 spec=used
+2026-11-27 07:48:33.762 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write replace keys=0
+2026-11-27 07:48:35.595 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] write undo keys=0
+2026-11-27 07:48:48.346 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:48:48.785 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] did disappear, margin 0: height 257.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:48:48.883 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1
+2026-11-27 07:48:50.350 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] orientation portrait: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:48:50.350 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] pinned: height 0.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:48:50.351 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 844.000000 window -1.000000 pin 257.000000 active true
+2026-11-27 07:48:50.401 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] will appear, document other, margin 0: height 844.000000 window 844.000000 pin 257.000000 active true
+2026-11-27 07:48:50.827 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 485.000000 window 485.000000 pin 257.000000 active true
+2026-11-27 07:48:50.840 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:height] bounds: height 257.000000 window 257.000000 pin 257.000000 active true
+2026-11-27 07:48:57.895 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read start b=48 a=0 s=0
+2026-11-27 07:48:58.400 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st f s=1 k=1 pr=1 ch=0 seen=-1 tot=504
+2026-11-27 07:48:58.400 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk f units=0 lf=0 reason=done steps=1 ms=504 first=504 late=0
+2026-11-27 07:48:58.471 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read st b1 s=1 k=43 pr=0 ch=1 seen=50 tot=71
+2026-11-27 07:48:58.471 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read step b1 s=1 why=characters k=43 b0=48 a0=0 b1=35 a1=26 fitb=0 fita=0 ch=1 ms=71
+2026-11-27 07:48:58.471 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read walk b1 units=0 lf=0 reason=characters steps=1 ms=71 first=71 late=0
+2026-11-27 07:48:58.471 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read done outcome=refused reason=b1:characters units=0 lf=0 h=811c9dc5 ms=576 known=1
+2026-11-27 07:48:58.471 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=43 known=1
+2026-11-27 07:49:01.061 Db ProtlyCIKeyboard[14846:cd32] [com.northprot.protly:read] read restore units=0 known=1

@@ -1,0 +1,133 @@
+CHECK 6.8-1 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-2 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-3 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-4 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-5 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-6 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-7 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-8 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-9 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-10 NOT-RUN filtered run: its test method was not selected
+CHECK 6.8-11 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-1 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-2 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-3 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-4 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-5 NOT-RUN filtered run: its test method was not selected
+CHECK 7.7-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-1o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-2o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-3 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-4 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-5 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-6o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-7o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-8o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9 NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-9o NOT-RUN filtered run: its test method was not selected
+CHECK 8.5-10 NOT-RUN filtered run: its test method was not selected
+CHECK app-dark NOT-RUN filtered run: its test method was not selected
+CHECK app-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-dark NOT-RUN filtered run: its test method was not selected
+CHECK bar-light NOT-RUN filtered run: its test method was not selected
+CHECK bar-xxl NOT-RUN filtered run: its test method was not selected
+CHECK card-cancel NOT-RUN filtered run: its test method was not selected
+CHECK card-done-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-done-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err0-light NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-err1-light NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-mid-light NOT-RUN filtered run: its test method was not selected
+CHECK card-slow NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-dark NOT-RUN filtered run: its test method was not selected
+CHECK card-wait-light NOT-RUN filtered run: its test method was not selected
+CHECK dark-1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-en NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-fast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-ko NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-kofast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-kopick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pickmid NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-pickmove NOT-RUN filtered run: its test method was not selected
+CHECK dsp-composer-word NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-en NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-fast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-ko NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-kofast NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-kopick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pick1 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pick2 NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pickmid NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-pickmove NOT-RUN filtered run: its test method was not selected
+CHECK dsp-uikit-word NOT-RUN filtered run: its test method was not selected
+CHECK hb-apple NOT-RUN filtered run: its test method was not selected
+CHECK hb-cancel NOT-RUN filtered run: its test method was not selected
+CHECK hb-card NOT-RUN filtered run: its test method was not selected
+CHECK hb-emoji NOT-RUN filtered run: its test method was not selected
+CHECK hb-globe NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-emoji NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-fresh NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-globe NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-long NOT-RUN filtered run: its test method was not selected
+CHECK hb-hide-switch NOT-RUN filtered run: its test method was not selected
+CHECK hb-kill-hidden NOT-RUN filtered run: its test method was not selected
+CHECK hb-kill-up NOT-RUN filtered run: its test method was not selected
+CHECK hb-launch NOT-RUN filtered run: its test method was not selected
+CHECK hb-switch NOT-RUN filtered run: its test method was not selected
+CHECK hb-switch-hidden NOT-RUN filtered run: its test method was not selected
+CHECK hit-1 NOT-RUN filtered run: its test method was not selected
+CHECK icon NOT-RUN filtered run: its test method was not selected
+CHECK mem-stream NOT-RUN filtered run: its test method was not selected
+CHECK menu-0 NOT-RUN filtered run: its test method was not selected
+CHECK menu-1 NOT-RUN filtered run: its test method was not selected
+CHECK menu-4 NOT-RUN filtered run: its test method was not selected
+CHECK pad-1 NOT-RUN filtered run: its test method was not selected
+CHECK pad-2 NOT-RUN filtered run: its test method was not selected
+CHECK pad-3 NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-1-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-2-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-3-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-4-textarea NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-composer NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-input NOT-RUN filtered run: its test method was not selected
+CHECK ret-5-textarea NOT-RUN filtered run: its test method was not selected
+CHECK wr-swiftui-cancel PASS t1={real=335/9/h49b6f226 caret=112,0 progress=4.1 cancelled=5.3 closed=0/0/0 left=335/9/h49b6f226 caret-left=112,0 want 112,0} log=t1:cancelled/4377ms
+CHECK wr-swiftui-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=7.5 reply=460/9/h0755cc33 caret-read=460,0 replace=3.75 undo=2.48} log=t1:call=3535/3642ms/cancelled t1:accepted/3047ms/keys=0,0
+CHECK wr-swiftui-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=6.7 reply=335/9/h49b6f226 caret-read=335,0 replace=3.03 undo=2.51} log=t1:call=4314/4420ms/cancelled t1:accepted/3871ms/keys=0,0
+CHECK wr-swiftui-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=5.8 reply=335/9/h49b6f226 caret-read=335,0 replace=2.71 undo=2.45} log=t1:call=3076/3182ms/cancelled t1:accepted/2603ms/keys=0,0
+CHECK wr-swiftui-smid PASS t1={real=39/0/h84d73b78 caret=26,0 s=4.0 reply=39/0/h84d73b78 caret-read=39,0 replace=2.55 undo=3.06} t2={real=39/0/h84d73b78 caret=26,0 s=4.3 reply=39/0/h84d73b78 caret-read=39,0 replace=2.29 undo=2.53} log=t1:call=2194/2291ms/used t1:accepted/2167ms/keys=0,0 t2:call=2220/2333ms/used t2:accepted/2185ms/keys=0,0
+CHECK wr-swiftui-ssel PASS t1={real=39/0/h84d73b78 caret=0,39 s=3.5 reply=39/0/h84d73b78 caret-read=39,0 replace=1.92 undo=2.44} t2={real=39/0/h84d73b78 caret=0,39 s=6.1 reply=39/0/h84d73b78 caret-read=39,0 replace=3.24 undo=3.74} log=t1:call=2053/2180ms/used t1:accepted/2015ms/keys=0,0 t2:call=2075/2226ms/used t2:accepted/2021ms/keys=0,0
+CHECK wr-swiftui-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=4.1 reply=39/0/h84d73b78 caret-read=39,0 replace=2.93 undo=2.91} t2={real=39/0/h84d73b78 caret=39,0 s=5.4 reply=39/0/h84d73b78 caret-read=39,0 replace=2.27 undo=2.50} t3={real=39/0/h84d73b78 caret=39,0 s=4.1 reply=39/0/h84d73b78 caret-read=39,0 replace=2.51 undo=2.56} log=t1:call=2037/2123ms/used t1:accepted/2006ms/keys=0,0 t2:call=2059/2176ms/used t2:accepted/2032ms/keys=0,0 t3:call=2049/2131ms/used t3:accepted/1989ms/keys=0,0
+CHECK wr-swiftui-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=5.8 reply=335/9/h49b6f226 caret-read=335,0 replace=3.76 undo=2.34} t2={real=335/9/h49b6f226 caret=335,0 s=4.9 reply=335/9/h49b6f226 caret-read=335,0 replace=3.32 undo=2.63} log=t1:call=3053/3175ms/cancelled t1:accepted/2605ms/keys=0,0 t2:call=2897/2998ms/cancelled t2:accepted/2441ms/keys=0,0
+CHECK wr-swiftui-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=3.2 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0} log=t1:refused/b1:characters/646ms/known=1
+CHECK wr-textarea-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=2.8 panel="Could not read the whole text. Copy it, then use Read clipboard." left=460/9/h0755cc33 caret-left=460,0 want 460,0} log=t1:refused/b1:characters/576ms/known=1
+CHECK wr-textarea-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=4.6 reply=39/0/h84d73b78 caret-read=39,0 replace=2.22 undo=2.37} t2={real=39/0/h84d73b78 caret=39,0 s=5.2 reply=39/0/h84d73b78 caret-read=39,0 replace=2.20 undo=2.44} t3={real=39/0/h84d73b78 caret=39,0 s=4.4 reply=39/0/h84d73b78 caret-read=39,0 replace=1.94 undo=2.40} log=t1:call=2219/2319ms/used t1:accepted/2162ms/keys=1,0 t2:call=2159/2317ms/used t2:accepted/2087ms/keys=0,0 t3:call=2100/2198ms/used t3:accepted/2060ms/keys=0,0
+CHECK wr-textarea-win FAIL t1={real=335/9/h49b6f226 caret=335,0 s=8.4 reply=335/9/h49b6f226 caret-read=335,0 replace=2.72 undo=timeout field=20/0/h0eec839c} t1=undo=timeout field=20/0/h0eec839c (not as expected) t2={real=335/9/h49b6f226 caret=335,0 s=5.3 reply=335/9/h49b6f226 caret-read=335,0 replace=2.73 undo=timeout field=20/0/h0eec839c} t2=undo=timeout field=20/0/h0eec839c (not as expected) log=t1:call=3183/3312ms/cancelled t1:accepted/2710ms/keys=0,none t2:call=3131/3235ms/cancelled t2:accepted/2662ms/keys=0,none log-problems=t1:undo keys missing (0),t2:undo keys missing (0)
+CHECK wr-uikit-cancel PASS t1={real=335/9/h49b6f226 caret=112,0 progress=4.0 cancelled=4.7 closed=0/0/0 left=335/9/h49b6f226 caret-left=112,0 want 112,0} log=t1:cancelled/4172ms
+CHECK wr-uikit-emoji PASS t1={real=460/9/h0755cc33 caret=460,0 s=5.8 reply=460/9/h0755cc33 caret-read=460,0 replace=3.39 undo=2.45} log=t1:call=3191/3294ms/cancelled t1:accepted/2716ms/keys=0,0
+CHECK wr-uikit-mid PASS t1={real=335/9/h49b6f226 caret=112,0 s=6.8 reply=335/9/h49b6f226 caret-read=335,0 replace=3.32 undo=2.60} log=t1:call=4635/4742ms/cancelled t1:accepted/4171ms/keys=0,0
+CHECK wr-uikit-sel PASS t1={real=335/9/h49b6f226 caret=0,335 s=6.2 reply=335/9/h49b6f226 caret-read=335,0 replace=3.93 undo=2.75} log=t1:call=3367/3474ms/none t1:accepted/2843ms/keys=1,0
+CHECK wr-uikit-smid PASS t1={real=39/0/h84d73b78 caret=26,0 s=4.2 reply=39/0/h84d73b78 caret-read=39,0 replace=2.24 undo=2.45} t2={real=39/0/h84d73b78 caret=26,0 s=3.9 reply=39/0/h84d73b78 caret-read=39,0 replace=2.36 undo=2.54} log=t1:call=2237/2362ms/used t1:accepted/2182ms/keys=0,0 t2:call=2211/2305ms/used t2:accepted/2174ms/keys=0,0
+CHECK wr-uikit-ssel PASS t1={real=39/0/h84d73b78 caret=0,39 s=5.4 reply=39/0/h84d73b78 caret-read=39,0 replace=2.11 undo=2.27} t2={real=39/0/h84d73b78 caret=0,39 s=5.2 reply=39/0/h84d73b78 caret-read=39,0 replace=3.19 undo=2.81} log=t1:call=2627/2737ms/none t1:accepted/2181ms/keys=0,0 t2:call=2753/2861ms/none t2:accepted/2279ms/keys=0,0
+CHECK wr-uikit-swin PASS t1={real=39/0/h84d73b78 caret=39,0 s=4.6 reply=39/0/h84d73b78 caret-read=39,0 replace=2.96 undo=2.86} t2={real=39/0/h84d73b78 caret=39,0 s=4.2 reply=39/0/h84d73b78 caret-read=39,0 replace=2.30 undo=2.58} t3={real=39/0/h84d73b78 caret=39,0 s=10.5 reply=39/0/h84d73b78 caret-read=39,0 replace=3.87 undo=2.60} log=t1:call=2080/2395ms/used t1:accepted/2029ms/keys=0,0 t2:call=2183/2283ms/used t2:accepted/2121ms/keys=0,0 t3:call=2109/2213ms/used t3:accepted/2032ms/keys=0,0
+CHECK wr-uikit-win PASS t1={real=335/9/h49b6f226 caret=335,0 s=7.3 reply=335/9/h49b6f226 caret-read=335,0 replace=8.91 undo=4.01} t2={real=335/9/h49b6f226 caret=335,0 s=6.8 reply=335/9/h49b6f226 caret-read=335,0 replace=3.41 undo=2.69} log=t1:call=3587/4024ms/cancelled t1:accepted/3073ms/keys=0,0 t2:call=3284/3387ms/cancelled t2:accepted/2809ms/keys=0,0
+CHECK wr-uikit-x14k PASS t1={real=14055/15/h0c02b8be caret=14055,0 s=5.3 panel="Could not read the whole text. Copy it, then use Read clipboard." left=14055/15/h0c02b8be caret-left=14055,0 want 14055,0} log=t1:refused/b1:characters/2581ms/known=1
+CHECK ws-1 NOT-RUN filtered run: its test method was not selected
+CHECK ws-2 NOT-RUN filtered run: its test method was not selected
+CHECK ws-3 NOT-RUN filtered run: its test method was not selected
