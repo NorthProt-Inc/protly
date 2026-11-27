@@ -8,7 +8,7 @@ const isBoundary = (n) => n.nodeType === 1 && (n.matches(GSEL.boundary) || !!n.q
 const isBlank = (n) =>
   n.nodeName === 'BR' ||
   (n.nodeType === 3 && !n.textContent.trim()) ||
-  (n.nodeType === 1 && !n.textContent.trim() && !n.querySelector(MEDIA));
+  (n.nodeType === 1 && !n.textContent.trim() && !n.matches(MEDIA) && !n.querySelector(MEDIA));
 
 // Where the user's part lives: normally the body itself, but a reopened draft can wrap the text and the
 // signature in one <div>, so descend while the first child holds a boundary without being one.
@@ -21,9 +21,16 @@ function userParent(body) {
   }
 }
 
+const lastLeaf = (n) => { while (n.nodeType === 1 && n.lastChild) n = n.lastChild; return n; };
 // A <br> right after text ends that text's line (Chrome types "line<br>" before a block); it is not a blank line.
-const endsLine = (kids, i) =>
-  kids[i].nodeName === 'BR' && i > 0 && !isBlank(kids[i - 1]) && !BLOCK.test(kids[i - 1].nodeName);
+// Space-only text in between does not count (Chrome types "<b>word</b>&nbsp;<br>"); an inline element that already
+// ends in its own <br> has ended its line, so the <br> after it is a blank line.
+const endsLine = (kids, i) => {
+  if (kids[i].nodeName !== 'BR') return false;
+  let j = i - 1;
+  while (j >= 0 && kids[j].nodeType === 3 && !kids[j].textContent.trim()) j--;
+  return j >= 0 && !isBlank(kids[j]) && !BLOCK.test(kids[j].nodeName) && lastLeaf(kids[j]).nodeName !== 'BR';
+};
 
 // The user's part of parent: its children before the first quote/signature block, minus trailing blank lines (those
 // separate the draft from the signature and stay untouched). With no Enter after the last line, Chrome leaves that

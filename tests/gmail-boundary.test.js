@@ -3,13 +3,14 @@
 // The layouts are Chromium's own markup: lines typed with Ctrl+Home, Input.insertText and Enter (Shift+Enter where
 // named) into the starting bodies of the diag/p1-chrome harness (probe/p1-chrome/harness.cjs), captured from
 // Chrome for Testing 156.0.8078.4 on 2026-11-17. The starting bodies themselves were made up by the harness, not
-// taken from Gmail; owner check P1b-2 (the todo at the end) is what ties them to Gmail.
+// taken from Gmail. The "real Gmail" rows are what ties them to Gmail: the body structure printed in a real Gmail
+// compose (Chrome, 2026-11-26) after typing three lines, forward and reply, with and without an Enter after the last.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { GSEL } from '../src/content/gmail/selectors.js';
-import { userNodes, nodesToText, textToNodes, replaceUserNodes } from '../src/content/gmail/body.js';
+import { userNodes, nodesToText, textToNodes, replaceUserNodes, hasMedia } from '../src/content/gmail/body.js';
 import { translate } from '../src/content/gmail/compose.js';
 import { shadowOf } from '../src/ui/card.js';
 
@@ -17,6 +18,9 @@ const SIG = '<span class="gmail_signature_prefix">-- </span><br><div class="gmai
 const WSIG = '<span class="gmail_signature_prefix">-- </span><br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature">Sig</div>';
 const QUOTE = '<div class="gmail_quote">On Monday someone wrote: old text</div>';
 const L3 = '가나다\n라마바\n사아자';
+// Real Gmail (2026-11-26): the attribution sits inside the quote container, the reply's quote in a blockquote.
+const FWD = '<div class="gmail_quote gmail_quote_container"><div dir="ltr" class="gmail_attr">---------- Forwarded message ---------<br>From: <strong class="gmail_sendername" dir="auto">A</strong> <span dir="auto">&lt;a@example.com&gt;</span><br>Date: Mon<br>Subject: S<br>To: &lt;b@example.com&gt;<br></div><br><br>old text</div>';
+const RQ = '<div class="gmail_quote gmail_quote_container"><div dir="ltr" class="gmail_attr">On Mon, A wrote:<br></div><blockquote class="gmail_quote" style="margin:0px 0px 0px 0.8ex">old text</blockquote></div>';
 
 // No Enter after the last line: Chrome leaves that line in the block that holds the signature or quote.
 // main read, sent and replaced every line but that one, and its write check passed.
@@ -28,11 +32,18 @@ const SHARED = [
   ['wrapped signature, 2 lines', `<div dir="ltr">가나다</div><div dir="ltr">라마바<br><div><br></div>${WSIG}</div>`, '가나다\n라마바'],
   ['expanded quote, 2 lines', `가나다<div>라마바<br>${QUOTE}</div>`, '가나다\n라마바'],
   ['flat signature, blank lines between', `가나다<div><br></div><div>라마바</div><div><br></div><div>사아자<br><div><br></div>${SIG}</div>`, '가나다\n\n라마바\n\n사아자'],
+  // Printed in real Gmail: #text DIV(#text) DIV(#text BR BR DIV.gmail_quote.gmail_quote_container(...)).
+  ['real Gmail forward, 3 lines', `가나다<div>라마바</div><div>사아자<br><br>${FWD}</div>`, L3],
   ['expanded quote, blank lines between', `가나다<div><br></div><div>라마바</div><div><br></div><div>사아자<br>${QUOTE}</div>`, '가나다\n\n라마바\n\n사아자'],
 ];
 
 // Layouts main already read whole.
 const WORKED = [
+  // Printed in real Gmail: #text DIV(#text) DIV(#text) DIV(BR BR DIV.gmail_quote.gmail_quote_container(...)).
+  ['real Gmail forward, Enter after the last line', `가나다<div>라마바</div><div>사아자</div><div><br><br>${FWD}</div>`, L3],
+  // Printed in real Gmail after "Show trimmed content": DIV(#text DIV(#text) DIV(#text)) BR DIV.gmail_quote...(DIV.gmail_attr
+  // BLOCKQUOTE.gmail_quote). With the quote collapsed it is outside the body and the draft is the "no signature" row.
+  ['real Gmail reply, quote expanded', `<div>가나다<div>라마바</div><div>사아자</div></div><br>${RQ}`, L3],
   ['no signature', '가나다<div>라마바</div><div>사아자</div>', L3],
   ['flat signature, Enter after the last line', `가나다<div>라마바</div><div>사아자</div><div><br><div><br></div>${SIG}</div>`, L3],
   ['wrapped signature, Enter after the last line', `<div dir="ltr">가나다</div><div dir="ltr">라마바</div><div dir="ltr">사아자</div><div dir="ltr"><br><div><br></div>${WSIG}</div>`, L3],
@@ -169,9 +180,29 @@ for (const [name, layout, typed] of SHARED.slice(0, 3)) {
   });
 }
 
-// Done-when 5 of Track C1 (owner check P1b-2). The owner runs the structure snippet from the diagnosis report's
-// appendix in a real Gmail compose (tag names only, no text): once with a signature or an expanded quote and no Enter
-// after the last line, once with an Enter. Paste each printed line here, with whether the last line stayed Korean,
-// and add the matching body to SHARED or WORKED above. If it prints `#text DIV DIV[holds-boundary]`, Gmail matches the
-// harness layouts at the top level.
-test.todo('owner fixture P1b-2: the body structure printed in the owner\'s Gmail');
+// Cross-model review 2026-11-26 (Gemini): quote and signature markers the selector missed, an image taken for a blank
+// line, and line ends after inline formatting.
+const readOf = (html) => nodesToText(userNodes(bodyOf(html).body));
+test('a legacy .gmail_extra wrapper is a boundary: its attribution is not read as the draft', () => {
+  assert.equal(readOf('가나다<div>라마바</div><div class="gmail_extra"><br><div class="gmail_attr">On Mon, A wrote:</div><blockquote class="gmail_quote">Old</blockquote></div>'), '가나다\n라마바');
+});
+test('a signature marked only by data-smartmail is a boundary', () => {
+  assert.equal(readOf('가나다<div>라마바</div><div>사아자<br><div><br></div><div data-smartmail="gmail_signature"><div dir="ltr">Best</div></div></div>'), L3);
+});
+test('a cited blockquote is a boundary, an indent blockquote is the draft', () => {
+  assert.equal(readOf('가나다<div>라마바</div><blockquote type="cite">Old</blockquote>'), '가나다\n라마바');
+  assert.equal(readOf('가나다<blockquote style="margin:0 0 0 40px;border:none;padding:0px">라마바</blockquote><div>사아자</div>'), L3);
+});
+test('an image at the end of the last line is media, not a blank line', () => {
+  assert.equal(hasMedia(userNodes(bodyOf(`가나다<div>라마바<img src="e.png"><br>${SIG}</div>`).body)), true);
+});
+test('a line ending in bold and a space keeps its line end inside the draft', () => {
+  const { doc, body } = bodyOf(`가나다<div><b>라마바</b>\u00a0<br><div><br></div>${SIG}</div>`);
+  replaceUserNodes(body, textToNodes(doc, 'EN1\nEN2'));
+  assert.equal(whole(body), 'EN1\nEN2\n\n-- \nSig');
+});
+test('an inline wrapper that ends its own line leaves the blank line after it alone', () => {
+  const { doc, body } = bodyOf(`가나다<div><span>라마바<br></span><br>${SIG}</div>`);
+  replaceUserNodes(body, textToNodes(doc, 'EN1\nEN2'));
+  assert.equal(whole(body), 'EN1\nEN2\n\n-- \nSig');
+});
