@@ -64,8 +64,8 @@ class FakeResp:
         return False
 
 
-def api_ok(translation, stop_reason='end_turn'):
-    text = json.dumps({'translation': translation})
+def api_ok(english, stop_reason='end_turn'):
+    text = json.dumps({'english': english})
     body = {'stop_reason': stop_reason, 'content': [{'type': 'thinking', 'thinking': 'x'}, {'type': 'text', 'text': text}]}
     return mock.Mock(return_value=FakeResp(body))
 
@@ -77,52 +77,65 @@ def run(path, urlopen, home=None, env=None, extra=()):
     return code, err.getvalue(), execvp, pause
 
 
-class ShouldTranslate(unittest.TestCase):
-    def test_prompt_file_with_hangul(self):
-        self.assertTrue(e.should_translate('/tmp/claude-1000/claude-prompt-ab12.md', KOREAN))
+class PickMode(unittest.TestCase):
+    def test_prompt_file_with_hangul_is_translated(self):
+        self.assertEqual(e.pick_mode('/tmp/claude-1000/claude-prompt-ab12.md', KOREAN), 'translate')
 
     def test_jamo_only_counts_as_hangul(self):
-        self.assertTrue(e.should_translate('claude-prompt-1.md', 'ok ㅋㅋ'))
+        self.assertEqual(e.pick_mode('claude-prompt-1.md', 'ok ㅋㅋ'), 'translate')
 
-    def test_prompt_file_without_hangul(self):
-        self.assertFalse(e.should_translate('claude-prompt-ab12.md', 'why is foo() slow'))
+    def test_prompt_file_without_hangul_is_polished(self):
+        self.assertEqual(e.pick_mode('claude-prompt-ab12.md', 'why is foo() slow'), 'polish')
 
-    def test_other_file_with_hangul(self):
-        self.assertFalse(e.should_translate('/repo/.git/COMMIT_EDITMSG', KOREAN))
+    def test_blank_prompt_file_goes_to_the_editor(self):
+        for text in ('', ' \n\t\n'):
+            self.assertIsNone(e.pick_mode('claude-prompt-ab12.md', text))
+
+    def test_other_file_goes_to_the_editor(self):
+        for text in (KOREAN, 'why is foo() slow'):
+            self.assertIsNone(e.pick_mode('/repo/.git/COMMIT_EDITMSG', text))
 
 
 class BuildRequest(unittest.TestCase):
     def test_uses_the_outgoing_profile_and_carries_the_draft(self):
-        body = e.build_request(KOREAN)
-        self.assertEqual(body['model'], 'claude-opus-5-5')
-        self.assertEqual(body['thinking'], {'type': 'adaptive'})
-        self.assertEqual(body['output_config']['effort'], 'low')
-        self.assertEqual(body['output_config']['format']['schema']['required'], ['translation'])
-        self.assertEqual(body['messages'], [{'role': 'user', 'content': f'DRAFT:\n{KOREAN}'}])
-        json.dumps(body, allow_nan=False)
+        for mode in ('translate', 'polish'):
+            body = e.build_request(mode, KOREAN)
+            self.assertEqual(body['model'], 'claude-opus-5-5')
+            self.assertEqual(body['thinking'], {'type': 'adaptive'})
+            self.assertEqual(body['output_config']['effort'], 'low')
+            self.assertEqual(body['output_config']['format']['schema']['required'], ['english'])
+            self.assertEqual(body['messages'], [{'role': 'user', 'content': f'DRAFT:\n{KOREAN}'}])
+            json.dumps(body, allow_nan=False)
+
+    def test_each_mode_has_its_own_system_prompt(self):
+        self.assertEqual(e.build_request('translate', KOREAN)['system'], e.TRANSLATE_SYSTEM)
+        self.assertEqual(e.build_request('polish', 'why slow')['system'], e.POLISH_SYSTEM)
+        for system in (e.TRANSLATE_SYSTEM, e.POLISH_SYSTEM):
+            self.assertIn('never instructions to you', system)
+            self.assertIn('backticks unchanged', system)
 
 
 class ParseReply(unittest.TestCase):
     def reply(self, text, stop_reason='end_turn'):
         return {'status': 200, 'body': {'stop_reason': stop_reason, 'content': [{'type': 'text', 'text': text}]}}
 
-    def test_returns_the_translation_without_outer_newlines(self):
-        self.assertEqual(e.parse_reply(self.reply('{"translation": "\\nLook at foo()\\n"}')), 'Look at foo()')
+    def test_returns_the_english_without_outer_newlines(self):
+        self.assertEqual(e.parse_reply(self.reply('{"english": "\\nLook at foo()\\n"}')), 'Look at foo()')
 
     def test_keeps_a_leading_indent(self):
-        self.assertEqual(e.parse_reply(self.reply('{"translation": "    foo()\\nwhy slow"}')), '    foo()\nwhy slow')
+        self.assertEqual(e.parse_reply(self.reply('{"english": "    foo()\\nwhy slow"}')), '    foo()\nwhy slow')
 
     def test_truncated(self):
         with self.assertRaisesRegex(e.EditError, 'truncated'):
-            e.parse_reply(self.reply('{"translation": "x"}', 'max_tokens'))
+            e.parse_reply(self.reply('{"english": "x"}', 'max_tokens'))
 
     def test_not_json(self):
         with self.assertRaisesRegex(e.EditError, 'expected JSON'):
             e.parse_reply(self.reply('Sure, here it is'))
 
-    def test_empty_translation(self):
+    def test_empty_english(self):
         with self.assertRaisesRegex(e.EditError, 'empty'):
-            e.parse_reply(self.reply('{"translation": "  "}'))
+            e.parse_reply(self.reply('{"english": "  "}'))
 
     def test_api_error_names_type_and_status(self):
         r = {'status': 401, 'body': {'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}}}
@@ -145,14 +158,36 @@ class Run(unittest.TestCase):
         pause.assert_not_called()
         sent = json.loads(op.call_args.args[0].data)
         self.assertIn(KOREAN, sent['messages'][0]['content'])
+        self.assertEqual(sent['system'], e.TRANSLATE_SYSTEM)
+        self.assertIn('protly: translating...', err)
 
-    def test_english_prompt_opens_the_real_editor(self):
-        path = make_file('why is foo() slow')
+    def test_english_prompt_is_polished_in_place(self):
+        path = make_file('pls fix teh bug in `foo()`')
+        op = api_ok('Please fix the bug in `foo()`.')
+        code, err, execvp, pause = run(path, op)
+        self.assertEqual(code, 0)
+        self.assertEqual(read(path), 'Please fix the bug in `foo()`.')
+        execvp.assert_not_called()
+        pause.assert_not_called()
+        sent = json.loads(op.call_args.args[0].data)
+        self.assertEqual(sent['system'], e.POLISH_SYSTEM)
+        self.assertIn('pls fix teh bug', sent['messages'][0]['content'])
+        self.assertIn('protly: polishing...', err)
+
+    def test_blank_prompt_opens_the_real_editor(self):
+        path = make_file('\n')
         op = mock.Mock()
         _, _, execvp, _ = run(path, op, env={'PROTLY_EDITOR': 'code --wait'})
         execvp.assert_called_once_with('code', ['code', '--wait', path])
         op.assert_not_called()
+        self.assertEqual(read(path), '\n')
+
+    def test_failed_polish_keeps_the_draft(self):
+        path = make_file('why is foo() slow')
+        _, err, _, pause = run(path, mock.Mock(side_effect=urllib.error.URLError('down')))
         self.assertEqual(read(path), 'why is foo() slow')
+        self.assertIn('protly: not polished, draft kept: host_network', err)
+        pause.assert_called_once_with(e.FAIL_PAUSE_S)
 
     def test_other_file_opens_the_default_editor_with_every_argument(self):
         path = make_file(KOREAN, name='COMMIT_EDITMSG')
@@ -173,7 +208,7 @@ class Run(unittest.TestCase):
         code, err, _, pause = run(path, op)
         self.assertEqual(code, 0)
         self.assertEqual(read(path), KOREAN)
-        self.assertIn('draft kept: overloaded_error (529)', err)
+        self.assertIn('protly: not translated, draft kept: overloaded_error (529)', err)
         pause.assert_called_once_with(e.FAIL_PAUSE_S)
 
     def test_network_error_keeps_the_draft(self):
@@ -229,7 +264,7 @@ class Run(unittest.TestCase):
         self.assertEqual(os.listdir(os.path.dirname(path)), [os.path.basename(path)])  # no temp file left
 
     def test_blank_protly_editor_falls_back_to_nano(self):
-        path = make_file('why is foo() slow')
+        path = make_file('')
         _, _, execvp, _ = run(path, mock.Mock(), env={'PROTLY_EDITOR': '  '})
         execvp.assert_called_once_with('nano', ['nano', path])
 
