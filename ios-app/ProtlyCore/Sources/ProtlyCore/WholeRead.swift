@@ -121,6 +121,90 @@ public enum WholeRead {
         b.count <= a.count && a.suffix(b.count).elementsEqual(b)
     }
 
+    /// What one walk of a one-pass read produced.
+    public enum WalkOutcome: Equatable, Sendable {
+        case done([UInt16])
+        case failed(String)
+    }
+
+    /// What R1 (one move forward by B1's length) produced.
+    public enum ReturnOutcome: Equatable, Sendable {
+        case atEnd
+        case notAtEnd
+        case timeUp
+    }
+
+    /// Evidence gathered by the keyboard for a one-pass whole-field read (F, B1, R1, FM).
+    public struct OnePass: Equatable, Sendable {
+        public var first: WalkOutcome
+        public var back: WalkOutcome?
+        public var fromSelection: Bool
+        public var hasText: Bool
+        public var returned: ReturnOutcome?
+        public var endProbe: WalkOutcome?
+        public var clean: Bool
+
+        public init(first: WalkOutcome, back: WalkOutcome? = nil, fromSelection: Bool = false, hasText: Bool = false,
+                    returned: ReturnOutcome? = nil, endProbe: WalkOutcome? = nil, clean: Bool = true) {
+            self.first = first
+            self.back = back
+            self.fromSelection = fromSelection
+            self.hasText = hasText
+            self.returned = returned
+            self.endProbe = endProbe
+            self.clean = clean
+        }
+    }
+
+    /// The pure verdict on a one-pass read.
+    public enum ReadVerdict: Equatable, Sendable {
+        case accept([UInt16])
+        case empty
+        case refuse(String)
+    }
+
+    /// R1 landed at the field's end: the move changed the contexts, nothing follows the cursor, and the before-context
+    /// agrees with the end's.
+    public static func showsEnd(changed: Bool, before: [UInt16], after: [UInt16], endBefore: [UInt16]) -> Bool {
+        changed && after.isEmpty && !before.isEmpty && agreeAtEnd(before, endBefore)
+    }
+
+    /// Pure acceptance rule for a one-pass whole-field read: F reached the end, a collapsed selection crossed nothing
+    /// (Codex bug 2), B1 reached the start, R1 showed the end again, FM crossed nothing, B1 ends with what F crossed,
+    /// and every step was clean (no late, blank, undone or misfit step). Anything else is refused at once.
+    public static func accept(_ r: OnePass) -> ReadVerdict {
+        guard case .done(let first) = r.first else {
+            if case .failed(let why) = r.first { return .refuse("f:\(why)") }
+            return .refuse("f:failed")
+        }
+        if r.fromSelection, !first.isEmpty { return .refuse("partialSelection") }
+        guard let backOutcome = r.back else { return .refuse("b1:missing") }
+        guard case .done(let back) = backOutcome else {
+            if case .failed(let why) = backOutcome { return .refuse("b1:\(why)") }
+            return .refuse("b1:failed")
+        }
+        if back.isEmpty, first.isEmpty {
+            return r.hasText ? .refuse("emptyHasText") : .empty
+        }
+        guard r.clean else { return .refuse("unclean") }
+        switch r.returned {
+        case .atEnd: break
+        case .timeUp: return .refuse("r1:timeUp")
+        case .notAtEnd, nil: return .refuse("r1:notAtEnd")
+        }
+        guard let probeOutcome = r.endProbe else { return .refuse("fm:missing") }
+        guard case .done(let mid) = probeOutcome else {
+            if case .failed(let why) = probeOutcome { return .refuse("fm:\(why)") }
+            return .refuse("fm:failed")
+        }
+        guard mid.isEmpty else { return .refuse("fm:crossed") }
+        guard hasSuffix(back, first) else { return .refuse("firstEnd") }
+        if String(decoding: back, as: UTF16.self).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return .empty
+        }
+        return .accept(back)
+    }
+
     /// F02c, a short draft: the read is proven at FM, without B2, R2 and FE, when the window the proxy showed before the
     /// walks (`window`: both contexts at the tap, or at the field's end after select all) is exactly what B1 read, F
     /// crossed only its tail, every walk so far was clean (no false start or end undone, no phantom, no resync), R1 by

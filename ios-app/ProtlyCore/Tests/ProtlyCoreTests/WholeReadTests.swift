@@ -680,6 +680,108 @@ final class WholeReadTests: XCTestCase {
     }
 }
 
+/// One-pass whole-field read: pure acceptance rule (WholeRead.accept, WholeRead.showsEnd).
+final class OnePassAcceptTests: XCTestCase {
+    private func u(_ s: String) -> [UInt16] { Array(s.utf16) }
+
+    func testAcceptsCleanOnePassWhenB1EndsWithFAndFMCrossesNothing() {
+        let text = u("First paragraph.\n\nSecond paragraph.")
+        // Cursor at end: F crossed nothing.
+        let atEnd = WholeRead.OnePass(first: .done([]), back: .done(text), returned: .atEnd, endProbe: .done([]))
+        XCTAssertEqual(WholeRead.accept(atEnd), .accept(text))
+        // Cursor mid-field: F crossed the tail of B1.
+        let tail = Array(text.suffix(12))
+        let mid = WholeRead.OnePass(first: .done(tail), back: .done(text), returned: .atEnd, endProbe: .done([]))
+        XCTAssertEqual(WholeRead.accept(mid), .accept(text))
+        // Select all collapsed at the end: F crossed nothing, accepted whole.
+        let selAll = WholeRead.OnePass(first: .done([]), back: .done(text), fromSelection: true,
+                                       returned: .atEnd, endProbe: .done([]))
+        XCTAssertEqual(WholeRead.accept(selAll), .accept(text))
+    }
+
+    func testRefusesWhenAnyWalkOrReturnFailedOrWasUnclean() {
+        let text = u("First line\nSecond line")
+        // F failed (stuck, badStep, falseEnd, timeUp).
+        for why in ["stuck", "badStep", "falseEnd", "timeUp"] {
+            let r = WholeRead.OnePass(first: .failed(why))
+            XCTAssertEqual(WholeRead.accept(r), .refuse("f:\(why)"))
+        }
+        // B1 failed (stuck, badStep, characters, falseStart, phantom, blank, timeUp).
+        for why in ["stuck", "badStep", "characters", "falseStart", "phantom", "blank", "timeUp"] {
+            let r = WholeRead.OnePass(first: .done([]), back: .failed(why))
+            XCTAssertEqual(WholeRead.accept(r), .refuse("b1:\(why)"))
+        }
+        // B1 missing.
+        XCTAssertEqual(WholeRead.accept(WholeRead.OnePass(first: .done([]))), .refuse("b1:missing"))
+        // R1 did not land at the end or ran out of time.
+        let r1Miss = WholeRead.OnePass(first: .done([]), back: .done(text), returned: .notAtEnd, endProbe: .done([]))
+        XCTAssertEqual(WholeRead.accept(r1Miss), .refuse("r1:notAtEnd"))
+        let r1Time = WholeRead.OnePass(first: .done([]), back: .done(text), returned: .timeUp)
+        XCTAssertEqual(WholeRead.accept(r1Time), .refuse("r1:timeUp"))
+        // FM crossed text or failed.
+        let fmCrossed = WholeRead.OnePass(first: .done([]), back: .done(text), returned: .atEnd, endProbe: .done([10]))
+        XCTAssertEqual(WholeRead.accept(fmCrossed), .refuse("fm:crossed"))
+        let fmBad = WholeRead.OnePass(first: .done([]), back: .done(text), returned: .atEnd, endProbe: .failed("badStep"))
+        XCTAssertEqual(WholeRead.accept(fmBad), .refuse("fm:badStep"))
+        let fmMissing = WholeRead.OnePass(first: .done([]), back: .done(text), returned: .atEnd)
+        XCTAssertEqual(WholeRead.accept(fmMissing), .refuse("fm:missing"))
+        // Unclean flag (any late, blank, undone or misfit signal).
+        let dirty = WholeRead.OnePass(first: .done([]), back: .done(text), returned: .atEnd, endProbe: .done([]),
+                                      clean: false)
+        XCTAssertEqual(WholeRead.accept(dirty), .refuse("unclean"))
+    }
+
+    func testRefusesWhenB1DoesNotEndWithWhatFCrossed() {
+        let text = u("the whole field\nsecond line")
+        let wrongTail = WholeRead.OnePass(first: .done(u("x") + Array(text.suffix(6))), back: .done(text),
+                                          returned: .atEnd, endProbe: .done([]))
+        XCTAssertEqual(WholeRead.accept(wrongTail), .refuse("firstEnd"))
+        let longerFirst = WholeRead.OnePass(first: .done(u("more ") + text), back: .done(text),
+                                            returned: .atEnd, endProbe: .done([]))
+        XCTAssertEqual(WholeRead.accept(longerFirst), .refuse("firstEnd"))
+    }
+
+    /// Codex bug 2: a partial selection at the start of the field up to a line feed shows both contexts empty, like
+    /// select all. After the +1 collapse, walk F crosses the rest of the field: refuse instead of treating it as
+    /// select all.
+    func testRefusesCollapsedSelectionWithTextAfterIt() {
+        let rest = u("private notes")
+        let full = u("Title\nprivate notes")
+        let partial = WholeRead.OnePass(first: .done(rest), back: .done(full), fromSelection: true,
+                                        returned: .atEnd, endProbe: .done([]))
+        XCTAssertEqual(WholeRead.accept(partial), .refuse("partialSelection"))
+        // Also when the driver stops right after F without running B1.
+        let early = WholeRead.OnePass(first: .done([10] + rest), fromSelection: true)
+        XCTAssertEqual(WholeRead.accept(early), .refuse("partialSelection"))
+    }
+
+    func testEmptyAndWhitespaceFields() {
+        // Nothing crossed either way and hasText is false: empty (protly key reads clipboard).
+        let empty = WholeRead.OnePass(first: .done([]), back: .done([]), hasText: false)
+        XCTAssertEqual(WholeRead.accept(empty), .empty)
+        // Nothing crossed but proxy says hasText is true: refuse, never treat as empty.
+        let ghost = WholeRead.OnePass(first: .done([]), back: .done([]), hasText: true)
+        XCTAssertEqual(WholeRead.accept(ghost), .refuse("emptyHasText"))
+        // Clean whitespace-only read: empty.
+        let spaces = WholeRead.OnePass(first: .done([]), back: .done(u("  \n\t ")), returned: .atEnd, endProbe: .done([]))
+        XCTAssertEqual(WholeRead.accept(spaces), .empty)
+        // Unclean whitespace read (R1 missed): refused, not treated as empty.
+        let badSpaces = WholeRead.OnePass(first: .done([]), back: .done(u("   ")), returned: .notAtEnd)
+        XCTAssertEqual(WholeRead.accept(badSpaces), .refuse("r1:notAtEnd"))
+    }
+
+    func testShowsEndRequiresChangedEmptyAfterNonEmptyAgreeingBefore() {
+        let end = u("Second paragraph.")
+        XCTAssertTrue(WholeRead.showsEnd(changed: true, before: end, after: [], endBefore: end))
+        XCTAssertTrue(WholeRead.showsEnd(changed: true, before: u("paragraph."), after: [], endBefore: end))
+        XCTAssertTrue(WholeRead.showsEnd(changed: true, before: u("First. ") + end, after: [], endBefore: end))
+        XCTAssertFalse(WholeRead.showsEnd(changed: false, before: end, after: [], endBefore: end))
+        XCTAssertFalse(WholeRead.showsEnd(changed: true, before: end, after: u("x"), endBefore: end))
+        XCTAssertFalse(WholeRead.showsEnd(changed: true, before: [], after: [], endBefore: end))
+        XCTAssertFalse(WholeRead.showsEnd(changed: true, before: u("other."), after: [], endBefore: end))
+    }
+}
+
 /// F02c: the read proven at FM when the proxy's window already showed the whole field (the short draft).
 final class WindowProofTests: XCTestCase {
     private func u(_ s: String) -> [UInt16] { Array(s.utf16) }
